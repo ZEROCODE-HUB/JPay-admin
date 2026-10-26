@@ -21,72 +21,8 @@ type Fondo = {
   alerta?: string;
 };
 
-const mock: Fondo[] = [
-  {
-    legajo: "LPF-20123456789",
-    email: "jperez@empresa.com",
-    nombre: "Juan Pérez",
-    cvu: "1234567890123456789012",
-    alias: `juanp.${brand.shortName.toLowerCase()}`,
-    balance: "$ 1.690.000.00",
-    estado: "Activo",
-  },
-  {
-    legajo: "LPF-20123456789",
-    email: "jperez@empresa.com",
-    nombre: "Juan Pérez",
-    cvu: "1234567890123456789013",
-    alias: "juanp.sueldos",
-    balance: "$ 340.000.00",
-    estado: "Activo",
-  },
-  {
-    legajo: "LPF-27234567890",
-    email: "mgarcia@corp.com",
-    nombre: "María García",
-    cvu: "1234567890123456789023",
-    alias: "mariag.corp",
-    balance: "$ 2.550.000.00",
-    estado: "Activo",
-  },
-  {
-    legajo: "LPF-27234567890",
-    email: "mgarcia@corp.com",
-    nombre: "María García",
-    cvu: "1234567890123456789024",
-    alias: "mariag.sueldos",
-    balance: "$ 450.000.00",
-    estado: "Activo",
-  },
-  {
-    legajo: "LPF-20345678901",
-    email: "carlosm@firma.com",
-    nombre: "Carlos Martínez",
-    cvu: "1234567890123456789034",
-    alias: "carlos.firma",
-    balance: "$ 610.000.00",
-    estado: "Activo",
-    alerta: "Diferencia vs banco: -$12.000",
-  },
-  {
-    legajo: "LPF-27456789012",
-    email: "analopez@sa.com",
-    nombre: "Ana López",
-    cvu: "1234567890123456789045",
-    alias: "analopez.sa",
-    balance: "$ 3.400.000.00",
-    estado: "Activo",
-  },
-  {
-    legajo: "LPF-20567890123",
-    email: "robertod@com.com",
-    nombre: "Roberto Díaz",
-    cvu: "1234567890123456789056",
-    alias: "roberto.com",
-    balance: "$ 180.000.00",
-    estado: "Suspendido",
-  },
-];
+// Sin datos hasta conectar con la base (antes eran datos de ejemplo).
+const mock: Fondo[] = [];
 
 export const Route = createFileRoute("/admin/administracion/registros/")({
   head: () => ({ meta: [{ title: "Fondos por usuario — Admin Panel" }] }),

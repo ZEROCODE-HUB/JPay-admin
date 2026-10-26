@@ -3,7 +3,6 @@ import { useState, useMemo } from "react";
 import {
   Building2,
   ShieldAlert,
-  TrendingUp,
   Activity,
   CheckCircle2,
   XCircle,
@@ -22,9 +21,9 @@ import { brand } from "@/brand/brand";
 
 export const Route = createFileRoute("/admin/")({ component: Page });
 
-const volumeData = [
-  82, 95, 78, 110, 124, 132, 118, 145, 138, 162, 158, 184, 172, 195,
-];
+// Sin datos hasta conectar con la base: KPIs, acreditaciones, volumen, estado del sistema,
+// últimos registros y alertas recientes eran valores de ejemplo escritos a mano.
+const volumeData: number[] = [];
 
 function DashboardComisionesCard() {
   const today = new Date();
@@ -149,7 +148,7 @@ function DashboardComisionesCard() {
 }
 
 function Page() {
-  const max = Math.max(...volumeData);
+  const max = Math.max(1, ...volumeData);
   return (
     <div className="bg-white -m-4 md:-m-6 lg:-mx-8 lg:-my-6 p-4 md:p-6 lg:p-8 min-h-[calc(100vh-3.5rem)]">
       <PageHeader
@@ -157,17 +156,17 @@ function Page() {
         description={`Estado global de la plataforma ${brand.shortName}.`}
         action={
           <div className="hidden md:flex items-center gap-2 text-xs text-muted-foreground">
-            <Activity size={14} className="text-primary-ink" /> Sistema operativo · 99,98%
+            <Activity size={14} className="text-primary-ink" /> Sistema operativo
           </div>
         }
       />
 
       {/* KPI row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <Stat label="Clientes activos" value="312" sub="+8 esta semana" />
-        <Stat label="Volumen del dia" value="$ 184,2M" sub="ARS · 12.480 ops" />
-        <Stat label="Alertas pendientes" value="7" sub="3 criticas" />
-        <Stat label="Altas en revision" value="12" sub="Validacion de legajo" />
+        <Stat label="Clientes activos" value="—" sub="Sin datos" />
+        <Stat label="Volumen del dia" value="—" sub="Sin datos" />
+        <Stat label="Alertas pendientes" value="—" sub="Sin datos" />
+        <Stat label="Altas en revision" value="—" sub="Sin datos" />
       </div>
 
       {/* Acreditaciones — formato operación */}
@@ -178,20 +177,20 @@ function Page() {
       <Card className="p-4 mb-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-1.5 text-sm">
-            <div className="flex justify-between gap-4"><span className="text-muted-foreground">Bruto</span><span className="font-mono font-semibold">$ 2,69M</span></div>
-            <div className="flex justify-between gap-4 text-xs"><span className="text-muted-foreground">− Impuestos</span><span className="font-mono text-danger-600">− $ 45k</span></div>
-            <div className="flex justify-between gap-4 text-xs"><span className="text-muted-foreground">− Comisión PayWay (3%)</span><span className="font-mono text-danger-600">− $ 110k</span></div>
-            <div className="flex justify-between gap-4 text-xs"><span className="text-muted-foreground">− Comisión {brand.name} (neto)</span><span className="font-mono text-danger-600">− $ 85k</span></div>
+            <div className="flex justify-between gap-4"><span className="text-muted-foreground">Bruto</span><span className="font-mono font-semibold">—</span></div>
+            <div className="flex justify-between gap-4 text-xs"><span className="text-muted-foreground">− Impuestos</span><span className="font-mono">—</span></div>
+            <div className="flex justify-between gap-4 text-xs"><span className="text-muted-foreground">− Comisión PayWay (3%)</span><span className="font-mono">—</span></div>
+            <div className="flex justify-between gap-4 text-xs"><span className="text-muted-foreground">− Comisión {brand.name} (neto)</span><span className="font-mono">—</span></div>
             <div className="border-t my-1.5" />
-            <div className="flex justify-between gap-4 font-semibold"><span>Neto {brand.name}</span><span className="font-mono text-emerald-700">$ 85k</span></div>
-            <div className="flex justify-between gap-4 text-xs text-muted-foreground"><span>Pendiente de acreditar</span><span className="font-mono">$ 2,45M</span></div>
+            <div className="flex justify-between gap-4 font-semibold"><span>Neto {brand.name}</span><span className="font-mono">—</span></div>
+            <div className="flex justify-between gap-4 text-xs text-muted-foreground"><span>Pendiente de acreditar</span><span className="font-mono">—</span></div>
           </div>
           <div className="space-y-1.5 text-sm md:border-l md:pl-6 pt-4 md:pt-0 border-t md:border-t-0">
-            <div className="flex justify-between gap-4"><span className="text-muted-foreground">Cuenta recaudadora</span><span className="font-mono font-semibold">$ 12,8M</span></div>
-            <div className="flex justify-between gap-4 text-xs"><span className="text-muted-foreground">Disponible</span><span className="font-mono">$ 12,8M</span></div>
-            <div className="flex justify-between gap-4 text-xs"><span className="text-muted-foreground">+ Pendiente</span><span className="font-mono text-emerald-700">+ $ 2,45M</span></div>
+            <div className="flex justify-between gap-4"><span className="text-muted-foreground">Cuenta recaudadora</span><span className="font-mono font-semibold">—</span></div>
+            <div className="flex justify-between gap-4 text-xs"><span className="text-muted-foreground">Disponible</span><span className="font-mono">—</span></div>
+            <div className="flex justify-between gap-4 text-xs"><span className="text-muted-foreground">+ Pendiente</span><span className="font-mono">—</span></div>
             <div className="border-t my-1.5" />
-            <div className="flex justify-between gap-4 font-semibold"><span>Total</span><span className="font-mono">$ 15,25M</span></div>
+            <div className="flex justify-between gap-4 font-semibold"><span>Total</span><span className="font-mono">—</span></div>
             <div className="text-[11px] text-muted-foreground">Período hoy</div>
           </div>
         </div>
@@ -207,11 +206,11 @@ function Page() {
               <h3 className="font-display font-semibold">Volumen transaccional</h3>
               <p className="text-xs text-muted-foreground">ultimos 14 dias — ARS</p>
             </div>
-            <div className="text-xs text-primary-ink font-semibold inline-flex items-center gap-1">
-              <TrendingUp size={14} /> +24,6%
-            </div>
           </div>
-          <div className="flex items-end gap-1.5 h-44">
+          {volumeData.length === 0 && (
+            <div className="flex items-center justify-center h-44 text-sm text-muted-foreground">Sin datos de volumen.</div>
+          )}
+          <div className={`flex items-end gap-1.5 h-44 ${volumeData.length === 0 ? "hidden" : ""}`}>
             {volumeData.map((v, i) => (
               <div key={i} className="flex-1 flex flex-col items-center gap-1">
                 <div
@@ -226,14 +225,9 @@ function Page() {
 
         <Card>
           <h3 className="font-display font-semibold mb-4">Estado del sistema</h3>
+          <p className="text-sm text-muted-foreground">Sin monitoreo configurado.</p>
           <ul className="space-y-3 text-sm">
-            {[
-              ["API publica", "operativo", "120 ms"],
-              ["Procesador CVU", "operativo", "210 ms"],
-              ["QR realtime", "operativo", "85 ms"],
-              ["Webhooks", "degradado", "640 ms"],
-              ["Conciliacion batch", "operativo", "—"],
-            ].map(([n, e, l]) => (
+            {([] as string[][]).map(([n, e, l]) => (
               <li key={n} className="flex items-center justify-between">
                 <span className="flex items-center gap-2">
                   {e === "operativo" ? (
@@ -273,13 +267,10 @@ function Page() {
                 </tr>
               </thead>
               <tbody className="divide-y">
-                {[
-                  ["Consorcio Larrea 1200", "30-71235678-2", "Consorcio", "warn", "Pendiente validacion", "—"],
-                  ["Microcreditos del Sur", "30-71239988-0", "Microcredito", "success", "Activo", "$ 8,4M"],
-                  ["Administradora Plaza", "30-71244455-1", "Alquileres", "warn", "Documentacion", "—"],
-                  ["Municipalidad de Chivilcoy", "30-99876543-2", "Municipio", "success", "Activo", "$ 21,2M"],
-                  ["Pagos Express SRL", "30-71300011-4", "Empresa", "danger", "Bloqueado", "—"],
-                ].map(([n, c, seg, tone, e, v]) => (
+                <tr>
+                  <td colSpan={5} className="py-6 px-5 text-center text-sm text-muted-foreground">Sin registros.</td>
+                </tr>
+                {([] as string[][]).map(([n, c, seg, tone, e, v]) => (
                   <tr key={n}>
                     <td className="py-2.5 px-5 font-semibold">{n}</td>
                     <td className="text-xs text-muted-foreground font-mono tabular-nums">{c}</td>
@@ -304,13 +295,9 @@ function Page() {
               Compliance ?
             </Link>
           </div>
+          <p className="py-2.5 text-sm text-muted-foreground">Sin alertas.</p>
           <div className="divide-y">
-            {[
-              ["Movimiento superior a $5M", "Microcreditos del Sur", "danger", "Hace 12 min"],
-              ["Frecuencia anomala – 48 ops/h", "Pagos Express SRL", "warn", "Hace 1 h"],
-              ["CUIT en lista de control", "Comercializadora ABC", "danger", "Hace 3 h"],
-              ["KYC vencido", "Consorcio Belgrano", "warn", "Hoy 09:00"],
-            ].map(([a, c, tone, t]) => (
+            {([] as string[][]).map(([a, c, tone, t]) => (
               <div key={a} className="py-2.5">
                 <div className="flex items-start justify-between gap-2">
                   <div className="text-sm font-semibold">{a}</div>
