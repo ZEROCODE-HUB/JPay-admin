@@ -1,3 +1,4 @@
+import { formatDate, formatDateTime, formatMoney } from "@/shared/format";
 import { createFileRoute } from "@tanstack/react-router";
 import { pageTitle } from "@/brand/brand";
 import { useState } from "react";
@@ -28,25 +29,9 @@ export const Route = createFileRoute("/admin/comercios/link-pago/lotes-venta")({
 
 const PAGE_SIZES = [10, 20, 50];
 
-function fmt(n: number) {
-  return `$ ${n.toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-}
-
 function parseDateLocal(dateStr: string): Date {
   const [year, month, day] = dateStr.split("-").map(Number);
   return new Date(year, month - 1, day);
-}
-
-function fmtDateTime(iso: string): string {
-  const d = new Date(iso);
-  if (isNaN(d.getTime())) return iso;
-  return d.toLocaleString("es-AR", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
 }
 
 function estadoTone(codigo?: string): "success" | "warn" | "danger" | "neutral" {
@@ -163,11 +148,7 @@ function Page() {
       key: "fecha",
       label: "Fecha Venta",
       minWidth: 120,
-      render: (r) => (
-        <span className="font-mono text-xs tabular-nums">
-          {parseDateLocal(r.fecha).toLocaleDateString("es-AR")}
-        </span>
-      ),
+      render: (r) => <span className="font-mono text-xs tabular-nums">{formatDate(r.fecha)}</span>,
     },
     {
       key: "comercio",
@@ -205,14 +186,14 @@ function Page() {
       key: "importeBruto",
       label: "Bruto",
       minWidth: 130,
-      render: (r) => <span className="font-mono tabular-nums">{fmt(r.importeBruto)}</span>,
+      render: (r) => <span className="font-mono tabular-nums">{formatMoney(r.importeBruto)}</span>,
     },
     {
       key: "impuestos",
       label: "Impuestos Est.",
       minWidth: 130,
       render: (r) => (
-        <span className="font-mono tabular-nums text-danger-600">- {fmt(r.impuestos)}</span>
+        <span className="font-mono tabular-nums text-danger-600">- {formatMoney(r.impuestos)}</span>
       ),
     },
     {
@@ -220,7 +201,7 @@ function Page() {
       label: "Comisión Est.",
       minWidth: 130,
       render: (r) => (
-        <span className="font-mono tabular-nums text-danger-600">- {fmt(r.comision)}</span>
+        <span className="font-mono tabular-nums text-danger-600">- {formatMoney(r.comision)}</span>
       ),
     },
     {
@@ -229,7 +210,7 @@ function Page() {
       minWidth: 140,
       render: (r) => (
         <span className="font-mono tabular-nums font-semibold text-emerald-700">
-          {fmt(r.netoEstimado)}
+          {formatMoney(r.netoEstimado)}
         </span>
       ),
     },
@@ -441,7 +422,9 @@ function DetalleLoteModal({ lote, onClose }: { lote: LoteVenta; onClose: () => v
       key: "fecha",
       label: "Fecha",
       minWidth: 130,
-      render: (r) => <span className="font-mono text-xs tabular-nums">{fmtDateTime(r.fecha)}</span>,
+      render: (r) => (
+        <span className="font-mono text-xs tabular-nums">{formatDateTime(r.fecha)}</span>
+      ),
     },
     {
       key: "idTxn",
@@ -469,14 +452,16 @@ function DetalleLoteModal({ lote, onClose }: { lote: LoteVenta; onClose: () => v
       key: "montoOperacion",
       label: "Monto",
       minWidth: 110,
-      render: (r) => <span className="font-mono tabular-nums">{fmt(r.montoOperacion)}</span>,
+      render: (r) => (
+        <span className="font-mono tabular-nums">{formatMoney(r.montoOperacion)}</span>
+      ),
     },
     {
       key: "comision",
       label: "Comisión",
       minWidth: 110,
       render: (r) => (
-        <span className="font-mono tabular-nums text-danger-600">- {fmt(r.comision)}</span>
+        <span className="font-mono tabular-nums text-danger-600">- {formatMoney(r.comision)}</span>
       ),
     },
     {
@@ -484,7 +469,7 @@ function DetalleLoteModal({ lote, onClose }: { lote: LoteVenta; onClose: () => v
       label: "Impuesto",
       minWidth: 110,
       render: (r) => (
-        <span className="font-mono tabular-nums text-danger-600">- {fmt(r.impuesto)}</span>
+        <span className="font-mono tabular-nums text-danger-600">- {formatMoney(r.impuesto)}</span>
       ),
     },
     {
@@ -502,7 +487,7 @@ function DetalleLoteModal({ lote, onClose }: { lote: LoteVenta; onClose: () => v
       open
       onClose={onClose}
       title="Detalle del lote de venta"
-      description={`${parseDateLocal(lote.fecha).toLocaleDateString("es-AR")} · ${
+      description={`${formatDate(lote.fecha)} · ${
         lote.comercio?.nombreComercio ?? lote.comercio?.usuario ?? "—"
       } · ${lote.comercio?.legajo ?? lote.comercioId} · ${lote.bandera}`}
       size="xl"
@@ -515,24 +500,24 @@ function DetalleLoteModal({ lote, onClose }: { lote: LoteVenta; onClose: () => v
           </div>
           <div className="rounded-lg border bg-muted/30 p-3">
             <div className="text-xs text-muted-foreground">Bruto</div>
-            <div className="font-mono font-semibold text-lg">{fmt(lote.importeBruto)}</div>
+            <div className="font-mono font-semibold text-lg">{formatMoney(lote.importeBruto)}</div>
           </div>
           <div className="rounded-lg border bg-muted/30 p-3">
             <div className="text-xs text-muted-foreground">Impuestos Est.</div>
             <div className="font-mono font-semibold text-lg text-danger-600">
-              - {fmt(lote.impuestos)}
+              - {formatMoney(lote.impuestos)}
             </div>
           </div>
           <div className="rounded-lg border bg-muted/30 p-3">
             <div className="text-xs text-muted-foreground">Comisión Est.</div>
             <div className="font-mono font-semibold text-lg text-danger-600">
-              - {fmt(lote.comision)}
+              - {formatMoney(lote.comision)}
             </div>
           </div>
           <div className="rounded-lg border bg-emerald-50 dark:bg-emerald-950/30 p-3">
             <div className="text-xs text-muted-foreground">Neto Estimado</div>
             <div className="font-mono font-semibold text-lg text-emerald-700">
-              {fmt(lote.netoEstimado)}
+              {formatMoney(lote.netoEstimado)}
             </div>
           </div>
         </div>

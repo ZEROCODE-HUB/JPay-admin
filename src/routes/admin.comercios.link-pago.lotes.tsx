@@ -1,3 +1,11 @@
+import {
+  formatDate,
+  formatDateShort,
+  formatDateTime,
+  formatMoney,
+  formatPercent,
+  formatTime,
+} from "@/shared/format";
 import { createFileRoute } from "@tanstack/react-router";
 import { brand, pageTitle } from "@/brand/brand";
 import { useMemo, useState } from "react";
@@ -97,19 +105,9 @@ function estadoMovimientoTone(
   return "warn";
 }
 
-function fmt(n: number) {
-  return `$ ${n.toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-}
-
 function parseDateLocal(dateStr: string): Date {
   const [year, month, day] = dateStr.split("-").map(Number);
   return new Date(year, month - 1, day);
-}
-
-function fmtFechaCorta(iso: string | null | undefined): string {
-  if (!iso) return "—";
-  const [y, m, d] = iso.split("-");
-  return `${d}/${m}/${y}`;
 }
 
 /**
@@ -225,7 +223,7 @@ function LoteDetalle({
       { Campo: "Fecha estimada", Valor: parseDateLocal(lote.fecha).toLocaleDateString("es-AR") },
       {
         Campo: "Fecha cobro real",
-        Valor: lote.fechaCobroReal ? fmtFechaCorta(lote.fechaCobroReal) : "—",
+        Valor: lote.fechaCobroReal ? formatDate(lote.fechaCobroReal) : "—",
       },
       { Campo: "Comercio", Valor: lote.comercio?.nombreComercio ?? lote.comercio?.usuario ?? "—" },
       { Campo: "Legajo", Valor: lote.comercio?.legajo ?? lote.comercioId },
@@ -266,7 +264,7 @@ function LoteDetalle({
               <Receipt size={18} /> Detalle del lote
             </h3>
             <p className="text-sm font-mono text-muted-foreground">
-              {lote.codigo} · {parseDateLocal(lote.fecha).toLocaleDateString("es-AR")} ·{" "}
+              {lote.codigo} · {formatDate(lote.fecha)} ·{" "}
               {lote.comercio?.nombreComercio ?? lote.comercio?.usuario ?? lote.comercioId} ·{" "}
               {lote.bandera} {esCuotas ? `· ${lote.cuotas} cuotas` : ""}
             </p>
@@ -290,14 +288,12 @@ function LoteDetalle({
               <div className="text-xs text-muted-foreground flex items-center gap-1">
                 <Calendar size={12} /> Fecha estimada
               </div>
-              <div className="font-mono font-semibold mt-1">
-                {parseDateLocal(lote.fecha).toLocaleDateString("es-AR")}
-              </div>
+              <div className="font-mono font-semibold mt-1">{formatDate(lote.fecha)}</div>
               <div className="text-[11px] text-muted-foreground mt-0.5 flex items-center gap-1">
                 Cobro real:{" "}
                 {lote.fechaCobroReal ? (
                   <>
-                    <span className="font-mono">{fmtFechaCorta(lote.fechaCobroReal)}</span>
+                    <span className="font-mono">{formatDate(lote.fechaCobroReal)}</span>
                     <Badge tone="success">real</Badge>
                   </>
                 ) : (
@@ -347,7 +343,7 @@ function LoteDetalle({
                     loteEstimado ? "text-muted-foreground/70" : ""
                   }`}
                 >
-                  {fmt(lote.importeBruto)}
+                  {formatMoney(lote.importeBruto)}
                   {loteEstimado && (
                     <span className="ml-1 text-[10px] text-muted-foreground/70">(Est.)</span>
                   )}
@@ -372,12 +368,13 @@ function LoteDetalle({
                           <Receipt size={12} /> IVA
                           {lote.tasaPropiaPct > 0 && (
                             <span className="text-[10px] text-muted-foreground/70">
-                              ({((iva / Math.max(lote.tasaPropiaMonto, 0.01)) * 100).toFixed(0)}%
+                              (
+                              {formatPercent((iva / Math.max(lote.tasaPropiaMonto, 0.01)) * 100, 0)}
                               s/comision)
                             </span>
                           )}
                         </span>
-                        <span className="font-mono text-danger-600">- {fmt(iva)}</span>
+                        <span className="font-mono text-danger-600">- {formatMoney(iva)}</span>
                       </div>
                     )}
                     {dc > 0 && (
@@ -385,7 +382,7 @@ function LoteDetalle({
                         <span className="text-muted-foreground flex items-center gap-1">
                           <Receipt size={12} /> Débito/Crédito
                         </span>
-                        <span className="font-mono text-danger-600">- {fmt(dc)}</span>
+                        <span className="font-mono text-danger-600">- {formatMoney(dc)}</span>
                       </div>
                     )}
                     {iibb > 0 && (
@@ -393,7 +390,7 @@ function LoteDetalle({
                         <span className="text-muted-foreground flex items-center gap-1">
                           <Receipt size={12} /> Ingresos Brutos
                         </span>
-                        <span className="font-mono text-danger-600">- {fmt(iibb)}</span>
+                        <span className="font-mono text-danger-600">- {formatMoney(iibb)}</span>
                       </div>
                     )}
                     {usarLegacy && (
@@ -402,7 +399,7 @@ function LoteDetalle({
                           <Receipt size={12} /> Impuestos
                           <span className="text-[10px] text-muted-foreground/70">(legacy)</span>
                         </span>
-                        <span className="font-mono text-danger-600">- {fmt(legacy)}</span>
+                        <span className="font-mono text-danger-600">- {formatMoney(legacy)}</span>
                       </div>
                     )}
                     {totalReal === 0 && !usarLegacy && (
@@ -418,7 +415,7 @@ function LoteDetalle({
                       <span
                         className={`font-mono ${loteEstimado ? "text-muted-foreground/70" : ""}`}
                       >
-                        {fmt(lote.importeBruto - (usarLegacy ? legacy : totalReal))}
+                        {formatMoney(lote.importeBruto - (usarLegacy ? legacy : totalReal))}
                       </span>
                     </div>
                   </>
@@ -432,7 +429,7 @@ function LoteDetalle({
                 <span
                   className={`font-mono ${loteEstimado ? "text-muted-foreground/60" : "text-danger-600"}`}
                 >
-                  - {fmt(tasaPaywayMostrar)}
+                  - {formatMoney(tasaPaywayMostrar)}
                 </span>
               </div>
               <div className="flex justify-between text-xs">
@@ -442,7 +439,7 @@ function LoteDetalle({
                 <span
                   className={`font-mono ${loteEstimado ? "text-muted-foreground/60" : "text-danger-600"}`}
                 >
-                  - {fmt(tasaPropiaMostrar)}
+                  - {formatMoney(tasaPropiaMostrar)}
                 </span>
               </div>
               {esCuotas && lote.costoPaywayPagoUnico != null && (
@@ -453,7 +450,7 @@ function LoteDetalle({
                   <span
                     className={`font-mono ${loteEstimado ? "text-muted-foreground/60" : "text-danger-600"}`}
                   >
-                    - {fmt(lote.costoPaywayPagoUnico)}
+                    - {formatMoney(lote.costoPaywayPagoUnico)}
                   </span>
                 </div>
               )}
@@ -466,7 +463,7 @@ function LoteDetalle({
                     $ 0,00 <span className="text-[10px]">— Pendiente de cierre</span>
                   </span>
                 ) : (
-                  <span className="font-mono text-danger-600">- {fmt(comisionCierre)}</span>
+                  <span className="font-mono text-danger-600">- {formatMoney(comisionCierre)}</span>
                 )}
               </div>
               {esContracargo && (
@@ -477,7 +474,7 @@ function LoteDetalle({
                       retenido
                     </Badge>
                   </span>
-                  <span className="font-mono text-danger-600">- {fmt(contracargo)}</span>
+                  <span className="font-mono text-danger-600">- {formatMoney(contracargo)}</span>
                 </div>
               )}
               {esCuotas && (
@@ -500,7 +497,7 @@ function LoteDetalle({
               <div className="flex justify-between text-xs text-muted-foreground">
                 <span>Total descuentos</span>
                 <span className={`font-mono ${loteEstimado ? "text-muted-foreground/70" : ""}`}>
-                  - {fmt(totalDesc)}
+                  - {formatMoney(totalDesc)}
                 </span>
               </div>
               <div className="flex justify-between text-base font-semibold">
@@ -514,13 +511,14 @@ function LoteDetalle({
                         : "text-emerald-700"
                   }`}
                 >
-                  {fmt(lote.importeNeto)}
+                  {formatMoney(lote.importeNeto)}
                   {loteEstimado && <Badge tone="neutral">Est.</Badge>}
                 </span>
               </div>
               {esContracargo && (
                 <p className="text-xs text-danger-700 bg-danger-50 border border-danger-200 rounded px-2 py-1.5 mt-2">
-                  Incluye contracargo ({fmt(contracargo)} retenido): el lote descuenta ese pago.
+                  Incluye contracargo ({formatMoney(contracargo)} retenido): el lote descuenta ese
+                  pago.
                 </p>
               )}
               {lote.notasResolucion && (
@@ -531,9 +529,7 @@ function LoteDetalle({
               {lote.resueltoPor && (
                 <p className="text-[11px] text-muted-foreground">
                   Resuelto por {lote.resueltoPor}{" "}
-                  {lote.fechaResolucion
-                    ? `· ${new Date(lote.fechaResolucion).toLocaleString("es-AR")}`
-                    : ""}
+                  {lote.fechaResolucion ? `· ${formatDateTime(lote.fechaResolucion)}` : ""}
                 </p>
               )}
             </div>
@@ -573,15 +569,10 @@ function LoteDetalle({
                           </div>
                         </td>
                         <td className="px-3 py-2 text-right font-mono font-semibold">
-                          {fmt(m.montoOperacion)}
+                          {formatMoney(m.montoOperacion)}
                         </td>
                         <td className="px-3 py-2 font-mono text-muted-foreground">
-                          {new Date(m.fecha).toLocaleString("es-AR", {
-                            day: "2-digit",
-                            month: "2-digit",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
+                          {formatDateShort(m.fecha)} {formatTime(m.fecha)}
                         </td>
                         <td className="px-3 py-2">
                           <Badge tone={estadoMovimientoTone(m.estadoCodigo)}>
@@ -725,33 +716,37 @@ function ComercioDetalleModal({
           <div className="grid grid-cols-2 gap-3">
             <Card className="p-3">
               <div className="text-xs text-muted-foreground">Total pendiente de acreditar</div>
-              <div className="font-mono font-semibold mt-1">{fmt(data.pendienteAcreditar)}</div>
+              <div className="font-mono font-semibold mt-1">
+                {formatMoney(data.pendienteAcreditar)}
+              </div>
               <div className="text-[11px] text-muted-foreground">
                 Máximo adelantable{" "}
                 {data.totalContracargo
-                  ? `— contracargo ${fmt(data.totalContracargo)} descontado`
+                  ? `— contracargo ${formatMoney(data.totalContracargo)} descontado`
                   : ""}
               </div>
             </Card>
             <Card className="p-3">
               <div className="text-xs text-muted-foreground">Pendiente de impuestos</div>
-              <div className="font-mono font-semibold mt-1">{fmt(data.pendienteImpuestos)}</div>
+              <div className="font-mono font-semibold mt-1">
+                {formatMoney(data.pendienteImpuestos)}
+              </div>
             </Card>
             <Card className="p-3">
               <div className="text-xs text-muted-foreground">Comisión total PayWay</div>
-              <div className="font-mono font-semibold mt-1">{fmt(data.totalPayWay)}</div>
+              <div className="font-mono font-semibold mt-1">{formatMoney(data.totalPayWay)}</div>
             </Card>
             <Card className="p-3">
               <div className="text-xs text-muted-foreground">Neto {brand.name}</div>
               <div className="font-mono font-semibold mt-1 text-emerald-700">
-                {fmt(data.totalPropio)}
+                {formatMoney(data.totalPropio)}
               </div>
             </Card>
             {data.totalContracargo > 0 && (
               <Card className="p-3 border-danger-200 bg-danger-50">
                 <div className="text-xs text-danger-700">Contracargo retenido</div>
                 <div className="font-mono font-semibold mt-1 text-danger-600">
-                  - {fmt(data.totalContracargo)}
+                  - {formatMoney(data.totalContracargo)}
                 </div>
                 <div className="text-[11px] text-danger-600">Restado del total a acreditar</div>
               </Card>
@@ -759,7 +754,7 @@ function ComercioDetalleModal({
             <Card className={`p-3 ${data.totalContracargo > 0 ? "" : "col-span-2"}`}>
               <div className="text-xs text-muted-foreground">Total a pagar al comercio</div>
               <div className="font-mono font-semibold mt-1 text-emerald-700">
-                {fmt(data.totalFinal)}
+                {formatMoney(data.totalFinal)}
               </div>
             </Card>
           </div>
@@ -792,16 +787,16 @@ function ComercioDetalleModal({
                             {l.bandera}
                           </span>
                         </td>
-                        <td className="px-2 py-1.5 font-mono">
-                          {parseDateLocal(l.fecha).toLocaleDateString("es-AR")}
+                        <td className="px-2 py-1.5 font-mono">{formatDate(l.fecha)}</td>
+                        <td className="px-2 py-1.5 text-right font-mono">
+                          {formatMoney(l.importeNeto)}
                         </td>
-                        <td className="px-2 py-1.5 text-right font-mono">{fmt(l.importeNeto)}</td>
                         <td className="px-2 py-1.5">
                           <Badge tone={tone(l.estado)}>{l.estado}</Badge>
                         </td>
                         {lotesDelComercio.some((x) => (x.contracargoMonto ?? 0) > 0) && (
                           <td className="px-2 py-1.5 text-right font-mono text-danger-600">
-                            {contra ? `- ${fmt(contra)}` : "—"}
+                            {contra ? `- ${formatMoney(contra)}` : "—"}
                           </td>
                         )}
                       </tr>
@@ -843,7 +838,9 @@ function ComercioDetalleModal({
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Monto solicitado</span>
-                      <span className="font-mono font-semibold">{fmt(a.montoSolicitado)}</span>
+                      <span className="font-mono font-semibold">
+                        {formatMoney(a.montoSolicitado)}
+                      </span>
                     </div>
                     <div className="flex justify-between text-xs">
                       <span className="text-muted-foreground">Plazo</span>
@@ -853,16 +850,14 @@ function ComercioDetalleModal({
                       </span>
                     </div>
                     <div className="text-xs text-muted-foreground">
-                      Solicitado {new Date(a.fechaSolicitud).toLocaleDateString("es-AR")}
-                      {a.fechaResolucion
-                        ? ` · Resuelto ${new Date(a.fechaResolucion).toLocaleDateString("es-AR")}`
-                        : ""}
+                      Solicitado {formatDate(a.fechaSolicitud)}
+                      {a.fechaResolucion ? ` · Resuelto ${formatDate(a.fechaResolucion)}` : ""}
                     </div>
                     {a.montoPorAcreditar != null && a.montoPorAcreditar > 0 && (
                       <div className="flex justify-between text-xs">
                         <span className="text-muted-foreground">Monto por acreditar</span>
                         <span className="font-mono font-semibold text-amber-700">
-                          {fmt(a.montoPorAcreditar)}
+                          {formatMoney(a.montoPorAcreditar)}
                         </span>
                       </div>
                     )}
@@ -1223,14 +1218,12 @@ function Page() {
           : { tone: "neutral" as const, txt: "est." };
         return (
           <div className="flex flex-col gap-0.5">
-            <span className="font-mono text-xs tabular-nums">
-              {parseDateLocal(r.fecha).toLocaleDateString("es-AR")}
-            </span>
+            <span className="font-mono text-xs tabular-nums">{formatDate(r.fecha)}</span>
             <span className="flex items-center gap-1">
               <Badge tone={badge.tone}>{badge.txt}</Badge>
               {r.fechaCobroReal && (
                 <span className="font-mono text-[10px] text-muted-foreground">
-                  cob. {fmtFechaCorta(r.fechaCobroReal)}
+                  cob. {formatDate(r.fechaCobroReal)}
                 </span>
               )}
             </span>
@@ -1294,7 +1287,7 @@ function Page() {
         <span
           className={`font-mono tabular-nums ${esLoteEstimado(r) ? "text-muted-foreground/60" : ""}`}
         >
-          {fmt(r.importeBruto)}
+          {formatMoney(r.importeBruto)}
           {esLoteEstimado(r) && (
             <span className="ml-1 text-[10px] text-muted-foreground/70">(Est.)</span>
           )}
@@ -1316,7 +1309,7 @@ function Page() {
               estimado ? "text-muted-foreground/60" : "text-danger-600"
             }`}
           >
-            - {fmt(totalDescuentos(r))}
+            - {formatMoney(totalDescuentos(r))}
             {estimado && (
               <span className="ml-1 text-[10px] text-muted-foreground/70">(sin 0,45%)</span>
             )}
@@ -1344,7 +1337,7 @@ function Page() {
                   : "text-emerald-700"
             }`}
           >
-            {fmt(r.importeNeto)}
+            {formatMoney(r.importeNeto)}
             {estimado && (
               <Badge tone="neutral" className="ml-1.5 align-middle">
                 Est.
@@ -1380,27 +1373,27 @@ function Page() {
       label: "Pendiente de acreditar",
       minWidth: 150,
       render: (r) => (
-        <span className="font-mono text-xs font-semibold">{fmt(r.pendienteAcreditar)}</span>
+        <span className="font-mono text-xs font-semibold">{formatMoney(r.pendienteAcreditar)}</span>
       ),
     },
     {
       key: "pendienteImpuestos",
       label: "Pendiente de impuestos",
       minWidth: 150,
-      render: (r) => <span className="font-mono text-xs">{fmt(r.pendienteImpuestos)}</span>,
+      render: (r) => <span className="font-mono text-xs">{formatMoney(r.pendienteImpuestos)}</span>,
     },
     {
       key: "totalPayWay",
       label: "Comisión PayWay",
       minWidth: 140,
-      render: (r) => <span className="font-mono text-xs">{fmt(r.totalPayWay)}</span>,
+      render: (r) => <span className="font-mono text-xs">{formatMoney(r.totalPayWay)}</span>,
     },
     {
       key: "totalPropio",
       label: `Neto ${brand.name}`,
       minWidth: 140,
       render: (r) => (
-        <span className="font-mono text-xs text-emerald-700">{fmt(r.totalPropio)}</span>
+        <span className="font-mono text-xs text-emerald-700">{formatMoney(r.totalPropio)}</span>
       ),
     },
     {
@@ -1408,7 +1401,9 @@ function Page() {
       label: "Total a pagar",
       minWidth: 140,
       render: (r) => (
-        <span className="font-mono font-semibold text-emerald-700">{fmt(r.totalFinal)}</span>
+        <span className="font-mono font-semibold text-emerald-700">
+          {formatMoney(r.totalFinal)}
+        </span>
       ),
     },
   ];
@@ -1455,7 +1450,7 @@ function Page() {
             {resumen?.programados.cantidad ?? 0}
           </div>
           <div className="text-[11px] text-muted-foreground mt-0.5 font-mono">
-            {fmt(resumen?.programados.monto ?? 0)}
+            {formatMoney(resumen?.programados.monto ?? 0)}
           </div>
         </Card>
         <Card className="p-3">
@@ -1467,7 +1462,7 @@ function Page() {
             {resumen?.pendientes.cantidad ?? 0}
           </div>
           <div className="text-[11px] text-muted-foreground mt-0.5 font-mono">
-            {fmt(resumen?.pendientes.monto ?? 0)}
+            {formatMoney(resumen?.pendientes.monto ?? 0)}
           </div>
         </Card>
         <Card className="p-3">
@@ -1479,7 +1474,7 @@ function Page() {
             {resumen?.acreditados.cantidad ?? 0}
           </div>
           <div className="text-[11px] text-muted-foreground mt-0.5 font-mono">
-            {fmt(resumen?.acreditados.monto ?? 0)}
+            {formatMoney(resumen?.acreditados.monto ?? 0)}
           </div>
         </Card>
         <Card className="p-3">
@@ -1491,7 +1486,7 @@ function Page() {
             {resumen?.contracargo.cantidad ?? 0}
           </div>
           <div className="text-[11px] text-muted-foreground mt-0.5 font-mono">
-            {fmt(resumen?.contracargo.monto ?? 0)}
+            {formatMoney(resumen?.contracargo.monto ?? 0)}
           </div>
         </Card>
       </div>
@@ -1745,7 +1740,7 @@ function Page() {
               Lote {contracargoModal.lote.bandera} ·{" "}
               {contracargoModal.lote.comercio?.nombreComercio ??
                 contracargoModal.lote.comercio?.usuario}{" "}
-              · Contracargo actual {fmt(contracargoModal.lote.contracargoMonto)}.
+              · Contracargo actual {formatMoney(contracargoModal.lote.contracargoMonto)}.
             </p>
             <div>
               <Label>Contracargo monto (opcional, recalcula neto)</Label>
@@ -1769,7 +1764,7 @@ function Page() {
                   // auditoría; la UI muestra siempre la fórmula
                   // correcta.
                   const tasas = tasasCalculadas(contracargoModal.lote);
-                  return fmt(
+                  return formatMoney(
                     contracargoModal.lote.importeBruto -
                       contracargoModal.lote.impuestos -
                       tasas.paywayMonto -

@@ -1,3 +1,4 @@
+import { formatMoney, formatPercent } from "@/shared/format";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { brand, pageTitle } from "@/brand/brand";
 import { useState, useEffect, useMemo } from "react";
@@ -90,13 +91,6 @@ const ESTADO_COLORS: Record<
     label: "Cancelado",
   },
 };
-
-function fmt(n: number) {
-  return `$ ${n.toLocaleString("es-AR", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}`;
-}
 
 function parseDateLocal(dateStr: string): Date {
   const [y, m, d] = dateStr.split("-").map(Number);
@@ -246,18 +240,18 @@ function DiaDetalleModal({
           <div className="grid grid-cols-3 gap-2 text-xs">
             <div className="rounded-md border bg-muted/30 px-3 py-2">
               <div className="text-muted-foreground">Total bruto</div>
-              <div className="font-mono font-semibold text-base">{fmt(totalBruto)}</div>
+              <div className="font-mono font-semibold text-base">{formatMoney(totalBruto)}</div>
             </div>
             <div className="rounded-md border bg-muted/30 px-3 py-2">
               <div className="text-muted-foreground">Total neto</div>
               <div className="font-mono font-semibold text-base text-emerald-700">
-                {fmt(totalNeto)}
+                {formatMoney(totalNeto)}
               </div>
             </div>
             <div className="rounded-md border bg-amber-50 border-amber-200 px-3 py-2">
               <div className="text-amber-700">Adelantos reservados</div>
               <div className="font-mono font-semibold text-base text-amber-700">
-                {fmt(totalAdelantos)}
+                {formatMoney(totalAdelantos)}
               </div>
             </div>
           </div>
@@ -311,8 +305,8 @@ function DiaDetalleModal({
                             onClick={() => irAAdelantos(it.comercioId, a.id)}
                             className="block w-full text-left hover:underline"
                           >
-                            {a.estado} · {fmt(a.montoPorAcreditar ?? a.montoSolicitado)} · Tkt #
-                            {a.id.slice(0, 8).toUpperCase()}
+                            {a.estado} · {formatMoney(a.montoPorAcreditar ?? a.montoSolicitado)} ·
+                            Tkt #{a.id.slice(0, 8).toUpperCase()}
                           </button>
                         ))}
                     </div>
@@ -332,54 +326,56 @@ function DiaDetalleModal({
                     <tbody className="font-mono">
                       <tr>
                         <td className="py-1">Importe bruto del lote</td>
-                        <td className="text-right">{fmt(it.importeBruto)}</td>
+                        <td className="text-right">{formatMoney(it.importeBruto)}</td>
                         <td className="text-right text-muted-foreground">
                           {it.cantidadOperaciones} ops
                         </td>
                       </tr>
                       <tr className="text-danger-600">
                         <td className="py-1">
-                          (-) Comisión {brand.name} ({it.tasaPropiaPct.toFixed(2)}%)
+                          (-) Comisión {brand.name} ({formatPercent(it.tasaPropiaPct)})
                         </td>
-                        <td className="text-right">-{fmt(it.tasaPropiaMonto)}</td>
+                        <td className="text-right">-{formatMoney(it.tasaPropiaMonto)}</td>
                         <td className="text-right" />
                       </tr>
                       <tr className="text-danger-600">
                         <td className="py-1">
-                          (-) Comisión PayWay ({it.tasaPaywayPct.toFixed(2)}%)
+                          (-) Comisión PayWay ({formatPercent(it.tasaPaywayPct)})
                         </td>
-                        <td className="text-right">-{fmt(it.tasaPaywayMonto)}</td>
+                        <td className="text-right">-{formatMoney(it.tasaPaywayMonto)}</td>
                         <td className="text-right" />
                       </tr>
                       <tr className="text-danger-600">
                         <td className="py-1">
-                          (-) Comisión cierre de lote ({comisionCierrePct.toFixed(2)}%)
+                          (-) Comisión cierre de lote ({formatPercent(comisionCierrePct)})
                         </td>
-                        <td className="text-right">-{fmt(it.comisionCierreLoteMonto)}</td>
+                        <td className="text-right">-{formatMoney(it.comisionCierreLoteMonto)}</td>
                         <td className="text-right" />
                       </tr>
                       <tr className="text-danger-600">
                         <td className="py-1">(-) Impuestos</td>
-                        <td className="text-right">-{fmt(it.impuestos)}</td>
+                        <td className="text-right">-{formatMoney(it.impuestos)}</td>
                         <td className="text-right" />
                       </tr>
                       {it.contracargoMonto > 0 && (
                         <tr className="text-danger-600">
                           <td className="py-1">(-) Contracargo</td>
-                          <td className="text-right">-{fmt(it.contracargoMonto)}</td>
+                          <td className="text-right">-{formatMoney(it.contracargoMonto)}</td>
                           <td className="text-right" />
                         </tr>
                       )}
                       {it.adelantosAplicadosDia > 0 && (
                         <tr className="text-amber-700">
                           <td className="py-1">(-) Adelanto aplicado a este día</td>
-                          <td className="text-right">-{fmt(it.adelantosAplicadosDia)}</td>
+                          <td className="text-right">-{formatMoney(it.adelantosAplicadosDia)}</td>
                           <td className="text-right" />
                         </tr>
                       )}
                       <tr className="border-t-2 font-semibold">
                         <td className="py-1.5">= Neto a depositar</td>
-                        <td className="text-right text-emerald-700">{fmt(netoDespuesAdelantos)}</td>
+                        <td className="text-right text-emerald-700">
+                          {formatMoney(netoDespuesAdelantos)}
+                        </td>
                         <td className="text-right" />
                       </tr>
                     </tbody>
@@ -391,7 +387,7 @@ function DiaDetalleModal({
                   <div className="mt-3 pt-3 border-t flex items-center justify-end gap-2">
                     <span className="text-xs text-muted-foreground mr-auto">
                       {netoDespuesAdelantos < minMonto
-                        ? `Remanente < ${fmt(minMonto)} (cupo agotado)`
+                        ? `Remanente < ${formatMoney(minMonto)} (cupo agotado)`
                         : "100% disponible para adelanto"}
                     </span>
                     <button
@@ -470,13 +466,13 @@ function exportPdf(fechaTitulo: string, rows: ExportDiaRow[]) {
       r.bandera,
       r.estado,
       String(r.cantidadOperaciones),
-      fmt(r.importeBruto),
-      fmt(r.tasaPropiaMonto),
-      fmt(r.tasaPaywayMonto),
-      fmt(r.comisionCierreLoteMonto),
-      fmt(r.impuestos),
-      fmt(r.contracargoMonto),
-      fmt(r.importeNeto),
+      formatMoney(r.importeBruto),
+      formatMoney(r.tasaPropiaMonto),
+      formatMoney(r.tasaPaywayMonto),
+      formatMoney(r.comisionCierreLoteMonto),
+      formatMoney(r.impuestos),
+      formatMoney(r.contracargoMonto),
+      formatMoney(r.importeNeto),
     ]),
     styles: { fontSize: 7, cellPadding: 1.5 },
     headStyles: { fillColor: [33, 37, 41] },
@@ -841,14 +837,16 @@ function Page() {
 
                   {tieneItems && (
                     <div className="space-y-1">
-                      <div className="font-mono text-sm font-semibold">{fmt(totalBruto)}</div>
+                      <div className="font-mono text-sm font-semibold">
+                        {formatMoney(totalBruto)}
+                      </div>
                       {items.slice(0, 2).map((it) => {
                         const color = ESTADO_COLORS[it.estadoCalculado] ?? ESTADO_COLORS.pendiente;
                         return (
                           <div
                             key={it.id}
                             className={`text-[10px] p-1 rounded truncate ${color.bg} ${color.text}`}
-                            title={`${it.comercioNombre} · ${it.bandera} · ${fmt(it.importeBruto)}`}
+                            title={`${it.comercioNombre} · ${it.bandera} · ${formatMoney(it.importeBruto)}`}
                           >
                             {it.bandera} · {it.comercioLegajo}
                           </div>
@@ -865,8 +863,10 @@ function Page() {
                           <div className="font-semibold flex items-center gap-1">
                             <AlertTriangle size={10} /> Adelanto
                           </div>
-                          <div className="font-mono">-{fmt(totalAdelantos)}</div>
-                          <div className="font-mono">Libre: {fmt(netoDespuesAdelantos)}</div>
+                          <div className="font-mono">-{formatMoney(totalAdelantos)}</div>
+                          <div className="font-mono">
+                            Libre: {formatMoney(netoDespuesAdelantos)}
+                          </div>
                           {cupoAgotado && (
                             <div className="text-danger-700 font-semibold mt-0.5">Cupo agotado</div>
                           )}
@@ -964,7 +964,7 @@ function KpiCard({
         {loading ? (
           <span className="inline-block w-20 h-5 bg-muted animate-pulse rounded" />
         ) : (
-          fmt(amount)
+          formatMoney(amount)
         )}
       </div>
       <div className="text-[10px] text-muted-foreground mt-0.5">{subtitle}</div>

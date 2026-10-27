@@ -1,3 +1,4 @@
+import { formatNumber } from "@/shared/format";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
 import {
@@ -441,9 +442,7 @@ function AnalisisConciliacionModal({
                       label: "Importe",
                       sortable: true,
                       render: (r) => (
-                        <span className="font-mono tabular-nums">
-                          {r.importe.toLocaleString("es-AR", { minimumFractionDigits: 2 })}
-                        </span>
+                        <span className="font-mono tabular-nums">{formatNumber(r.importe, 2)}</span>
                       ),
                     },
                     {
@@ -1254,7 +1253,7 @@ function ReportesComisiones() {
       label: "Cantidad",
       filterable: true,
       sortable: true,
-      render: (r) => r.cantidad.toLocaleString(),
+      render: (r) => formatNumber(r.cantidad),
     },
     {
       key: "monto",

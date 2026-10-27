@@ -1,3 +1,4 @@
+import { formatCuit, formatDate, formatDateTime, formatMoney } from "@/shared/format";
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
 import { useState, useRef, useEffect } from "react";
@@ -44,7 +45,6 @@ import {
   listEvaluacionesRiesgo,
   registrarEvaluacionRiesgo,
   updatePerfilTransaccional,
-  formatCuit,
   type RiesgoPLD,
   type EvaluacionRiesgoRow,
 } from "@/lib/api/clientes";
@@ -115,7 +115,7 @@ import { resolverEstadoMovimiento } from "@/lib/estados";
 import { useEstadosMovimiento } from "@/hooks/useEstados";
 import { useCambiarEstadoMovimiento } from "@/hooks/useMovimientoActions";
 import { FormDialog } from "@/components/form-dialog";
-import { MOCK_IMPUESTOS_POR_COBRAR, formatImpuestoMonto } from "@/data/impuestos-por-cobrar";
+import { MOCK_IMPUESTOS_POR_COBRAR } from "@/data/impuestos-por-cobrar";
 import { pageTitle } from "@/brand/brand";
 
 export const Route = createFileRoute("/admin/general/usuarios/$legajo")({
@@ -253,21 +253,6 @@ const BLOQUEO_PARAM_DEF: ParamDef[] = [
     periodoDefecto: "24h",
   },
 ];
-
-function fmtFecha(iso: string | null | undefined) {
-  if (!iso) return "—";
-  return new Date(iso).toLocaleDateString("es-AR");
-}
-
-function fmtFechaHora(iso: string | null | undefined) {
-  if (!iso) return "—";
-  return new Date(iso).toLocaleString("es-AR");
-}
-
-function fmtMonto(n: number | null | undefined) {
-  if (n === null || n === undefined) return "—";
-  return `$ ${n.toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-}
 
 function Toggle({ enabled, onChange }: { enabled: boolean; onChange: (v: boolean) => void }) {
   return (
@@ -627,8 +612,8 @@ function toDetalleMovimiento(m: Movimiento, catalogo: EstadoMovimiento[]): Detai
     nombreOrigen: m.cliente?.nombre ?? "—",
     nombreDestino: "—",
     cuit: m.cliente?.cuit ?? "—",
-    monto: fmtMonto(m.montoCobrado),
-    fecha: fmtFechaHora(m.fecha),
+    monto: formatMoney(m.montoCobrado),
+    fecha: formatDateTime(m.fecha),
     estado: resolverEstadoMovimiento(m, catalogo).codigo,
   };
 }
@@ -664,13 +649,13 @@ function TablaMovimientos({
             <tr key={m.id} className="border-b border-border last:border-b-0">
               <td className="px-4 py-3 font-mono text-xs">{m.idTxn}</td>
               <td className="px-4 py-3">{m.tipo}</td>
-              <td className="px-4 py-3 text-right tabular-nums">{fmtMonto(m.montoOperacion)}</td>
-              <td className="px-4 py-3 text-right tabular-nums">{fmtMonto(m.comision)}</td>
-              <td className="px-4 py-3 text-right tabular-nums">{fmtMonto(m.impuesto)}</td>
+              <td className="px-4 py-3 text-right tabular-nums">{formatMoney(m.montoOperacion)}</td>
+              <td className="px-4 py-3 text-right tabular-nums">{formatMoney(m.comision)}</td>
+              <td className="px-4 py-3 text-right tabular-nums">{formatMoney(m.impuesto)}</td>
               <td className="px-4 py-3 text-right tabular-nums font-medium">
-                {fmtMonto(m.montoCobrado)}
+                {formatMoney(m.montoCobrado)}
               </td>
-              <td className="px-4 py-3 whitespace-nowrap">{fmtFechaHora(m.fecha)}</td>
+              <td className="px-4 py-3 whitespace-nowrap">{formatDateTime(m.fecha)}</td>
               <td className="px-4 py-3">
                 <Badge tone={m.esFinal ? "success" : "warn"}>
                   {m.estadoNombre ?? m.estadoCodigo ?? "—"}
@@ -729,9 +714,9 @@ function TablaImpuestos({
               <td className="px-4 py-3 text-right tabular-nums">
                 {(a.impuesto?.tipo ?? a.tipo) === "Porcentaje"
                   ? `${a.impuesto?.monto ?? a.monto ?? 0} %`
-                  : fmtMonto(a.impuesto?.monto ?? a.monto)}
+                  : formatMoney(a.impuesto?.monto ?? a.monto)}
               </td>
-              <td className="px-4 py-3 whitespace-nowrap">{fmtFecha(a.fechaAsignacion)}</td>
+              <td className="px-4 py-3 whitespace-nowrap">{formatDate(a.fechaAsignacion)}</td>
               <td className="px-4 py-3">
                 <Badge tone={a.estado === "Activo" ? "success" : "neutral"}>{a.estado}</Badge>
               </td>
@@ -761,7 +746,7 @@ function camposIdentificacion(c: Cliente) {
   const personal: { label: string; valor: string }[] = [
     { label: "Legajo", valor: c.legajo },
     { label: "Email", valor: c.correo },
-    { label: "Fecha de registro", valor: fmtFecha(c.fechaAlta) },
+    { label: "Fecha de registro", valor: formatDate(c.fechaAlta) },
     {
       label: "Tipo de cuenta",
       valor: c.tipoPersona === "juridica" ? "Persona Jurídica" : "Persona Física",
@@ -778,7 +763,10 @@ function camposIdentificacion(c: Cliente) {
     { label: "Ciudad", valor: c.ciudad ?? "—" },
     { label: "Estado / Provincia", valor: c.provincia ?? "—" },
     { label: "Código postal", valor: c.cp ?? "—" },
-    { label: "Fecha de nacimiento", valor: c.fechaNacimiento ? fmtFecha(c.fechaNacimiento) : "—" },
+    {
+      label: "Fecha de nacimiento",
+      valor: c.fechaNacimiento ? formatDate(c.fechaNacimiento) : "—",
+    },
   ];
   const compliance: { label: string; valor: string }[] = [
     { label: "Ocupación", valor: c.ocupacion ?? "—" },
@@ -795,7 +783,7 @@ function camposIdentificacion(c: Cliente) {
     { label: "Nombre comercial", valor: c.nombreFantasia ?? "—" },
     {
       label: "Fecha de inscripción",
-      valor: c.fechaInscripcion ? fmtFecha(c.fechaInscripcion) : "—",
+      valor: c.fechaInscripcion ? formatDate(c.fechaInscripcion) : "—",
     },
   ];
   return { personal, compliance, empresa };
@@ -1780,11 +1768,11 @@ function ApiDetalleModal({
             </div>
             <div className="flex justify-between gap-2 border-b border-border pb-1">
               <dt className="text-muted-foreground">Creado</dt>
-              <dd className="font-medium">{fmtFechaHora(usuario?.createdAt)}</dd>
+              <dd className="font-medium">{formatDateTime(usuario?.createdAt)}</dd>
             </div>
             <div className="flex justify-between gap-2 border-b border-border pb-1">
               <dt className="text-muted-foreground">Actualizado</dt>
-              <dd className="font-medium">{fmtFechaHora(usuario?.updatedAt)}</dd>
+              <dd className="font-medium">{formatDateTime(usuario?.updatedAt)}</dd>
             </div>
             <div className="flex justify-between gap-2 border-b border-border pb-1">
               <dt className="text-muted-foreground">Acciones</dt>
@@ -1831,7 +1819,7 @@ function ApiDetalleModal({
                   <td className="px-3 py-2">
                     Creado a través de solicitud de registro de usuario.
                   </td>
-                  <td className="px-3 py-2">{fmtFechaHora(usuario?.createdAt)}</td>
+                  <td className="px-3 py-2">{formatDateTime(usuario?.createdAt)}</td>
                   <td className="px-3 py-2">
                     <Badge tone={credencialActiva ? "success" : "danger"}>
                       {credencialActiva ? "Activa" : "Inactiva"}
@@ -3089,7 +3077,9 @@ function ClienteDetailPage() {
                   <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                     Saldo total de la cuenta
                   </p>
-                  <p className="mt-2 text-2xl font-semibold tabular-nums">{fmtMonto(saldoTotal)}</p>
+                  <p className="mt-2 text-2xl font-semibold tabular-nums">
+                    {formatMoney(saldoTotal)}
+                  </p>
                   <p className="mt-1 text-xs text-muted-foreground">
                     Disponible + retenido ·{" "}
                     {(subcuentasQuery.data?.length ?? 0) > 0
@@ -3235,7 +3225,7 @@ function ClienteDetailPage() {
                                   <td className="px-2 py-1.5 font-medium">{r.impuesto}</td>
                                   <td className="px-2 py-1.5 font-mono">{r.loteId}</td>
                                   <td className="px-2 py-1.5 text-right font-mono">
-                                    {formatImpuestoMonto(r.monto)}
+                                    {formatMoney(r.monto)}
                                   </td>
                                   <td className="px-2 py-1.5">{r.bandera}</td>
                                 </tr>
@@ -3271,7 +3261,7 @@ function ClienteDetailPage() {
                                   <td className="px-2 py-1.5 font-medium">{r.impuesto}</td>
                                   <td className="px-2 py-1.5 font-mono">{r.loteId}</td>
                                   <td className="px-2 py-1.5 text-right font-mono">
-                                    {formatImpuestoMonto(r.monto)}
+                                    {formatMoney(r.monto)}
                                   </td>
                                   <td className="px-2 py-1.5 font-mono">{r.fechaLote}</td>
                                 </tr>
@@ -3535,7 +3525,7 @@ function ClienteDetailPage() {
                         {
                           label: "Monto",
                           render: (r: (typeof rows)[number]) => (
-                            <span className="font-mono">{formatImpuestoMonto(r.monto)}</span>
+                            <span className="font-mono">{formatMoney(r.monto)}</span>
                           ),
                         },
                         { label: "Estado", render: (r: (typeof rows)[number]) => r.estado },
@@ -3659,10 +3649,7 @@ function ClienteDetailPage() {
                       {riesgoVigente ? riesgoVigente.nivel.toUpperCase() : "Sin evaluar"}
                     </div>
                     <div className="text-xs text-muted-foreground">
-                      Vigente desde:{" "}
-                      {riesgoVigente
-                        ? new Date(riesgoVigente.vigente_desde).toLocaleDateString("es-AR")
-                        : "—"}
+                      Vigente desde: {riesgoVigente ? formatDate(riesgoVigente.vigente_desde) : "—"}
                     </div>
                   </div>
                   <p className="mt-3 text-xs text-foreground">
@@ -3681,7 +3668,7 @@ function ClienteDetailPage() {
                               {e.nivel.toUpperCase()}
                             </span>
                             {" · "}
-                            {new Date(e.created_at).toLocaleDateString("es-AR")}
+                            {formatDate(e.created_at)}
                             {" — "}
                             {e.motivo.length > 60 ? `${e.motivo.slice(0, 60)}…` : e.motivo}
                           </li>
@@ -3711,13 +3698,7 @@ function ClienteDetailPage() {
                         Monto máx. transferencia
                       </div>
                       <div className="text-sm font-semibold tabular-nums">
-                        {cliente.limiteTransferencia != null
-                          ? new Intl.NumberFormat("es-AR", {
-                              style: "currency",
-                              currency: "ARS",
-                              maximumFractionDigits: 0,
-                            }).format(cliente.limiteTransferencia)
-                          : "—"}
+                        {formatMoney(cliente.limiteTransferencia, { decimals: 0 })}
                       </div>
                     </div>
                     <div>
@@ -3733,13 +3714,7 @@ function ClienteDetailPage() {
                         Monto diario máx.
                       </div>
                       <div className="text-sm font-semibold tabular-nums">
-                        {cliente.limiteMontoDiario != null
-                          ? new Intl.NumberFormat("es-AR", {
-                              style: "currency",
-                              currency: "ARS",
-                              maximumFractionDigits: 0,
-                            }).format(cliente.limiteMontoDiario)
-                          : "—"}
+                        {formatMoney(cliente.limiteMontoDiario, { decimals: 0 })}
                       </div>
                     </div>
                   </div>
@@ -4049,7 +4024,7 @@ function ClienteDetailPage() {
                                     )}
                                   </td>
                                   <td className="px-4 py-3 text-right tabular-nums">
-                                    {l.monto != null ? fmtMonto(l.monto) : "—"}
+                                    {l.monto != null ? formatMoney(l.monto) : "—"}
                                   </td>
                                   <td className="px-4 py-3">
                                     <Badge
@@ -4209,7 +4184,9 @@ function ClienteDetailPage() {
                     </a>
                   )}
                   {l.monto != null && (
-                    <p className="mt-1 text-xs text-muted-foreground">Monto: {fmtMonto(l.monto)}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Monto: {formatMoney(l.monto)}
+                    </p>
                   )}
                 </div>
               ))}
@@ -4307,9 +4284,9 @@ function ClienteDetailPage() {
                 value:
                   (impuestoDetail.impuesto?.tipo ?? impuestoDetail.tipo) === "Porcentaje"
                     ? `${impuestoDetail.impuesto?.monto ?? impuestoDetail.monto ?? 0} %`
-                    : fmtMonto(impuestoDetail.impuesto?.monto ?? impuestoDetail.monto),
+                    : formatMoney(impuestoDetail.impuesto?.monto ?? impuestoDetail.monto),
               },
-              { label: "Fecha asignación", value: fmtFecha(impuestoDetail.fechaAsignacion) },
+              { label: "Fecha asignación", value: formatDate(impuestoDetail.fechaAsignacion) },
               { label: "Estado", value: impuestoDetail.estado },
               { label: "Legajo", value: impuestoDetail.clienteLegajo },
             ]}

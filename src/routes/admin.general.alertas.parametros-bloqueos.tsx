@@ -1,3 +1,4 @@
+import { formatDateTime } from "@/shared/format";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { keepPreviousData, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -688,9 +689,7 @@ function Page() {
             </div>
             <div>
               <span className="text-muted-foreground">Actualizado:</span>{" "}
-              <span className="font-medium">
-                {new Date(viendo.updatedAt).toLocaleString("es-AR")}
-              </span>
+              <span className="font-medium">{formatDateTime(viendo.updatedAt)}</span>
             </div>
             <div>
               <span className="text-muted-foreground">Salarios mínimos por persona:</span>{" "}

@@ -1,3 +1,4 @@
+import { formatMoney } from "@/shared/format";
 import { createFileRoute } from "@tanstack/react-router";
 import { AlertTriangle } from "lucide-react";
 import { PageHeader } from "@/components/page-header";
@@ -41,24 +42,24 @@ function Page() {
           <div className="space-y-3 text-sm">
             <div className="flex justify-between">
               <span>Interno de usuarios</span>
-              <span className="font-semibold">$ {interno.toLocaleString()}</span>
+              <span className="font-semibold">{formatMoney(interno)}</span>
             </div>
             <div className="flex justify-between">
               <span>+ Impuestos cobrados</span>
-              <span className="font-semibold">$ {impuestos.toLocaleString()}</span>
+              <span className="font-semibold">{formatMoney(impuestos)}</span>
             </div>
             <div className="flex justify-between border-t pt-2">
               <span>Subtotal</span>
-              <span className="font-semibold">$ {(interno + impuestos).toLocaleString()}</span>
+              <span className="font-semibold">{formatMoney(interno + impuestos)}</span>
             </div>
             <div className="flex justify-between">
               <span>− Banco</span>
-              <span className="font-semibold">$ {banco.toLocaleString()}</span>
+              <span className="font-semibold">{formatMoney(banco)}</span>
             </div>
             <div className="flex justify-between border-t pt-2 text-lg">
               <span className="font-semibold">Diferencia</span>
               <span className={`font-bold ${formula1 < 0 ? "text-danger-600" : "text-green-600"}`}>
-                {formula1 < 0 ? "-" : "+"}$ {Math.abs(formula1).toLocaleString()}
+                {formatMoney(formula1, { signo: true })}
               </span>
             </div>
           </div>
@@ -71,16 +72,16 @@ function Page() {
           <div className="space-y-3 text-sm">
             <div className="flex justify-between">
               <span>Interno de usuarios (nuevo)</span>
-              <span className="font-semibold">$ {internoNuevo.toLocaleString()}</span>
+              <span className="font-semibold">{formatMoney(internoNuevo)}</span>
             </div>
             <div className="flex justify-between">
               <span>− Banco</span>
-              <span className="font-semibold">$ {banco.toLocaleString()}</span>
+              <span className="font-semibold">{formatMoney(banco)}</span>
             </div>
             <div className="flex justify-between border-t pt-2 text-lg">
               <span className="font-semibold">Diferencia</span>
               <span className={`font-bold ${formula2 < 0 ? "text-danger-600" : "text-green-600"}`}>
-                {formula2 < 0 ? "-" : "+"}$ {Math.abs(formula2).toLocaleString()}
+                {formatMoney(formula2, { signo: true })}
               </span>
             </div>
           </div>

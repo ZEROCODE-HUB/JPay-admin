@@ -1,3 +1,4 @@
+import { formatDate, formatMoney } from "@/shared/format";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import {
@@ -69,16 +70,6 @@ type Props = {
   onClose: () => void;
   onCargado: (resultado: ResultadoCargaCsv) => void;
 };
-
-function fmt(n: number): string {
-  return `$ ${Number(n || 0).toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-}
-
-function fmtFecha(iso: string | null | undefined): string {
-  if (!iso) return "—";
-  const [y, m, d] = iso.split("-");
-  return `${d}/${m}/${y}`;
-}
 
 const ETIQUETA_ESTADO: Record<
   EstadoRenglon,
@@ -576,7 +567,7 @@ export function CargarCsvModal({ open, lote, onClose, onCargado }: Props) {
   const submitLabel = (() => {
     if (modoPerLote) {
       return hayPreviewPerLote
-        ? `Pasar a Pendiente (${fmt(previewPerLote!.totales.importeNeto)})`
+        ? `Pasar a Pendiente (${formatMoney(previewPerLote!.totales.importeNeto)})`
         : "Pasar a Pendiente";
     }
     if (hayPreviewGeneral) {
@@ -614,11 +605,11 @@ export function CargarCsvModal({ open, lote, onClose, onCargado }: Props) {
               </div>
               <div>
                 <div className="text-muted-foreground">Bruto estimado</div>
-                <div className="font-mono font-semibold">{fmt(lote.importeBruto)}</div>
+                <div className="font-mono font-semibold">{formatMoney(lote.importeBruto)}</div>
               </div>
               <div>
                 <div className="text-muted-foreground">Neto estimado</div>
-                <div className="font-mono font-semibold">{fmt(lote.importeNeto)}</div>
+                <div className="font-mono font-semibold">{formatMoney(lote.importeNeto)}</div>
               </div>
             </div>
           </div>
@@ -781,7 +772,7 @@ export function CargarCsvModal({ open, lote, onClose, onCargado }: Props) {
                           className={m.acreditable ? "" : "text-muted-foreground"}
                         >
                           <td className="px-2.5 py-1.5 font-mono tabular-nums">
-                            {fmtFecha(m.renglon.fecha)}
+                            {formatDate(m.renglon.fecha)}
                           </td>
                           <td className="px-2.5 py-1.5">{m.renglon.marca || "-"}</td>
                           <td className="px-2.5 py-1.5 font-mono">
@@ -791,17 +782,17 @@ export function CargarCsvModal({ open, lote, onClose, onCargado }: Props) {
                             {m.comercioNombre ?? "-"}
                           </td>
                           <td className="px-2.5 py-1.5 text-right font-mono tabular-nums">
-                            {fmt(m.renglon.totalBruto)}
+                            {formatMoney(m.renglon.totalBruto)}
                           </td>
                           <td className="px-2.5 py-1.5 text-right font-mono tabular-nums">
-                            {fmt(m.renglon.totalNeto)}
+                            {formatMoney(m.renglon.totalNeto)}
                           </td>
                           <td
                             className={`px-2.5 py-1.5 text-right font-mono tabular-nums ${
                               m.acreditable && m.diferencia > 0 ? "text-amber-600" : ""
                             }`}
                           >
-                            {m.acreditable ? fmt(m.diferencia) : "-"}
+                            {m.acreditable ? formatMoney(m.diferencia) : "-"}
                           </td>
                           <td className="px-2.5 py-1.5">
                             <Badge tone={et.tone}>{et.texto}</Badge>
@@ -856,8 +847,8 @@ export function CargarCsvModal({ open, lote, onClose, onCargado }: Props) {
               <div className="mt-2 flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
                 <AlertTriangle size={14} className="mt-0.5 shrink-0" />
                 <span>
-                  El bruto del CSV difiere del lote en {fmt(previewPerLote.diferenciaBruto)} (
-                  {previewPerLote.diferenciaBrutoPct}%), más allá de la tolerancia de{" "}
+                  El bruto del CSV difiere del lote en {formatMoney(previewPerLote.diferenciaBruto)}{" "}
+                  ({previewPerLote.diferenciaBrutoPct}%), más allá de la tolerancia de{" "}
                   {parametros.toleranciaBrutoPct}%. Se aplica igual.
                 </span>
               </div>
@@ -932,13 +923,13 @@ export function CargarCsvModal({ open, lote, onClose, onCargado }: Props) {
                           </td>
                           <td className="px-3 py-1.5">{m.lote.bandera}</td>
                           <td className="px-3 py-1.5 font-mono tabular-nums">
-                            {fmtFecha(m.lote.fecha)}
+                            {formatDate(m.lote.fecha)}
                           </td>
                           <td className="px-3 py-1.5 text-right font-mono tabular-nums">
-                            {fmt(m.preview.totales.brutoCsv)}
+                            {formatMoney(m.preview.totales.brutoCsv)}
                           </td>
                           <td className="px-3 py-1.5 text-right font-mono tabular-nums text-muted-foreground">
-                            {fmt(m.lote.importeBruto)}
+                            {formatMoney(m.lote.importeBruto)}
                           </td>
                           <td
                             className={`px-3 py-1.5 text-right font-mono tabular-nums ${
@@ -947,10 +938,10 @@ export function CargarCsvModal({ open, lote, onClose, onCargado }: Props) {
                                 : "text-muted-foreground"
                             }`}
                           >
-                            {fmt(m.preview.diferenciaBruto)}
+                            {formatMoney(m.preview.diferenciaBruto)}
                           </td>
                           <td className="px-3 py-1.5 text-right font-mono font-semibold text-emerald-700">
-                            {fmt(m.preview.totales.importeNeto)}
+                            {formatMoney(m.preview.totales.importeNeto)}
                           </td>
                         </tr>
                       ))}
@@ -982,15 +973,15 @@ export function CargarCsvModal({ open, lote, onClose, onCargado }: Props) {
                       {previewGeneral.sinMatch.map((r) => (
                         <tr key={r.nro} className="text-muted-foreground">
                           <td className="px-2.5 py-1.5 font-mono tabular-nums">
-                            {fmtFecha(r.fecha)}
+                            {formatDate(r.fecha)}
                           </td>
                           <td className="px-2.5 py-1.5">{r.marca || "-"}</td>
                           <td className="px-2.5 py-1.5 font-mono">{r.establecimiento || "-"}</td>
                           <td className="px-2.5 py-1.5 text-right font-mono tabular-nums">
-                            {fmt(r.totalBruto)}
+                            {formatMoney(r.totalBruto)}
                           </td>
                           <td className="px-2.5 py-1.5 text-right font-mono tabular-nums">
-                            {fmt(r.totalNeto)}
+                            {formatMoney(r.totalNeto)}
                           </td>
                           <td className="px-2.5 py-1.5 text-amber-700">
                             {r.error ? r.error : "sin lote Programado"}
@@ -1025,19 +1016,19 @@ export function CargarCsvModal({ open, lote, onClose, onCargado }: Props) {
             </h4>
             <CalcRow
               label="Neto liquidado por Payway"
-              value={fmt(previewPerLote.totales.netoCsv)}
+              value={formatMoney(previewPerLote.totales.netoCsv)}
               hint="TOTAL_NETO del CSV"
             />
             <div className="border-t my-1" />
             <CalcRow
               label={`Comisión ${brand.name}`}
-              value={`- ${fmt(previewPerLote.totales.comisionPropia)}`}
+              value={`- ${formatMoney(previewPerLote.totales.comisionPropia)}`}
               tone="subtract"
               hint={`${lote!.tasaPropiaPct}% sobre el neto`}
             />
             <CalcRow
               label="Comisión de cierre de lote"
-              value={`- ${fmt(previewPerLote.totales.comisionCierre)}`}
+              value={`- ${formatMoney(previewPerLote.totales.comisionCierre)}`}
               tone="subtract"
               hint={`${parametros.comisionCierreLotePct}% — se guarda como snapshot`}
             />
@@ -1072,7 +1063,7 @@ export function CargarCsvModal({ open, lote, onClose, onCargado }: Props) {
                     </span>
                   </span>
                   <span className="font-mono tabular-nums whitespace-nowrap text-danger-600">
-                    - {fmt(retenciones.debitoCredito.monto)}
+                    - {formatMoney(retenciones.debitoCredito.monto)}
                   </span>
                 </div>
                 <div className="flex items-start justify-between gap-3 text-sm py-1">
@@ -1095,7 +1086,7 @@ export function CargarCsvModal({ open, lote, onClose, onCargado }: Props) {
                     <span className="block text-[11px] opacity-80">{retenciones.iva.motivo}</span>
                   </span>
                   <span className="font-mono tabular-nums whitespace-nowrap text-danger-600">
-                    - {fmt(retenciones.iva.monto)}
+                    - {formatMoney(retenciones.iva.monto)}
                   </span>
                 </div>
                 <div className="flex items-start justify-between gap-3 text-sm py-1">
@@ -1118,7 +1109,7 @@ export function CargarCsvModal({ open, lote, onClose, onCargado }: Props) {
                     <span className="block text-[11px] opacity-80">{retenciones.iibb.motivo}</span>
                   </span>
                   <span className="font-mono tabular-nums whitespace-nowrap text-danger-600">
-                    - {fmt(iibbMontoFinal)}
+                    - {formatMoney(iibbMontoFinal)}
                   </span>
                 </div>
               </>
@@ -1126,19 +1117,19 @@ export function CargarCsvModal({ open, lote, onClose, onCargado }: Props) {
               <>
                 <CalcRow
                   label="Retención débito y crédito"
-                  value={`- ${fmt(previewPerLote.totales.retencionDebitoCredito)}`}
+                  value={`- ${formatMoney(previewPerLote.totales.retencionDebitoCredito)}`}
                   tone="subtract"
                   hint={`${parametros.retencionDebitoCreditoPct}% (RG 2111/4172)`}
                 />
                 <CalcRow
                   label="Retención IVA"
-                  value={`- ${fmt(previewPerLote.totales.retencionIva)}`}
+                  value={`- ${formatMoney(previewPerLote.totales.retencionIva)}`}
                   tone="subtract"
                   hint={`${parametros.retencionIvaPct}% sobre la comisión ${brand.name}`}
                 />
                 <CalcRow
                   label="Retención Ingresos Brutos"
-                  value={`- ${fmt(previewPerLote.totales.retencionIibb)}`}
+                  value={`- ${formatMoney(previewPerLote.totales.retencionIibb)}`}
                   tone="subtract"
                   hint="a completar por el operador"
                 />
@@ -1147,7 +1138,7 @@ export function CargarCsvModal({ open, lote, onClose, onCargado }: Props) {
             <div className="border-t mt-1 pt-1" />
             <CalcRow
               label="Importe a acreditar (Pendiente)"
-              value={fmt(
+              value={formatMoney(
                 retenciones
                   ? Math.max(
                       0,
@@ -1190,7 +1181,7 @@ export function CargarCsvModal({ open, lote, onClose, onCargado }: Props) {
                 </Label>
                 {retenciones?.iibb.asignado ? (
                   <div className="mt-1 h-10 px-3 rounded-md border bg-muted/30 text-sm font-mono flex items-center">
-                    {fmt(retenciones.iibb.monto)}
+                    {formatMoney(retenciones.iibb.monto)}
                   </div>
                 ) : (
                   <Input

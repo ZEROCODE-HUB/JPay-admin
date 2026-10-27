@@ -48,7 +48,3 @@ export function getImpuestosPorComercio(): ImpuestoPorComercio[] {
   }
   return Array.from(map.values());
 }
-
-export function formatImpuestoMonto(n: number) {
-  return `$ ${n.toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-}

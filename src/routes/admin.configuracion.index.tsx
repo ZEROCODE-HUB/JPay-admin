@@ -1,3 +1,4 @@
+import { formatNumber } from "@/shared/format";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import {
@@ -205,7 +206,7 @@ function Page() {
               <div className="flex items-center justify-between border-t border-border pt-3">
                 <span className="text-xs text-muted-foreground">Ejecuciones totales</span>
                 <span className="font-display text-lg font-semibold tabular-nums">
-                  {i.ejecuciones.toLocaleString()}
+                  {formatNumber(i.ejecuciones)}
                 </span>
               </div>
             </Card>

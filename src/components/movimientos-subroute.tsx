@@ -1,3 +1,4 @@
+import { formatDateTime, formatMoney, formatPercent } from "@/shared/format";
 import { useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Eye, FilterX, AlertTriangle, Inbox, ShieldAlert, Info } from "lucide-react";
@@ -14,7 +15,7 @@ import { useMovimientos } from "@/hooks/useMovimientos";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { useCambiarEstadoMovimiento } from "@/hooks/useMovimientoActions";
 import { useEstadosMovimiento, useEstadosPorTipo } from "@/hooks/useEstados";
-import { calcularDesglose, fmtARS } from "@/lib/aranceles";
+import { calcularDesglose } from "@/lib/aranceles";
 import { DataAccessError } from "@/lib/api/errors";
 import {
   ESTADOS_MOVIMIENTO,
@@ -39,13 +40,6 @@ const TIPO_LABEL: Record<string, string> = {
   cobro_pct: "Cobro PCT",
 };
 
-function fmtFecha(iso: string): string {
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return iso;
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
-}
-
 export function toViewMovimiento(m: MovimientoDB, catalogo: EstadoMovimiento[]): Movimiento {
   const pctImpuesto = m.comision > 0 ? (m.impuesto / m.comision) * 100 : 0;
   const estado = resolverEstadoMovimiento(m, catalogo).codigo;
@@ -60,8 +54,8 @@ export function toViewMovimiento(m: MovimientoDB, catalogo: EstadoMovimiento[]):
     nombreDestino: m.destinatarioNombre ?? (m.tipo === "transferencia" ? "—" : brand.name),
     cuit: m.destinatarioCuit ?? m.cliente?.cuit ?? "—",
     bancoDestino: m.destinatarioBanco ?? undefined,
-    monto: fmtARS(m.montoOperacion),
-    fecha: fmtFecha(m.fecha),
+    monto: formatMoney(m.montoOperacion),
+    fecha: formatDateTime(m.fecha),
     estado,
     desglose: calcularDesglose(m.comision, pctImpuesto),
   };
@@ -254,7 +248,8 @@ export function MovimientosSubRoute({
           return <span className="font-mono tabular-nums text-muted-foreground">—</span>;
         return (
           <span className="font-mono tabular-nums">
-            {fmtARS(monto)} <span className="text-muted-foreground">({pct.toFixed(2)}%)</span>
+            {formatMoney(monto)}{" "}
+            <span className="text-muted-foreground">({formatPercent(pct)})</span>
           </span>
         );
       },
@@ -449,7 +444,8 @@ const columns: Column<FilaSubRuta>[] = [
       const pct = r._montoOperacion > 0 ? (r._comision / r._montoOperacion) * 100 : 0;
       return (
         <span className="font-mono tabular-nums">
-          {fmtARS(r._comision)} <span className="text-muted-foreground">({pct.toFixed(2)}%)</span>
+          {formatMoney(r._comision)}{" "}
+          <span className="text-muted-foreground">({formatPercent(pct)})</span>
         </span>
       );
     },
@@ -462,7 +458,8 @@ const columns: Column<FilaSubRuta>[] = [
       const pct = r._montoOperacion > 0 ? (r._impuesto / r._montoOperacion) * 100 : 0;
       return (
         <span className="font-mono tabular-nums">
-          {fmtARS(r._impuesto)} <span className="text-muted-foreground">({pct.toFixed(2)}%)</span>
+          {formatMoney(r._impuesto)}{" "}
+          <span className="text-muted-foreground">({formatPercent(pct)})</span>
         </span>
       );
     },
@@ -471,14 +468,14 @@ const columns: Column<FilaSubRuta>[] = [
     key: "iva",
     label: "IVA sobre comisión",
     minWidth: 140,
-    render: (r) => <span className="font-mono tabular-nums">{fmtARS(r._iva)}</span>,
+    render: (r) => <span className="font-mono tabular-nums">{formatMoney(r._iva)}</span>,
   },
   {
     key: "cobrado",
     label: "Monto cobrado",
     minWidth: 150,
     render: (r) => (
-      <span className="font-mono font-semibold tabular-nums">{fmtARS(r._cobrado)}</span>
+      <span className="font-mono font-semibold tabular-nums">{formatMoney(r._cobrado)}</span>
     ),
   },
   {

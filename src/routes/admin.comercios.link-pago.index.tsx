@@ -1,3 +1,4 @@
+import { formatDate, formatDateTime, formatMoney } from "@/shared/format";
 import { createFileRoute } from "@tanstack/react-router";
 import { brand, pageTitle } from "@/brand/brand";
 import { useState, useEffect } from "react";
@@ -52,11 +53,6 @@ function tone(e: string): "success" | "neutral" | "warn" | "danger" {
   if (e === "Expirado" || e === "Cancelado") return "neutral";
   if (e === "Rechazado" || e === "Eliminado" || e === "Suspendido") return "danger";
   return "warn"; // Pendiente de aprobación
-}
-
-function fmtMoney(n: number | null | undefined) {
-  if (n == null) return "—";
-  return `$ ${Number(n).toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
 function EnlaceDetalle({ enlace, onClose }: { enlace: EnlacePago; onClose: () => void }) {
@@ -120,7 +116,9 @@ function EnlaceDetalle({ enlace, onClose }: { enlace: EnlacePago; onClose: () =>
               </div>
               <div>
                 <span className="text-muted-foreground">Monto</span>
-                <div className="font-mono font-semibold">{fmtMoney(enlace.monto)}</div>
+                <div className="font-mono font-semibold">
+                  {formatMoney(enlace.monto == null ? null : Number(enlace.monto))}
+                </div>
               </div>
               <div>
                 <span className="text-muted-foreground">Referencia</span>
@@ -129,7 +127,7 @@ function EnlaceDetalle({ enlace, onClose }: { enlace: EnlacePago; onClose: () =>
               <div>
                 <span className="text-muted-foreground">Expira</span>
                 <div className="font-mono text-xs">
-                  {enlace.expiraEn ? new Date(enlace.expiraEn).toLocaleDateString("es-AR") : "—"}
+                  {enlace.expiraEn ? formatDate(enlace.expiraEn) : "—"}
                 </div>
               </div>
               <div>
@@ -192,12 +190,14 @@ function EnlaceDetalle({ enlace, onClose }: { enlace: EnlacePago; onClose: () =>
                 </div>
                 <div>
                   <span className="text-muted-foreground">Importe pagado</span>
-                  <div className="font-mono font-semibold">{fmtMoney(pago.importePagado)}</div>
+                  <div className="font-mono font-semibold">
+                    {formatMoney(pago.importePagado == null ? null : Number(pago.importePagado))}
+                  </div>
                 </div>
                 <div>
                   <span className="text-muted-foreground">Fecha de pago</span>
                   <div className="font-mono text-xs">
-                    {pago.fechaPago ? new Date(pago.fechaPago).toLocaleString("es-AR") : "—"}
+                    {pago.fechaPago ? formatDateTime(pago.fechaPago) : "—"}
                   </div>
                 </div>
                 <div>
@@ -453,7 +453,7 @@ function Page() {
       label: "Monto",
       render: (r) => (
         <span className="font-mono tabular-nums text-xs">
-          {r.monto != null ? `$ ${Number(r.monto).toLocaleString("es-AR")}` : "—"}
+          {formatMoney(r.monto == null ? null : Number(r.monto))}
         </span>
       ),
     },
@@ -467,11 +467,7 @@ function Page() {
     {
       key: "createdAt",
       label: "Fecha",
-      render: (r) => (
-        <span className="font-mono text-xs">
-          {new Date(r.createdAt).toLocaleDateString("es-AR")}
-        </span>
-      ),
+      render: (r) => <span className="font-mono text-xs">{formatDate(r.createdAt)}</span>,
     },
   ];
 

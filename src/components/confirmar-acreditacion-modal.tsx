@@ -1,3 +1,4 @@
+import { formatDate, formatMoney } from "@/shared/format";
 import { useEffect, useMemo, useState } from "react";
 import { AlertTriangle, Info, Wallet } from "lucide-react";
 import { FormDialog } from "@/components/form-dialog";
@@ -21,16 +22,6 @@ type Props = {
   onClose: () => void;
   onAcreditado: () => void;
 };
-
-function fmt(n: number): string {
-  return `$ ${Number(n || 0).toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-}
-
-function fmtFecha(iso: string | null | undefined): string {
-  if (!iso) return "—";
-  const [y, m, d] = iso.split("-");
-  return `${d}/${m}/${y}`;
-}
 
 function CalcRow({
   label,
@@ -110,7 +101,7 @@ export function ConfirmarAcreditacionModal({ lote, onClose, onAcreditado }: Prop
   // netoCsv = importeNeto + descuentos (reconstruido del snapshot)
   const netoCsv = importeNeto + totalDescuentos;
 
-  const submitLabel = lote ? `Acreditar y depositar ${fmt(netoFinal)}` : "Acreditar";
+  const submitLabel = lote ? `Acreditar y depositar ${formatMoney(netoFinal)}` : "Acreditar";
 
   const confirmar = async () => {
     if (!lote) return;
@@ -162,12 +153,12 @@ export function ConfirmarAcreditacionModal({ lote, onClose, onAcreditado }: Prop
               </div>
               <div>
                 <div className="text-muted-foreground">Fecha estimada</div>
-                <div className="font-mono font-semibold">{fmtFecha(lote.fecha)}</div>
+                <div className="font-mono font-semibold">{formatDate(lote.fecha)}</div>
               </div>
               <div>
                 <div className="text-muted-foreground">Fecha cobro real</div>
                 <div className="font-mono font-semibold flex items-center gap-1.5">
-                  {fmtFecha(lote.fechaCobroReal)}
+                  {formatDate(lote.fechaCobroReal)}
                   {lote.fechaCobroReal ? (
                     <Badge tone="success">real</Badge>
                   ) : (
@@ -186,20 +177,20 @@ export function ConfirmarAcreditacionModal({ lote, onClose, onAcreditado }: Prop
 
             <CalcRow
               label="Neto liquidado por Payway (CSV)"
-              value={fmt(netoCsv)}
+              value={formatMoney(netoCsv)}
               hint="TOTAL_NETO reconstruido del snapshot"
             />
             <div className="border-t my-1" />
 
             <CalcRow
               label={`Comisión ${brand.name}`}
-              value={`- ${fmt(comisionPropiaMonto)}`}
+              value={`- ${formatMoney(comisionPropiaMonto)}`}
               tone="subtract"
               hint={`${lote.tasaPropiaPct}% sobre el neto CSV`}
             />
             <CalcRow
               label="Comisión de cierre de lote"
-              value={`- ${fmt(comisionCierreMonto)}`}
+              value={`- ${formatMoney(comisionCierreMonto)}`}
               tone="subtract"
               hint={
                 lote.comisionCierreLotePct != null
@@ -209,26 +200,26 @@ export function ConfirmarAcreditacionModal({ lote, onClose, onAcreditado }: Prop
             />
             <CalcRow
               label="Retención débito/crédito"
-              value={`- ${fmt(debitoCreditoMonto)}`}
+              value={`- ${formatMoney(debitoCreditoMonto)}`}
               tone="subtract"
               hint="RG 2111/4172"
             />
             <CalcRow
               label="Retención IVA"
-              value={`- ${fmt(ivaMonto)}`}
+              value={`- ${formatMoney(ivaMonto)}`}
               tone="subtract"
               hint={`21% sobre la comisión ${brand.name}`}
             />
             <CalcRow
               label="Retención Ingresos Brutos"
-              value={`- ${fmt(iibbMonto)}`}
+              value={`- ${formatMoney(iibbMonto)}`}
               tone="subtract"
             />
 
             <div className="border-t mt-1 pt-1" />
             <CalcRow
               label="Importe a acreditar (lote Pendiente)"
-              value={fmt(importeNeto)}
+              value={formatMoney(importeNeto)}
               tone="total"
               hint="a depositar en la subcuenta Operativa"
             />
@@ -246,14 +237,14 @@ export function ConfirmarAcreditacionModal({ lote, onClose, onAcreditado }: Prop
               </h4>
               <CalcRow
                 label="Deducción por adelantos Pendiente/Aprobado"
-                value={`- ${fmt(deduccionAdelantos)}`}
+                value={`- ${formatMoney(deduccionAdelantos)}`}
                 tone="subtract"
                 hint="se descuenta del neto acreditado (FIFO)"
               />
               <div className="border-t pt-1">
                 <CalcRow
                   label="Neto final a depositar en la subcuenta"
-                  value={fmt(netoFinal)}
+                  value={formatMoney(netoFinal)}
                   tone="final"
                   hint="importe_neto - deducción adelantos"
                 />
@@ -262,7 +253,7 @@ export function ConfirmarAcreditacionModal({ lote, onClose, onAcreditado }: Prop
                 <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
                   <AlertTriangle size={14} className="mt-0.5 shrink-0" />
                   <span>
-                    La deducción ({fmt(deduccionAdelantos)}) supera el neto del lote. La RPC
+                    La deducción ({formatMoney(deduccionAdelantos)}) supera el neto del lote. La RPC
                     rechazará esta confirmación; revisá los adelantos.
                   </span>
                 </div>

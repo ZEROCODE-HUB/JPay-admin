@@ -1,4 +1,5 @@
 ﻿import { createFileRoute } from "@tanstack/react-router";
+import { formatDate } from "@/shared/format";
 import { pageTitle } from "@/brand/brand";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -74,15 +75,6 @@ function MensajeEstado({
       <p>No hay excepciones que coincidan con la búsqueda.</p>
     </div>
   );
-}
-
-function formatFecha(f: string | null) {
-  if (!f) return "—";
-  try {
-    return new Date(f).toLocaleDateString("es-AR");
-  } catch {
-    return f;
-  }
 }
 
 // --- Alta manual de excepción ----------------------------------------------------
@@ -276,14 +268,14 @@ function Page() {
       key: "vigenciaDesde",
       label: "Vigencia desde",
       render: (r) => (
-        <span className="font-mono tabular-nums text-xs">{formatFecha(r.vigenciaDesde)}</span>
+        <span className="font-mono tabular-nums text-xs">{formatDate(r.vigenciaDesde)}</span>
       ),
     },
     {
       key: "vigenciaHasta",
       label: "Vigencia hasta",
       render: (r) => (
-        <span className="font-mono tabular-nums text-xs">{formatFecha(r.vigenciaHasta)}</span>
+        <span className="font-mono tabular-nums text-xs">{formatDate(r.vigenciaHasta)}</span>
       ),
     },
     {

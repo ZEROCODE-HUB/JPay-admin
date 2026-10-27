@@ -1,7 +1,7 @@
+import { formatPercent } from "@/shared/format";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, Info } from "lucide-react";
 import { BrandLogo } from "@/components/brand-logo";
-import { fmtPct } from "@/lib/aranceles";
 import { brand, pageTitle } from "@/brand/brand";
 
 export const Route = createFileRoute("/legales/comisiones")({
@@ -54,7 +54,7 @@ const filas: Fila[] = [
 ];
 
 const comLabel = (f: Fila) =>
-  f.comTexto ? f.comTexto : f.comPct != null ? fmtPct(f.comPct) : "$ 45,00";
+  f.comTexto ? f.comTexto : f.comPct != null ? formatPercent(f.comPct) : "$ 45,00";
 
 const totalLabel = (f: Fila): string => {
   if (f.comTexto) return "—";
@@ -105,7 +105,7 @@ function Page() {
                     {comLabel(f)}
                   </td>
                   <td className="px-4 py-3 text-right whitespace-nowrap font-mono tabular-nums text-muted-foreground">
-                    {f.comTexto ? "—" : `IVA ${fmtPct(IVA)}`}
+                    {f.comTexto ? "—" : `IVA ${formatPercent(IVA)}`}
                   </td>
                   <td className="px-4 py-3 text-right font-semibold whitespace-nowrap font-mono tabular-nums">
                     {totalLabel(f)}
@@ -119,11 +119,12 @@ function Page() {
         <div className="mt-4 flex items-start gap-2 rounded-lg border border-muted bg-muted/30 px-4 py-3 text-xs text-muted-foreground">
           <Info size={14} className="shrink-0 mt-0.5" />
           <p>
-            El impuesto (IVA {fmtPct(IVA)}) se aplica <strong>sobre la comision</strong> y{" "}
+            El impuesto (IVA {formatPercent(IVA)}) se aplica <strong>sobre la comision</strong> y{" "}
             {brand.name}
             lo retiene y liquida por el servicio. Formula del total cobrado:{" "}
-            <span className="font-mono">comision x (1 + {fmtPct(IVA)})</span>. Es independiente de
-            retenciones impositivas que correspondan al comercio (Ingresos Brutos, debito/credito).
+            <span className="font-mono">comision x (1 + {formatPercent(IVA)})</span>. Es
+            independiente de retenciones impositivas que correspondan al comercio (Ingresos Brutos,
+            debito/credito).
           </p>
         </div>
 

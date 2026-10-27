@@ -1,3 +1,4 @@
+import { formatDateTime, formatMoney } from "@/shared/format";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { keepPreviousData, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -46,19 +47,6 @@ const ALCANCE_LABEL: Record<BlockScope, string> = {
   client: "Toda la cuenta",
   subaccount: "Subcuenta",
 };
-
-const fmtFecha = (iso: string | null) =>
-  iso
-    ? new Date(iso).toLocaleString("es-AR", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-      })
-    : "—";
-const fmtMonto = (n: number) =>
-  `$ ${n.toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
 const invertir = <K extends string>(m: Record<K, string>) =>
   new Map(Object.entries(m).map(([k, v]) => [v as string, k as K]));
@@ -133,7 +121,7 @@ function Page() {
       const r = await releaseBlock(liberando.id, notas.trim());
       toast.success(
         r.depositos_liberados > 0
-          ? `Bloqueo liberado. Se liberaron ${r.depositos_liberados} depósito(s) retenido(s) por ${fmtMonto(Number(r.monto_liberado))}.`
+          ? `Bloqueo liberado. Se liberaron ${r.depositos_liberados} depósito(s) retenido(s) por ${formatMoney(Number(r.monto_liberado))}.`
           : "Bloqueo liberado.",
       );
       setLiberando(null);
@@ -265,7 +253,7 @@ function Page() {
           </Badge>
           {r.heldAmount > 0 && (
             <span className="text-[11px] text-muted-foreground">
-              Retenido {fmtMonto(r.heldAmount)}
+              Retenido {formatMoney(r.heldAmount)}
             </span>
           )}
         </div>
@@ -289,7 +277,7 @@ function Page() {
       filterable: "date",
       minWidth: 150,
       render: (r) => (
-        <span className="font-mono tabular-nums text-xs">{fmtFecha(r.blockedAt)}</span>
+        <span className="font-mono tabular-nums text-xs">{formatDateTime(r.blockedAt)}</span>
       ),
     },
     {
@@ -298,7 +286,7 @@ function Page() {
       filterable: "date",
       minWidth: 150,
       render: (r) => (
-        <span className="font-mono tabular-nums text-xs">{fmtFecha(r.acceptedAt)}</span>
+        <span className="font-mono tabular-nums text-xs">{formatDateTime(r.acceptedAt)}</span>
       ),
     },
   ];
@@ -392,13 +380,13 @@ function Page() {
             />
             <Campo
               label="Bloqueado"
-              value={`${fmtFecha(detalle.blockedAt)} · ${detalle.blockedByName ?? "Sistema"}`}
+              value={`${formatDateTime(detalle.blockedAt)} · ${detalle.blockedByName ?? "Sistema"}`}
             />
             <Campo
               label="Aceptado"
               value={
                 detalle.acceptedAt
-                  ? `${fmtFecha(detalle.acceptedAt)} · ${detalle.acceptedByName ?? "—"}`
+                  ? `${formatDateTime(detalle.acceptedAt)} · ${detalle.acceptedByName ?? "—"}`
                   : "—"
               }
             />
@@ -406,11 +394,11 @@ function Page() {
               label="Liberado"
               value={
                 detalle.releasedAt
-                  ? `${fmtFecha(detalle.releasedAt)} · ${detalle.releasedByName ?? "—"}`
+                  ? `${formatDateTime(detalle.releasedAt)} · ${detalle.releasedByName ?? "—"}`
                   : "—"
               }
             />
-            <Campo label="Fondos retenidos" value={fmtMonto(detalle.heldAmount)} />
+            <Campo label="Fondos retenidos" value={formatMoney(detalle.heldAmount)} />
             <Campo label="Motivo" value={detalle.reason} full />
             {detalle.releaseNotes && (
               <Campo label="Motivo de liberación" value={detalle.releaseNotes} full />
@@ -440,8 +428,8 @@ function Page() {
         >
           {liberando.heldAmount > 0 && (
             <div className="mb-3 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
-              Se liberarán {fmtMonto(liberando.heldAmount)} de depósitos retenidos: pasan de saldo
-              retenido a disponible con su asiento contable.
+              Se liberarán {formatMoney(liberando.heldAmount)} de depósitos retenidos: pasan de
+              saldo retenido a disponible con su asiento contable.
             </div>
           )}
           <label className="text-xs font-semibold text-foreground mb-1.5 block">

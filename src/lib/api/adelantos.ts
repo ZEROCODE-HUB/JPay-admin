@@ -1,3 +1,4 @@
+import { formatMoney } from "@/shared/format";
 import { requireSupabase } from "@/lib/supabase";
 import type { TablesUpdate } from "@/lib/database.types";
 import { DataAccessError } from "./errors";
@@ -169,7 +170,7 @@ export async function createAdelanto(input: {
       if (input.montoSolicitado > tope) {
         throw new DataAccessError(
           new Error(
-            `El monto solicitado ($${input.montoSolicitado.toLocaleString()}) supera el máximo disponible para adelantar ($${tope.toLocaleString()}).`,
+            `El monto solicitado (${formatMoney(input.montoSolicitado)}) supera el máximo disponible para adelantar (${formatMoney(tope)}).`,
           ),
         );
       }
@@ -203,7 +204,7 @@ export async function createAdelanto(input: {
       if (input.montoSolicitado > montoMaximo) {
         throw new DataAccessError(
           new Error(
-            `El monto solicitado ($${input.montoSolicitado.toLocaleString()}) supera el máximo disponible para adelantar ($${montoMaximo.toLocaleString()}). Ventas totales: $${totalVendido.toLocaleString()}, adelantos pendientes: $${adelantosPendientes.toLocaleString()}.`,
+            `El monto solicitado (${formatMoney(input.montoSolicitado)}) supera el máximo disponible para adelantar (${formatMoney(montoMaximo)}). Ventas totales: ${formatMoney(totalVendido)}, adelantos pendientes: ${formatMoney(adelantosPendientes)}.`,
           ),
         );
       }

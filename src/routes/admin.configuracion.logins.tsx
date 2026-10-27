@@ -1,3 +1,4 @@
+import { formatNumber } from "@/shared/format";
 import { createFileRoute } from "@tanstack/react-router";
 import { DataTable, type Column } from "@/components/data-table";
 import { PageHeader, Badge } from "@/components/portal-shell";
@@ -158,7 +159,7 @@ function Page() {
       label: "Ejecuciones",
       sortable: true,
       render: (r) => (
-        <span className="font-semibold tabular-nums">{r.ejecuciones.toLocaleString()}</span>
+        <span className="font-semibold tabular-nums">{formatNumber(r.ejecuciones)}</span>
       ),
     },
     {

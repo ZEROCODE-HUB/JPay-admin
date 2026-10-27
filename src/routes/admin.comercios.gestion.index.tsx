@@ -1,3 +1,4 @@
+import { formatDate, formatMoney, formatPercent } from "@/shared/format";
 import { createFileRoute } from "@tanstack/react-router";
 import { brand, pageTitle } from "@/brand/brand";
 import { useQueryClient } from "@tanstack/react-query";
@@ -50,7 +51,7 @@ import type {
   NivelComercio,
 } from "@/lib/api/types";
 import { ESTADOS_COMERCIO, NIVELES_COMERCIO } from "@/lib/api/types";
-import { MOCK_IMPUESTOS_POR_COBRAR, formatImpuestoMonto } from "@/data/impuestos-por-cobrar";
+import { MOCK_IMPUESTOS_POR_COBRAR } from "@/data/impuestos-por-cobrar";
 
 export const Route = createFileRoute("/admin/comercios/gestion/")({
   component: Page,
@@ -121,10 +122,6 @@ function MensajeEstado({
       <p>No hay comercios que coincidan con la búsqueda.</p>
     </div>
   );
-}
-
-function formatPct(n: number): string {
-  return `${n.toFixed(2)}%`;
 }
 
 function BanderasSection({ comercioId }: { comercioId: string }) {
@@ -369,13 +366,13 @@ function BanderasSection({ comercioId }: { comercioId: string }) {
                     {b.metodoKey || "-"}
                   </td>
                   <td className="px-3 py-2.5 text-right font-mono tabular-nums">
-                    {formatPct(b.comisionPropia)}
+                    {formatPercent(b.comisionPropia)}
                   </td>
                   <td className="px-3 py-2.5 text-right font-mono tabular-nums">
-                    {formatPct(b.comisionPayway)}
+                    {formatPercent(b.comisionPayway)}
                   </td>
                   <td className="px-3 py-2.5 text-right font-mono tabular-nums font-semibold">
-                    {formatPct(b.comisionNeta)}
+                    {formatPercent(b.comisionNeta)}
                   </td>
                   <td className="px-3 py-2.5">
                     <Badge tone={b.estado === "Activo" ? "success" : "neutral"}>{b.estado}</Badge>
@@ -500,7 +497,7 @@ function BanderasSection({ comercioId }: { comercioId: string }) {
             </div>
             <div className="rounded-md bg-muted px-3 py-2 flex justify-between text-sm">
               <span className="text-muted-foreground">% Neto (autocalculado)</span>
-              <span className="font-mono font-semibold">{neto.toFixed(2)}%</span>
+              <span className="font-mono font-semibold">{formatPercent(neto)}</span>
             </div>
             <div>
               <Label>Estado</Label>
@@ -584,7 +581,9 @@ function BanderasSection({ comercioId }: { comercioId: string }) {
                 {cuotas.map((c) => (
                   <tr key={c.id} className="border-b last:border-0">
                     <td className="px-3 py-2 font-mono font-semibold">{c.cuotas}x</td>
-                    <td className="px-3 py-2 text-right font-mono">{formatPct(c.tasaMensual)}</td>
+                    <td className="px-3 py-2 text-right font-mono">
+                      {formatPercent(c.tasaMensual)}
+                    </td>
                     <td className="px-3 py-2">
                       <Badge tone={c.estado === "Activo" ? "success" : "neutral"}>{c.estado}</Badge>
                     </td>
@@ -752,7 +751,7 @@ function ComercioDetalle({ comercio, onClose }: { comercio: Comercio; onClose: (
                 label="Fecha de registro"
                 value={
                   <span className="font-mono text-xs tabular-nums">
-                    {new Date(comercio.createdAt).toLocaleDateString("es-AR")}
+                    {formatDate(comercio.createdAt)}
                   </span>
                 }
               />
@@ -788,7 +787,7 @@ function ComercioDetalle({ comercio, onClose }: { comercio: Comercio; onClose: (
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <div className="text-2xl font-mono font-semibold tabular-nums">
-                      {formatImpuestoMonto(total)}
+                      {formatMoney(total)}
                     </div>
                     <Badge tone="warn">Por pagar</Badge>
                   </div>
@@ -804,9 +803,7 @@ function ComercioDetalle({ comercio, onClose }: { comercio: Comercio; onClose: (
                         <span className="font-mono text-xs">
                           {loteId} · {v.count} impuesto(s)
                         </span>
-                        <span className="font-mono font-semibold">
-                          {formatImpuestoMonto(v.total)}
-                        </span>
+                        <span className="font-mono font-semibold">{formatMoney(v.total)}</span>
                       </div>
                     ))}
                   </div>
@@ -1426,9 +1423,7 @@ function Page() {
       sortable: true,
       minWidth: 120,
       render: (r) => (
-        <span className="font-mono text-xs tabular-nums">
-          {new Date(r.createdAt).toLocaleDateString("es-AR")}
-        </span>
+        <span className="font-mono text-xs tabular-nums">{formatDate(r.createdAt)}</span>
       ),
     },
   ];

@@ -1,3 +1,4 @@
+import { formatDateTime, formatMoney, formatPercent } from "@/shared/format";
 import { createFileRoute } from "@tanstack/react-router";
 import { pageTitle } from "@/brand/brand";
 import { useQueryClient } from "@tanstack/react-query";
@@ -35,10 +36,6 @@ const AMBITOS_IMPUESTO: AmbitoImpuesto[] = ["Externo", "Interno"];
 
 function estadoTone(estado: "Activo" | "Inactivo"): "success" | "neutral" {
   return estado === "Activo" ? "success" : "neutral";
-}
-
-function formatTasa(tasa: number) {
-  return Number.isInteger(tasa) ? String(tasa) : tasa.toFixed(2);
 }
 
 function Field({ label, value }: { label: string; value: React.ReactNode }) {
@@ -135,9 +132,7 @@ function DetalleModal({ imp, onClose }: { imp: Impuesto; onClose: () => void }) 
                   "—"
                 ) : (
                   <span className="font-mono tabular-nums">
-                    {imp.tipo === "Porcentaje"
-                      ? `${formatTasa(imp.monto)}%`
-                      : `$ ${formatTasa(imp.monto)}`}
+                    {imp.tipo === "Porcentaje" ? formatPercent(imp.monto) : formatMoney(imp.monto)}
                   </span>
                 )
               }
@@ -149,17 +144,13 @@ function DetalleModal({ imp, onClose }: { imp: Impuesto; onClose: () => void }) 
             <Field
               label="Creado"
               value={
-                <span className="font-mono tabular-nums">
-                  {new Date(imp.createdAt).toLocaleString("es-AR")}
-                </span>
+                <span className="font-mono tabular-nums">{formatDateTime(imp.createdAt)}</span>
               }
             />
             <Field
               label="Actualizado"
               value={
-                <span className="font-mono tabular-nums">
-                  {new Date(imp.updatedAt).toLocaleString("es-AR")}
-                </span>
+                <span className="font-mono tabular-nums">{formatDateTime(imp.updatedAt)}</span>
               }
             />
           </div>
@@ -501,7 +492,7 @@ function Page() {
           "—"
         ) : (
           <span className="font-mono tabular-nums">
-            {r.tipo === "Porcentaje" ? `${formatTasa(r.monto)}%` : `$ ${formatTasa(r.monto)}`}
+            {r.tipo === "Porcentaje" ? formatPercent(r.monto) : formatMoney(r.monto)}
           </span>
         ),
     },

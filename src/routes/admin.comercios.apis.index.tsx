@@ -1,3 +1,4 @@
+import { formatDateTime } from "@/shared/format";
 import { createFileRoute } from "@tanstack/react-router";
 import { brand, pageTitle } from "@/brand/brand";
 import { useQueryClient } from "@tanstack/react-query";
@@ -136,9 +137,7 @@ function DetalleModal({ usr, onClose }: { usr: ApiUsuario; onClose: () => void }
               <Field
                 label="Fecha de creación"
                 value={
-                  <span className="font-mono tabular-nums">
-                    {new Date(usr.createdAt).toLocaleString("es-AR")}
-                  </span>
+                  <span className="font-mono tabular-nums">{formatDateTime(usr.createdAt)}</span>
                 }
               />
             </div>
@@ -426,11 +425,7 @@ function Page() {
       key: "createdAt",
       label: "Fecha de creación",
       sortable: true,
-      render: (r) => (
-        <span className="font-mono tabular-nums">
-          {new Date(r.createdAt).toLocaleString("es-AR")}
-        </span>
-      ),
+      render: (r) => <span className="font-mono tabular-nums">{formatDateTime(r.createdAt)}</span>,
     },
   ];
 

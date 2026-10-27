@@ -1,3 +1,4 @@
+import { formatDate, formatDateTime, formatMoney, formatTime } from "@/shared/format";
 import { createFileRoute } from "@tanstack/react-router";
 import { brand, pageTitle } from "@/brand/brand";
 import { useState, useEffect, useMemo, useRef, type ReactElement } from "react";
@@ -86,10 +87,6 @@ function tone(e: EstadoContra): "warn" | "neutral" | "success" | "danger" {
   return "danger"; // Cerrado_retenido
 }
 
-function fmt(n: number) {
-  return `$ ${n.toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-}
-
 /**
  * Días hábiles entre hoy y `fecha_limite`.
  * - Positivo: días que faltan (en horario hábil, lun-vie)
@@ -133,24 +130,18 @@ function PlazoMediacion({
     );
   }
   const dias = diasHabilesRestantes(fechaLimite);
-  const fechaFmt = new Date(fechaLimite).toLocaleString("es-AR", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  const fechaFmt = formatDateTime(fechaLimite);
   let badge: ReactElement;
   let texto: string;
   if (enviadoAt) {
     badge = <Badge tone="success">Enviado a PayWay</Badge>;
-    texto = `Enviado el ${new Date(enviadoAt).toLocaleDateString("es-AR")}.`;
+    texto = `Enviado el ${formatDate(enviadoAt)}.`;
   } else if (dias < 0) {
     badge = <Badge tone="danger">Vencido hace {-dias} día(s) hábil(es)</Badge>;
     texto = `Venció el ${fechaFmt}.`;
   } else if (dias === 0) {
     badge = <Badge tone="warn">Vence hoy</Badge>;
-    texto = `Vence hoy a las ${new Date(fechaLimite).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })}.`;
+    texto = `Vence hoy a las ${formatTime(fechaLimite)}.`;
   } else {
     badge = <Badge tone="warn">Vence en {dias} día(s) hábil(es)</Badge>;
     texto = `Límite: ${fechaFmt}.`;
@@ -215,7 +206,7 @@ function Detalle({ c, onClose }: { c: Contra; onClose: () => void }) {
       if (estado === "Cerrado_retenido" && loteId) {
         const r = await cerrarComoRetenido(c.id, loteId);
         toast.success(
-          `Contracargo retenido. Se descontaron ${fmt(r.importeDescontado)} del lote ${r.loteCodigo || r.loteId.slice(0, 8)}.`,
+          `Contracargo retenido. Se descontaron ${formatMoney(r.importeDescontado)} del lote ${r.loteCodigo || r.loteId.slice(0, 8)}.`,
         );
       } else {
         await updateContracargo(c.id, {
@@ -345,13 +336,13 @@ function Detalle({ c, onClose }: { c: Contra; onClose: () => void }) {
                 {c.impactoNeto != null && (
                   <div>
                     <span className="text-blue-600">Descuento neto:</span>{" "}
-                    <span className="font-mono font-semibold">{fmt(c.impactoNeto)}</span>
+                    <span className="font-mono font-semibold">{formatMoney(c.impactoNeto)}</span>
                   </div>
                 )}
                 {c.impactoSaldo != null && (
                   <div>
                     <span className="text-blue-600">Saldo commerce:</span>{" "}
-                    <span className="font-mono font-semibold">{fmt(c.impactoSaldo)}</span>
+                    <span className="font-mono font-semibold">{formatMoney(c.impactoSaldo)}</span>
                   </div>
                 )}
                 {c.impactoTasa != null && (
@@ -363,7 +354,7 @@ function Detalle({ c, onClose }: { c: Contra; onClose: () => void }) {
                 {c.impactoCierre != null && (
                   <div>
                     <span className="text-blue-600">Cierre lote:</span>{" "}
-                    <span className="font-mono">{fmt(c.impactoCierre)}</span>
+                    <span className="font-mono">{formatMoney(c.impactoCierre)}</span>
                   </div>
                 )}
               </div>
@@ -410,21 +401,17 @@ function Detalle({ c, onClose }: { c: Contra; onClose: () => void }) {
                 <div>
                   <span className="text-muted-foreground">Importe</span>
                   <div className="font-mono font-semibold text-lg text-danger-600">
-                    -{fmt(c.importe)}
+                    -{formatMoney(c.importe)}
                   </div>
                 </div>
                 <div>
                   <span className="text-muted-foreground">Fecha creación</span>
-                  <div className="font-mono text-xs">
-                    {new Date(c.createdAt).toLocaleString("es-AR")}
-                  </div>
+                  <div className="font-mono text-xs">{formatDateTime(c.createdAt)}</div>
                 </div>
                 {c.fechaTransaccion && (
                   <div>
                     <span className="text-muted-foreground">Fecha transacción</span>
-                    <div className="font-mono text-xs">
-                      {new Date(c.fechaTransaccion).toLocaleString("es-AR")}
-                    </div>
+                    <div className="font-mono text-xs">{formatDateTime(c.fechaTransaccion)}</div>
                   </div>
                 )}
                 {c.motivoPayway && (
@@ -555,8 +542,7 @@ function Detalle({ c, onClose }: { c: Contra; onClose: () => void }) {
                         <div className="min-w-0">
                           <p className="truncate font-medium">{a.name}</p>
                           <p className="text-muted-foreground text-[10px]">
-                            {(a.size / 1024).toFixed(1)} KB ·{" "}
-                            {new Date(a.uploaded_at).toLocaleString("es-AR")}
+                            {(a.size / 1024).toFixed(1)} KB · {formatDateTime(a.uploaded_at)}
                           </p>
                         </div>
                       </div>
@@ -661,7 +647,7 @@ function Detalle({ c, onClose }: { c: Contra; onClose: () => void }) {
                     >
                       {lotes.map((l) => (
                         <option key={l.id} value={l.id}>
-                          {l.codigo} · {l.estado} · {l.fecha} · neto {fmt(l.importeNeto)}
+                          {l.codigo} · {l.estado} · {l.fecha} · neto {formatMoney(l.importeNeto)}
                           {l.esSugerido ? "  ★ sugerido" : ""}
                         </option>
                       ))}
@@ -999,7 +985,7 @@ function Page() {
       label: "Importe",
       render: (r) => (
         <span className="font-mono tabular-nums font-semibold text-danger-600">
-          -{fmt(r.importe)}
+          -{formatMoney(r.importe)}
         </span>
       ),
     },
@@ -1032,11 +1018,7 @@ function Page() {
     {
       key: "createdAt",
       label: "Fecha",
-      render: (r) => (
-        <span className="font-mono text-xs">
-          {new Date(r.createdAt).toLocaleDateString("es-AR")}
-        </span>
-      ),
+      render: (r) => <span className="font-mono text-xs">{formatDate(r.createdAt)}</span>,
     },
   ];
 

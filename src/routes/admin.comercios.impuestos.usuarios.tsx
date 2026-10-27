@@ -1,3 +1,4 @@
+import { formatDate, formatMoney, formatPercent } from "@/shared/format";
 import { createFileRoute } from "@tanstack/react-router";
 import { pageTitle } from "@/brand/brand";
 import { useQueryClient } from "@tanstack/react-query";
@@ -23,11 +24,7 @@ import { useCan } from "@/lib/permissions";
 import { PermissionGuard } from "@/components/permission-guard";
 import type { ImpuestoAsignacion, TipoImpuesto, TipoOperacion } from "@/lib/api/types";
 import { TIPOS_OPERACION } from "@/lib/api/types";
-import {
-  MOCK_IMPUESTOS_POR_COBRAR,
-  formatImpuestoMonto,
-  type ImpuestoPorCobrar,
-} from "@/data/impuestos-por-cobrar";
+import { MOCK_IMPUESTOS_POR_COBRAR, type ImpuestoPorCobrar } from "@/data/impuestos-por-cobrar";
 
 export const Route = createFileRoute("/admin/comercios/impuestos/usuarios")({
   head: () => ({ meta: [{ title: pageTitle("Usuarios con impuestos — Admin") }] }),
@@ -36,13 +33,9 @@ export const Route = createFileRoute("/admin/comercios/impuestos/usuarios")({
 
 const PAGE_SIZE = 10;
 
-function formatTasa(tasa: number) {
-  return Number.isInteger(tasa) ? String(tasa) : tasa.toFixed(2);
-}
-
 function montoLabel(asig: ImpuestoAsignacion) {
   if (asig.monto === null) return "—";
-  return asig.tipo === "Porcentaje" ? `${formatTasa(asig.monto)}%` : `$ ${formatTasa(asig.monto)}`;
+  return asig.tipo === "Porcentaje" ? formatPercent(asig.monto) : formatMoney(asig.monto);
 }
 
 function MensajeEstado({
@@ -363,7 +356,7 @@ function ImpuestosPorCobrarTab() {
     {
       key: "monto",
       label: "Monto",
-      render: (r) => <span className="font-mono tabular-nums">{formatImpuestoMonto(r.monto)}</span>,
+      render: (r) => <span className="font-mono tabular-nums">{formatMoney(r.monto)}</span>,
     },
     {
       key: "estado",
@@ -412,15 +405,15 @@ function ImpuestosPorCobrarTab() {
         </button>
       </div>
       <div className="text-xs text-muted-foreground">
-        {filtrados.length} registro(s) · pendiente {formatImpuestoMonto(totalPendiente)} · pagado{" "}
-        {formatImpuestoMonto(totalPagado)}
+        {filtrados.length} registro(s) · pendiente {formatMoney(totalPendiente)} · pagado{" "}
+        {formatMoney(totalPagado)}
       </div>
       {subTab === "por_cobrar" ? (
         <>
           <Card className="p-3">
             <div className="text-xs text-muted-foreground">Impuestos por cobrar lote actual</div>
             <div className="font-mono text-lg font-semibold mt-1">
-              {formatImpuestoMonto(
+              {formatMoney(
                 loteActual.filter((r) => r.estado === "pendiente").reduce((a, b) => a + b.monto, 0),
               )}
             </div>
@@ -435,7 +428,7 @@ function ImpuestosPorCobrarTab() {
           <Card className="p-3">
             <div className="text-xs text-muted-foreground">Historial pagado</div>
             <div className="font-mono text-lg font-semibold mt-1 text-emerald-700">
-              {formatImpuestoMonto(totalPagado)}
+              {formatMoney(totalPagado)}
             </div>
             <div className="text-[11px] text-muted-foreground">
               Cuándo se pagaron · {historial.length} items
@@ -643,9 +636,7 @@ function Page() {
       sortable: true,
       render: (r) =>
         r.fechaAsignacion ? (
-          <span className="font-mono tabular-nums">
-            {new Date(r.fechaAsignacion).toLocaleDateString("es-AR")}
-          </span>
+          <span className="font-mono tabular-nums">{formatDate(r.fechaAsignacion)}</span>
         ) : (
           "—"
         ),

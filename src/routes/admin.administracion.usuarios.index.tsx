@@ -1,3 +1,4 @@
+import { formatDate } from "@/shared/format";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -23,13 +24,6 @@ export const Route = createFileRoute("/admin/administracion/usuarios/")({
   head: () => ({ meta: [{ title: "Administración de personal — Admin Panel" }] }),
   component: Page,
 });
-
-function fmtFecha(iso: string): string {
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return iso;
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`;
-}
 
 function Page() {
   const qc = useQueryClient();
@@ -112,7 +106,7 @@ function Page() {
       label: "Creado",
       sortable: true,
       filterable: false,
-      render: (r) => fmtFecha(r.createdAt),
+      render: (r) => formatDate(r.createdAt),
     },
   ];
 

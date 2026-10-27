@@ -1,3 +1,4 @@
+import { formatDateTime, formatMoney } from "@/shared/format";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { keepPreviousData, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -56,21 +57,6 @@ const STATUS_TONE: Record<AlertStatus, "warn" | "neutral" | "success" | "danger"
   resolved: "success",
   dismissed: "neutral",
 };
-
-const fmtFecha = (iso: string | null) =>
-  iso
-    ? new Date(iso).toLocaleString("es-AR", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-      })
-    : "—";
-const fmtMonto = (n: number | null) =>
-  n == null
-    ? "—"
-    : `$ ${n.toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
 type Dictamen = { alert: AlertItem; resolution: AlertResolution };
 
@@ -152,7 +138,7 @@ function ListadoAlertas() {
       toast.success(
         `Barrido ejecutado: ${r.coincidencias_revisadas} coincidencias PLAFT revisadas, ${r.alertas_nuevas} alertas nuevas.` +
           (r.ultima_corrida_plaft
-            ? ` Última corrida PLAFT: ${fmtFecha(r.ultima_corrida_plaft)}.`
+            ? ` Última corrida PLAFT: ${formatDateTime(r.ultima_corrida_plaft)}.`
             : " No hay corridas PLAFT registradas."),
       );
       await refrescar();
@@ -305,7 +291,7 @@ function ListadoAlertas() {
       filterable: "date",
       minWidth: 150,
       render: (r) => (
-        <span className="font-mono tabular-nums text-xs">{fmtFecha(r.createdAt)}</span>
+        <span className="font-mono tabular-nums text-xs">{formatDateTime(r.createdAt)}</span>
       ),
     },
     {
@@ -314,7 +300,7 @@ function ListadoAlertas() {
       filterable: "date",
       minWidth: 150,
       render: (r) => (
-        <span className="font-mono tabular-nums text-xs">{fmtFecha(r.acceptedAt)}</span>
+        <span className="font-mono tabular-nums text-xs">{formatDateTime(r.acceptedAt)}</span>
       ),
     },
   ];
@@ -399,13 +385,13 @@ function ListadoAlertas() {
             <Campo label="Cliente" value={`${detalle.nombre} · ${detalle.correo}`} />
             <Campo label="Estado" value={ALERT_STATUS_LABEL[detalle.status]} />
             <Campo label="Regla" value={detalle.ruleCode ?? "—"} mono />
-            <Campo label="Fecha de alerta" value={fmtFecha(detalle.createdAt)} />
-            <Campo label="Vencimiento normativo" value={fmtFecha(detalle.dueAt)} />
+            <Campo label="Fecha de alerta" value={formatDateTime(detalle.createdAt)} />
+            <Campo label="Vencimiento normativo" value={formatDateTime(detalle.dueAt)} />
             <Campo
               label="Aceptada"
               value={
                 detalle.acceptedAt
-                  ? `${fmtFecha(detalle.acceptedAt)} · ${detalle.acceptedByName ?? "—"}`
+                  ? `${formatDateTime(detalle.acceptedAt)} · ${detalle.acceptedByName ?? "—"}`
                   : "—"
               }
             />
@@ -413,7 +399,7 @@ function ListadoAlertas() {
               label="Cerrada"
               value={
                 detalle.resolvedAt
-                  ? `${fmtFecha(detalle.resolvedAt)} · ${detalle.resolvedByName ?? "—"}`
+                  ? `${formatDateTime(detalle.resolvedAt)} · ${detalle.resolvedByName ?? "—"}`
                   : "—"
               }
             />
@@ -429,7 +415,7 @@ function ListadoAlertas() {
                 <Campo label="Operación (TXID)" value={detalle.idTxn} mono />
                 <Campo
                   label="Monto / tipo"
-                  value={`${fmtMonto(detalle.montoOperacion)} · ${detalle.tipoOperacion ?? "—"}`}
+                  value={`${formatMoney(detalle.montoOperacion)} · ${detalle.tipoOperacion ?? "—"}`}
                 />
               </>
             )}

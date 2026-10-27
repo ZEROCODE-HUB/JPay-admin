@@ -1,3 +1,4 @@
+import { formatMoney } from "@/shared/format";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import {
@@ -21,7 +22,7 @@ import { useLineasMovimiento } from "@/hooks/useLineasMovimiento";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { useCambiarEstadoMovimiento } from "@/hooks/useMovimientoActions";
 import { useEstadosMovimiento } from "@/hooks/useEstados";
-import { calcularDesglose, fmtARS } from "@/lib/aranceles";
+import { calcularDesglose } from "@/lib/aranceles";
 import { DataAccessError } from "@/lib/api/errors";
 import { getMovimiento } from "@/lib/api/movimientos";
 import { TIPOS_LINEA, type LineaMovimiento, type TipoLinea } from "@/lib/api/lineas-movimiento";
@@ -86,8 +87,6 @@ function fmtFecha(iso: string): string {
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
 }
 
-const fmtMonto = (n: number) => `${n >= 0 ? "+" : "-"} ${fmtARS(Math.abs(n))}`;
-
 function toViewMovimiento(m: MovimientoDB, catalogo: EstadoMovimiento[]): Movimiento {
   const pctImpuesto = m.comision > 0 ? (m.impuesto / m.comision) * 100 : 0;
   return {
@@ -101,7 +100,7 @@ function toViewMovimiento(m: MovimientoDB, catalogo: EstadoMovimiento[]): Movimi
     nombreDestino: m.destinatarioNombre ?? (m.tipo === "transferencia" ? "—" : brand.name),
     cuit: m.destinatarioCuit ?? m.cliente?.cuit ?? "—",
     bancoDestino: m.destinatarioBanco ?? undefined,
-    monto: fmtARS(m.montoOperacion),
+    monto: formatMoney(m.montoOperacion),
     fecha: fmtFecha(m.fecha),
     estado: resolverEstadoMovimiento(m, catalogo).codigo,
     desglose: calcularDesglose(m.comision, pctImpuesto),
@@ -343,7 +342,7 @@ function TodosPage() {
         <span
           className={`font-mono tabular-nums font-semibold ${r.monto >= 0 ? "text-emerald-700" : "text-danger-700"}`}
         >
-          {fmtMonto(r.monto)}
+          {formatMoney(r.monto, { signo: true })}
         </span>
       ),
     },

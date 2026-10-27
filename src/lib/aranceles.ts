@@ -87,10 +87,3 @@ export function desgloseDemo(montoOperacion: number, porcentajeImpuesto = 21): D
     porcentajeImpuesto,
   );
 }
-
-const ars = (n: number) =>
-  n.toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-
-export const fmtARS = (n: number) => `$ ${ars(n)}`;
-
-export const fmtPct = (n: number) => `${ars(n)}%`;

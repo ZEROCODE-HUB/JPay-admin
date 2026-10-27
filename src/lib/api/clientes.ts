@@ -390,14 +390,6 @@ export async function getConsumoMensualPorLegajo(
   }
 }
 
-/** Helper de UI: formatea un CUIT de 11 dígitos con guiones `XX-XXXXXXXX-X`. */
-export function formatCuit(cuit: string | null | undefined): string {
-  if (!cuit) return "—";
-  const clean = cuit.replace(/\D/g, "");
-  if (clean.length !== 11) return cuit;
-  return `${clean.slice(0, 2)}-${clean.slice(2, 10)}-${clean.slice(10)}`;
-}
-
 // ============================================================================
 // PLAFT: edición de riesgo y perfil transaccional
 // ============================================================================

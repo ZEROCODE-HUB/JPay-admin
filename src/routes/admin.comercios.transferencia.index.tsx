@@ -1,3 +1,4 @@
+import { formatDate } from "@/shared/format";
 import { createFileRoute } from "@tanstack/react-router";
 import { brand, pageTitle } from "@/brand/brand";
 import { useQueryClient } from "@tanstack/react-query";
@@ -184,9 +185,7 @@ function QrDetalle({ qr, onClose }: { qr: PuntoVenta; onClose: () => void }) {
               </div>
               <div>
                 <span className="text-muted-foreground">Fecha creación</span>
-                <div className="font-mono text-xs">
-                  {new Date(qr.createdAt).toLocaleDateString("es-AR")}
-                </div>
+                <div className="font-mono text-xs">{formatDate(qr.createdAt)}</div>
               </div>
               <div>
                 <span className="text-muted-foreground">Comercio</span>
@@ -448,11 +447,7 @@ function Page() {
     {
       key: "createdAt",
       label: "Fecha",
-      render: (r) => (
-        <span className="font-mono text-xs">
-          {new Date(r.createdAt).toLocaleDateString("es-AR")}
-        </span>
-      ),
+      render: (r) => <span className="font-mono text-xs">{formatDate(r.createdAt)}</span>,
     },
   ];
 

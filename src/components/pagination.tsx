@@ -1,3 +1,4 @@
+import { formatNumber } from "@/shared/format";
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
 import { useId, useMemo } from "react";
 
@@ -160,7 +161,7 @@ export function Pagination({
     return (
       <span className="text-muted-foreground text-xs sm:text-sm tabular-nums">
         {estimated ? "~" : ""}
-        {total.toLocaleString("es-AR")}
+        {formatNumber(total)}
         {countLabel ? <> {countLabel}</> : null}
       </span>
     );

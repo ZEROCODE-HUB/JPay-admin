@@ -1,3 +1,4 @@
+import { formatCuit } from "@/shared/format";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -31,7 +32,6 @@ import {
   eliminarCliente,
   getClienteByLegajo,
   getClientesEnrichment,
-  formatCuit,
   type ClienteEnrichment,
 } from "@/lib/api/clientes";
 import { DataAccessError } from "@/lib/api/errors";

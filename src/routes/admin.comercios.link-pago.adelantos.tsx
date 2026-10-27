@@ -1,3 +1,4 @@
+import { formatDate, formatMoney, formatPercent } from "@/shared/format";
 import { createFileRoute, useSearch, useNavigate } from "@tanstack/react-router";
 import { pageTitle } from "@/brand/brand";
 import { useEffect, useMemo, useState } from "react";
@@ -99,10 +100,6 @@ function tone(e: EstadoAdelanto): "warn" | "success" | "danger" | "neutral" {
   if (e === "Acreditado") return "success";
   if (e === "Cancelado") return "neutral";
   return "danger";
-}
-
-function fmt(n: number) {
-  return `$ ${n.toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
 function shortId(id: string) {
@@ -248,7 +245,7 @@ function Detalle({
     try {
       const r = await acreditarAdelanto(a.fullId, notas.trim() || undefined);
       toast.success(
-        `Adelanto acreditado. Depósito neto: ${fmt(r.montoNetoDepositado)} (interés ${fmt(r.interes)}).`,
+        `Adelanto acreditado. Depósito neto: ${formatMoney(r.montoNetoDepositado)} (interés ${formatMoney(r.interes)}).`,
       );
       onAcreditado();
       onClose();
@@ -287,11 +284,11 @@ function Detalle({
             <div className="rounded-lg border bg-amber-50 border-amber-200 px-3 py-2 text-xs text-amber-800 flex items-center justify-between">
               <span>
                 Tope disponible del comercio:{" "}
-                <span className="font-mono font-semibold">{fmt(tope)}</span>
+                <span className="font-mono font-semibold">{formatMoney(tope)}</span>
               </span>
               <span className="text-amber-700">
                 Importe solicitado:{" "}
-                <span className="font-mono font-semibold">{fmt(a.importeSolicitado)}</span>
+                <span className="font-mono font-semibold">{formatMoney(a.importeSolicitado)}</span>
               </span>
             </div>
           )}
@@ -311,20 +308,26 @@ function Detalle({
               <span className="flex items-center gap-3">
                 <span>
                   Pool Recaudación:{" "}
-                  <span className="font-mono font-semibold">{fmt(pool.poolRecaudacionTotal)}</span>
+                  <span className="font-mono font-semibold">
+                    {formatMoney(pool.poolRecaudacionTotal)}
+                  </span>
                 </span>
                 <span>
                   Adelantos en curso:{" "}
-                  <span className="font-mono font-semibold">{fmt(pool.adelantosEnCurso)}</span>
+                  <span className="font-mono font-semibold">
+                    {formatMoney(pool.adelantosEnCurso)}
+                  </span>
                 </span>
                 <span>
                   Cupo disponible:{" "}
-                  <span className="font-mono font-semibold">{fmt(pool.cupoDisponiblePool)}</span>
+                  <span className="font-mono font-semibold">
+                    {formatMoney(pool.cupoDisponiblePool)}
+                  </span>
                 </span>
               </span>
               {poolInsuficiente && (
                 <span className="font-semibold">
-                  ⚠ Pool insuficiente para acreditar {fmt(a.importeSolicitado)}
+                  ⚠ Pool insuficiente para acreditar {formatMoney(a.importeSolicitado)}
                 </span>
               )}
             </div>
@@ -350,7 +353,9 @@ function Detalle({
               </div>
               <div>
                 <span className="text-muted-foreground">Importe solicitado</span>
-                <div className="font-mono font-semibold text-base">{fmt(a.importeSolicitado)}</div>
+                <div className="font-mono font-semibold text-base">
+                  {formatMoney(a.importeSolicitado)}
+                </div>
               </div>
               <div>
                 <span className="text-muted-foreground flex items-center gap-1">
@@ -412,17 +417,17 @@ function Detalle({
                     <span>
                       Interés:{" "}
                       <span className="font-mono font-semibold text-danger-600">
-                        - {fmt(interesEstimado)}
+                        - {formatMoney(interesEstimado)}
                       </span>
                     </span>
                     <span>
                       Neto a depositar:{" "}
                       <span className="font-mono font-semibold text-emerald-700">
-                        {fmt(netoEstimado)}
+                        {formatMoney(netoEstimado)}
                       </span>
                     </span>
                     <span>
-                      TNA: <span className="font-mono">{(tasaPctNum * 12).toFixed(1)}%</span>
+                      TNA: <span className="font-mono">{formatPercent(tasaPctNum * 12, 1)}</span>
                     </span>
                   </div>
                 )}
@@ -513,19 +518,19 @@ function Detalle({
               <div className="grid grid-cols-2 gap-2 text-sm">
                 <div className="text-muted-foreground">Origen (Recaudación)</div>
                 <div className="font-mono text-danger-600 text-right">
-                  - {fmt(a.importeSolicitado)}
+                  - {formatMoney(a.importeSolicitado)}
                 </div>
                 <div className="text-muted-foreground">Interés (TEM {a.tasaInteresPct ?? 0}%)</div>
                 <div className="font-mono text-danger-600 text-right">
                   -{" "}
-                  {fmt(
+                  {formatMoney(
                     Math.round(((a.importeSolicitado * (a.tasaInteresPct ?? 0)) / 100) * 100) / 100,
                   )}
                 </div>
                 <div className="text-muted-foreground font-semibold">Neto a Operativa</div>
                 <div className="font-mono text-emerald-700 text-right font-semibold">
                   +{" "}
-                  {fmt(
+                  {formatMoney(
                     a.importeSolicitado -
                       Math.round(((a.importeSolicitado * (a.tasaInteresPct ?? 0)) / 100) * 100) /
                         100,
@@ -635,13 +640,13 @@ function Page() {
       fullId: a.id,
       comercio: c?.nombre ?? a.comercioId,
       legajo: c?.legajo ?? "—",
-      fechaSolicitud: new Date(a.fechaSolicitud).toLocaleDateString("es-AR"),
+      fechaSolicitud: formatDate(a.fechaSolicitud),
       importeSolicitado: a.montoSolicitado,
       plazoSolicitado: `${a.plazoAdelantadoDias} días`,
       plazoContractual: `${a.plazoOriginalDias} días`,
       comision: a.tasaInteresPct != null ? `${a.tasaInteresPct}%` : "Pendiente",
       tasaEfectiva:
-        a.tasaInteresPct != null ? `TNA ${(a.tasaInteresPct * 12).toFixed(0)}%` : undefined,
+        a.tasaInteresPct != null ? `TNA ${formatPercent(a.tasaInteresPct * 12, 0)}` : undefined,
       estado: a.estado,
       notas: a.motivo,
       tasaInteresPct: a.tasaInteresPct,
@@ -748,7 +753,9 @@ function Page() {
       key: "importeSolicitado",
       label: "Importe",
       render: (r) => (
-        <span className="font-mono tabular-nums font-semibold">{fmt(r.importeSolicitado)}</span>
+        <span className="font-mono tabular-nums font-semibold">
+          {formatMoney(r.importeSolicitado)}
+        </span>
       ),
     },
     {
@@ -843,7 +850,7 @@ function Page() {
             Pool de Recaudación (plataforma)
           </div>
           <div className="font-mono text-2xl font-semibold mt-1">
-            {poolCabecera ? fmt(poolCabecera.poolRecaudacionTotal) : "—"}
+            {poolCabecera ? formatMoney(poolCabecera.poolRecaudacionTotal) : "—"}
           </div>
           <div className="text-[11px] text-muted-foreground mt-1">
             Suma de saldo_disponible de todas las subcuentas tipo=Recaudación. Es la única fuente de
@@ -855,7 +862,7 @@ function Page() {
             Adelantos en curso
           </div>
           <div className="font-mono text-2xl font-semibold mt-1">
-            {poolCabecera ? fmt(poolCabecera.adelantosEnCurso) : "—"}
+            {poolCabecera ? formatMoney(poolCabecera.adelantosEnCurso) : "—"}
           </div>
           <div className="text-[11px] text-muted-foreground mt-1">
             Capital prestado pendiente de reponer: Aprobados (aún no desembolsados) + Acreditados
@@ -888,7 +895,7 @@ function Page() {
                   : "text-emerald-700")
             }
           >
-            {poolCabecera ? fmt(poolCabecera.cupoDisponiblePool) : "—"}
+            {poolCabecera ? formatMoney(poolCabecera.cupoDisponiblePool) : "—"}
           </div>
           <div className="text-[11px] text-muted-foreground mt-1">
             Pool − Adelantos en curso. Define si se puede seguir Acreditando.
@@ -907,7 +914,7 @@ function Page() {
                 <Badge tone={tone(s)}>{t.cantidad}</Badge>
               </div>
               <div className="font-mono text-lg font-semibold mt-1">
-                {t.monto > 0 ? fmt(t.monto) : "—"}
+                {t.monto > 0 ? formatMoney(t.monto) : "—"}
               </div>
             </Card>
           );

@@ -1,3 +1,4 @@
+import { formatMoney } from "@/shared/format";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
 import {
@@ -14,7 +15,6 @@ import { PageHeader, Card, Stat, Badge } from "@/components/portal-shell";
 import { Input, Label } from "@/components/portal-shell";
 import { DataTable, type Column } from "@/components/data-table";
 import { useMovimientos } from "@/hooks/useMovimientos";
-import { fmtARS } from "@/lib/aranceles";
 import { brand } from "@/brand/brand";
 
 export const Route = createFileRoute("/admin/")({ component: Page });
@@ -108,18 +108,18 @@ function DashboardComisionesCard() {
     {
       key: "monto",
       label: "Monto transaccionado",
-      render: (r) => <span className="font-mono text-xs">{fmtARS(r.monto)}</span>,
+      render: (r) => <span className="font-mono text-xs">{formatMoney(r.monto)}</span>,
     },
     {
       key: "comision",
       label: "Comisión",
-      render: (r) => <span className="font-mono text-xs">{fmtARS(r.comision)}</span>,
+      render: (r) => <span className="font-mono text-xs">{formatMoney(r.comision)}</span>,
     },
     {
       key: "remanente",
       label: "Remanente",
       render: (r) => (
-        <span className="font-mono text-xs font-semibold">{fmtARS(r.monto - r.comision)}</span>
+        <span className="font-mono text-xs font-semibold">{formatMoney(r.monto - r.comision)}</span>
       ),
     },
   ];
@@ -163,20 +163,20 @@ function DashboardComisionesCard() {
           <div className="grid grid-cols-3 gap-3">
             <div className="rounded-lg border bg-muted/30 px-3 py-3">
               <div className="text-xs text-muted-foreground">Monto transaccionado</div>
-              <div className="font-mono font-semibold mt-1">{fmtARS(montoTransaccionado)}</div>
+              <div className="font-mono font-semibold mt-1">{formatMoney(montoTransaccionado)}</div>
               <div className="text-[11px] text-muted-foreground">Depósitos + Retiros</div>
             </div>
             <div className="rounded-lg border bg-muted/30 px-3 py-3">
               <div className="text-xs text-muted-foreground">Comisión total</div>
               <div className="font-mono font-semibold mt-1 text-primary-ink">
-                {fmtARS(comisionTotal)}
+                {formatMoney(comisionTotal)}
               </div>
               <div className="text-[11px] text-muted-foreground">Suma comision</div>
             </div>
             <div className="rounded-lg border bg-primary/10 px-3 py-3">
               <div className="text-xs text-muted-foreground">Remanente</div>
               <div className="font-mono font-semibold mt-1 text-emerald-700">
-                {fmtARS(remanente)}
+                {formatMoney(remanente)}
               </div>
               <div className="text-[11px] text-muted-foreground">Monto − Comisión</div>
             </div>

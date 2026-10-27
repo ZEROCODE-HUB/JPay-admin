@@ -1,3 +1,4 @@
+import { formatDate, formatDateTime } from "@/shared/format";
 import { createFileRoute } from "@tanstack/react-router";
 import { pageTitle } from "@/brand/brand";
 import { useQueryClient } from "@tanstack/react-query";
@@ -346,9 +347,7 @@ function Page() {
       label: "Fecha de creación",
       sortable: true,
       render: (r) => (
-        <span className="font-mono tabular-nums">
-          {new Date(r.fechaCreacion).toLocaleString("es-AR")}
-        </span>
+        <span className="font-mono tabular-nums">{formatDateTime(r.fechaCreacion)}</span>
       ),
     },
     {
@@ -358,7 +357,7 @@ function Page() {
       render: (r) => (
         <span className="font-mono tabular-nums">
           {r.fechaExpiracion ? (
-            new Date(r.fechaExpiracion).toLocaleDateString("es-AR")
+            formatDate(r.fechaExpiracion)
           ) : (
             <span className="text-muted-foreground">—</span>
           )}

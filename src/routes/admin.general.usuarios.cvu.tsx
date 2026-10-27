@@ -1,3 +1,4 @@
+import { formatCuit, formatDate } from "@/shared/format";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import {
@@ -26,7 +27,7 @@ import { useCan } from "@/lib/permissions";
 import { PermissionGuard } from "@/components/permission-guard";
 import { listAllCvus, updateSubcuenta } from "@/lib/api/subcuentas";
 import { asignarCvuParaNuevo, asignarCvuParaExistente } from "@/lib/api/cvu";
-import { getClienteByCorreo, formatCuit } from "@/lib/api/clientes";
+import { getClienteByCorreo } from "@/lib/api/clientes";
 import { useClientesForSelect } from "@/hooks/useComercios";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { toast } from "sonner";
@@ -336,7 +337,7 @@ function CvuPage() {
               _cbk: r.cbu ? `CBK-${r.cbu.slice(-12)}` : "—",
               _alias: r.cbu ? r.cbu.slice(-6) : "—",
               _estado: r.estado,
-              _fechaAlta: r.createdAt ? new Date(r.createdAt).toLocaleDateString("es-AR") : "—",
+              _fechaAlta: r.createdAt ? formatDate(r.createdAt) : "—",
               _fechaAltaRaw: r.createdAt,
             }))}
             keyExtractor={(r: any) => r.id}

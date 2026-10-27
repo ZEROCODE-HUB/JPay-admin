@@ -1,3 +1,4 @@
+import { formatMoney } from "@/shared/format";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { Search, ArrowLeftRight, Banknote, Loader2 } from "lucide-react";
@@ -27,7 +28,7 @@ function mockResult(id: string, tipo: QueryType): ConsultaResult {
     nombre: tipo === "deposito" ? "María Rodríguez" : "Luis Fernández",
     email:
       tipo === "deposito" ? `mrodriguez@${brand.web.domain}` : `lfernandez@${brand.web.domain}`,
-    monto: `$${(((base * 137) % 90000) + 1000).toLocaleString("es-AR")}`,
+    monto: formatMoney(((base * 137) % 90000) + 1000),
     estado: base % 3 === 0 ? "Pendiente" : base % 3 === 1 ? "Acreditado" : "Rechazado",
     fecha:
       tipo === "deposito"

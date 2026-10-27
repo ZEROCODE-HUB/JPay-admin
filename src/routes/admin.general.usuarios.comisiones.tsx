@@ -1,3 +1,4 @@
+import { formatMoney, formatPercent } from "@/shared/format";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
@@ -10,7 +11,7 @@ import { BtnPrimary, Badge, Input, Label } from "@/components/portal-shell";
 import { FormDialog } from "@/components/form-dialog";
 import { LegajoCell, LEGAJO_TOOLTIP } from "@/components/legajo-label";
 import { Pagination } from "@/components/pagination";
-import { desgloseDesdeConfig, fmtARS, fmtPct, type Desglose } from "@/lib/aranceles";
+import { desgloseDesdeConfig, type Desglose } from "@/lib/aranceles";
 import { useComisiones } from "@/hooks/useComisiones";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { upsertComision, setComisionEstado, listComisiones } from "@/lib/api/comisiones";
@@ -79,7 +80,7 @@ const desgloseDe = (
   );
 
 const configLabel = (c: Comision) =>
-  c.modalidad === "Fijo" ? fmtARS(c.montoFijo ?? 0) : fmtPct(c.porcentaje ?? 0);
+  c.modalidad === "Fijo" ? formatMoney(c.montoFijo ?? 0) : formatPercent(c.porcentaje ?? 0);
 
 type ComisionDraft = {
   id?: string;
@@ -333,15 +334,15 @@ function DesglosePreview({ desglose }: { desglose: Desglose }) {
       </div>
       <div className="flex justify-between">
         <span className="text-muted-foreground">Comisión</span>
-        <span className="font-mono tabular-nums">{fmtARS(desglose.comision)}</span>
+        <span className="font-mono tabular-nums">{formatMoney(desglose.comision)}</span>
       </div>
       <div className="flex justify-between">
         <span className="text-muted-foreground">Impuesto ({desglose.porcentajeImpuesto}%)</span>
-        <span className="font-mono tabular-nums">{fmtARS(desglose.impuesto)}</span>
+        <span className="font-mono tabular-nums">{formatMoney(desglose.impuesto)}</span>
       </div>
       <div className="flex justify-between border-t border-border pt-1.5 font-semibold">
         <span>Monto cobrado al cliente</span>
-        <span className="font-mono tabular-nums">{fmtARS(desglose.total)}</span>
+        <span className="font-mono tabular-nums">{formatMoney(desglose.total)}</span>
       </div>
     </div>
   );
@@ -829,7 +830,7 @@ function ComisionesPage() {
             <div>
               <span className="text-muted-foreground">% Impuesto (IVA):</span>{" "}
               <span className="font-medium font-mono tabular-nums">
-                {fmtPct(viewing.porcentajeImpuesto)}
+                {formatPercent(viewing.porcentajeImpuesto)}
               </span>
             </div>
             <div>
@@ -952,7 +953,7 @@ const columns: Column<Comision>[] = [
     label: "% Comisión",
     render: (r) => (
       <span className="font-mono tabular-nums">
-        {r.modalidad === "Porcentaje" ? fmtPct(r.porcentaje ?? 0) : "—"}
+        {r.modalidad === "Porcentaje" ? formatPercent(r.porcentaje ?? 0) : "—"}
       </span>
     ),
   },
@@ -961,14 +962,16 @@ const columns: Column<Comision>[] = [
     label: "Monto fijo",
     render: (r) => (
       <span className="font-mono tabular-nums">
-        {r.modalidad === "Fijo" ? fmtARS(r.montoFijo ?? 0) : "—"}
+        {r.modalidad === "Fijo" ? formatMoney(r.montoFijo ?? 0) : "—"}
       </span>
     ),
   },
   {
     key: "porcentajeImpuesto",
     label: "% Impuesto (IVA)",
-    render: (r) => <span className="font-mono tabular-nums">{fmtPct(r.porcentajeImpuesto)}</span>,
+    render: (r) => (
+      <span className="font-mono tabular-nums">{formatPercent(r.porcentajeImpuesto)}</span>
+    ),
   },
   {
     key: "estado",

@@ -1,3 +1,4 @@
+import { formatCuit, formatMoney } from "@/shared/format";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -30,7 +31,6 @@ import {
   eliminarCliente,
   getClienteByLegajo,
   getClientesEnrichment,
-  formatCuit,
   type ClienteEnrichment,
   type RiesgoPLD,
 } from "@/lib/api/clientes";
@@ -195,14 +195,12 @@ function PerfilConsumo({ pct, limite }: { pct: number | null; limite: number | n
         : pct >= 50
           ? "bg-yellow-500"
           : "bg-emerald-500";
-  const fmtLimite = limite
-    ? new Intl.NumberFormat("es-AR", { maximumFractionDigits: 0 }).format(limite)
-    : null;
+  const fmtLimite = limite ? formatMoney(limite, { decimals: 0 }) : null;
   return (
     <div className="flex flex-col gap-0.5 min-w-[100px]">
       <div className="flex items-center justify-between text-[11px] text-muted-foreground">
         <span>{pct}%</span>
-        {fmtLimite && <span>${fmtLimite}</span>}
+        {fmtLimite && <span>{fmtLimite}</span>}
       </div>
       <div className="h-1.5 rounded-full bg-muted overflow-hidden">
         <div

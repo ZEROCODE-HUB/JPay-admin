@@ -1,3 +1,4 @@
+import { formatMoney } from "@/shared/format";
 import { useState, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Eye, CheckCircle, PauseCircle, PlayCircle, Trash2 } from "lucide-react";
@@ -6,10 +7,6 @@ import { ActionsDropdown } from "@/components/actions-dropdown";
 import { Badge } from "@/components/portal-shell";
 import { toast } from "sonner";
 
-function fmtMonto(n: number | null | undefined) {
-  if (n === null || n === undefined) return "—";
-  return `$ ${n.toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-}
 import {
   type Subcuenta,
   type SubcuentaConfiguracion,
@@ -64,7 +61,9 @@ export function TablaSubcuentas({
                   </span>
                 )}
               </td>
-              <td className="px-4 py-3 text-right tabular-nums">{fmtMonto(s.saldoDisponible)}</td>
+              <td className="px-4 py-3 text-right tabular-nums">
+                {formatMoney(s.saldoDisponible)}
+              </td>
               <td className="px-4 py-3 text-right">
                 {s.retirosHabilitados ? "Habilitados" : "Bloqueados"}
               </td>

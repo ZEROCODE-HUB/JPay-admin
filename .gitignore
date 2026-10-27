@@ -63,3 +63,6 @@ generarllave*.js
 temp_parse.js
 test.md
 manual_text.txt
+
+# Generado por `deno check` de las Edge Functions
+deno.lock

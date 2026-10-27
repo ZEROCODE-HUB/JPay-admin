@@ -1,4 +1,5 @@
 ﻿import { createFileRoute } from "@tanstack/react-router";
+import { formatMoney, formatNumber, formatPercent } from "@/shared/format";
 import { pageTitle } from "@/brand/brand";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -126,21 +127,19 @@ function ReporteDetalleModal({
       key: "tasa",
       label: "Tasa (%)",
       sortable: true,
-      render: (u) => <span className="font-mono tabular-nums">{u.tasa.toFixed(2)}%</span>,
+      render: (u) => <span className="font-mono tabular-nums">{formatPercent(u.tasa)}</span>,
     },
     {
       key: "monto",
       label: "Monto",
       sortable: true,
-      render: (u) => <span className="font-mono tabular-nums">$ {u.monto.toLocaleString()}</span>,
+      render: (u) => <span className="font-mono tabular-nums">{formatMoney(u.monto)}</span>,
     },
     {
       key: "retencion",
       label: "Retención",
       sortable: true,
-      render: (u) => (
-        <span className="font-mono tabular-nums">$ {u.retencion.toLocaleString()}</span>
-      ),
+      render: (u) => <span className="font-mono tabular-nums">{formatMoney(u.retencion)}</span>,
     },
   ];
 
@@ -165,13 +164,10 @@ function ReporteDetalleModal({
 
         <div className="p-6 space-y-5">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <KpiCard label="Total movimientos" value={reporte.totalMovimientos.toLocaleString()} />
-            <KpiCard label="Monto total" value={`$ ${reporte.totalMontos.toLocaleString()}`} />
-            <KpiCard label="Total montos" value={`$ ${reporte.totalMontos.toLocaleString()}`} />
-            <KpiCard
-              label="Total retenciones"
-              value={`$ ${reporte.totalRetenciones.toLocaleString()}`}
-            />
+            <KpiCard label="Total movimientos" value={formatNumber(reporte.totalMovimientos)} />
+            <KpiCard label="Monto total" value={formatMoney(reporte.totalMontos)} />
+            <KpiCard label="Total montos" value={formatMoney(reporte.totalMontos)} />
+            <KpiCard label="Total retenciones" value={formatMoney(reporte.totalRetenciones)} />
             <KpiCard
               label="Impuesto por movimiento"
               value={`$ ${impuestoPorMovimiento.toFixed(2)}`}
@@ -179,12 +175,12 @@ function ReporteDetalleModal({
             />
             <KpiCard
               label="Total movimientos"
-              value={reporte.totalMovimientos.toLocaleString()}
+              value={formatNumber(reporte.totalMovimientos)}
               sub="Usuarios en padrón"
             />
             <KpiCard
               label="Monto total"
-              value={`$ ${reporte.totalMontos.toLocaleString()}`}
+              value={formatMoney(reporte.totalMontos)}
               sub="Suma de montos del período"
             />
             <KpiCard
@@ -255,31 +251,27 @@ function ReportesMock() {
       label: "Total movimientos",
       sortable: true,
       render: (r) => (
-        <span className="font-mono tabular-nums">{r.totalMovimientos.toLocaleString()}</span>
+        <span className="font-mono tabular-nums">{formatNumber(r.totalMovimientos)}</span>
       ),
     },
     {
       key: "totalMontos",
       label: "Monto total",
       sortable: true,
-      render: (r) => (
-        <span className="font-mono tabular-nums">$ {r.totalMontos.toLocaleString()}</span>
-      ),
+      render: (r) => <span className="font-mono tabular-nums">{formatMoney(r.totalMontos)}</span>,
     },
     {
       key: "totalMontos2",
       label: "Total montos",
       sortable: true,
-      render: (r) => (
-        <span className="font-mono tabular-nums">$ {r.totalMontos.toLocaleString()}</span>
-      ),
+      render: (r) => <span className="font-mono tabular-nums">{formatMoney(r.totalMontos)}</span>,
     },
     {
       key: "totalRetenciones",
       label: "Total retenciones",
       sortable: true,
       render: (r) => (
-        <span className="font-mono tabular-nums">$ {r.totalRetenciones.toLocaleString()}</span>
+        <span className="font-mono tabular-nums">{formatMoney(r.totalRetenciones)}</span>
       ),
     },
     {

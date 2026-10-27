@@ -1,13 +1,10 @@
+import { formatMoney } from "@/shared/format";
 import { createFileRoute } from "@tanstack/react-router";
 import { brand, pageTitle } from "@/brand/brand";
 import { useState, useMemo } from "react";
 import { PageHeader, Card, Badge } from "@/components/portal-shell";
 import { DataTable, type Column } from "@/components/data-table";
-import {
-  getImpuestosPorComercio,
-  formatImpuestoMonto,
-  type ImpuestoPorComercio,
-} from "@/data/impuestos-por-cobrar";
+import { getImpuestosPorComercio, type ImpuestoPorComercio } from "@/data/impuestos-por-cobrar";
 import { PermissionGuard } from "@/components/permission-guard";
 import { Wallet, Landmark, Percent, ArrowUpRight, Calendar } from "lucide-react";
 
@@ -20,10 +17,6 @@ export const Route = createFileRoute("/admin/comercios/link-pago/resumen")({
     ],
   }),
 });
-
-function fmt(n: number) {
-  return `$ ${n.toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-}
 
 const DATA_BY_PERIOD: Record<
   string,
@@ -103,19 +96,19 @@ function Page() {
           <div className="text-xs text-muted-foreground flex items-center gap-1">
             <Wallet size={12} /> Total pendiente de acreditar
           </div>
-          <div className="font-mono text-xl font-semibold mt-1">{fmt(kpi.pendiente)}</div>
+          <div className="font-mono text-xl font-semibold mt-1">{formatMoney(kpi.pendiente)}</div>
           <div className="text-xs text-muted-foreground mt-1">Máximo adelantable</div>
         </Card>
         <Card className="p-4">
           <div className="text-xs text-muted-foreground flex items-center gap-1">
             <Landmark size={12} /> Total disponible en cuenta recaudadora
           </div>
-          <div className="font-mono text-xl font-semibold mt-1">{fmt(kpi.recaudadora)}</div>
+          <div className="font-mono text-xl font-semibold mt-1">{formatMoney(kpi.recaudadora)}</div>
           <div className="text-xs text-muted-foreground mt-1">Fondos en cuenta</div>
         </Card>
         <Card className="p-4">
           <div className="text-xs text-muted-foreground">Total bruto</div>
-          <div className="font-mono text-xl font-semibold mt-1">{fmt(kpi.bruto)}</div>
+          <div className="font-mono text-xl font-semibold mt-1">{formatMoney(kpi.bruto)}</div>
           <div className="text-xs text-muted-foreground mt-1">Suma operaciones</div>
         </Card>
         <Card className="p-4 border-primary/20">
@@ -123,7 +116,7 @@ function Page() {
             <Percent size={12} /> Neto {brand.name}
           </div>
           <div className="font-mono text-xl font-semibold mt-1 text-emerald-700">
-            {fmt(kpi.netoPropio)}
+            {formatMoney(kpi.netoPropio)}
           </div>
           <div className="text-[11px] text-muted-foreground mt-1">
             Tasa {brand.name} (neto) — cuánto genera en el período
@@ -133,12 +126,12 @@ function Page() {
           <div className="text-xs text-muted-foreground flex items-center gap-1">
             <ArrowUpRight size={12} /> Neto PayWay
           </div>
-          <div className="font-mono text-xl font-semibold mt-1">{fmt(kpi.netoPayWay)}</div>
+          <div className="font-mono text-xl font-semibold mt-1">{formatMoney(kpi.netoPayWay)}</div>
           <div className="text-[11px] text-muted-foreground mt-1">A pagar a pasarela</div>
         </Card>
         <Card className="p-4">
           <div className="text-xs text-muted-foreground">Impuestos</div>
-          <div className="font-mono text-xl font-semibold mt-1">{fmt(kpi.impuestos)}</div>
+          <div className="font-mono text-xl font-semibold mt-1">{formatMoney(kpi.impuestos)}</div>
           <div className="text-xs text-muted-foreground mt-1">Total impuestos período</div>
         </Card>
       </div>
@@ -150,24 +143,24 @@ function Page() {
         <div className="space-y-2 text-sm">
           <div className="flex justify-between">
             <span className="text-muted-foreground">Bruto</span>
-            <span className="font-mono">{fmt(kpi.bruto)}</span>
+            <span className="font-mono">{formatMoney(kpi.bruto)}</span>
           </div>
           <div className="flex justify-between text-xs">
             <span className="text-muted-foreground">Impuestos</span>
-            <span className="font-mono text-danger-600">- {fmt(kpi.impuestos)}</span>
+            <span className="font-mono text-danger-600">- {formatMoney(kpi.impuestos)}</span>
           </div>
           <div className="flex justify-between text-xs">
             <span className="text-muted-foreground">Neto PayWay</span>
-            <span className="font-mono text-danger-600">- {fmt(kpi.netoPayWay)}</span>
+            <span className="font-mono text-danger-600">- {formatMoney(kpi.netoPayWay)}</span>
           </div>
           <div className="flex justify-between text-xs">
             <span className="text-muted-foreground">Neto {brand.name}</span>
-            <span className="font-mono text-emerald-700">{fmt(kpi.netoPropio)}</span>
+            <span className="font-mono text-emerald-700">{formatMoney(kpi.netoPropio)}</span>
           </div>
           <div className="border-t my-2" />
           <div className="flex justify-between font-semibold">
             <span>Disponible + pendiente</span>
-            <span className="font-mono">{fmt(kpi.recaudadora + kpi.pendiente)}</span>
+            <span className="font-mono">{formatMoney(kpi.recaudadora + kpi.pendiente)}</span>
           </div>
         </div>
       </Card>
@@ -247,7 +240,7 @@ function Page() {
               key: "pendiente",
               label: "Impuestos",
               render: (r) => (
-                <span className="font-mono text-amber-700">{formatImpuestoMonto(r.pendiente)}</span>
+                <span className="font-mono text-amber-700">{formatMoney(r.pendiente)}</span>
               ),
             },
             {
@@ -255,24 +248,20 @@ function Page() {
               label: `Comisión ${brand.shortName}`,
               render: (r) => (
                 <span className="font-mono text-emerald-700">
-                  {formatImpuestoMonto(r.comisionPlataformaPropia)}
+                  {formatMoney(r.comisionPlataformaPropia)}
                 </span>
               ),
             },
             {
               key: "comisionPayway",
               label: "Comisión PayWay",
-              render: (r) => (
-                <span className="font-mono">{formatImpuestoMonto(r.comisionPayway)}</span>
-              ),
+              render: (r) => <span className="font-mono">{formatMoney(r.comisionPayway)}</span>,
             },
             {
               key: "pendienteNeto",
               label: "Pendiente neto",
               render: (r) => (
-                <span className="font-mono font-semibold">
-                  {formatImpuestoMonto(r.pendienteNeto)}
-                </span>
+                <span className="font-mono font-semibold">{formatMoney(r.pendienteNeto)}</span>
               ),
             },
             {
@@ -281,7 +270,7 @@ function Page() {
               render: (r) =>
                 r.adelanto ? (
                   <div>
-                    <div className="font-mono text-xs">{formatImpuestoMonto(r.adelanto.monto)}</div>
+                    <div className="font-mono text-xs">{formatMoney(r.adelanto.monto)}</div>
                     <Badge
                       tone={
                         r.adelanto.estado === "Pendiente"
@@ -303,7 +292,7 @@ function Page() {
               label: "Acreditación",
               render: (r) => (
                 <span className="font-mono font-semibold text-emerald-700">
-                  {formatImpuestoMonto(r.acreditacion)}
+                  {formatMoney(r.acreditacion)}
                 </span>
               ),
             },
@@ -312,9 +301,7 @@ function Page() {
               label: "Contracargo retenido",
               render: (r) =>
                 r.contracargo ? (
-                  <span className="font-mono text-danger-600">
-                    {formatImpuestoMonto(r.contracargo)}
-                  </span>
+                  <span className="font-mono text-danger-600">{formatMoney(r.contracargo)}</span>
                 ) : (
                   <span className="text-muted-foreground">—</span>
                 ),

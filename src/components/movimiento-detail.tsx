@@ -1,7 +1,8 @@
+import { formatMoney } from "@/shared/format";
 import type { ReactNode } from "react";
 import { Badge } from "@/components/portal-shell";
 import { LegajoCell } from "@/components/legajo-label";
-import { fmtARS, type Desglose } from "@/lib/aranceles";
+import { type Desglose } from "@/lib/aranceles";
 
 export type Movimiento = {
   clienteId: string;
@@ -123,20 +124,20 @@ export function MovimientoDetail({ m, onClose }: { m: Movimiento; onClose: () =>
               {
                 label: `Comisión (${m.desglose.porcentajeImpuesto}% imp. no incluido)`,
                 value: (
-                  <span className="font-mono tabular-nums">{fmtARS(m.desglose.comision)}</span>
+                  <span className="font-mono tabular-nums">{formatMoney(m.desglose.comision)}</span>
                 ),
               },
               {
                 label: "Impuesto (IVA)",
                 value: (
-                  <span className="font-mono tabular-nums">{fmtARS(m.desglose.impuesto)}</span>
+                  <span className="font-mono tabular-nums">{formatMoney(m.desglose.impuesto)}</span>
                 ),
               },
               {
                 label: "Monto cobrado al cliente",
                 value: (
                   <span className="font-mono font-semibold tabular-nums">
-                    {fmtARS(m.desglose.total)}
+                    {formatMoney(m.desglose.total)}
                   </span>
                 ),
               },

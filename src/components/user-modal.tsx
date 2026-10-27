@@ -1,3 +1,4 @@
+import { formatDate, formatMoney } from "@/shared/format";
 import { useEffect, useState, type ReactNode, type MouseEvent as ReactMouseEvent } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import {
@@ -595,15 +596,11 @@ function buildMovimientosOperativos(user: UserData): MovimientoOperativo[] {
     id: `mov-${base}-${i + 1}`,
     tipo: tipos[i % tipos.length],
     detalle: `TX-2026-08-0${(i % 9) + 1}-${1000 + i}`,
-    monto: `$ ${((i + 1) * 3250 + i * 137).toLocaleString("es-AR")}`,
+    monto: formatMoney((i + 1) * 3250 + i * 137),
     fecha: `0${(i % 9) + 1}/08/2026`,
     estado: estados[i % estados.length],
   }));
 }
-
-const fmtARS = (n: number) => "$ " + n.toLocaleString("es-AR");
-
-const fmtMov = (n: number) => (n >= 0 ? "+" : "") + "$ " + Math.abs(n).toLocaleString("es-AR");
 
 const historialColumns: Column<HistorialRegistro>[] = [
   {
@@ -1019,7 +1016,7 @@ export function UserModal({
   };
 
   const forzarValidacion = () => {
-    const hoy = new Date().toLocaleDateString("es-AR");
+    const hoy = formatDate(new Date());
     setValidaciones((prev) => [
       {
         id: `val-${Date.now()}`,
@@ -1073,7 +1070,7 @@ export function UserModal({
       disp: saldoInicial,
       ret: 0,
       conc: saldoInicial,
-      ing: fmtARS(saldoInicial),
+      ing: formatMoney(saldoInicial),
       egr: "$ 0",
       resp: subcuentaForm.resp || "—",
       lim: subcuentaForm.lim || "Sin limite",
@@ -2499,7 +2496,7 @@ function SubDetailModal({ sub, onClose }: { sub: Subcuenta; onClose: () => void 
                   Balance actual
                 </div>
                 <div className="font-display tabular-nums text-base font-semibold mt-1">
-                  {fmtARS(sub.disp)}
+                  {formatMoney(sub.disp)}
                 </div>
               </div>
               <div className="bg-muted/30 rounded-lg p-3">
@@ -2507,7 +2504,7 @@ function SubDetailModal({ sub, onClose }: { sub: Subcuenta; onClose: () => void 
                   Total depositos
                 </div>
                 <div className="font-display tabular-nums text-base font-semibold mt-1 text-emerald-700">
-                  {fmtARS(totalDepositos)}
+                  {formatMoney(totalDepositos)}
                 </div>
               </div>
               <div className="bg-muted/30 rounded-lg p-3">
@@ -2515,7 +2512,7 @@ function SubDetailModal({ sub, onClose }: { sub: Subcuenta; onClose: () => void 
                   Total retiros
                 </div>
                 <div className="font-display tabular-nums text-base font-semibold mt-1 text-danger-700">
-                  {fmtARS(totalRetiros)}
+                  {formatMoney(totalRetiros)}
                 </div>
               </div>
               <div className="bg-muted/30 rounded-lg p-3">
@@ -2523,7 +2520,7 @@ function SubDetailModal({ sub, onClose }: { sub: Subcuenta; onClose: () => void 
                   Total comisiones
                 </div>
                 <div className="font-display tabular-nums text-base font-semibold mt-1">
-                  {fmtARS(totalComisiones)}
+                  {formatMoney(totalComisiones)}
                 </div>
               </div>
             </div>
@@ -2623,7 +2620,7 @@ function SubDetailModal({ sub, onClose }: { sub: Subcuenta; onClose: () => void 
                             m.tipo === "ingreso" ? "text-emerald-700" : "text-danger-700"
                           }`}
                         >
-                          {fmtMov(m.tipo === "ingreso" ? m.monto : -m.monto)}
+                          {formatMoney(m.monto, { signo: m.tipo === "ingreso" })}
                         </span>
                       </div>
                       <div className="text-[11px] text-muted-foreground mt-1 flex flex-wrap gap-x-4 gap-y-0.5">
