@@ -11,7 +11,7 @@ import {
   ShieldOff,
   Download,
 } from "lucide-react";
-import { FormDialog } from "@/components/form-dialog";
+import { FormDialog } from "@/shared/ui/form-dialog";
 import { FileDropzone } from "@/components/file-dropzone";
 import { Badge, Input, Label } from "@/components/portal-shell";
 import { useQuery } from "@tanstack/react-query";

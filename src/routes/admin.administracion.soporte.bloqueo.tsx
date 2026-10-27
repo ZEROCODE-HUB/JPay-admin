@@ -1,12 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { Plus, Edit3, Trash2 } from "lucide-react";
-import { PageHeader } from "@/components/page-header";
-import { DataTable, type Column } from "@/components/data-table";
-import { FormDialog } from "@/components/form-dialog";
-import { ConfirmDialog } from "@/components/confirm-dialog";
+import { DataTable, type Column } from "@/shared/ui/data-table";
+import { FormDialog } from "@/shared/ui/form-dialog";
+import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
 import { ActionsDropdown, type ActionItem } from "@/components/actions-dropdown";
-import { Input, Label, Badge } from "@/components/portal-shell";
+import { Input, Label, Badge, PageHeader } from "@/components/portal-shell";
 
 const TIPOS = [
   "Todos",

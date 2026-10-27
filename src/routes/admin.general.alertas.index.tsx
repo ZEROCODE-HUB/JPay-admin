@@ -15,12 +15,11 @@ import {
   Landmark,
 } from "lucide-react";
 import { toast } from "sonner";
-import { DataTable, type Column, type TableServerFilters } from "@/components/data-table";
-import { FormDialog } from "@/components/form-dialog";
+import { DataTable, type Column, type TableServerFilters } from "@/shared/ui/data-table";
+import { FormDialog } from "@/shared/ui/form-dialog";
 import { ActionsDropdown, type ActionItem } from "@/components/actions-dropdown";
-import { Badge, BtnOutline } from "@/components/portal-shell";
-import { PageHeader } from "@/components/page-header";
-import { Pagination } from "@/components/pagination";
+import { Badge, BtnOutline, PageHeader } from "@/components/portal-shell";
+import { Pagination } from "@/shared/ui/pagination";
 import { LegajoCell } from "@/components/legajo-label";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { descargarCsv } from "@/lib/api/alert-rules";

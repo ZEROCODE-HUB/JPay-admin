@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { X } from "lucide-react";
-import { BtnPrimary, BtnOutline } from "./portal-shell";
+import { BtnPrimary, BtnOutline } from "@/components/portal-shell";
 
 export function ConfirmDialog({
   open,
@@ -11,15 +11,18 @@ export function ConfirmDialog({
   confirmLabel = "Confirmar",
   variant = "default",
   extraContent,
+  closeOnConfirm = false,
 }: {
   open: boolean;
   onClose: () => void;
   onConfirm: () => void | Promise<void>;
   title: string;
-  message: string;
+  message: ReactNode;
   confirmLabel?: string;
   variant?: "default" | "danger";
-  extraContent?: React.ReactNode;
+  extraContent?: ReactNode;
+  /** Cierra el diálogo cuando `onConfirm` termina sin error. */
+  closeOnConfirm?: boolean;
 }) {
   const [loading, setLoading] = useState(false);
   if (!open) return null;
@@ -30,6 +33,7 @@ export function ConfirmDialog({
     setLoading(true);
     try {
       await onConfirm();
+      if (closeOnConfirm) onClose();
     } finally {
       setLoading(false);
     }
@@ -50,7 +54,7 @@ export function ConfirmDialog({
             <X size={18} />
           </button>
         </div>
-        <p className="text-sm text-muted-foreground mb-6">{message}</p>
+        <div className="text-sm text-muted-foreground mb-6">{message}</div>
         {extraContent}
         <div className="flex gap-2">
           <BtnOutline type="button" className="flex-1" onClick={onClose} disabled={loading}>

@@ -14,14 +14,14 @@ import {
   CheckCircle,
 } from "lucide-react";
 import { requireSupabase } from "@/lib/supabase";
-import { DataTable, type TableServerFilters } from "@/components/data-table";
+import { DataTable, type TableServerFilters } from "@/shared/ui/data-table";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { ActionsDropdown, type ActionItem } from "@/components/actions-dropdown";
 import { PageHeader, Badge, Card } from "@/components/portal-shell";
-import { ConfirmDialog } from "@/components/confirm-dialog";
+import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
 import { useCan } from "@/lib/permissions";
 import { PermissionGuard } from "@/components/permission-guard";
-import { Pagination } from "@/components/pagination";
+import { Pagination } from "@/shared/ui/pagination";
 import { DataAccessError } from "@/lib/api/errors";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -434,7 +434,7 @@ function Page() {
     return items;
   };
 
-  const columns: import("@/components/data-table").Column<EnlacePago>[] = [
+  const columns: import("@/shared/ui/data-table").Column<EnlacePago>[] = [
     {
       key: "url",
       label: "Enlace de pago",

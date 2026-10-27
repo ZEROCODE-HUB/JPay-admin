@@ -28,7 +28,7 @@ import {
   Receipt as ReceiptIcon,
   Gavel,
 } from "lucide-react";
-import { DataTable, type Column } from "@/components/data-table";
+import { DataTable, type Column } from "@/shared/ui/data-table";
 import {
   PageHeader,
   Badge,
@@ -40,8 +40,8 @@ import {
 } from "@/components/portal-shell";
 import { ActionsDropdown, type ActionItem } from "@/components/actions-dropdown";
 import { PermissionGuard } from "@/components/permission-guard";
-import { Pagination } from "@/components/pagination";
-import { ConfirmDialog } from "@/components/confirm-dialog";
+import { Pagination } from "@/shared/ui/pagination";
+import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
 import { CargarCsvModal } from "@/components/cargar-csv-modal";
 import { ConfirmarAcreditacionModal } from "@/components/confirmar-acreditacion-modal";
 import { toast } from "sonner";

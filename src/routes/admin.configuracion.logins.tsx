@@ -1,6 +1,6 @@
 import { formatNumber } from "@/shared/format";
 import { createFileRoute } from "@tanstack/react-router";
-import { DataTable, type Column } from "@/components/data-table";
+import { DataTable, type Column } from "@/shared/ui/data-table";
 import { PageHeader, Badge } from "@/components/portal-shell";
 import { useIntegraciones } from "@/hooks/useIntegraciones";
 import { PermissionGuard } from "@/components/permission-guard";

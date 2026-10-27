@@ -1,8 +1,7 @@
 import { formatMoney } from "@/shared/format";
 import { createFileRoute } from "@tanstack/react-router";
 import { AlertTriangle } from "lucide-react";
-import { PageHeader } from "@/components/page-header";
-import { Card } from "@/components/portal-shell";
+import { Card, PageHeader } from "@/components/portal-shell";
 import { brand } from "@/brand/brand";
 
 export const Route = createFileRoute("/admin/administracion/registros/total")({

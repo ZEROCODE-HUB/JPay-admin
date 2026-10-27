@@ -3,12 +3,11 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus, Eye, Loader2, AlertTriangle, Inbox, X } from "lucide-react";
-import { PageHeader } from "@/components/page-header";
-import { DataTable, type Column, type TableServerFilters } from "@/components/data-table";
+import { DataTable, type Column, type TableServerFilters } from "@/shared/ui/data-table";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
-import { FormDialog } from "@/components/form-dialog";
+import { FormDialog } from "@/shared/ui/form-dialog";
 import { ActionsDropdown, type ActionItem } from "@/components/actions-dropdown";
-import { Badge, Input, BtnPrimary } from "@/components/portal-shell";
+import { Badge, Input, BtnPrimary, PageHeader } from "@/components/portal-shell";
 import { listAdminUsers } from "@/lib/api/admin-users";
 import { listRoles } from "@/lib/api/roles-permisos";
 import type { AdminUser, Rol } from "@/lib/api/types";
@@ -16,7 +15,7 @@ import { crearAdminUser } from "@/lib/api/edge";
 import { DataAccessError } from "@/lib/api/errors";
 import { useCan } from "@/lib/permissions";
 import { PermissionGuard } from "@/components/permission-guard";
-import { Pagination } from "@/components/pagination";
+import { Pagination } from "@/shared/ui/pagination";
 
 const PAGE_SIZES = [10, 20, 50];
 

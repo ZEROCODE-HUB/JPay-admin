@@ -14,11 +14,10 @@ import {
   CheckCircle,
   AlertOctagon,
 } from "lucide-react";
-import { PageHeader } from "@/components/page-header";
-import { DataTable, type Column, type TableServerFilters } from "@/components/data-table";
-import { ConfirmDialog } from "@/components/confirm-dialog";
+import { DataTable, type Column, type TableServerFilters } from "@/shared/ui/data-table";
+import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
 import { ActionsDropdown, type ActionItem } from "@/components/actions-dropdown";
-import { Badge } from "@/components/portal-shell";
+import { Badge, PageHeader } from "@/components/portal-shell";
 import { LegajoCell, LEGAJO_TOOLTIP } from "@/components/legajo-label";
 import { useClientes } from "@/hooks/useClientes";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
@@ -46,7 +45,7 @@ import {
   LABEL_A_ESTADO,
 } from "@/lib/cliente-estados";
 import { toast } from "sonner";
-import { Pagination } from "@/components/pagination";
+import { Pagination } from "@/shared/ui/pagination";
 import { SHOW_PLAFT_COLUMNS } from "@/lib/feature-flags";
 import { pageTitle } from "@/brand/brand";
 

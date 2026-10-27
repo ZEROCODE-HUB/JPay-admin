@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { brand, pageTitle } from "@/brand/brand";
 import { useState, useMemo } from "react";
 import { PageHeader, Card, Badge } from "@/components/portal-shell";
-import { DataTable, type Column } from "@/components/data-table";
+import { DataTable, type Column } from "@/shared/ui/data-table";
 import { getImpuestosPorComercio, type ImpuestoPorComercio } from "@/data/impuestos-por-cobrar";
 import { PermissionGuard } from "@/components/permission-guard";
 import { Wallet, Landmark, Percent, ArrowUpRight, Calendar } from "lucide-react";

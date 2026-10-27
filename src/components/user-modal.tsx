@@ -31,10 +31,10 @@ import {
 import { toast } from "sonner";
 import { Badge, Input, BtnOutline } from "./portal-shell";
 import { useDemoMode } from "@/contexts/demo-mode";
-import { FormDialog } from "./form-dialog";
-import { ConfirmDialog } from "./confirm-dialog";
+import { FormDialog } from "@/shared/ui/form-dialog";
+import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
 import { ActionsDropdown } from "./actions-dropdown";
-import { DataTable, type Column } from "./data-table";
+import { DataTable, type Column } from "@/shared/ui/data-table";
 import { useDocumentosUrls } from "@/lib/api/use-documento-url";
 import { DOCUMENTO_LABELS } from "@/lib/api/documentos";
 import { brand } from "@/brand/brand";

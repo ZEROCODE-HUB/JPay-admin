@@ -1,7 +1,7 @@
 import { formatDate, formatMoney } from "@/shared/format";
 import { useEffect, useMemo, useState } from "react";
 import { AlertTriangle, Info, Wallet } from "lucide-react";
-import { FormDialog } from "@/components/form-dialog";
+import { FormDialog } from "@/shared/ui/form-dialog";
 import { Badge, Label } from "@/components/portal-shell";
 import { useQuery } from "@tanstack/react-query";
 import { listAdelantosByComercio } from "@/lib/api/adelantos";

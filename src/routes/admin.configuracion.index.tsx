@@ -16,8 +16,8 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { Card, Badge, BtnOutline } from "@/components/portal-shell";
-import { FormDialog } from "@/components/form-dialog";
-import { ConfirmDialog } from "@/components/confirm-dialog";
+import { FormDialog } from "@/shared/ui/form-dialog";
+import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
 import { useDeveloperMode } from "@/hooks/use-developer-mode";
 import { toast } from "sonner";
 import { useIntegraciones } from "@/hooks/useIntegraciones";

@@ -2,7 +2,7 @@ import { formatMoney } from "@/shared/format";
 import { useState, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Eye, CheckCircle, PauseCircle, PlayCircle, Trash2 } from "lucide-react";
-import { ModalDialog } from "@/components/modal-dialog";
+import { ModalDialog } from "@/shared/ui/modal-dialog";
 import { ActionsDropdown } from "@/components/actions-dropdown";
 import { Badge } from "@/components/portal-shell";
 import { toast } from "sonner";

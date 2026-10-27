@@ -23,12 +23,12 @@ import {
   BtnOutline,
   Card,
 } from "@/components/portal-shell";
-import { DataTable, type Column } from "@/components/data-table";
+import { DataTable, type Column } from "@/shared/ui/data-table";
 import { ActionsDropdown, type ActionItem } from "@/components/actions-dropdown";
-import { ConfirmDialog } from "@/components/confirm-dialog";
-import { FormDialog } from "@/components/form-dialog";
+import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
+import { FormDialog } from "@/shared/ui/form-dialog";
 import { LegajoCell } from "@/components/legajo-label";
-import { Pagination } from "@/components/pagination";
+import { Pagination } from "@/shared/ui/pagination";
 import { useComercios, useClientesForSelect } from "@/hooks/useComercios";
 import { useCodigosCategoria } from "@/hooks/useCodigosCategoria";
 import { useAdminUsers } from "@/hooks/useAdminUsers";

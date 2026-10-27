@@ -22,7 +22,7 @@ import {
 } from "lucide-react";
 import { PortalShell, type NavItem } from "@/components/portal-shell";
 import { useDemoMode } from "@/contexts/demo-mode";
-import { RouteSkeleton } from "@/components/route-skeleton";
+import { RouteSkeleton } from "@/shared/ui/route-skeleton";
 import { AdminChatbot } from "@/components/admin-chatbot";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { brand } from "@/brand/brand";

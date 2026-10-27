@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { pageTitle } from "@/brand/brand";
 import { useRef, useState, useEffect } from "react";
 import { Edit3, Eye, Plus, Trash2, X } from "lucide-react";
-import { DataTable, type Column } from "@/components/data-table";
+import { DataTable, type Column } from "@/shared/ui/data-table";
 import { ActionsDropdown, type ActionItem } from "@/components/actions-dropdown";
 import {
   PageHeader,

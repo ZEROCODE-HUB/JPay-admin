@@ -1,9 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { Send, Eye, X } from "lucide-react";
-import { PageHeader } from "@/components/page-header";
-import { DataTable, type Column } from "@/components/data-table";
-import { Badge } from "@/components/portal-shell";
+import { DataTable, type Column } from "@/shared/ui/data-table";
+import { Badge, PageHeader } from "@/components/portal-shell";
 
 type Mensaje = {
   id: string;

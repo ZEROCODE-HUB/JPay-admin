@@ -17,10 +17,17 @@ import {
 } from "lucide-react";
 import * as XLSX from "xlsx";
 import { toast } from "sonner";
-import { PageHeader } from "@/components/page-header";
-import { Card, Badge, BtnOutline, BtnPrimary, Input, Label } from "@/components/portal-shell";
-import { DataTable, type Column } from "@/components/data-table";
-import { FormDialog } from "@/components/form-dialog";
+import {
+  Card,
+  Badge,
+  BtnOutline,
+  BtnPrimary,
+  Input,
+  Label,
+  PageHeader,
+} from "@/components/portal-shell";
+import { DataTable, type Column } from "@/shared/ui/data-table";
+import { FormDialog } from "@/shared/ui/form-dialog";
 import { FileDropzone } from "@/components/file-dropzone";
 import { useEffect } from "react";
 import { isSupabaseConfigured, requireSupabase } from "@/lib/supabase";
@@ -423,7 +430,7 @@ function AnalisisConciliacionModal({
                     fecha: it.bankRow.fechaHoraCoelsa || it.bankRow.fechaNegocio,
                     cvu: it.bankRow.cvu,
                   }));
-                  const cols: import("@/components/data-table").Column<RowNE>[] = [
+                  const cols: import("@/shared/ui/data-table").Column<RowNE>[] = [
                     {
                       key: "id",
                       label: "ID_DEBIN",

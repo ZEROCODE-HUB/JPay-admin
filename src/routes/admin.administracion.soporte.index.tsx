@@ -2,8 +2,7 @@ import { formatMoney } from "@/shared/format";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { Search, ArrowLeftRight, Banknote, Loader2 } from "lucide-react";
-import { PageHeader } from "@/components/page-header";
-import { Input, BtnPrimary, Badge } from "@/components/portal-shell";
+import { Input, BtnPrimary, Badge, PageHeader } from "@/components/portal-shell";
 import { brand } from "@/brand/brand";
 
 type QueryType = "deposito" | "retiro";

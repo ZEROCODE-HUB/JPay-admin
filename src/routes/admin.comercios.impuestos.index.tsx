@@ -4,11 +4,11 @@ import { pageTitle } from "@/brand/brand";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState, useMemo } from "react";
 import { Eye, Power, PowerOff, Edit3, Trash2, Plus, X, AlertTriangle, Inbox } from "lucide-react";
-import { DataTable, type Column } from "@/components/data-table";
+import { DataTable, type Column } from "@/shared/ui/data-table";
 import { ActionsDropdown, type ActionItem } from "@/components/actions-dropdown";
 import { PageHeader, Badge, BtnOutline, BtnPrimary, Input, Label } from "@/components/portal-shell";
-import { ConfirmDialog } from "@/components/confirm-dialog";
-import { FormDialog } from "@/components/form-dialog";
+import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
+import { FormDialog } from "@/shared/ui/form-dialog";
 import { useImpuestos } from "@/hooks/useImpuestos";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import {

@@ -14,13 +14,12 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import { toast } from "sonner";
-import { PageHeader } from "@/components/page-header";
-import { DataTable, type Column, type TableServerFilters } from "@/components/data-table";
-import { FormDialog } from "@/components/form-dialog";
-import { ConfirmDialog } from "@/components/confirm-dialog";
+import { DataTable, type Column, type TableServerFilters } from "@/shared/ui/data-table";
+import { FormDialog } from "@/shared/ui/form-dialog";
+import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
 import { ActionsDropdown, type ActionItem } from "@/components/actions-dropdown";
-import { BtnPrimary } from "@/components/portal-shell";
-import { Pagination } from "@/components/pagination";
+import { BtnPrimary, PageHeader } from "@/components/portal-shell";
+import { Pagination } from "@/shared/ui/pagination";
 import { LegajoCell } from "@/components/legajo-label";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { useClientesForSelect } from "@/hooks/useComercios";

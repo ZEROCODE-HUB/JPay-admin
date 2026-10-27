@@ -23,12 +23,11 @@ import {
   Ban,
   Info,
 } from "lucide-react";
-import { PageHeader } from "@/components/page-header";
-import { Badge } from "@/components/portal-shell";
-import { ConfirmDialog } from "@/components/confirm-dialog";
-import { ModalDialog } from "@/components/modal-dialog";
+import { Badge, PageHeader } from "@/components/portal-shell";
+import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
+import { ModalDialog } from "@/shared/ui/modal-dialog";
 
-import { DataTable, type Column } from "@/components/data-table";
+import { DataTable, type Column } from "@/shared/ui/data-table";
 import { PermissionGuard } from "@/components/permission-guard";
 import { toast } from "sonner";
 import { AlertaGestionModal, type GestionAlerta } from "@/components/alerta-gestion";
@@ -114,7 +113,7 @@ import {
 import { resolverEstadoMovimiento } from "@/lib/estados";
 import { useEstadosMovimiento } from "@/hooks/useEstados";
 import { useCambiarEstadoMovimiento } from "@/hooks/useMovimientoActions";
-import { FormDialog } from "@/components/form-dialog";
+import { FormDialog } from "@/shared/ui/form-dialog";
 import { MOCK_IMPUESTOS_POR_COBRAR } from "@/data/impuestos-por-cobrar";
 import { pageTitle } from "@/brand/brand";
 

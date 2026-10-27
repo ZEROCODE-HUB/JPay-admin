@@ -8,8 +8,8 @@ import {
   Search,
   HelpCircle,
 } from "lucide-react";
-import { BtnOutline } from "./portal-shell";
-import { Pagination } from "./pagination";
+import { BtnOutline } from "@/components/portal-shell";
+import { Pagination } from "@/shared/ui/pagination";
 
 export type FilterType = "text" | "date" | "enum";
 

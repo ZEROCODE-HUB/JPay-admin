@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { PageHeader, Card, Stat, Badge } from "@/components/portal-shell";
 import { Input, Label } from "@/components/portal-shell";
-import { DataTable, type Column } from "@/components/data-table";
+import { DataTable, type Column } from "@/shared/ui/data-table";
 import { useMovimientos } from "@/hooks/useMovimientos";
 import { brand } from "@/brand/brand";
 

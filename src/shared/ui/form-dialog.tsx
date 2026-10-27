@@ -1,6 +1,6 @@
 import { type ReactNode, useEffect } from "react";
 import { X } from "lucide-react";
-import { BtnPrimary, BtnOutline } from "./portal-shell";
+import { BtnPrimary, BtnOutline } from "@/components/portal-shell";
 
 export function FormDialog({
   open,

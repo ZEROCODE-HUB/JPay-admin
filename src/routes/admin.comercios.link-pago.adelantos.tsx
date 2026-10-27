@@ -15,7 +15,7 @@ import {
   Banknote,
   X,
 } from "lucide-react";
-import { DataTable, type Column } from "@/components/data-table";
+import { DataTable, type Column } from "@/shared/ui/data-table";
 import {
   PageHeader,
   Badge,
@@ -27,7 +27,7 @@ import {
 } from "@/components/portal-shell";
 import { ActionsDropdown, type ActionItem } from "@/components/actions-dropdown";
 import { PermissionGuard } from "@/components/permission-guard";
-import { ConfirmDialog } from "@/components/confirm-dialog";
+import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
 import { toast } from "sonner";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {

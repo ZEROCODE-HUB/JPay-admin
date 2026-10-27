@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Upload, X, FileText } from "lucide-react";
-import { ModalDialog } from "./modal-dialog";
+import { ModalDialog } from "@/shared/ui/modal-dialog";
 import { BtnOutline } from "./portal-shell";
 import { useAuth } from "@/lib/auth";
 

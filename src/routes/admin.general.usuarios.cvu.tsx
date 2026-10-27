@@ -14,13 +14,12 @@ import {
   ShieldCheck,
   Coins,
 } from "lucide-react";
-import { PageHeader } from "@/components/page-header";
-import { DataTable, type Column, type TableServerFilters } from "@/components/data-table";
+import { DataTable, type Column, type TableServerFilters } from "@/shared/ui/data-table";
 import { ActionsDropdown, type ActionItem } from "@/components/actions-dropdown";
-import { BtnPrimary, Badge, Input, Label } from "@/components/portal-shell";
-import { FormDialog } from "@/components/form-dialog";
+import { BtnPrimary, Badge, Input, Label, PageHeader } from "@/components/portal-shell";
+import { FormDialog } from "@/shared/ui/form-dialog";
 import { LegajoCell, LEGAJO_TOOLTIP } from "@/components/legajo-label";
-import { Pagination } from "@/components/pagination";
+import { Pagination } from "@/shared/ui/pagination";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { DataAccessError } from "@/lib/api/errors";
 import { useCan } from "@/lib/permissions";

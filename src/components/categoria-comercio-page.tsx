@@ -2,10 +2,10 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { CheckCircle, XCircle, Edit3, Plus, Trash2, AlertTriangle, Inbox } from "lucide-react";
 import { PageHeader, Badge, Input, Label, BtnPrimary } from "@/components/portal-shell";
-import { DataTable, type Column } from "@/components/data-table";
+import { DataTable, type Column } from "@/shared/ui/data-table";
 import { ActionsDropdown, type ActionItem } from "@/components/actions-dropdown";
-import { ConfirmDialog } from "@/components/confirm-dialog";
-import { FormDialog } from "@/components/form-dialog";
+import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
+import { FormDialog } from "@/shared/ui/form-dialog";
 import { useCodigosCategoria } from "@/hooks/useCodigosCategoria";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import {

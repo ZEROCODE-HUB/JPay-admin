@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { PageHeader } from "@/components/portal-shell";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Save, Info, AlertTriangle, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { PageHeader } from "@/components/page-header";
 import {
   listAlertRules,
   saveAlertRules,

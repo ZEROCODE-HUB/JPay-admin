@@ -14,7 +14,7 @@ import {
   AlertTriangle,
   Inbox,
 } from "lucide-react";
-import { DataTable, type Column } from "@/components/data-table";
+import { DataTable, type Column } from "@/shared/ui/data-table";
 import { ActionsDropdown, type ActionItem } from "@/components/actions-dropdown";
 import {
   PageHeader,
@@ -25,8 +25,8 @@ import {
   Label,
   Card,
 } from "@/components/portal-shell";
-import { ConfirmDialog } from "@/components/confirm-dialog";
-import { FormDialog } from "@/components/form-dialog";
+import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
+import { FormDialog } from "@/shared/ui/form-dialog";
 import { useApiUsuarios } from "@/hooks/useApiUsuarios";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import {

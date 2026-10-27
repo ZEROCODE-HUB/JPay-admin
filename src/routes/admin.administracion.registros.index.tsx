@@ -3,11 +3,10 @@ import { useState } from "react";
 import { Download, Eye } from "lucide-react";
 import * as XLSX from "xlsx";
 import { toast } from "sonner";
-import { PageHeader } from "@/components/page-header";
-import { DataTable, type Column } from "@/components/data-table";
-import { FormDialog } from "@/components/form-dialog";
+import { DataTable, type Column } from "@/shared/ui/data-table";
+import { FormDialog } from "@/shared/ui/form-dialog";
 import { ActionsDropdown, type ActionItem } from "@/components/actions-dropdown";
-import { Badge } from "@/components/portal-shell";
+import { Badge, PageHeader } from "@/components/portal-shell";
 
 type Fondo = {
   legajo: string;
