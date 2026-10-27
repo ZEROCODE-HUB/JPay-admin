@@ -1,7 +1,7 @@
 import { Download, Upload } from "lucide-react";
 import { brand } from "@/brand/brand";
 import { BtnOutline, BtnPrimary, PageHeader } from "@/components/portal-shell";
-import { CargarCsvModal } from "@/components/cargar-csv-modal";
+import { CargarCsvModal } from "@/features/link-pago/cargar-csv";
 import { ConfirmarAcreditacionModal } from "@/components/confirmar-acreditacion-modal";
 import { PermissionGuard } from "@/components/permission-guard";
 import { useLotesAcciones } from "../hooks/useLotesAcciones";

@@ -1,50 +1,10 @@
-import { formatMoney } from "@/shared/format";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Search, ArrowLeftRight, Banknote, Loader2 } from "lucide-react";
-import { Input, BtnPrimary, Badge, PageHeader } from "@/components/portal-shell";
-import { brand } from "@/brand/brand";
+import { Search, ArrowLeftRight, Banknote } from "lucide-react";
+import { Input, BtnPrimary, PageHeader } from "@/components/portal-shell";
+import { EmptyState } from "@/shared/ui/empty-state";
 
 type QueryType = "deposito" | "retiro";
-
-type ConsultaResult = {
-  legajo: string;
-  nombre: string;
-  email: string;
-  monto: string;
-  estado: string;
-  fecha: string;
-  terceroNombre: string;
-  terceroCvu: string;
-  terceroCuit: string;
-  tipo: QueryType;
-};
-
-function mockResult(id: string, tipo: QueryType): ConsultaResult {
-  const base = Number(id.replace(/\D/g, "")) || 1000;
-  return {
-    legajo: `LEG-${base}`,
-    nombre: tipo === "deposito" ? "María Rodríguez" : "Luis Fernández",
-    email:
-      tipo === "deposito" ? `mrodriguez@${brand.web.domain}` : `lfernandez@${brand.web.domain}`,
-    monto: formatMoney(((base * 137) % 90000) + 1000),
-    estado: base % 3 === 0 ? "Pendiente" : base % 3 === 1 ? "Acreditado" : "Rechazado",
-    fecha:
-      tipo === "deposito"
-        ? `2026-07-${((base % 27) + 1).toString().padStart(2, "0")} 14:32`
-        : `2026-07-${((base % 27) + 1).toString().padStart(2, "0")} 09:15`,
-    terceroNombre: tipo === "deposito" ? "Juan Pérez" : "Comercio Express SRL",
-    terceroCvu: `000000${base.toString().padStart(18, "0")}`.slice(-22),
-    terceroCuit: `30-${((base % 90000000) + 10000000).toString()}-${base % 9}`,
-    tipo,
-  };
-}
-
-const estadoTone: Record<string, "success" | "warn" | "danger" | "neutral"> = {
-  Acreditado: "success",
-  Pendiente: "warn",
-  Rechazado: "danger",
-};
 
 export const Route = createFileRoute("/admin/administracion/soporte/")({
   head: () => ({ meta: [{ title: "Consultas frecuentes — Admin Panel" }] }),
@@ -54,29 +14,20 @@ export const Route = createFileRoute("/admin/administracion/soporte/")({
 function Page() {
   const [tipo, setTipo] = useState<QueryType>("deposito");
   const [id, setId] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<ConsultaResult | null>(null);
+  // La consulta a Coelsa todavía no está conectada (antes devolvía un resultado
+  // inventado). Se guarda el último ID consultado para mostrar el estado vacío.
+  const [consultado, setConsultado] = useState<{ id: string; tipo: QueryType } | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const consultar = () => {
     if (!id.trim()) {
       setError("Ingresá un ID de Coelsa");
-      setResult(null);
+      setConsultado(null);
       return;
     }
     setError(null);
-    setLoading(true);
-    setResult(null);
-    setTimeout(() => {
-      setResult(mockResult(id.trim(), tipo));
-      setLoading(false);
-    }, 600);
+    setConsultado({ id: id.trim(), tipo });
   };
-
-  const campoFecha = tipo === "deposito" ? "Fecha de depósito" : "Fecha de retiro";
-  const campoTercero = tipo === "deposito" ? "Nombre del depositante" : "Nombre del destinatario";
-  const labelCvu = tipo === "deposito" ? "CVU del depositante" : "CVU del destinatario";
-  const labelCuit = tipo === "deposito" ? "CUIT del depositante" : "CUIT del destinatario";
 
   return (
     <>
@@ -123,8 +74,8 @@ function Page() {
               onKeyDown={(e) => e.key === "Enter" && consultar()}
             />
           </div>
-          <BtnPrimary onClick={consultar} disabled={loading}>
-            {loading ? <Loader2 size={16} className="animate-spin" /> : <Search size={16} />}
+          <BtnPrimary onClick={consultar}>
+            <Search size={16} />
             Consultar
           </BtnPrimary>
         </div>
@@ -132,44 +83,14 @@ function Page() {
         {error && <p className="text-sm text-danger-600">{error}</p>}
       </div>
 
-      {loading && (
-        <div className="bg-card border rounded-lg p-8 flex items-center justify-center gap-2 text-muted-foreground">
-          <Loader2 size={18} className="animate-spin" /> Consultando…
-        </div>
-      )}
-
-      {result && !loading && (
-        <div className="bg-card border rounded-lg p-5 space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="font-display font-semibold text-foreground">
-              Resultado — {result.tipo === "deposito" ? "Depósito" : "Retiro"}
-            </h3>
-            <Badge tone={estadoTone[result.estado] ?? "neutral"}>{result.estado}</Badge>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4 text-sm">
-            <Field label="Legajo" value={result.legajo} mono />
-            <Field label="Nombre" value={result.nombre} />
-            <Field label="Email" value={result.email} />
-            <Field label="Monto" value={result.monto} mono />
-            <Field label="Estado" value={result.estado} />
-            <Field label={campoFecha} value={result.fecha} mono />
-            <Field label={campoTercero} value={result.terceroNombre} />
-            <Field label={labelCvu} value={result.terceroCvu} mono />
-            <Field label={labelCuit} value={result.terceroCuit} mono />
-          </div>
+      {consultado && (
+        <div className="bg-card border rounded-lg">
+          <EmptyState
+            title="Sin datos"
+            description={`La consulta de ${consultado.tipo === "deposito" ? "depósitos" : "retiros"} por ID de Coelsa (${consultado.id}) todavía no está conectada.`}
+          />
         </div>
       )}
     </>
-  );
-}
-
-function Field({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
-  return (
-    <div>
-      <div className="text-xs uppercase tracking-wide text-muted-foreground">{label}</div>
-      <div className={`mt-0.5 font-medium text-foreground ${mono ? "font-mono text-xs" : ""}`}>
-        {value}
-      </div>
-    </div>
   );
 }

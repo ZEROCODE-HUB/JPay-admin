@@ -2,7 +2,7 @@ import { formatDate, formatMoney, formatPercent } from "@/shared/format";
 import { createFileRoute } from "@tanstack/react-router";
 import { pageTitle } from "@/brand/brand";
 import { useQueryClient } from "@tanstack/react-query";
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { Power, PowerOff, Edit3, Trash2, Plus, AlertTriangle, Inbox } from "lucide-react";
 import { DataTable, type Column } from "@/shared/ui/data-table";
 import { ActionsDropdown, type ActionItem } from "@/components/actions-dropdown";
@@ -24,7 +24,7 @@ import { useCan } from "@/lib/permissions";
 import { PermissionGuard } from "@/components/permission-guard";
 import type { ImpuestoAsignacion, TipoImpuesto, TipoOperacion } from "@/lib/api/types";
 import { TIPOS_OPERACION } from "@/lib/api/types";
-import { MOCK_IMPUESTOS_POR_COBRAR, type ImpuestoPorCobrar } from "@/data/impuestos-por-cobrar";
+import { EmptyState } from "@/shared/ui/empty-state";
 
 export const Route = createFileRoute("/admin/comercios/impuestos/usuarios")({
   head: () => ({ meta: [{ title: pageTitle("Usuarios con impuestos — Admin") }] }),
@@ -315,128 +315,18 @@ function AsignacionFormModal({
   );
 }
 
+/**
+ * Impuestos por cobrar por lote de acreditación. Todavía no hay fuente real
+ * (antes mostraba datos de ejemplo), así que queda en estado vacío.
+ */
 function ImpuestosPorCobrarTab() {
-  const [subTab, setSubTab] = useState<"por_cobrar" | "historial">("por_cobrar");
-
-  const filtrados = useMemo(() => {
-    return MOCK_IMPUESTOS_POR_COBRAR;
-  }, []);
-
-  const columns: Column<ImpuestoPorCobrar>[] = [
-    {
-      key: "usuario",
-      label: "Usuario",
-      filterable: true,
-      render: (r) => <span className="text-xs font-medium">{r.usuario}</span>,
-    },
-    {
-      key: "legajo",
-      label: "Legajo",
-      render: (r) => <span className="font-mono text-xs">{r.legajo}</span>,
-    },
-    {
-      key: "loteId",
-      label: "Lote",
-      filterable: true,
-      render: (r) => <span className="font-mono text-xs font-semibold">{r.loteId}</span>,
-    },
-    {
-      key: "bandera",
-      label: "Bandera",
-      filterable: "enum",
-      filterOptions: ["Visa", "Mastercard", "Amex", "Cabal"],
-      render: (r) => (
-        <span className="inline-flex items-center rounded-full border px-2 py-0.5 text-xs bg-muted/50">
-          {r.bandera}
-        </span>
-      ),
-    },
-    { key: "impuesto", label: "Impuesto", filterable: true, render: (r) => r.impuesto },
-    {
-      key: "monto",
-      label: "Monto",
-      render: (r) => <span className="font-mono tabular-nums">{formatMoney(r.monto)}</span>,
-    },
-    {
-      key: "estado",
-      label: "Estado",
-      filterable: "enum",
-      filterOptions: ["pendiente", "pagado"],
-      render: (r) => <Badge tone={r.estado === "pendiente" ? "warn" : "success"}>{r.estado}</Badge>,
-    },
-    {
-      key: "fechaLote",
-      label: "Fecha lote",
-      render: (r) => <span className="font-mono text-xs">{r.fechaLote}</span>,
-    },
-  ];
-
-  const loteActualIds = [
-    "LOTE-2026-09-07-001",
-    "LOTE-2026-09-07-002",
-    "LOTE-2026-09-07-003",
-    "LOTE-2026-09-07-004",
-    "LOTE-2026-09-07-005",
-  ];
-  const loteActual = filtrados.filter((r) => loteActualIds.includes(r.loteId));
-  const historial = filtrados.filter((r) => !loteActualIds.includes(r.loteId));
-  const totalPendiente = filtrados
-    .filter((r) => r.estado === "pendiente")
-    .reduce((a, b) => a + b.monto, 0);
-  const totalPagado = filtrados
-    .filter((r) => r.estado === "pagado")
-    .reduce((a, b) => a + b.monto, 0);
-
   return (
-    <div className="space-y-4">
-      <div className="flex gap-2 border-b">
-        <button
-          onClick={() => setSubTab("por_cobrar")}
-          className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${subTab === "por_cobrar" ? "border-primary text-primary-ink" : "border-transparent text-muted-foreground hover:text-foreground"}`}
-        >
-          Impuestos por cobrar
-        </button>
-        <button
-          onClick={() => setSubTab("historial")}
-          className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${subTab === "historial" ? "border-primary text-primary-ink" : "border-transparent text-muted-foreground hover:text-foreground"}`}
-        >
-          Historial
-        </button>
-      </div>
-      <div className="text-xs text-muted-foreground">
-        {filtrados.length} registro(s) · pendiente {formatMoney(totalPendiente)} · pagado{" "}
-        {formatMoney(totalPagado)}
-      </div>
-      {subTab === "por_cobrar" ? (
-        <>
-          <Card className="p-3">
-            <div className="text-xs text-muted-foreground">Impuestos por cobrar lote actual</div>
-            <div className="font-mono text-lg font-semibold mt-1">
-              {formatMoney(
-                loteActual.filter((r) => r.estado === "pendiente").reduce((a, b) => a + b.monto, 0),
-              )}
-            </div>
-            <div className="text-[11px] text-muted-foreground">
-              Lote completo al corte y por bandera · {loteActual.length} items
-            </div>
-          </Card>
-          <DataTable columns={columns} data={loteActual} keyExtractor={(r) => r.id} />
-        </>
-      ) : (
-        <>
-          <Card className="p-3">
-            <div className="text-xs text-muted-foreground">Historial pagado</div>
-            <div className="font-mono text-lg font-semibold mt-1 text-emerald-700">
-              {formatMoney(totalPagado)}
-            </div>
-            <div className="text-[11px] text-muted-foreground">
-              Cuándo se pagaron · {historial.length} items
-            </div>
-          </Card>
-          <DataTable columns={columns} data={historial} keyExtractor={(r) => r.id} />
-        </>
-      )}
-    </div>
+    <Card>
+      <EmptyState
+        title="Sin datos"
+        description="Los impuestos por cobrar por lote de acreditación todavía no están conectados a la base."
+      />
+    </Card>
   );
 }
 
