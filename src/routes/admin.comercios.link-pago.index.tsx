@@ -1,7 +1,8 @@
 import { formatDate, formatDateTime, formatMoney } from "@/shared/format";
+import { useRealtimeInvalidate } from "@/shared/realtime";
 import { createFileRoute } from "@tanstack/react-router";
 import { brand, pageTitle } from "@/brand/brand";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Eye,
   Ban,
@@ -13,7 +14,6 @@ import {
   Copy,
   CheckCircle,
 } from "lucide-react";
-import { requireSupabase } from "@/lib/supabase";
 import { DataTable, type TableServerFilters } from "@/shared/ui/data-table";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { ActionsDropdown, type ActionItem } from "@/components/actions-dropdown";
@@ -269,19 +269,9 @@ function Page() {
     refetchOnWindowFocus: true,
   });
 
-  useEffect(() => {
-    const sb = requireSupabase();
-    if (!sb) return;
-    const ch = sb
-      .channel("realtime-enlaces-pago-admin")
-      .on("postgres_changes", { event: "*", schema: "public", table: "cliente_links_pago" }, () => {
-        qc.invalidateQueries({ queryKey: ["enlaces-pago"] });
-      })
-      .subscribe();
-    return () => {
-      sb.removeChannel(ch);
-    };
-  }, [qc]);
+  useRealtimeInvalidate("realtime-enlaces-pago-admin", {
+    cliente_links_pago: [["enlaces-pago"]],
+  });
 
   const rows = data?.rows ?? [];
   const total = data?.total ?? 0;

@@ -30,8 +30,12 @@ import { DataTable, type Column } from "@/shared/ui/data-table";
 import { FormDialog } from "@/shared/ui/form-dialog";
 import { FileDropzone } from "@/components/file-dropzone";
 import { useEffect } from "react";
-import { isSupabaseConfigured, requireSupabase } from "@/lib/supabase";
-import { listConciliacionesArchivos, createConciliacionArchivo } from "@/lib/api/conciliaciones";
+import { isSupabaseConfigured } from "@/lib/supabase";
+import {
+  listConciliacionesArchivos,
+  createConciliacionArchivo,
+  descargarArchivoConciliacion,
+} from "@/lib/api/conciliaciones";
 import { parseBancoFile } from "@/lib/conciliacion/parse";
 import { cruzarConciliacion, type AnalisisResumen } from "@/lib/conciliacion/engine";
 import { listMovimientos } from "@/lib/api/movimientos";
@@ -185,14 +189,7 @@ function AnalisisConciliacionModal({
           if (archivo.rawFile) {
             bankRows = await parseBancoFile(archivo.rawFile);
           } else if (archivo.storagePath && isSupabaseConfigured) {
-            const sb = requireSupabase();
-            const { data, error: dlErr } = await sb.storage
-              .from("conciliaciones")
-              .download(archivo.storagePath);
-            if (dlErr) throw dlErr;
-            const file = new File([data], archivo.archivo, {
-              type: (data as Blob).type || "application/octet-stream",
-            });
+            const file = await descargarArchivoConciliacion(archivo.storagePath, archivo.archivo);
             bankRows = await parseBancoFile(file);
           } else if (archivo.downloadRows.length > 0) {
             // fallback mock -> convertir downloadRows a BankRow shape mínimo

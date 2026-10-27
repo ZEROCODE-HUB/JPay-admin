@@ -1,4 +1,5 @@
 import { formatDate } from "@/shared/format";
+import { useRealtimeInvalidate } from "@/shared/realtime";
 import { createFileRoute } from "@tanstack/react-router";
 import { brand, pageTitle } from "@/brand/brand";
 import { useQueryClient } from "@tanstack/react-query";
@@ -26,7 +27,6 @@ import { DataAccessError } from "@/lib/api/errors";
 import { Badge as BadgeComp } from "@/components/portal-shell";
 import { Pagination } from "@/shared/ui/pagination";
 import { useQuery } from "@tanstack/react-query";
-import { requireSupabase } from "@/lib/supabase";
 import { listQrPos, updateQrEstado, deleteQrPos } from "@/lib/api/qr-pos";
 import type { PuntoVenta, EstadoQr } from "@/lib/api/types";
 
@@ -247,19 +247,9 @@ function Page() {
     refetchOnWindowFocus: true,
   });
 
-  useEffect(() => {
-    const sb = requireSupabase();
-    if (!sb) return;
-    const ch = sb
-      .channel("realtime-puntos_venta-admin")
-      .on("postgres_changes", { event: "*", schema: "public", table: "puntos_venta" }, () => {
-        qc.invalidateQueries({ queryKey: ["qr-pos"] });
-      })
-      .subscribe();
-    return () => {
-      sb.removeChannel(ch);
-    };
-  }, [qc]);
+  useRealtimeInvalidate("realtime-puntos_venta-admin", {
+    puntos_venta: [["qr-pos"]],
+  });
 
   const rows = data?.rows ?? [];
   const total = data?.total ?? 0;

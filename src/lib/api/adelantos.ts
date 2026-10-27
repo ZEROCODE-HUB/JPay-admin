@@ -408,3 +408,33 @@ export async function updateAdelanto(
   if (error) throw new DataAccessError(error);
   return toAdelanto(data as AdelantoRow);
 }
+
+/** comercio_id de un adelanto (null si no existe). */
+export async function getComercioIdDeAdelanto(adelantoId: string): Promise<string | null> {
+  const sb = requireSupabase();
+  const { data, error } = await sb
+    .from("adelantos")
+    .select("comercio_id")
+    .eq("id", adelantoId)
+    .maybeSingle();
+  if (error) throw new DataAccessError(error);
+  return data?.comercio_id ?? null;
+}
+
+export type ComercioResumen = { id: string; nombre: string; legajo: string };
+
+/** Nombre y legajo de cada comercio, indexado por id. */
+export async function getComerciosResumen(ids: string[]): Promise<Record<string, ComercioResumen>> {
+  if (ids.length === 0) return {};
+  const sb = requireSupabase();
+  const { data, error } = await sb
+    .from("comercios")
+    .select("id, nombre_comercio, legajo")
+    .in("id", ids);
+  if (error) throw new DataAccessError(error);
+  const map: Record<string, ComercioResumen> = {};
+  for (const r of data ?? []) {
+    map[r.id] = { id: r.id, nombre: r.nombre_comercio || "(sin nombre)", legajo: r.legajo };
+  }
+  return map;
+}

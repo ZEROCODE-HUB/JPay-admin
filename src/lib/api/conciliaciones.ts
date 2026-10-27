@@ -101,3 +101,11 @@ export async function createConciliacionArchivo(input: {
   if (error) throw error;
   return mapRow(data as ConciliacionArchivoRow);
 }
+
+/** Descarga el archivo bancario de una conciliación desde el bucket `conciliaciones`. */
+export async function descargarArchivoConciliacion(path: string, nombre: string): Promise<File> {
+  const sb = requireSupabase();
+  const { data, error } = await sb.storage.from("conciliaciones").download(path);
+  if (error) throw error;
+  return new File([data], nombre, { type: data.type || "application/octet-stream" });
+}

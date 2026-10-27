@@ -1,4 +1,5 @@
 import { formatDate, formatDateTime, formatMoney, formatTime } from "@/shared/format";
+import { useRealtimeInvalidate } from "@/shared/realtime";
 import { createFileRoute } from "@tanstack/react-router";
 import { brand, pageTitle } from "@/brand/brand";
 import { useState, useEffect, useMemo, useRef, type ReactElement } from "react";
@@ -31,7 +32,6 @@ import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
 import { toast } from "sonner";
 import { useCan } from "@/lib/permissions";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { requireSupabase } from "@/lib/supabase";
 import {
   listContracargos,
   updateContracargo,
@@ -902,7 +902,6 @@ function Page() {
   const [estadoFilter, setEstadoFilter] = useState<EstadoContra | "">("");
   const { can } = useCan();
   const puedeGestionar = can("modificar", "comercios");
-  const qc = useQueryClient();
 
   const filterEstado = useMemo<EstadoContra | undefined>(() => {
     if (!estadoFilter) return undefined;
@@ -914,22 +913,9 @@ function Page() {
     queryFn: () => listContracargos(filterEstado ? { estado: filterEstado } : undefined),
   });
 
-  // Realtime: cualquier cambio en contracargos (incluso desde Enterprise)
-  // invalida esta query y la de lotes (por si cambió contracargo_monto).
-  useEffect(() => {
-    const sb = requireSupabase();
-    if (!sb) return;
-    const ch = sb
-      .channel("realtime-contracargos-admin")
-      .on("postgres_changes", { event: "*", schema: "public", table: "contracargos" }, () => {
-        qc.invalidateQueries({ queryKey: ["contracargos"] });
-        qc.invalidateQueries({ queryKey: ["lotes"] });
-      })
-      .subscribe();
-    return () => {
-      sb.removeChannel(ch);
-    };
-  }, [qc]);
+  useRealtimeInvalidate("realtime-contracargos-admin", {
+    contracargos: [["contracargos"], ["lotes"]],
+  });
 
   const getActions = (r: Contra): ActionItem[] => {
     const base: ActionItem[] = [

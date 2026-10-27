@@ -37,9 +37,11 @@ import {
   acreditarAdelanto,
   calcularTopeDisponible,
   obtenerPoolRecaudacion,
+  getComercioIdDeAdelanto,
+  getComerciosResumen,
+  type ComercioResumen,
   type PoolRecaudacion,
 } from "@/lib/api/adelantos";
-import { requireSupabase } from "@/lib/supabase";
 import type { Adelanto, EstadoAdelanto } from "@/lib/api/types";
 
 /**
@@ -66,12 +68,6 @@ export const Route = createFileRoute("/admin/comercios/link-pago/adelantos")({
 
 // Lo que la grilla necesita del comercio lo armamos via join para no
 // mostrar el UUID crudo en la columna "Comercio".
-type ComercioResumen = {
-  id: string;
-  nombre: string;
-  legajo: string;
-};
-
 type AdelantoUI = {
   id: string;
   /** UUID real del adelanto (para llamar a las RPCs). */
@@ -143,14 +139,9 @@ function Detalle({
     // directo: de las filas que ya tenemos, sacamos el comercio_id.
     let cancelled = false;
     (async () => {
-      const sb = requireSupabase();
-      const { data } = await sb
-        .from("adelantos")
-        .select("comercio_id")
-        .eq("id", a.fullId)
-        .maybeSingle();
-      if (cancelled || !data?.comercio_id) return;
-      const t = await calcularTopeDisponible(data.comercio_id as string);
+      const comercioId = await getComercioIdDeAdelanto(a.fullId);
+      if (cancelled || !comercioId) return;
+      const t = await calcularTopeDisponible(comercioId);
       if (!cancelled) setTope(t);
     })();
     return () => {
@@ -607,28 +598,7 @@ function Page() {
   );
   const { data: comerciosMap } = useQuery<Record<string, ComercioResumen>>({
     queryKey: ["adelantos-comercios", comerciosIds],
-    queryFn: async () => {
-      if (comerciosIds.length === 0) return {};
-      const sb = requireSupabase();
-      const { data, error } = await sb
-        .from("comercios")
-        .select("id, nombre_comercio, legajo")
-        .in("id", comerciosIds);
-      if (error) throw new Error(error.message);
-      const map: Record<string, ComercioResumen> = {};
-      for (const r of (data ?? []) as {
-        id: string;
-        nombre_comercio: string | null;
-        legajo: string;
-      }[]) {
-        map[r.id] = {
-          id: r.id,
-          nombre: r.nombre_comercio || "(sin nombre)",
-          legajo: r.legajo,
-        };
-      }
-      return map;
-    },
+    queryFn: () => getComerciosResumen(comerciosIds),
     enabled: comerciosIds.length > 0,
     staleTime: 5 * 60_000,
   });

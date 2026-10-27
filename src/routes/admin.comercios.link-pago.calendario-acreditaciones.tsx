@@ -1,4 +1,5 @@
 import { formatMoney, formatPercent } from "@/shared/format";
+import { useRealtimeInvalidate } from "@/shared/realtime";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { brand, pageTitle } from "@/brand/brand";
 import { useState, useEffect, useMemo } from "react";
@@ -20,7 +21,7 @@ import {
 } from "lucide-react";
 import { PageHeader, Badge, Card, Label } from "@/components/portal-shell";
 import { PermissionGuard } from "@/components/permission-guard";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
   listCalendarioAcreditaciones,
@@ -35,7 +36,6 @@ import {
   type ExportDiaRow,
 } from "@/lib/api/calendario-acreditaciones";
 import { useComercios } from "@/hooks/useComercios";
-import { requireSupabase } from "@/lib/supabase";
 import * as XLSX from "xlsx";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -495,7 +495,6 @@ function Page() {
   const [selectedFecha, setSelectedFecha] = useState<string | null>(null);
   const [selectedItems, setSelectedItems] = useState<CalendarioAcreditacion[]>([]);
   const [minMonto, setMinMonto] = useState<number>(100);
-  const qc = useQueryClient();
 
   const { rows: comerciosOptions } = useComercios({ page: 0, pageSize: 200 });
 
@@ -535,26 +534,14 @@ function Page() {
     staleTime: 60_000,
   });
 
-  // Realtime: cualquier cambio en lotes o adelantos invalida el calendario.
-  useEffect(() => {
-    const sb = requireSupabase();
-    if (!sb) return;
-    const ch = sb
-      .channel("realtime-calendario-acreditaciones")
-      .on("postgres_changes", { event: "*", schema: "public", table: "lotes_acreditacion" }, () => {
-        qc.invalidateQueries({ queryKey: ["calendario-acreditaciones"] });
-        qc.invalidateQueries({ queryKey: ["calendario-resumen"] });
-      })
-      .on("postgres_changes", { event: "*", schema: "public", table: "adelantos" }, () => {
-        qc.invalidateQueries({ queryKey: ["calendario-acreditaciones"] });
-        qc.invalidateQueries({ queryKey: ["calendario-resumen"] });
-        qc.invalidateQueries({ queryKey: ["calendario-adelantos-dia"] });
-      })
-      .subscribe();
-    return () => {
-      sb.removeChannel(ch);
-    };
-  }, [qc]);
+  useRealtimeInvalidate("realtime-calendario-acreditaciones", {
+    lotes_acreditacion: [["calendario-acreditaciones"], ["calendario-resumen"]],
+    adelantos: [
+      ["calendario-acreditaciones"],
+      ["calendario-resumen"],
+      ["calendario-adelantos-dia"],
+    ],
+  });
 
   // Días del mes en grilla 7×N
   const diasDelMes = useMemo(() => {
