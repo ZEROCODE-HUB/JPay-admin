@@ -1,4 +1,4 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
+import { createDcExcepcion, createDcExcepcionAmbos } from "./dc-excepciones";
 import { requireSupabase } from "@/lib/supabase";
 import { DataAccessError } from "./errors";
 
@@ -375,20 +375,31 @@ export type ExencionInput = {
   vigenciaHasta: string | null;
 };
 
+/**
+ * Alta de una exención de débitos/créditos para el cliente. Se guarda en `dc_excepciones`
+ * (la misma tabla que la pantalla de Impuestos > Débitos y créditos), identificada por el
+ * email del cliente; "Ambos" se registra como dos excepciones (entrantes y salientes).
+ */
 export async function crearExencion(clienteLegajo: string, input: ExencionInput): Promise<void> {
   const sb = requireSupabase();
-  // TODO: la tabla exenciones_debito_credito no existe en la base (pendiente de decisión)
-  const { error } = await (sb as unknown as SupabaseClient)
-    .from("exenciones_debito_credito")
-    .insert({
-      cliente_legajo: clienteLegajo,
-      cuit: input.cuit,
-      direccion: input.direccion,
-      motivo: input.motivo,
-      vigencia_desde: input.vigenciaDesde || null,
-      vigencia_hasta: input.vigenciaHasta || null,
-    });
+  const { data: cli, error } = await sb
+    .from("clientes")
+    .select("correo")
+    .eq("legajo", clienteLegajo)
+    .maybeSingle();
   if (error) throw new DataAccessError(error);
+  if (!cli) throw new Error(`No existe el cliente ${clienteLegajo}`);
+
+  const base = {
+    email: cli.correo,
+    cuit: input.cuit,
+    tipo: "Exención" as const,
+    motivo: input.motivo,
+    vigencia_desde: input.vigenciaDesde || new Date().toISOString().slice(0, 10),
+    vigencia_hasta: input.vigenciaHasta || null,
+  };
+  if (input.direccion === "Ambos") await createDcExcepcionAmbos(base);
+  else await createDcExcepcion({ ...base, direccion: input.direccion });
 }
 
 export type ComisionCliente = {

@@ -108,8 +108,7 @@ function AsignacionFormModal({
   const [form, setForm] = useState<AsignacionForm>(() => ({
     clienteLegajo: asignacion?.clienteLegajo ?? "",
     impuestoId: asignacion?.impuestoId ?? "",
-    monto:
-      asignacion?.monto === null || asignacion?.monto === undefined ? "" : String(asignacion.monto),
+    monto: String(asignacion?.monto ?? 0),
     tipo: asignacion?.tipo ?? "Porcentaje",
     estado: asignacion?.estado ?? "Activo",
     tipoOperacion: asignacion?.tipoOperacion ?? "",
@@ -124,7 +123,7 @@ function AsignacionFormModal({
 
   const legajoValido = /^[A-Z]{3}-\d{11}$/.test(form.clienteLegajo.trim());
   const montoValido =
-    form.monto.trim() === "" || (!isNaN(Number(form.monto)) && Number(form.monto) >= 0);
+    form.monto.trim() !== "" && !isNaN(Number(form.monto)) && Number(form.monto) >= 0;
   const valido =
     form.clienteLegajo.trim() !== "" &&
     (!asignacion ? legajoValido : true) &&
@@ -244,7 +243,7 @@ function AsignacionFormModal({
               setForm({
                 ...form,
                 impuestoId: e.target.value,
-                monto: imp ? String(imp.monto ?? "") : form.monto,
+                monto: imp ? String(imp.monto ?? 0) : form.monto,
                 tipo: imp ? (imp.tipo as TipoImpuesto) : form.tipo,
               });
             }}
@@ -503,7 +502,7 @@ function Page() {
         await updateImpuestoAsignacion(editTarget.id, {
           impuesto_id: form.impuestoId || undefined,
           tipo: form.tipo as any,
-          monto: form.monto.trim() === "" ? null : Number(form.monto),
+          monto: Number(form.monto),
           estado: form.estado,
           tipo_operacion: tipoOperacion,
         } as any);
@@ -512,7 +511,7 @@ function Page() {
           cliente_legajo: form.clienteLegajo.trim(),
           impuesto_id: form.impuestoId,
           tipo: form.tipo as any,
-          monto: form.monto.trim() === "" ? null : Number(form.monto),
+          monto: Number(form.monto),
           estado: form.estado,
           tipo_operacion: tipoOperacion,
         } as any);

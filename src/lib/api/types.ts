@@ -1115,7 +1115,7 @@ export type ImpuestoAsignacionInput = {
   cliente_legajo: string;
   impuesto_id: string;
   tipo: TipoImpuesto;
-  monto: number | null;
+  monto: number;
   estado: EstadoImpuesto;
   fecha_asignacion?: string | null;
   tipo_operacion?: TipoOperacion | null;

@@ -303,8 +303,7 @@ export async function createImpuestoAsignacion(
       legajo: input.cliente_legajo.trim(),
       impuesto_id: input.impuesto_id,
       tipo: input.tipo,
-      // TODO: monto es NOT NULL en la base pero el form admite vacío (pendiente de decisión).
-      monto: input.monto as number,
+      monto: input.monto,
       estado: input.estado ?? "Activo",
       fecha_asignacion: input.fecha_asignacion ?? new Date().toISOString().slice(0, 10),
       tipo_operacion: input.tipo_operacion ?? null,
@@ -324,8 +323,7 @@ export async function updateImpuestoAsignacion(
   const sb = requireSupabase();
   const payload: TablesUpdate<"impuestos_asignaciones"> = {};
   if (input.tipo !== undefined) payload.tipo = input.tipo;
-  // TODO: monto es NOT NULL en la base pero el form admite vacío (pendiente de decisión).
-  if (input.monto !== undefined) payload.monto = input.monto as number;
+  if (input.monto !== undefined) payload.monto = input.monto;
   if (input.estado !== undefined) payload.estado = input.estado;
   if (input.fecha_asignacion !== undefined)
     payload.fecha_asignacion = input.fecha_asignacion ?? undefined;

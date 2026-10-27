@@ -1590,7 +1590,7 @@ function ExencionModal({
         vigenciaDesde: desde || null,
         vigenciaHasta: hasta || null,
       });
-      await queryClient.invalidateQueries({ queryKey: ["exenciones", legajo] });
+      await queryClient.invalidateQueries({ queryKey: ["dc_excepciones"] });
       onClose();
     } catch (e) {
       setErr((e as Error).message);
