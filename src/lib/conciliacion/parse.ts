@@ -91,7 +91,7 @@ export async function parseBancoFile(file: File): Promise<BankRow[]> {
   const firstCell = String(rows[0]?.[0] ?? "");
   const isSingleColumnSemicolon = firstCell.includes(";") && firstCell.includes("ID_DEBIN");
   let header: string[] = [];
-  let dataRows: string[][] = [];
+  const dataRows: string[][] = [];
 
   if (isSingleColumnSemicolon) {
     header = firstCell.split(";").map(normalizeHeader);

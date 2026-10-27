@@ -864,13 +864,14 @@ export function UserModal({
     }
   }, [user]);
 
-  if (!open || !user) return null;
-
-  const existingDocs = user.documentos.filter((d) => d.url);
+  // El hook va antes del return temprano: los hooks no pueden depender de `open`/`user`.
+  const existingDocs = user?.documentos.filter((d) => d.url) ?? [];
   const docResueltos = useDocumentosUrls(
     existingDocs.map((d) => ({ id: d.id, url: d.url ?? null })),
-    user.legajo,
+    user?.legajo ?? "",
   );
+
+  if (!open || !user) return null;
   const missingDocTypes: UserDocument["tipo"][] = (
     ["id_frente", "id_dorso", "servicio", "selfie"] as UserDocument["tipo"][]
   ).filter((t) => !user.documentos.some((d) => d.tipo === t && d.url));

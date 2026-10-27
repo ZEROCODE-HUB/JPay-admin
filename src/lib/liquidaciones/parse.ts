@@ -513,7 +513,7 @@ export type MovimientoParaCsvTestInput = {
 
 export function generarCsvLiquidacionTestParaLote(
   lote: LoteParaCsvTestInput,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
   _movimientos: MovimientoParaCsvTestInput[] = [],
 ): { filename: string; contenido: string } {
   return generarCsvLiquidacionTest(

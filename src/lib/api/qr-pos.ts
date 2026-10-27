@@ -42,7 +42,7 @@ export async function listQrPos(filters: QrFilters): Promise<Page<PuntoVenta>> {
     return query;
   };
 
-  let q = await build(COLUMNS, true);
+  const q = await build(COLUMNS, true);
   let { data, error, count } = await q;
   if (error && isMissingColumnError(error)) {
     const fb = await build(COLUMNS_LEGACY, false);

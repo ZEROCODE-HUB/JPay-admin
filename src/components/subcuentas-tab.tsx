@@ -138,7 +138,6 @@ export function SubcuentaDetalleModal({
       bloqueos: c.bloqueos.length ? c.bloqueos : DEFAULT_PARAMS_BLOQUEO.map((p) => ({ ...p })),
       comisiones: c.comisiones ?? [],
     }));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const guardarConfig = async () => {

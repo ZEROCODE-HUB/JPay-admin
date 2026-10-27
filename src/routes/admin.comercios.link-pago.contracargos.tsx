@@ -109,7 +109,7 @@ function diasHabilesRestantes(fechaLimite: string): number {
   const sentido = dLimite.getTime() > dHoy.getTime() ? 1 : -1;
   const cursor = new Date(dHoy);
   let count = 0;
-  // eslint-disable-next-line no-constant-condition
+
   while (true) {
     cursor.setDate(cursor.getDate() + sentido);
     const dow = cursor.getDay();

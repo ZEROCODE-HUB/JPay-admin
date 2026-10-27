@@ -165,7 +165,7 @@ export function parseFecha(raw: string | undefined): string | null {
 
   // DD/MM/YYYY o DD-MM-YYYY
   const m = s.match(
-    /^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})(?:\s+(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?)?$/,
+    /^(\d{1,2})[/-](\d{1,2})[/-](\d{2,4})(?:\s+(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?)?$/,
   );
   if (m) {
     const [, dd, mm, yyyy, hh, mi, ss] = m;
