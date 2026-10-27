@@ -1,6 +1,7 @@
 import type { LoteVenta } from "@/lib/api/types";
 import { parseDateLocal } from "../lotes/utils";
 
+import { getPais } from "@/shared/pais";
 export { PAGE_SIZES } from "../lotes/utils";
 
 /** Nombre visible del comercio del lote de venta. */
@@ -39,7 +40,7 @@ const HEADERS_CSV = [
 /** CSV (sin BOM) de los lotes de venta exportados. */
 export function lotesVentaACsv(rows: LoteVenta[]): string {
   const lines = rows.map((r) => [
-    parseDateLocal(r.fecha).toLocaleDateString("es-AR"),
+    parseDateLocal(r.fecha).toLocaleDateString(getPais().locale),
     nombreComercioVenta(r),
     legajoComercioVenta(r),
     r.bandera,

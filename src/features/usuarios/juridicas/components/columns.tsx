@@ -16,7 +16,7 @@ export const columns: Column<JuridicaRow>[] = [
   },
   {
     key: "cuit",
-    label: "CUIT",
+    label: "ID fiscal",
     filterable: true,
     minWidth: 130,
     render: (r) => (

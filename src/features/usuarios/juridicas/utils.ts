@@ -1,9 +1,9 @@
-import { formatCuit } from "@/shared/format";
 import type { ClienteEnrichment } from "@/lib/api/clientes";
 import type { Cliente, EstadoCliente } from "@/lib/api/types";
 import { ESTADO_LABEL, ESTADO_TONE, normalizarEstado } from "@/lib/cliente-estados";
 import type { Tono } from "../comun/types";
 
+import { idFiscalCliente } from "@/lib/identificacion-cliente";
 /**
  * Etiqueta corta del tipo societario a partir de `clientes.tipo_sociedad`.
  * Si no matchea ninguno conocido, devuelve el texto original truncado.
@@ -55,7 +55,7 @@ export function toJuridicaRow(c: Cliente, e: ClienteEnrichment = {}): JuridicaRo
     legajo: c.legajo,
     correo: c.correo,
     cuit: c.cuit,
-    cuitFormatted: formatCuit(c.cuit),
+    cuitFormatted: idFiscalCliente(c).valor,
     razonSocial: c.nombre,
     nombreFantasia: c.nombreFantasia ?? null,
     tipoSociedadRaw: c.tipoSociedad ?? null,

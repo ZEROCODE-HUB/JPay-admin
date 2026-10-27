@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 
+import { monedaActiva } from "@/shared/format";
 export function PlaftPerfilModal({
   open,
   onClose,
   clienteId,
-  cuit,
+  idFiscal,
   initial,
   loading,
   onSubmit,
@@ -13,7 +14,8 @@ export function PlaftPerfilModal({
   open: boolean;
   onClose: () => void;
   clienteId: string;
-  cuit: string;
+  /** Identificador fiscal con su etiqueta ("RFC …", "CUIT …"). */
+  idFiscal: string;
   initial: {
     limiteTransferencia: number | null;
     limiteOpsDiarias: number | null;
@@ -65,14 +67,14 @@ export function PlaftPerfilModal({
         <div>
           <h3 className="font-display font-semibold text-lg">Perfil transaccional</h3>
           <p className="text-xs text-muted-foreground mt-1">
-            Cliente <span className="font-mono">{clienteId.slice(0, 8)}…</span> · CUIT {cuit}
+            Cliente <span className="font-mono">{clienteId.slice(0, 8)}…</span> · {idFiscal}
           </p>
         </div>
 
         <div className="grid grid-cols-1 gap-3">
           <div>
             <label className="block text-sm font-medium mb-1">
-              Monto máximo por transferencia (ARS)
+              Monto máximo por transferencia ({monedaActiva()})
             </label>
             <input
               type="text"
@@ -96,7 +98,9 @@ export function PlaftPerfilModal({
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Monto diario máx. (ARS)</label>
+              <label className="block text-sm font-medium mb-1">
+                Monto diario máx. ({monedaActiva()})
+              </label>
               <input
                 type="text"
                 inputMode="numeric"

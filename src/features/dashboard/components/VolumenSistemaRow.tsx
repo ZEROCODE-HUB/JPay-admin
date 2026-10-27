@@ -1,6 +1,7 @@
 import { CheckCircle2, XCircle } from "lucide-react";
 import { Card } from "@/components/portal-shell";
 
+import { monedaActiva } from "@/shared/format";
 // Sin datos hasta conectar con la base: volumen y estado del sistema eran valores de ejemplo
 // escritos a mano.
 const volumeData: number[] = [];
@@ -14,7 +15,7 @@ export function VolumenSistemaRow() {
         <div className="flex items-end justify-between mb-4">
           <div>
             <h3 className="font-display font-semibold">Volumen transaccional</h3>
-            <p className="text-xs text-muted-foreground">ultimos 14 dias — ARS</p>
+            <p className="text-xs text-muted-foreground">ultimos 14 dias — {monedaActiva()}</p>
           </div>
         </div>
         {volumeData.length === 0 && (

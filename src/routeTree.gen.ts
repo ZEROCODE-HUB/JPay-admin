@@ -34,6 +34,7 @@ import { Route as AdminComerciosTransferenciaRouteImport } from './routes/admin.
 import { Route as AdminConfiguracionIndexRouteImport } from './routes/admin.configuracion.index'
 import { Route as AdminConfiguracionConfiguracionesRouteImport } from './routes/admin.configuracion.configuraciones'
 import { Route as AdminConfiguracionLoginsRouteImport } from './routes/admin.configuracion.logins'
+import { Route as AdminConfiguracionPaisesRouteImport } from './routes/admin.configuracion.paises'
 import { Route as AdminGeneralAlertasRouteImport } from './routes/admin.general.alertas'
 import { Route as AdminGeneralMovimientosRouteImport } from './routes/admin.general.movimientos'
 import { Route as AdminGeneralUsuariosRouteImport } from './routes/admin.general.usuarios'
@@ -213,6 +214,12 @@ const AdminConfiguracionLoginsRoute =
   AdminConfiguracionLoginsRouteImport.update({
     id: '/logins',
     path: '/logins',
+    getParentRoute: () => AdminConfiguracionRoute,
+  } as any)
+const AdminConfiguracionPaisesRoute =
+  AdminConfiguracionPaisesRouteImport.update({
+    id: '/paises',
+    path: '/paises',
     getParentRoute: () => AdminConfiguracionRoute,
   } as any)
 const AdminGeneralAlertasRoute = AdminGeneralAlertasRouteImport.update({
@@ -523,6 +530,7 @@ export interface FileRoutesByFullPath {
   '/admin/comercios/transferencia': typeof AdminComerciosTransferenciaRouteWithChildren
   '/admin/configuracion/configuraciones': typeof AdminConfiguracionConfiguracionesRoute
   '/admin/configuracion/logins': typeof AdminConfiguracionLoginsRoute
+  '/admin/configuracion/paises': typeof AdminConfiguracionPaisesRoute
   '/admin/general/alertas': typeof AdminGeneralAlertasRouteWithChildren
   '/admin/general/movimientos': typeof AdminGeneralMovimientosRouteWithChildren
   '/admin/general/usuarios': typeof AdminGeneralUsuariosRouteWithChildren
@@ -586,6 +594,7 @@ export interface FileRoutesByTo {
   '/admin/administracion/reportes': typeof AdminAdministracionReportesRoute
   '/admin/configuracion/configuraciones': typeof AdminConfiguracionConfiguracionesRoute
   '/admin/configuracion/logins': typeof AdminConfiguracionLoginsRoute
+  '/admin/configuracion/paises': typeof AdminConfiguracionPaisesRoute
   '/admin/comercios': typeof AdminComerciosIndexRoute
   '/admin/configuracion': typeof AdminConfiguracionIndexRoute
   '/admin/notificaciones': typeof AdminNotificacionesIndexRoute
@@ -658,6 +667,7 @@ export interface FileRoutesById {
   '/admin/comercios/transferencia': typeof AdminComerciosTransferenciaRouteWithChildren
   '/admin/configuracion/configuraciones': typeof AdminConfiguracionConfiguracionesRoute
   '/admin/configuracion/logins': typeof AdminConfiguracionLoginsRoute
+  '/admin/configuracion/paises': typeof AdminConfiguracionPaisesRoute
   '/admin/general/alertas': typeof AdminGeneralAlertasRouteWithChildren
   '/admin/general/movimientos': typeof AdminGeneralMovimientosRouteWithChildren
   '/admin/general/usuarios': typeof AdminGeneralUsuariosRouteWithChildren
@@ -735,6 +745,7 @@ export interface FileRouteTypes {
     | '/admin/comercios/transferencia'
     | '/admin/configuracion/configuraciones'
     | '/admin/configuracion/logins'
+    | '/admin/configuracion/paises'
     | '/admin/general/alertas'
     | '/admin/general/movimientos'
     | '/admin/general/usuarios'
@@ -798,6 +809,7 @@ export interface FileRouteTypes {
     | '/admin/administracion/reportes'
     | '/admin/configuracion/configuraciones'
     | '/admin/configuracion/logins'
+    | '/admin/configuracion/paises'
     | '/admin/comercios'
     | '/admin/configuracion'
     | '/admin/notificaciones'
@@ -869,6 +881,7 @@ export interface FileRouteTypes {
     | '/admin/comercios/transferencia'
     | '/admin/configuracion/configuraciones'
     | '/admin/configuracion/logins'
+    | '/admin/configuracion/paises'
     | '/admin/general/alertas'
     | '/admin/general/movimientos'
     | '/admin/general/usuarios'
@@ -1105,6 +1118,13 @@ declare module '@tanstack/react-router' {
       path: '/logins'
       fullPath: '/admin/configuracion/logins'
       preLoaderRoute: typeof AdminConfiguracionLoginsRouteImport
+      parentRoute: typeof AdminConfiguracionRoute
+    }
+    '/admin/configuracion/paises': {
+      id: '/admin/configuracion/paises'
+      path: '/paises'
+      fullPath: '/admin/configuracion/paises'
+      preLoaderRoute: typeof AdminConfiguracionPaisesRouteImport
       parentRoute: typeof AdminConfiguracionRoute
     }
     '/admin/general/alertas': {
@@ -1587,6 +1607,7 @@ const AdminComerciosRouteWithChildren = AdminComerciosRoute._addFileChildren(
 interface AdminConfiguracionRouteChildren {
   AdminConfiguracionConfiguracionesRoute: typeof AdminConfiguracionConfiguracionesRoute
   AdminConfiguracionLoginsRoute: typeof AdminConfiguracionLoginsRoute
+  AdminConfiguracionPaisesRoute: typeof AdminConfiguracionPaisesRoute
   AdminConfiguracionIndexRoute: typeof AdminConfiguracionIndexRoute
 }
 
@@ -1594,6 +1615,7 @@ const AdminConfiguracionRouteChildren: AdminConfiguracionRouteChildren = {
   AdminConfiguracionConfiguracionesRoute:
     AdminConfiguracionConfiguracionesRoute,
   AdminConfiguracionLoginsRoute: AdminConfiguracionLoginsRoute,
+  AdminConfiguracionPaisesRoute: AdminConfiguracionPaisesRoute,
   AdminConfiguracionIndexRoute: AdminConfiguracionIndexRoute,
 }
 

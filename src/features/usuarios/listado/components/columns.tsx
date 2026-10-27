@@ -17,7 +17,7 @@ const columns: Column<Usuario>[] = [
   },
   {
     key: "cuit",
-    label: "CUIT",
+    label: "ID fiscal",
     filterable: true,
     minWidth: 130,
     render: (row) => (

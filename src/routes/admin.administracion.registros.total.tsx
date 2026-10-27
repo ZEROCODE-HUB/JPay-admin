@@ -1,4 +1,4 @@
-import { formatMoney } from "@/shared/format";
+import { formatMoney, monedaActiva } from "@/shared/format";
 import { createFileRoute } from "@tanstack/react-router";
 import { AlertTriangle } from "lucide-react";
 import { Card, PageHeader } from "@/components/portal-shell";
@@ -36,7 +36,7 @@ function Page() {
       <div className="grid lg:grid-cols-2 gap-6 mb-6">
         <Card className="p-6">
           <h3 className="font-display font-semibold mb-4 text-sm uppercase tracking-wide text-muted-foreground">
-            Fórmula 1 (ARS)
+            Fórmula 1 ({monedaActiva()})
           </h3>
           <div className="space-y-3 text-sm">
             <div className="flex justify-between">
@@ -66,7 +66,7 @@ function Page() {
 
         <Card className="p-6">
           <h3 className="font-display font-semibold mb-4 text-sm uppercase tracking-wide text-muted-foreground">
-            Fórmula 2 (ARS) — Interno nuevo
+            Fórmula 2 ({monedaActiva()}) — Interno nuevo
           </h3>
           <div className="space-y-3 text-sm">
             <div className="flex justify-between">

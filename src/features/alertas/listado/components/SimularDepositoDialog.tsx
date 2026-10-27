@@ -9,6 +9,7 @@ import {
   type FormSimulacion,
 } from "../utils";
 
+import { monedaActiva } from "@/shared/format";
 const inputCls =
   "w-full h-9 rounded-md border border-input bg-card px-3 text-sm outline-none focus:ring-2 focus:ring-ring/40";
 
@@ -75,7 +76,7 @@ export function SimularDepositoDialog({
           />
         </div>
         <div>
-          <label className="text-xs font-semibold mb-1.5 block">Importe (ARS)</label>
+          <label className="text-xs font-semibold mb-1.5 block">Importe ({monedaActiva()})</label>
           <input
             className={inputCls}
             type="number"

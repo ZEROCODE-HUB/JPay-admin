@@ -4,6 +4,7 @@ import type { Cliente, EstadoCliente, EstadoMovimiento, Movimiento } from "@/lib
 import type { Movimiento as DetailMovimiento } from "@/components/movimiento-detail";
 import { resolverEstadoMovimiento } from "@/lib/estados";
 
+import { idFiscalCliente, regimenFiscalCliente } from "@/lib/identificacion-cliente";
 export const estadoLabel: Record<EstadoCliente, string> = {
   pendiente_verificacion: "Pendiente de verificación de email",
   registrado: "Registrado",
@@ -197,7 +198,15 @@ export function camposIdentificacion(c: Cliente) {
     { label: "Cant. cuentas virtuales", valor: "—" },
     { label: "Nombre", valor: nombreDerivado },
     { label: "Apellido", valor: apellidoDerivado },
-    { label: "CUIT", valor: c.cuitCuil ?? c.cuit ?? "—" },
+    {
+      label: idFiscalCliente(c).etiqueta,
+      valor: c.pais && c.pais !== "AR" ? idFiscalCliente(c).valor : (c.cuitCuil ?? c.cuit ?? "—"),
+    },
+    ...(c.idPersonal ? [{ label: c.idPersonalTipo ?? "ID personal", valor: c.idPersonal }] : []),
+    ...(c.regimenFiscal ? [{ label: "Régimen fiscal", valor: regimenFiscalCliente(c) }] : []),
+    ...(c.cuentaBancaria
+      ? [{ label: c.cuentaBancariaTipo ?? "Cuenta bancaria", valor: c.cuentaBancaria }]
+      : []),
     { label: "Género", valor: c.genero ?? "—" },
     { label: "Dirección", valor: c.direccion ?? "—" },
     { label: "Número de dirección", valor: c.direccion2 ?? "—" },
@@ -215,7 +224,7 @@ export function camposIdentificacion(c: Cliente) {
     { label: "PEP", valor: c.esPep ? "Sí" : c.esPep === false ? "No" : "—" },
   ];
   const empresa: { label: string; valor: string }[] = [
-    { label: "CUIT de la empresa", valor: c.cuit ?? "—" },
+    { label: `${idFiscalCliente(c).etiqueta} de la empresa`, valor: idFiscalCliente(c).valor },
     { label: "Tipo de empresa", valor: c.tipoSociedad ?? "—" },
     {
       label: "Nombre legal",

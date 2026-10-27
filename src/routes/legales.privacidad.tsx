@@ -39,10 +39,10 @@ function Page() {
               1. Responsable del tratamiento
             </h2>
             <p>
-              {brand.company.legalName}, CUIT{" "}
-              <span className="font-mono tabular-nums">{brand.company.cuit}</span>, con domicilio en
-              Av. Corrientes 1234, CABA, Argentina, es la responsable del tratamiento de los datos
-              personales.
+              {brand.company.legalName}, {brand.company.taxIdType}{" "}
+              <span className="font-mono tabular-nums">{brand.company.taxId}</span>, con domicilio
+              en Av. Corrientes 1234, CABA, Argentina, es la responsable del tratamiento de los
+              datos personales.
             </p>
           </div>
           <div>

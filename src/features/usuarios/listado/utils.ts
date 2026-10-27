@@ -1,9 +1,9 @@
-import { formatCuit } from "@/shared/format";
 import type { ClienteEnrichment, RiesgoPLD } from "@/lib/api/clientes";
 import type { Cliente, EstadoCliente } from "@/lib/api/types";
 import { ESTADO_LABEL, ESTADO_TONE, normalizarEstado } from "@/lib/cliente-estados";
 import type { Tono } from "../comun/types";
 
+import { idFiscalCliente } from "@/lib/identificacion-cliente";
 export type Usuario = {
   id: string;
   legajo: string;
@@ -34,7 +34,7 @@ export function toUsuario(c: Cliente, e: ClienteEnrichment = {}): Usuario {
     correo: c.correo,
     nombres: c.nombre,
     cuit: c.cuit,
-    cuitFormatted: formatCuit(c.cuit),
+    cuitFormatted: idFiscalCliente(c).valor,
     estadoRaw: c.estado,
     estadoLabel: ESTADO_LABEL[norm],
     estadoTone: ESTADO_TONE[norm] as Usuario["estadoTone"],

@@ -6,6 +6,7 @@ import type { ExportDiaRow } from "@/lib/api/calendario-acreditaciones";
 import { formatMoney } from "@/shared/format";
 import { nombreArchivoSeguro } from "./utils";
 
+import { getPais } from "@/shared/pais";
 export function exportExcel(fechaTitulo: string, rows: ExportDiaRow[]) {
   const wb = XLSX.utils.book_new();
   const data = rows.map((r) => ({
@@ -33,7 +34,7 @@ export function exportPdf(fechaTitulo: string, rows: ExportDiaRow[]) {
   doc.setFontSize(14);
   doc.text(`Calendario de Acreditaciones — ${fechaTitulo}`, 14, 16);
   doc.setFontSize(9);
-  doc.text(`Generado: ${new Date().toLocaleString("es-AR")}`, 14, 22);
+  doc.text(`Generado: ${new Date().toLocaleString(getPais().locale)}`, 14, 22);
   autoTable(doc, {
     startY: 28,
     head: [

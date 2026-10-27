@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
-import { formatCuit, formatDate, formatMoney } from "@/shared/format";
+import { formatDate, formatMoney } from "@/shared/format";
 import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
 import { FormDialog } from "@/shared/ui/form-dialog";
 import { AlertaGestionModal } from "@/components/alerta-gestion";
@@ -19,6 +19,7 @@ import { ParametrosEditorModal } from "./ParametrosEditorModal";
 import { PlaftPerfilModal } from "./PlaftPerfilModal";
 import { PlaftRiesgoModal } from "./PlaftRiesgoModal";
 
+import { idFiscalCliente } from "@/lib/identificacion-cliente";
 /** Modales de la ficha que viven a nivel pantalla (su estado sobrevive al cambio de pestaña). */
 export function ClienteModales({
   legajo,
@@ -148,7 +149,7 @@ export function ClienteModales({
           limiteOpsDiarias: cliente.limiteOpsDiarias ?? null,
           limiteMontoDiario: cliente.limiteMontoDiario ?? null,
         }}
-        cuit={formatCuit(cliente.cuit)}
+        idFiscal={`${idFiscalCliente(cliente).etiqueta} ${idFiscalCliente(cliente).valor}`}
         loading={updatePerfilMutation.isPending}
         onSubmit={(input) => updatePerfilMutation.mutate({ clienteId: cliente.id, ...input })}
       />

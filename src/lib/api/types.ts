@@ -93,6 +93,14 @@ export type ClienteRow = {
   limite_transferencia?: number | null;
   limite_ops_diarias?: number | null;
   limite_monto_diario?: number | null;
+  pais?: string | null;
+  tax_id?: string | null;
+  tax_id_tipo?: string | null;
+  id_personal?: string | null;
+  id_personal_tipo?: string | null;
+  regimen_fiscal?: string | null;
+  cuenta_bancaria?: string | null;
+  cuenta_bancaria_tipo?: string | null;
 };
 
 export type Cliente = {
@@ -101,7 +109,20 @@ export type Cliente = {
   tipoPersona: TipoPersona;
   correo: string;
   nombre: string;
+  /** Identificador interno (CUIT en Argentina; número con prefijo 99 en otros países). */
   cuit: string;
+  /** País del cliente (código de `@/shared/pais`). */
+  pais?: string | null;
+  /** Identificador fiscal del país (RFC, CUIT). */
+  taxId?: string | null;
+  taxIdTipo?: string | null;
+  /** Identificador personal (CURP). */
+  idPersonal?: string | null;
+  idPersonalTipo?: string | null;
+  regimenFiscal?: string | null;
+  /** Cuenta para liquidaciones (CLABE, CBU). */
+  cuentaBancaria?: string | null;
+  cuentaBancariaTipo?: string | null;
   estado: EstadoCliente;
   fechaAlta: string;
   createdAt: string;

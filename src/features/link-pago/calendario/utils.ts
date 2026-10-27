@@ -4,6 +4,7 @@ import type {
 } from "@/lib/api/calendario-acreditaciones";
 import { adelantoCerrado } from "./estados";
 
+import { getPais } from "@/shared/pais";
 /** "2026-10-21" → Date local (sin corrimiento por zona horaria). */
 export function parseDateLocal(dateStr: string): Date {
   const [y, m, d] = dateStr.split("-").map(Number);
@@ -11,7 +12,7 @@ export function parseDateLocal(dateStr: string): Date {
 }
 
 export function fechaCorta(d: Date): string {
-  return d.toLocaleDateString("es-AR", {
+  return d.toLocaleDateString(getPais().locale, {
     weekday: "short",
     day: "2-digit",
     month: "2-digit",
@@ -19,7 +20,7 @@ export function fechaCorta(d: Date): string {
 }
 
 export function fechaLarga(fecha: string): string {
-  return parseDateLocal(fecha).toLocaleDateString("es-AR", {
+  return parseDateLocal(fecha).toLocaleDateString(getPais().locale, {
     weekday: "long",
     day: "numeric",
     month: "long",
@@ -28,7 +29,7 @@ export function fechaLarga(fecha: string): string {
 }
 
 export function nombreMes(mes: number, anio: number): string {
-  return new Date(anio, mes - 1).toLocaleDateString("es-AR", {
+  return new Date(anio, mes - 1).toLocaleDateString(getPais().locale, {
     month: "long",
     year: "numeric",
   });

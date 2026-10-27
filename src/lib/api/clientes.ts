@@ -13,7 +13,7 @@ export type ClienteFilters = Pagination & {
 };
 
 const COLUMNS =
-  "id, legajo, tipo_persona, correo, nombre, cuit, estado, fecha_alta, created_at, updated_at, email_verificado, onboarding_completo, cbu, cbu_cancelado, genero, cuit_cuil, fecha_nacimiento, ocupacion, origen_fondos, es_pep, tipo_sociedad, nombre_legal, nombre_fantasia, fecha_inscripcion, direccion, direccion2, ciudad, provincia, cp, estado_onboarding, limite_transferencia, limite_ops_diarias, limite_monto_diario";
+  "id, legajo, tipo_persona, correo, nombre, cuit, estado, fecha_alta, created_at, updated_at, email_verificado, onboarding_completo, cbu, cbu_cancelado, genero, cuit_cuil, fecha_nacimiento, ocupacion, origen_fondos, es_pep, tipo_sociedad, nombre_legal, nombre_fantasia, fecha_inscripcion, direccion, direccion2, ciudad, provincia, cp, estado_onboarding, limite_transferencia, limite_ops_diarias, limite_monto_diario, pais, tax_id, tax_id_tipo, id_personal, id_personal_tipo, regimen_fiscal, cuenta_bancaria, cuenta_bancaria_tipo";
 const COLUMNS_LEGACY =
   "id, legajo, tipo_persona, correo, nombre, cuit, estado, fecha_alta, created_at, updated_at, email_verificado, onboarding_completo, cbu, cbu_cancelado";
 
