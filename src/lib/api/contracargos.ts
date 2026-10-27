@@ -3,23 +3,13 @@ import type { TablesUpdate } from "@/lib/database.types";
 import { DataAccessError } from "./errors";
 import { uploadAdjunto, deleteAdjunto, type ArchivoAdjunto } from "@/lib/storage/contracargos";
 
+/**
+ * Estados de `contracargos.estado` tal como se guardan en la base
+ * ("En_mediacion" va sin tilde: es el valor del CHECK constraint).
+ * La etiqueta legible ("En mediación") la arma `features/.../estados.ts`.
+ */
 export type EstadoContra =
-  | "Simulado"
-  | "Abierto"
-  | "En_mediación"
-  | "En_mediacion" // valor real del CHECK constraint
-  | "Cerrado_acreditado"
-  | "Cerrado_retenido";
-
-/** Valor canónico para enviar a la DB. */
-export const ESTADO_CONTRA_DB: Record<EstadoContra, EstadoContra> = {
-  Simulado: "Simulado",
-  Abierto: "Abierto",
-  En_mediación: "En_mediacion",
-  En_mediacion: "En_mediacion",
-  Cerrado_acreditado: "Cerrado_acreditado",
-  Cerrado_retenido: "Cerrado_retenido",
-};
+  "Simulado" | "Abierto" | "En_mediacion" | "Cerrado_acreditado" | "Cerrado_retenido";
 
 export type ContraRow = {
   id: string;
@@ -70,9 +60,9 @@ export type Contra = {
   linkId: string;
   movimientoId: string;
   importe: number;
-  /** Estado canónico para UI: "En_mediación" (con tilde). */
+  /** Estado normalizado al valor de la base (ver `normalizarEstadoContra`). */
   estado: EstadoContra;
-  /** Estado real que se persiste en la DB: "En_mediacion" (sin tilde). */
+  /** Mismo valor que `estado` (se mantiene por compatibilidad). */
   estadoDb: EstadoContra;
   ticketPayway: string | null;
   motivoPayway: string | null;
@@ -118,16 +108,20 @@ const COLUMNS = `
   cliente_links_pago_pagos(link_id, site_transaction_id)
 `;
 
-/** DB → UI: "En_mediacion" (snake) → "En_mediación" (con tilde) */
-function estadoDbToUi(raw: string | null | undefined): EstadoContra {
-  if (raw === "En_mediacion") return "En_mediación";
-  return (raw as EstadoContra) ?? "Abierto";
+/**
+ * Valor crudo de la base → `EstadoContra`. Acepta la variante con tilde
+ * ("En_mediación") que pudo quedar de datos viejos y la lleva al valor
+ * real del CHECK ("En_mediacion").
+ */
+export function normalizarEstadoContra(raw: string | null | undefined): EstadoContra {
+  if (raw == null || raw === "") return "Abierto";
+  if (raw === "En_mediación") return "En_mediacion";
+  return raw as EstadoContra;
 }
 
-/** UI → DB: "En_mediación" (con tilde) → "En_mediacion" (snake) */
+/** Valor a persistir en la base para un estado. */
 export function estadoUiToDb(estado: EstadoContra): string {
-  if (estado === "En_mediación") return "En_mediacion";
-  return estado;
+  return normalizarEstadoContra(estado);
 }
 
 function toContra(r: ContraRow): Contra {
@@ -142,8 +136,8 @@ function toContra(r: ContraRow): Contra {
     linkId: pago?.link_id ?? "",
     movimientoId: r.movimiento_id ?? "",
     importe: Number(r.importe),
-    estado: estadoDbToUi(r.estado),
-    estadoDb: (r.estado as EstadoContra) ?? "Abierto",
+    estado: normalizarEstadoContra(r.estado),
+    estadoDb: normalizarEstadoContra(r.estado),
     ticketPayway: r.ticket_payway ?? null,
     motivoPayway: r.motivo_payway ?? null,
     documentacion: r.documentacion ?? null,

@@ -123,3 +123,18 @@ export function totalesPorEstado(
   }
   return m;
 }
+
+/** Cantidad de páginas para un total (mínimo 1). */
+export function totalPaginas(total: number, pageSize: number): number {
+  return Math.max(1, Math.ceil(total / Math.max(1, pageSize)));
+}
+
+/**
+ * Search params al cerrar el modal abierto por enlace directo: se quita
+ * `adelanto` (si no, el modal se vuelve a abrir) y se conserva el resto.
+ */
+export function searchSinAdelanto<T extends { adelanto?: string }>(search: T): Omit<T, "adelanto"> {
+  const resto: Partial<T> = { ...search };
+  delete resto.adelanto;
+  return resto as Omit<T, "adelanto">;
+}

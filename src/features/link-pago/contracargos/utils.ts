@@ -1,4 +1,4 @@
-import type { Contra, EstadoContra } from "@/lib/api/contracargos";
+import { normalizarEstadoContra, type Contra, type EstadoContra } from "@/lib/api/contracargos";
 
 /**
  * Días hábiles entre `hoy` y `fechaLimite`.
@@ -32,12 +32,14 @@ export function contarPorEstado(rows: Pick<Contra, "estado">[]): Record<EstadoCo
   const kpis: Record<EstadoContra, number> = {
     Simulado: 0,
     Abierto: 0,
-    En_mediación: 0,
     En_mediacion: 0,
     Cerrado_acreditado: 0,
     Cerrado_retenido: 0,
   };
-  for (const r of rows) kpis[r.estado] = (kpis[r.estado] ?? 0) + 1;
+  for (const r of rows) {
+    const e = normalizarEstadoContra(r.estado);
+    kpis[e] = (kpis[e] ?? 0) + 1;
+  }
   return kpis;
 }
 

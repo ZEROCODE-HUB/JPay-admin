@@ -6,9 +6,11 @@ import {
   interesAdelanto,
   netoAdelanto,
   parseTasa,
+  searchSinAdelanto,
   poolInsuficiente,
   shortId,
   tnaDesdeTem,
+  totalPaginas,
   toAdelantoUI,
   totalesPorEstado,
   validarTasa,
@@ -124,5 +126,38 @@ describe("toneAdelanto", () => {
     expect(toneAdelanto("Acreditado")).toBe("success");
     expect(toneAdelanto("Cancelado")).toBe("neutral");
     expect(toneAdelanto("Rechazado")).toBe("danger");
+  });
+});
+
+describe("searchSinAdelanto", () => {
+  it("quita `adelanto` para que el modal no se reabra y conserva `comercio`", () => {
+    const r = searchSinAdelanto({ comercio: "c1", adelanto: "a1" });
+    expect(r).toEqual({ comercio: "c1" });
+    expect("adelanto" in r).toBe(false);
+  });
+  it("no cambia nada si no habia `adelanto`", () => {
+    const search: { comercio?: string; adelanto?: string } = { comercio: "c1" };
+    expect(searchSinAdelanto(search)).toEqual({ comercio: "c1" });
+  });
+});
+
+describe("totalPaginas", () => {
+  it("redondea hacia arriba y nunca devuelve menos de 1", () => {
+    expect(totalPaginas(0, 20)).toBe(1);
+    expect(totalPaginas(20, 20)).toBe(1);
+    expect(totalPaginas(21, 20)).toBe(2);
+    expect(totalPaginas(95, 10)).toBe(10);
+  });
+});
+
+describe("totalesPorEstado sobre el total (no solo la pagina)", () => {
+  it("suma todas las filas recibidas, aunque sean mas de 20", () => {
+    const rows = Array.from({ length: 45 }, (_, i) => ({
+      estado: (i % 2 === 0 ? "Pendiente" : "Acreditado") as Adelanto["estado"],
+      montoSolicitado: 100,
+    }));
+    const t = totalesPorEstado(rows);
+    expect(t.Pendiente).toEqual({ cantidad: 23, monto: 2300 });
+    expect(t.Acreditado).toEqual({ cantidad: 22, monto: 2200 });
   });
 });

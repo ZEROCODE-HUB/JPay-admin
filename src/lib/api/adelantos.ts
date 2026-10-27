@@ -2,7 +2,7 @@ import { formatMoney } from "@/shared/format";
 import { requireSupabase } from "@/lib/supabase";
 import type { TablesUpdate } from "@/lib/database.types";
 import { DataAccessError } from "./errors";
-import type { Adelanto, AdelantoRow, EstadoAdelanto } from "./types";
+import type { Adelanto, AdelantoRow, EstadoAdelanto, Page } from "./types";
 
 const COLUMNS =
   "id, comercio_id, monto_solicitado, plazo_original_dias, plazo_adelantado_dias, tasa_interes_pct, estado, motivo, fecha_acreditacion, monto_por_acreditar, fecha_solicitud, fecha_resolucion, resuelto_por, created_at, updated_at";
@@ -38,24 +38,79 @@ export async function listAdelantosByComercio(comercioId: string): Promise<Adela
   return ((data ?? []) as AdelantoRow[]).map(toAdelanto);
 }
 
-export async function listAdelantos(filters: {
+export type AdelantoFilters = {
   comercioId?: string;
   estado?: EstadoAdelanto;
-  page?: number;
-  pageSize?: number;
-}): Promise<Adelanto[]> {
+};
+
+/** Página de adelantos (filtro por comercio y estado en el servidor). */
+export async function listAdelantos(
+  filters: AdelantoFilters & { page: number; pageSize: number },
+): Promise<Page<Adelanto>> {
   const sb = requireSupabase();
-  let q = sb.from("adelantos").select(COLUMNS).order("fecha_solicitud", { ascending: false });
+  const { page, pageSize } = filters;
+  let q = sb
+    .from("adelantos")
+    .select(COLUMNS, { count: "exact" })
+    .order("fecha_solicitud", { ascending: false });
   if (filters.comercioId) q = q.eq("comercio_id", filters.comercioId);
   if (filters.estado) q = q.eq("estado", filters.estado);
-  if (filters.page != null && filters.pageSize != null) {
-    const from = filters.page * filters.pageSize;
-    const to = from + filters.pageSize - 1;
-    q = q.range(from, to);
-  }
-  const { data, error } = await q;
+  const from = page * pageSize;
+  q = q.range(from, from + pageSize - 1);
+  const { data, error, count } = await q;
   if (error) throw new DataAccessError(error);
-  return ((data ?? []) as AdelantoRow[]).map(toAdelanto);
+  const rows = ((data ?? []) as AdelantoRow[]).map(toAdelanto);
+  return { rows, total: count ?? rows.length, page, pageSize };
+}
+
+/** Un adelanto por id (null si no existe). Para el enlace directo `?adelanto=`. */
+export async function getAdelanto(id: string): Promise<Adelanto | null> {
+  const sb = requireSupabase();
+  const { data, error } = await sb.from("adelantos").select(COLUMNS).eq("id", id).maybeSingle();
+  if (error) throw new DataAccessError(error);
+  return data ? toAdelanto(data as AdelantoRow) : null;
+}
+
+/** Tope de filas que se leen para los KPIs (por encima, `truncado` = true). */
+export const TOPE_KPIS_ADELANTOS = 20_000;
+const LOTE_KPIS = 1000;
+
+export type MontosAdelantos = {
+  rows: Pick<Adelanto, "estado" | "montoSolicitado">[];
+  truncado: boolean;
+};
+
+/**
+ * Estado y monto de TODOS los adelantos que cumplen el filtro (no solo la
+ * página visible), para las cards de totales por estado. Se lee en lotes
+ * de 1000 (límite de PostgREST) hasta `TOPE_KPIS_ADELANTOS`.
+ */
+export async function listMontosAdelantos(
+  filters: AdelantoFilters = {},
+  tope: number = TOPE_KPIS_ADELANTOS,
+): Promise<MontosAdelantos> {
+  const sb = requireSupabase();
+  const rows: MontosAdelantos["rows"] = [];
+  for (let from = 0; from < tope; from += LOTE_KPIS) {
+    const to = Math.min(from + LOTE_KPIS, tope) - 1;
+    let q = sb
+      .from("adelantos")
+      .select("id, estado, monto_solicitado")
+      .order("id", { ascending: true });
+    if (filters.comercioId) q = q.eq("comercio_id", filters.comercioId);
+    if (filters.estado) q = q.eq("estado", filters.estado);
+    const { data, error } = await q.range(from, to);
+    if (error) throw new DataAccessError(error);
+    const lote = data ?? [];
+    for (const r of lote) {
+      rows.push({
+        estado: r.estado as EstadoAdelanto,
+        montoSolicitado: Number(r.monto_solicitado),
+      });
+    }
+    if (lote.length < to - from + 1) return { rows, truncado: false };
+  }
+  return { rows, truncado: true };
 }
 
 /**

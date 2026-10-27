@@ -2,7 +2,7 @@ import { FileText, Ticket } from "lucide-react";
 import { Card } from "@/components/portal-shell";
 import type { Contra, EstadoContra } from "@/lib/api/contracargos";
 import { formatMoney } from "@/shared/format";
-import { ESTADO_LABEL, ESTADO_OPTIONS_UI } from "../estados";
+import { ESTADO_LABEL, ESTADO_OPTIONS_UI, enMediacion } from "../estados";
 import type { ContracargoDetalleState } from "../hooks/useContracargoDetalle";
 
 function CheckCircleIcon() {
@@ -84,7 +84,7 @@ export function GestionCard({
               </option>
             ))}
           </select>
-          {estado === "En_mediación" && !c.fechaLimite && (
+          {enMediacion(estado) && !c.fechaLimite && (
             <p className="text-xs text-muted-foreground mt-1">
               Al guardar se calculará el plazo (10 días hábiles).
             </p>

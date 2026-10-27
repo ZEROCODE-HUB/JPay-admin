@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { ESTADO_LABEL, ESTADO_OPTIONS_UI, toneContra } from "./estados";
+import { normalizarEstadoContra, type EstadoContra } from "@/lib/api/contracargos";
+import {
+  ESTADO_LABEL,
+  ESTADO_OPTIONS_UI,
+  muestraAdjuntos,
+  muestraPlazo,
+  toneContra,
+} from "./estados";
 import { contarPorEstado, diasHabilesRestantes, parseImporte, tamanoKb } from "./utils";
 
 describe("diasHabilesRestantes", () => {
@@ -31,10 +38,13 @@ describe("contarPorEstado", () => {
     expect(k.Cerrado_retenido).toBe(1);
     expect(k.Simulado).toBe(0);
   });
-  it("cuenta la variante sin tilde aparte (no la suma a 'En_mediación')", () => {
-    const k = contarPorEstado([{ estado: "En_mediacion" }]);
-    expect(k.En_mediacion).toBe(1);
-    expect(k["En_mediación"]).toBe(0);
+  it("cuenta En_mediacion (valor de la base) y suma la variante vieja con tilde", () => {
+    const k = contarPorEstado([
+      { estado: "En_mediacion" },
+      { estado: "En_mediación" as EstadoContra },
+    ]);
+    expect(k.En_mediacion).toBe(2);
+    expect(Object.keys(k)).not.toContain("En_mediación");
   });
 });
 
@@ -65,5 +75,25 @@ describe("estados", () => {
   });
   it("todas las opciones de UI tienen label", () => {
     for (const s of ESTADO_OPTIONS_UI) expect(ESTADO_LABEL[s]).toBeTruthy();
+  });
+});
+
+describe("En_mediacion (valor real de la base)", () => {
+  it("se muestra como 'En mediación' y está en el selector / KPIs", () => {
+    expect(ESTADO_LABEL.En_mediacion).toBe("En mediación");
+    expect(ESTADO_OPTIONS_UI).toContain("En_mediacion");
+  });
+  it("muestra plazo y adjuntos", () => {
+    expect(muestraPlazo("En_mediacion")).toBe(true);
+    expect(muestraAdjuntos("En_mediacion")).toBe(true);
+    expect(muestraPlazo("Abierto")).toBe(false);
+    expect(muestraAdjuntos("Cerrado_retenido")).toBe(true);
+    expect(muestraAdjuntos("Simulado")).toBe(false);
+  });
+  it("normaliza la variante con tilde y el vacío", () => {
+    expect(normalizarEstadoContra("En_mediación")).toBe("En_mediacion");
+    expect(normalizarEstadoContra("En_mediacion")).toBe("En_mediacion");
+    expect(normalizarEstadoContra(null)).toBe("Abierto");
+    expect(normalizarEstadoContra("Cerrado_retenido")).toBe("Cerrado_retenido");
   });
 });

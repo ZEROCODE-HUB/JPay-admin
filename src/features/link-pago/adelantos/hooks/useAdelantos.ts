@@ -1,52 +1,71 @@
 import { useEffect, useMemo, useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useSearch } from "@tanstack/react-router";
+import { toast } from "sonner";
 import {
+  getAdelanto,
   getComerciosResumen,
   listAdelantos,
+  listMontosAdelantos,
   obtenerPoolRecaudacion,
   type ComercioResumen,
   type PoolRecaudacion,
 } from "@/lib/api/adelantos";
-import type { Adelanto, EstadoAdelanto } from "@/lib/api/types";
-import { toAdelantoUI, totalesPorEstado, type AdelantoUI } from "../utils";
+import type { EstadoAdelanto } from "@/lib/api/types";
+import {
+  searchSinAdelanto,
+  toAdelantoUI,
+  totalPaginas,
+  totalesPorEstado,
+  type AdelantoUI,
+} from "../utils";
 
-/** Estado de la pantalla: filtro, listado, pool, deep link y modal abierto. */
+const RUTA = "/admin/comercios/link-pago/adelantos";
+
+/** Estado de la pantalla: filtro, listado paginado, pool, deep link y modal abierto. */
 export function useAdelantos() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [page, setPage] = useState(0);
-  const [pageSize] = useState(20);
+  const [pageSize, setPageSize] = useState(20);
   const [estadoFilter, setEstadoFilter] = useState<EstadoAdelanto | "">("");
   const [detail, setDetail] = useState<AdelantoUI | null>(null);
-  // Marker interno: id de adelanto a abrir cuando aparezca en la grilla.
-  const [pendingDeepLinkAdelantoId, setPendingDeepLinkAdelantoId] = useState<string | null>(null);
 
   // Deep link desde el calendario: ?comercio=<uuid>&adelanto=<uuid>
-  // Si viene `comercio`, lo usamos como filtro hasta que el operador
-  // lo limpie con "Limpiar". Si viene `adelanto`, abrimos el modal
-  // apenas la fila esté disponible en la página actual.
-  const search = useSearch({ from: "/admin/comercios/link-pago/adelantos" });
+  // `comercio` filtra el listado (en el servidor) hasta que el operador
+  // lo quite; `adelanto` abre el modal aunque no esté en la página actual.
+  const search = useSearch({ from: RUTA });
   const comercioFromUrl = search?.comercio;
   const adelantoFromUrl = search?.adelanto;
 
-  const { data, isLoading, isError, error, refetch } = useQuery({
-    queryKey: ["adelantos", page, pageSize, estadoFilter],
-    queryFn: () =>
-      listAdelantos({
-        page,
-        pageSize,
-        estado: (estadoFilter as EstadoAdelanto) || undefined,
-      }),
+  // Al cambiar el comercio de la URL se vuelve a la primera página.
+  const [comercioPrevio, setComercioPrevio] = useState(comercioFromUrl);
+  if (comercioPrevio !== comercioFromUrl) {
+    setComercioPrevio(comercioFromUrl);
+    setPage(0);
+  }
+
+  const comercioId = comercioFromUrl || undefined;
+  const estado = estadoFilter || undefined;
+
+  const { data, isLoading, isFetching, isError, error, refetch } = useQuery({
+    queryKey: ["adelantos", "pagina", page, pageSize, estado, comercioId],
+    queryFn: () => listAdelantos({ comercioId, estado, page, pageSize }),
+    placeholderData: keepPreviousData,
   });
 
-  // Si la URL trae `adelanto=<uuid>`, marcamos la intención de abrir
-  // el modal. Si la fila está en la página actual, el modal se abre
-  // apenas se arme el `AdelantoUI` con su join a comercios.
-  useEffect(() => {
-    if (!adelantoFromUrl || detail) return;
-    setPendingDeepLinkAdelantoId(adelantoFromUrl);
-  }, [adelantoFromUrl, detail]);
+  // KPIs por estado sobre el total (respeta el comercio, no la página).
+  const { data: montos } = useQuery({
+    queryKey: ["adelantos", "kpis", comercioId],
+    queryFn: () => listMontosAdelantos({ comercioId }),
+  });
+
+  // Adelanto del enlace directo, leído por id.
+  const { data: adelantoDeepLink, isSuccess: deepLinkCargado } = useQuery({
+    queryKey: ["adelantos", "detalle", adelantoFromUrl],
+    queryFn: () => getAdelanto(adelantoFromUrl as string),
+    enabled: !!adelantoFromUrl,
+  });
 
   // Pool de Recaudación: KPIs globales que se muestran SIEMPRE en la
   // cabecera de la pantalla. Refresca cada 30s.
@@ -57,12 +76,13 @@ export function useAdelantos() {
   });
 
   // La columna "Comercio" necesita nombre y legajo, no el UUID: un solo
-  // query une los comercios que aparecieron en la página actual.
-  const adelantosCrudos: Adelanto[] = useMemo(() => data ?? [], [data]);
-  const comerciosIds = useMemo(
-    () => Array.from(new Set(adelantosCrudos.map((a) => a.comercioId))),
-    [adelantosCrudos],
-  );
+  // query une los comercios de la página (y el del enlace directo).
+  const adelantosCrudos = useMemo(() => data?.rows ?? [], [data]);
+  const comerciosIds = useMemo(() => {
+    const ids = new Set(adelantosCrudos.map((a) => a.comercioId));
+    if (adelantoDeepLink) ids.add(adelantoDeepLink.comercioId);
+    return Array.from(ids);
+  }, [adelantosCrudos, adelantoDeepLink]);
   const { data: comerciosMap } = useQuery<Record<string, ComercioResumen>>({
     queryKey: ["adelantos-comercios", comerciosIds],
     queryFn: () => getComerciosResumen(comerciosIds),
@@ -74,28 +94,30 @@ export function useAdelantos() {
     toAdelantoUI(a, comerciosMap?.[a.comercioId]),
   );
 
-  // Deep link: si la fila del adelanto está en la página actual,
-  // abrimos el modal automáticamente y limpiamos el marker.
+  // Enlace a un adelanto que no existe: avisamos y limpiamos la URL.
   useEffect(() => {
-    if (!pendingDeepLinkAdelantoId || detail) return;
-    const target = rows.find((r) => r.fullId === pendingDeepLinkAdelantoId);
-    if (target) {
-      setDetail(target);
-      setPendingDeepLinkAdelantoId(null);
+    if (adelantoFromUrl && deepLinkCargado && adelantoDeepLink === null) {
+      toast.error("No se encontró el adelanto del enlace");
+      void navigate({ to: RUTA, search: (prev) => searchSinAdelanto(prev), replace: true });
     }
-  }, [pendingDeepLinkAdelantoId, rows, detail]);
+  }, [adelantoFromUrl, deepLinkCargado, adelantoDeepLink, navigate]);
 
-  // Si la URL trae `comercio`, filtramos la grilla en cliente.
-  const rowsVisibles = useMemo(() => {
-    if (!comercioFromUrl) return rows;
-    return rows.filter((r) => r.comercioId === comercioFromUrl);
-  }, [rows, comercioFromUrl]);
+  // El modal del enlace directo se deriva de la URL: al cerrarlo se quita
+  // `adelanto` de la URL (replace) y ya no se vuelve a abrir.
+  const detailDeepLink =
+    adelantoFromUrl && adelantoDeepLink
+      ? toAdelantoUI(adelantoDeepLink, comerciosMap?.[adelantoDeepLink.comercioId])
+      : null;
+
+  const cerrarDetalle = () => {
+    setDetail(null);
+    if (adelantoFromUrl) {
+      void navigate({ to: RUTA, search: (prev) => searchSinAdelanto(prev), replace: true });
+    }
+  };
 
   const limpiarFiltroComercio = () => {
-    void navigate({
-      to: "/admin/comercios/link-pago/adelantos",
-      search: {},
-    } as never);
+    void navigate({ to: RUTA, search: {} });
   };
 
   const invalidarTodo = () => {
@@ -108,7 +130,8 @@ export function useAdelantos() {
     queryClient.invalidateQueries({ queryKey: ["pool-recaudacion"] });
   };
 
-  const totales = useMemo(() => totalesPorEstado(adelantosCrudos), [adelantosCrudos]);
+  const totales = useMemo(() => totalesPorEstado(montos?.rows ?? []), [montos]);
+  const total = data?.total ?? 0;
 
   return {
     estadoFilter,
@@ -120,13 +143,24 @@ export function useAdelantos() {
     limpiarFiltroComercio,
     poolCabecera,
     totales,
-    rowsVisibles,
+    rowsVisibles: rows,
+    page,
+    setPage,
+    pageSize,
+    setPageSize: (n: number) => {
+      setPageSize(n);
+      setPage(0);
+    },
+    total,
+    totalPages: totalPaginas(total, pageSize),
     isLoading,
+    isFetching,
     isError,
     error: error as Error | null,
     refetch,
-    detail,
+    detail: detail ?? detailDeepLink,
     setDetail,
+    cerrarDetalle,
     onSave: () => {
       refetch();
       invalidarTodo();

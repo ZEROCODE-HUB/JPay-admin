@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import type { CalendarioAcreditacion } from "@/lib/api/calendario-acreditaciones";
 import { colorEstado, ESTADO_COLORS } from "./estados";
 import {
+  claveFecha,
+  nombresBanderas,
   adelantosComprometidos,
   agruparPorFecha,
   comisionCierrePct,
@@ -153,5 +155,35 @@ describe("helpers", () => {
   it("colorEstado cae a pendiente si el estado es desconocido", () => {
     expect(colorEstado("acreditado")).toBe(ESTADO_COLORS.acreditado);
     expect(colorEstado("raro" as never)).toBe(ESTADO_COLORS.pendiente);
+  });
+});
+
+describe("claveFecha", () => {
+  it("usa la fecha local, no UTC (no corre el día a la noche ni a la madrugada)", () => {
+    expect(claveFecha(new Date(2026, 9, 5, 23, 30))).toBe("2026-10-05");
+    expect(claveFecha(new Date(2026, 9, 5, 0, 0))).toBe("2026-10-05");
+    expect(claveFecha(new Date(2026, 0, 1))).toBe("2026-01-01");
+  });
+  it("coincide con las claves de agruparPorFecha para cada día del mes", () => {
+    const dias = diasDelMes(10, 2026, new Date(2026, 9, 15));
+    const claves = dias.filter((d) => !d.esOtroMes).map((d) => claveFecha(d.fecha));
+    expect(claves[0]).toBe("2026-10-01");
+    expect(claves[claves.length - 1]).toBe("2026-10-31");
+  });
+});
+
+describe("nombresBanderas", () => {
+  it("toma los nombres del catálogo, sin repetidos ni vacíos, ordenados", () => {
+    expect(
+      nombresBanderas([
+        { nombre: "Visa" },
+        { nombre: "Naranja X" },
+        { nombre: " " },
+        { nombre: "Visa" },
+      ]),
+    ).toEqual(["Naranja X", "Visa"]);
+  });
+  it("devuelve vacío si no hay catálogo", () => {
+    expect(nombresBanderas([])).toEqual([]);
   });
 });

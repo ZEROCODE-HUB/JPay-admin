@@ -3,6 +3,7 @@ import { Card } from "@/components/portal-shell";
 import type { Contra } from "@/lib/api/contracargos";
 import { formatDateTime } from "@/shared/format";
 import type { ContracargoDetalleState } from "../hooks/useContracargoDetalle";
+import { enMediacion } from "../estados";
 import { tamanoKb } from "../utils";
 
 /** Documentación adjunta del contracargo + "Enviar a PayWay". */
@@ -14,7 +15,7 @@ export function AdjuntosCard({ c, d }: { c: Contra; d: ContracargoDetalleState }
         <h4 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground flex items-center gap-1.5">
           <Paperclip size={12} /> Documentación adjunta ({archivos.length})
         </h4>
-        {puedeGestionar && estado === "En_mediación" && !c.enviadoPaywayAt && (
+        {puedeGestionar && enMediacion(estado) && !c.enviadoPaywayAt && (
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
@@ -85,7 +86,7 @@ export function AdjuntosCard({ c, d }: { c: Contra; d: ContracargoDetalleState }
         </ul>
       )}
 
-      {estado === "En_mediación" && archivos.length > 0 && !c.enviadoPaywayAt && puedeGestionar && (
+      {enMediacion(estado) && archivos.length > 0 && !c.enviadoPaywayAt && puedeGestionar && (
         <button
           type="button"
           onClick={d.onEnviarPayway}
@@ -95,7 +96,7 @@ export function AdjuntosCard({ c, d }: { c: Contra; d: ContracargoDetalleState }
         </button>
       )}
 
-      {estado === "En_mediación" && archivos.length === 0 && (
+      {enMediacion(estado) && archivos.length === 0 && (
         <p className="text-xs text-amber-700 mt-2">
           Adjuntá al menos un comprobante antes de enviar a PayWay.
         </p>

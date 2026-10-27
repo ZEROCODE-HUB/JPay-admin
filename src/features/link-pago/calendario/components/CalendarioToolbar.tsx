@@ -1,7 +1,7 @@
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { Card, Label } from "@/components/portal-shell";
 import type { EstadoCalendario } from "@/lib/api/calendario-acreditaciones";
-import { BANDERAS, ESTADOS_FILTRO } from "../estados";
+import { ESTADOS_FILTRO } from "../estados";
 import type { CalendarioState } from "../hooks/useCalendario";
 
 /** Navegación de mes + filtros de comercio, bandera y estado. */
@@ -53,7 +53,7 @@ export function CalendarioToolbar({ s }: { s: CalendarioState }) {
             className="h-8 px-2 rounded-md border bg-background text-xs"
           >
             <option value="">Todas</option>
-            {BANDERAS.map((b) => (
+            {s.banderasOptions.map((b) => (
               <option key={b} value={b}>
                 {b}
               </option>

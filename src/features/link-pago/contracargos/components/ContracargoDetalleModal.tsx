@@ -1,6 +1,7 @@
 import { AlertTriangle, Calendar, X } from "lucide-react";
 import { Card } from "@/components/portal-shell";
 import type { Contra } from "@/lib/api/contracargos";
+import { muestraAdjuntos, muestraPlazo } from "../estados";
 import { useContracargoDetalle } from "../hooks/useContracargoDetalle";
 import { AdjuntosCard } from "./AdjuntosCard";
 import { DatosContracargo, FlujoContracargo, LinkOriginal, SimulacionBanner } from "./DetalleInfo";
@@ -50,8 +51,8 @@ export function ContracargoDetalleModal({ c, onClose }: { c: Contra; onClose: ()
 
           <DatosContracargo c={c} />
 
-          {/* Plazo de mediación (solo si En_mediación) */}
-          {estado === "En_mediación" && (
+          {/* Plazo de mediación (solo si está en mediación) */}
+          {muestraPlazo(estado) && (
             <Card className="p-4">
               <h4 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2 flex items-center gap-1.5">
                 <Calendar size={12} /> Plazo de mediación
@@ -60,9 +61,7 @@ export function ContracargoDetalleModal({ c, onClose }: { c: Contra; onClose: ()
             </Card>
           )}
 
-          {(estado === "En_mediación" ||
-            estado === "Cerrado_acreditado" ||
-            estado === "Cerrado_retenido") && <AdjuntosCard c={c} d={d} />}
+          {muestraAdjuntos(estado) && <AdjuntosCard c={c} d={d} />}
 
           <GestionCard c={c} d={d} onClose={onClose} />
         </div>

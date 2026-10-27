@@ -8,9 +8,17 @@ import {
   type EstadoCalendario,
   type ResumenSaldos,
 } from "@/lib/api/calendario-acreditaciones";
+import { useBanderasCatalogo } from "@/hooks/useBanderas";
 import { useComercios } from "@/hooks/useComercios";
 import { useRealtimeInvalidate } from "@/shared/realtime";
-import { agruparPorFecha, diasDelMes, mesAnterior, mesSiguiente, nombreMes } from "../utils";
+import {
+  agruparPorFecha,
+  diasDelMes,
+  mesAnterior,
+  mesSiguiente,
+  nombreMes,
+  nombresBanderas,
+} from "../utils";
 
 /** Estado de la pantalla: mes visible, filtros, datos y día seleccionado. */
 export function useCalendario() {
@@ -25,6 +33,11 @@ export function useCalendario() {
   const [minMonto, setMinMonto] = useState<number>(100);
 
   const { rows: comerciosOptions } = useComercios({ page: 0, pageSize: 200 });
+  const { data: banderasCatalogo } = useBanderasCatalogo();
+  const banderasOptions = useMemo(
+    () => nombresBanderas(banderasCatalogo ?? []),
+    [banderasCatalogo],
+  );
 
   // Traemos el monto mínimo de una sola vez al montar (configurable).
   useEffect(() => {
@@ -98,6 +111,7 @@ export function useCalendario() {
     mesSiguiente: () => irA(mesSiguiente({ mes, anio })),
     irAHoy: () => irA({ mes: today.getMonth() + 1, anio: today.getFullYear() }),
     comerciosOptions,
+    banderasOptions,
     comercioFilter,
     setComercioFilter,
     banderaFilter,

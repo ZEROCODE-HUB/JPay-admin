@@ -4,6 +4,7 @@ import { PermissionGuard } from "@/components/permission-guard";
 import { Card, Label, PageHeader } from "@/components/portal-shell";
 import type { EstadoAdelanto } from "@/lib/api/types";
 import { DataTable } from "@/shared/ui/data-table";
+import { Pagination } from "@/shared/ui/pagination";
 import { ESTADOS } from "../estados";
 import { useAdelantos } from "../hooks/useAdelantos";
 import { AdelantoDetalleModal } from "./AdelantoDetalleModal";
@@ -80,22 +81,35 @@ export function AdelantosPage() {
           </button>
         </div>
       ) : (
-        <DataTable
-          columns={adelantosColumns}
-          data={s.rowsVisibles}
-          keyExtractor={(r) => r.fullId}
-          actions={(r) => (
-            <ActionsDropdown
-              actions={[{ label: "Ver / gestionar", icon: Eye, onClick: () => s.setDetail(r) }]}
-            />
-          )}
-        />
+        <>
+          <DataTable
+            columns={adelantosColumns}
+            data={s.rowsVisibles}
+            keyExtractor={(r) => r.fullId}
+            actions={(r) => (
+              <ActionsDropdown
+                actions={[{ label: "Ver / gestionar", icon: Eye, onClick: () => s.setDetail(r) }]}
+              />
+            )}
+            hidePagination
+          />
+          <Pagination
+            page={s.page + 1}
+            totalPages={s.totalPages}
+            pageSize={s.pageSize}
+            total={s.total}
+            countLabel="adelantos"
+            disabled={s.isFetching}
+            onPageChange={(p) => s.setPage(p - 1)}
+            onPageSizeChange={s.setPageSize}
+          />
+        </>
       )}
 
       {s.detail && (
         <AdelantoDetalleModal
           a={s.detail}
-          onClose={() => s.setDetail(null)}
+          onClose={s.cerrarDetalle}
           onSave={s.onSave}
           onAcreditado={s.onAcreditado}
         />

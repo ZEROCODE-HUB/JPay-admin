@@ -48,8 +48,6 @@ export const ESTADOS_FILTRO: { value: EstadoCalendario; label: string }[] = [
   { value: "contracargo", label: "Contracargo" },
 ];
 
-export const BANDERAS = ["Visa", "Mastercard", "Amex", "Cabal", "Diners"];
-
 export const DIAS_SEMANA = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
 
 /** Estados de adelanto que ya no comprometen el lote. */

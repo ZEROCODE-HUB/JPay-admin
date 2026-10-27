@@ -91,9 +91,21 @@ export function diasDelMes(mes: number, anio: number, today: Date): DiaCalendari
   return dias;
 }
 
-/** Clave yyyy-mm-dd de una celda (igual que la pantalla original: vía ISO/UTC). */
+/**
+ * Clave yyyy-mm-dd de una celda en fecha LOCAL. No usar `toISOString()`:
+ * pasa a UTC y corre el día (p. ej. 23:30 en UTC-3 ya es el día siguiente).
+ */
 export function claveFecha(d: Date): string {
-  return d.toISOString().slice(0, 10);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const dia = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${dia}`;
+}
+
+/** Nombres de bandera para el filtro, tomados del catálogo (sin repetidos, ordenados). */
+export function nombresBanderas(catalogo: { nombre: string }[]): string[] {
+  const nombres = catalogo.map((b) => b.nombre.trim()).filter((n) => n !== "");
+  return Array.from(new Set(nombres)).sort((a, b) => a.localeCompare(b, "es"));
 }
 
 /** Indexa las acreditaciones por fecha de acreditación. */
