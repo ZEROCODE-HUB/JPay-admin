@@ -2,14 +2,7 @@
 import { pageTitle } from "@/brand/brand";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import {
-  Plus,
-  Power,
-  PowerOff,
-  X,
-  Inbox,
-  AlertTriangle,
-} from "lucide-react";
+import { Plus, Power, PowerOff, X, Inbox, AlertTriangle } from "lucide-react";
 import { PageHeader } from "@/components/page-header";
 import { DataTable, type Column } from "@/components/data-table";
 import { FormDialog } from "@/components/form-dialog";
@@ -26,11 +19,7 @@ import {
   createDcExcepcionAmbos,
   setDcExcepcionEstado,
 } from "@/lib/api/dc-excepciones";
-import type {
-  DcExcepcion,
-  DireccionDcExcepcion,
-  TipoDcExcepcion,
-} from "@/lib/api/types";
+import type { DcExcepcion, DireccionDcExcepcion, TipoDcExcepcion } from "@/lib/api/types";
 
 export const Route = createFileRoute("/admin/comercios/impuestos/debitos-creditos")({
   head: () => ({ meta: [{ title: pageTitle("Débitos y créditos — Admin") }] }),
@@ -300,9 +289,19 @@ function Page() {
     {
       key: "archivoCertificado",
       label: "Certificado",
-      render: (r) => r.archivoCertificado
-        ? <a href={r.archivoCertificado} target="_blank" rel="noopener noreferrer" className="text-primary-ink underline text-xs">Ver certificado</a>
-        : <span className="text-muted-foreground text-xs">—</span>,
+      render: (r) =>
+        r.archivoCertificado ? (
+          <a
+            href={r.archivoCertificado}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-primary-ink underline text-xs"
+          >
+            Ver certificado
+          </a>
+        ) : (
+          <span className="text-muted-foreground text-xs">—</span>
+        ),
     },
     {
       key: "estado",
@@ -521,7 +520,9 @@ function Page() {
               >
                 <option value="">Sin impuesto específico</option>
                 {(impuestos ?? []).map((imp) => (
-                  <option key={imp.id} value={imp.id}>{imp.codigo} · {imp.nombre}</option>
+                  <option key={imp.id} value={imp.id}>
+                    {imp.codigo} · {imp.nombre}
+                  </option>
                 ))}
               </select>
             </div>
@@ -533,7 +534,9 @@ function Page() {
                 onChange={(e) => setAlta({ ...alta, archivo_certificado: e.target.value })}
                 placeholder="https://..."
               />
-              <p className="text-[11px] text-muted-foreground mt-1">Link al certificado de exención o convenio.</p>
+              <p className="text-[11px] text-muted-foreground mt-1">
+                Link al certificado de exención o convenio.
+              </p>
             </div>
           </div>
           {!altaValido && (

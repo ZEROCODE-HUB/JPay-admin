@@ -1,9 +1,4 @@
-import {
-  ChevronLeft,
-  ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
-} from "lucide-react";
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
 import { useId, useMemo } from "react";
 
 /**
@@ -158,10 +153,7 @@ export function Pagination({
     if (target !== safePage) onPageChange(target);
   };
 
-  const items = useMemo(
-    () => buildPageItems(safePage, safeTotalPages),
-    [safePage, safeTotalPages],
-  );
+  const items = useMemo(() => buildPageItems(safePage, safeTotalPages), [safePage, safeTotalPages]);
 
   const renderCount = () => {
     if (!total) return null;
@@ -213,10 +205,7 @@ export function Pagination({
     if (!hasPages) return null;
 
     return (
-      <nav
-        className="flex items-center"
-        aria-label="Paginación"
-      >
+      <nav className="flex items-center" aria-label="Paginación">
         {/* Primera + Anterior (en sm: solo iconos para ahorrar espacio) */}
         <div className="hidden sm:flex">
           <NavButton

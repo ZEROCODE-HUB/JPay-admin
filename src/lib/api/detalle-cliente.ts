@@ -375,20 +375,19 @@ export type ExencionInput = {
   vigenciaHasta: string | null;
 };
 
-export async function crearExencion(
-  clienteLegajo: string,
-  input: ExencionInput,
-): Promise<void> {
+export async function crearExencion(clienteLegajo: string, input: ExencionInput): Promise<void> {
   const sb = requireSupabase();
   // TODO: la tabla exenciones_debito_credito no existe en la base (pendiente de decisión)
-  const { error } = await (sb as unknown as SupabaseClient).from("exenciones_debito_credito").insert({
-    cliente_legajo: clienteLegajo,
-    cuit: input.cuit,
-    direccion: input.direccion,
-    motivo: input.motivo,
-    vigencia_desde: input.vigenciaDesde || null,
-    vigencia_hasta: input.vigenciaHasta || null,
-  });
+  const { error } = await (sb as unknown as SupabaseClient)
+    .from("exenciones_debito_credito")
+    .insert({
+      cliente_legajo: clienteLegajo,
+      cuit: input.cuit,
+      direccion: input.direccion,
+      motivo: input.motivo,
+      vigencia_desde: input.vigenciaDesde || null,
+      vigencia_hasta: input.vigenciaHasta || null,
+    });
   if (error) throw new DataAccessError(error);
 }
 
@@ -442,23 +441,23 @@ type ClienteApiUsuarioRow = {
   cliente_legajo: string;
   api_usuario_id: string;
   created_at: string;
-  api_usuarios:
-    | {
-        id: string;
-        codigo_usuario_api: string;
-        usuario: string;
-        nombre_completo: string;
-        estado: string;
-        created_at: string;
-      }
-    | null;
+  api_usuarios: {
+    id: string;
+    codigo_usuario_api: string;
+    usuario: string;
+    nombre_completo: string;
+    estado: string;
+    created_at: string;
+  } | null;
 };
 
 export async function listClienteApiUsuarios(clienteLegajo: string): Promise<ClienteApiUsuario[]> {
   const sb = requireSupabase();
   const { data, error } = await sb
     .from("cliente_api_usuarios")
-    .select("id, cliente_legajo, api_usuario_id, created_at, api_usuarios(id, codigo_usuario_api, usuario, nombre_completo, estado, created_at)")
+    .select(
+      "id, cliente_legajo, api_usuario_id, created_at, api_usuarios(id, codigo_usuario_api, usuario, nombre_completo, estado, created_at)",
+    )
     .eq("cliente_legajo", clienteLegajo)
     .order("created_at", { ascending: false });
   if (error) throw new DataAccessError(error);
@@ -477,7 +476,10 @@ export async function listClienteApiUsuarios(clienteLegajo: string): Promise<Cli
     }));
 }
 
-export async function vincularApiUsuarioACliente(clienteLegajo: string, apiUsuarioId: string): Promise<void> {
+export async function vincularApiUsuarioACliente(
+  clienteLegajo: string,
+  apiUsuarioId: string,
+): Promise<void> {
   const sb = requireSupabase();
   const { error } = await sb.from("cliente_api_usuarios").insert({
     cliente_legajo: clienteLegajo,
@@ -486,7 +488,10 @@ export async function vincularApiUsuarioACliente(clienteLegajo: string, apiUsuar
   if (error) throw new DataAccessError(error);
 }
 
-export async function desvincularApiUsuarioDeCliente(clienteLegajo: string, apiUsuarioId: string): Promise<void> {
+export async function desvincularApiUsuarioDeCliente(
+  clienteLegajo: string,
+  apiUsuarioId: string,
+): Promise<void> {
   const sb = requireSupabase();
   const { error } = await sb
     .from("cliente_api_usuarios")

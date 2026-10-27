@@ -129,7 +129,8 @@ export async function updateDcExcepcion(
   if (input.autorizacion_codigo !== undefined)
     payload.autorizacion_codigo = input.autorizacion_codigo?.trim() ?? null;
   if (input.estado !== undefined) payload.estado = input.estado;
-  if (input.archivo_certificado !== undefined) payload.archivo_certificado = input.archivo_certificado ?? null;
+  if (input.archivo_certificado !== undefined)
+    payload.archivo_certificado = input.archivo_certificado ?? null;
   if (input.impuesto_id !== undefined) payload.impuesto_id = input.impuesto_id ?? null;
 
   const { data, error } = await sb

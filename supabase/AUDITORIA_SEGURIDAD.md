@@ -1,4 +1,5 @@
 # Auditoría de Seguridad — MoliPay
+
 **Módulo:** Base de Datos, Autenticación y RLS
 **Stack:** Supabase (Postgres + GoTrue + RLS)
 **Nivel:** PSP / Billetera Virtual B2B (BCRA)
@@ -26,6 +27,7 @@ Mientras no se aplique este fix, ningún otro módulo de seguridad (MFA, JWT, bc
 ### 🔴 CRÍTICO — Exposición a `anon` (sin login)
 
 **C-1. `banderas` es accesible de forma anónima para INSERT/UPDATE/DELETE/SELECT.**
+
 ```sql
 -- Encontrado en 20261005224751_remote_schema.sql líneas 4565-4581
 CREATE POLICY "Allow anon read"   ON "public"."banderas" FOR SELECT TO "anon" USING (true);
@@ -33,12 +35,15 @@ CREATE POLICY "Allow anon insert" ON "public"."banderas" FOR INSERT TO "anon" WI
 CREATE POLICY "Allow anon update" ON "public"."banderas" FOR UPDATE TO "anon" USING (true) WITH CHECK (true);
 CREATE POLICY "Allow anon delete" ON "public"."banderas" FOR DELETE TO "anon" USING (true);
 ```
+
 **Riesgo:** Un visitante con la `anon` key pública puede listar/crear/modificar/borrar banderas del catálogo (los métodos de pago que aplican al sistema). Compromete todo el motor de liquidación.
 
 **C-2. `comercios` es legible anónimamente.**
+
 ```sql
 CREATE POLICY "anon_read_comercios" ON "public"."comercios" FOR SELECT TO "anon" USING (true);
 ```
+
 **Riesgo:** Cualquier visitante (incluso sin login) puede listar todos los comercios con CUIT, legajo, site_id y datos de contacto. PII filtrada por defecto.
 
 ---
@@ -47,17 +52,17 @@ CREATE POLICY "anon_read_comercios" ON "public"."comercios" FOR SELECT TO "anon"
 
 Varias tablas financieras **no tienen** `ENABLE ROW LEVEL SECURITY` en el dump remoto. Postgres por defecto las deja pasar a todos los roles. Esto significa que cualquier `authenticated` puede SELECT/UPDATE/DELETE sin restricción:
 
-| Tabla | Por qué importa |
-|---|---|
-| `clientes` | PII (CUIT, nombre, mail, CBU, fecha nac, domicilio). Es la base. |
-| `movimientos` | Movimientos contables de cada cliente. |
-| `subcuentas` | Saldos de subcuentas/CVU. |
-| `productos` | Catálogo del cliente. |
-| `cliente_links_pago`, `cliente_links_pago_detalle`, `cliente_links_pago_pagos` | Links de pago. |
-| `destinatarios_frecuentes`, `transferencias_borrador`, `transferencias_programadas` | Transferencias. |
-| `validaciones`, `documentos`, `alertas`, `bloqueos`, `historial_cambios` | KYC. |
-| `lotes` (legacy), `lote_registros` | Liquidaciones. |
-| `caja_molipay`, `caja_movimientos` | La caja común. Si alguien edita `saldo_bancario`, todo el motor se rompe. |
+| Tabla                                                                               | Por qué importa                                                           |
+| ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| `clientes`                                                                          | PII (CUIT, nombre, mail, CBU, fecha nac, domicilio). Es la base.          |
+| `movimientos`                                                                       | Movimientos contables de cada cliente.                                    |
+| `subcuentas`                                                                        | Saldos de subcuentas/CVU.                                                 |
+| `productos`                                                                         | Catálogo del cliente.                                                     |
+| `cliente_links_pago`, `cliente_links_pago_detalle`, `cliente_links_pago_pagos`      | Links de pago.                                                            |
+| `destinatarios_frecuentes`, `transferencias_borrador`, `transferencias_programadas` | Transferencias.                                                           |
+| `validaciones`, `documentos`, `alertas`, `bloqueos`, `historial_cambios`            | KYC.                                                                      |
+| `lotes` (legacy), `lote_registros`                                                  | Liquidaciones.                                                            |
+| `caja_molipay`, `caja_movimientos`                                                  | La caja común. Si alguien edita `saldo_bancario`, todo el motor se rompe. |
 
 **Severidad operativa:** total. Estas tablas son la espina dorsal del producto. Hoy día están literalmente abiertas para cualquier usuario autenticado.
 
@@ -111,6 +116,7 @@ CREATE POLICY "authenticated_all_api_usuarios" ON "public"."api_usuarios" TO aut
 **H-2.** No hay protección de "último admin activo". Si quedan cero admins activos con rol Admin, nadie puede volver a crear. **Solución:** trigger que impida UPDATE/DELETE del último `admin_users` con rol Admin activo.
 
 **H-3.** `auth.uid()` se usa para identificar `admin_users`, pero `admin_users.id` tiene FK a `auth.users(id)`. Hasta acá bien. **Pero** `clientes.id` **no tiene FK a `auth.users(id)`** (es un UUID independiente). La forma actual de hacer "yo soy este cliente" es por `legajo_de_sesion()` que matchea `auth.email()` con `clientes.correo`. Esto es funcional pero **frágil**:
+
 - Si renombrás el email → el cliente pierde acceso a sus datos.
 - Dos cuentas `auth.users` con el mismo email (improbable pero posible) rompen la unicidad.
 - **Recomendación a futuro:** agregar una tabla `auth_links` o `clientes.usuario_id uuid FK auth.users(id)` y migrar.
@@ -162,32 +168,34 @@ Las siguientes tablas tienen trigger de log o deberían tenerlo y no:
 
 ## 2. Lo que está bien (no tocar)
 
-| Pieza | Estado |
-|---|---|
-| `clientes.cuit` CHECK `^[0-9]{11}$` | ✅ |
-| `clientes.legajo` CHECK `^(LPF|LPJ)-[0-9]{11}$` | ✅ |
-| `legajo_deriva_de_cuit` CHECK | ✅ |
-| Trigger `fn_log_transicion_cliente` | ✅ |
-| Trigger `fn_log_transicion_movimiento` | ✅ |
-| Trigger `trg_prevent_cliente_admin_email` | ✅ |
-| Trigger `trg_fix_monto_cobrado` | ✅ |
-| `movimientos.monto_cobrado_consistente` CHECK | ✅ |
-| `movimientos.movimientos_tarjeta_requiere_comercio_bandera` CHECK | ✅ |
-| FKs `clientes.legajo` desde casi todas las tablas hijas | ✅ |
-| `acreditacion_lotes` append-only por convención | ✅ (pero falta FK enforcement) |
-| `caja_movimientos` append-only por convención | ✅ |
-| Uso de `SECURITY DEFINER` en RPCs | ✅ |
-| `search_path` fijado en `SECURITY DEFINER` | ✅ |
-| Supabase Auth (JWT firmado, bcrypt, refresh) | ✅ (provisto por Supabase) |
+| Pieza                                                             | Estado                         |
+| ----------------------------------------------------------------- | ------------------------------ |
+| `clientes.cuit` CHECK `^[0-9]{11}$`                               | ✅                             |
+| `clientes.legajo` CHECK `^(LPF                                    | LPJ)-[0-9]{11}$`               | ✅  |
+| `legajo_deriva_de_cuit` CHECK                                     | ✅                             |
+| Trigger `fn_log_transicion_cliente`                               | ✅                             |
+| Trigger `fn_log_transicion_movimiento`                            | ✅                             |
+| Trigger `trg_prevent_cliente_admin_email`                         | ✅                             |
+| Trigger `trg_fix_monto_cobrado`                                   | ✅                             |
+| `movimientos.monto_cobrado_consistente` CHECK                     | ✅                             |
+| `movimientos.movimientos_tarjeta_requiere_comercio_bandera` CHECK | ✅                             |
+| FKs `clientes.legajo` desde casi todas las tablas hijas           | ✅                             |
+| `acreditacion_lotes` append-only por convención                   | ✅ (pero falta FK enforcement) |
+| `caja_movimientos` append-only por convención                     | ✅                             |
+| Uso de `SECURITY DEFINER` en RPCs                                 | ✅                             |
+| `search_path` fijado en `SECURITY DEFINER`                        | ✅                             |
+| Supabase Auth (JWT firmado, bcrypt, refresh)                      | ✅ (provisto por Supabase)     |
 
 ---
 
 ## 3. Plan de remediación
 
 ### Aplicar esta migración:
+
 `supabase/migrations/20261010000000_security_rls_hardening.sql`
 
 Incluye:
+
 1. Mata las 4 policies `anon` de `banderas` y la `anon_read_comercios`.
 2. Habilita RLS en TODAS las tablas que faltan (`clientes`, `movimientos`, `subcuentas`, `caja_molipay`, …).
 3. Define `current_admin_id()`, `current_cliente_legajo()`, `is_admin()`, `current_is_staff()` como **single source of truth**.

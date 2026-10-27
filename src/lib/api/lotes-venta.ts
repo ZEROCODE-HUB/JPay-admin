@@ -78,7 +78,9 @@ export async function listLotesVenta(filters: LotesVentaFilters): Promise<Page<L
  * request de PostgREST. La exportación se hace sobre el filtrado actual, no
  * solo sobre la página visible.
  */
-export async function exportLotesVenta(filters: Omit<LotesVentaFilters, "page" | "pageSize">): Promise<LoteVenta[]> {
+export async function exportLotesVenta(
+  filters: Omit<LotesVentaFilters, "page" | "pageSize">,
+): Promise<LoteVenta[]> {
   const PAGE = 1000;
   const todas: LoteVenta[] = [];
   let page = 0;
@@ -113,9 +115,7 @@ export type OperacionesLoteFilters = Pagination & {
 const OPS_COLUMNS =
   "id, id_txn, fecha, monto_operacion, comision, impuesto, monto_cobrado, estado_id, legajo, bandera, estados_movimiento(codigo, nombre, es_final), clientes!transactions_cliente_id_fkey(correo, nombre, cuit)";
 
-export async function listOperacionesLote(
-  f: OperacionesLoteFilters,
-): Promise<Page<Movimiento>> {
+export async function listOperacionesLote(f: OperacionesLoteFilters): Promise<Page<Movimiento>> {
   const sb = requireSupabase();
   const { page, pageSize, comercioId, bandera, fecha, search } = f;
   const from = page * pageSize;

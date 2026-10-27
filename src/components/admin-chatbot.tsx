@@ -149,8 +149,8 @@ export function AdminChatbot() {
           <div className="flex-1 overflow-y-auto p-4 space-y-3">
             {messages.length === 0 && (
               <div className="text-sm text-muted-foreground text-center py-6">
-                ¡Hola! Soy el asistente virtual de {brand.shortName}. Seleccioná una consulta o escribí tu
-                pregunta.
+                ¡Hola! Soy el asistente virtual de {brand.shortName}. Seleccioná una consulta o
+                escribí tu pregunta.
               </div>
             )}
 

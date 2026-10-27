@@ -110,9 +110,7 @@ export function ConfirmarAcreditacionModal({ lote, onClose, onAcreditado }: Prop
   // netoCsv = importeNeto + descuentos (reconstruido del snapshot)
   const netoCsv = importeNeto + totalDescuentos;
 
-  const submitLabel = lote
-    ? `Acreditar y depositar ${fmt(netoFinal)}`
-    : "Acreditar";
+  const submitLabel = lote ? `Acreditar y depositar ${fmt(netoFinal)}` : "Acreditar";
 
   const confirmar = async () => {
     if (!lote) return;
@@ -158,7 +156,9 @@ export function ConfirmarAcreditacionModal({ lote, onClose, onAcreditado }: Prop
               <div>
                 <div className="text-muted-foreground">Bandera</div>
                 <div className="font-semibold">{lote.bandera}</div>
-                <div className="text-[11px] text-muted-foreground">{lote.cantidadOperaciones} ops</div>
+                <div className="text-[11px] text-muted-foreground">
+                  {lote.cantidadOperaciones} ops
+                </div>
               </div>
               <div>
                 <div className="text-muted-foreground">Fecha estimada</div>

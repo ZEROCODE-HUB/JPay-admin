@@ -132,7 +132,15 @@ export function MovimientosSubRoute({
       fechaDesde: rango?.from ? `${rango.from}T00:00:00.000` : undefined,
       fechaHasta: rango?.to ? `${rango.to}T23:59:59.999` : undefined,
     };
-  }, [page, tipoCode, soloConImpuesto, soloConComision, search, filtrosPanel.enums, filtrosPanel.dates]);
+  }, [
+    page,
+    tipoCode,
+    soloConImpuesto,
+    soloConComision,
+    search,
+    filtrosPanel.enums,
+    filtrosPanel.dates,
+  ]);
 
   const { rows, total, isLoading, isFetching, isError, error, isEmpty, refetch, isEstimated } =
     useMovimientos(filtros);
@@ -177,8 +185,11 @@ export function MovimientosSubRoute({
   }));
 
   // PASO 2: Comisión Payway solo para tarjeta — cruce comercio_banderas + snapshot lote
-  const isTarjeta = tipoCode === 'tarjeta';
-  const comercioIds = useMemo(() => [...new Set(data.map((d) => d._comercioId).filter(Boolean) as string[])], [data]);
+  const isTarjeta = tipoCode === "tarjeta";
+  const comercioIds = useMemo(
+    () => [...new Set(data.map((d) => d._comercioId).filter(Boolean) as string[])],
+    [data],
+  );
   const movimientoIds = useMemo(() => data.map((d) => d._dbId), [data]);
   const { data: banderasPayway } = useQuery({
     queryKey: ["banderas-payway", comercioIds],
@@ -233,14 +244,19 @@ export function MovimientosSubRoute({
         let monto: number;
         if (snapshot) {
           pct = snapshot.pct;
-          monto = r._montoOperacion * pct / 100;
+          monto = (r._montoOperacion * pct) / 100;
         } else {
           const key = `${r._comercioId}::${r._bandera}`;
           pct = banderasLookup.get(key) ?? 0;
-          monto = r._montoOperacion * pct / 100;
+          monto = (r._montoOperacion * pct) / 100;
         }
-        if (!r._bandera || !r._comercioId) return <span className="font-mono tabular-nums text-muted-foreground">—</span>;
-        return <span className="font-mono tabular-nums">{fmtARS(monto)} <span className="text-muted-foreground">({pct.toFixed(2)}%)</span></span>;
+        if (!r._bandera || !r._comercioId)
+          return <span className="font-mono tabular-nums text-muted-foreground">—</span>;
+        return (
+          <span className="font-mono tabular-nums">
+            {fmtARS(monto)} <span className="text-muted-foreground">({pct.toFixed(2)}%)</span>
+          </span>
+        );
       },
     };
     const idx = columns.findIndex((c) => c.key === "comision");
@@ -396,7 +412,14 @@ const columns: Column<FilaSubRuta>[] = [
     maxWidth: 200,
     render: (r) => <span className="font-mono tabular-nums">{r.cvu}</span>,
   },
-  { key: "usuario", label: "Usuario", filterable: true, minWidth: 180, maxWidth: 280, render: (r) => r.usuario },
+  {
+    key: "usuario",
+    label: "Usuario",
+    filterable: true,
+    minWidth: 180,
+    maxWidth: 280,
+    render: (r) => r.usuario,
+  },
   {
     key: "nombreOrigen",
     label: "Nombre empresa/persona",
@@ -424,7 +447,11 @@ const columns: Column<FilaSubRuta>[] = [
     minWidth: 150,
     render: (r) => {
       const pct = r._montoOperacion > 0 ? (r._comision / r._montoOperacion) * 100 : 0;
-      return <span className="font-mono tabular-nums">{fmtARS(r._comision)} <span className="text-muted-foreground">({pct.toFixed(2)}%)</span></span>;
+      return (
+        <span className="font-mono tabular-nums">
+          {fmtARS(r._comision)} <span className="text-muted-foreground">({pct.toFixed(2)}%)</span>
+        </span>
+      );
     },
   },
   {
@@ -433,7 +460,11 @@ const columns: Column<FilaSubRuta>[] = [
     minWidth: 150,
     render: (r) => {
       const pct = r._montoOperacion > 0 ? (r._impuesto / r._montoOperacion) * 100 : 0;
-      return <span className="font-mono tabular-nums">{fmtARS(r._impuesto)} <span className="text-muted-foreground">({pct.toFixed(2)}%)</span></span>;
+      return (
+        <span className="font-mono tabular-nums">
+          {fmtARS(r._impuesto)} <span className="text-muted-foreground">({pct.toFixed(2)}%)</span>
+        </span>
+      );
     },
   },
   {

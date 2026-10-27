@@ -38,6 +38,7 @@ Admin
 **Archivo:** `src/routes/admin.comercios.gestion.index.tsx` (~1050 líneas), `gestion.tsx` (TabLayout), `gestion.categoria.tsx`, `gestion.metodos-pago.tsx`
 
 **Modelo:** `Comercio` (`src/lib/api/types.ts:478-524`)
+
 ```
 Comercio {
   id, legajo FK→clientes.legajo, usuario (email), cliente {legajo,nombre,cuit,correo},
@@ -51,6 +52,7 @@ Comercio {
 ```
 
 **Listado:**
+
 - `useComercios({page, search, estado, nivel, fechaDesde, fechaHasta})` + `useClientesForSelect` + `useCodigosCategoria`.
 - **Filtros unificados en un único contenedor blanco superior** (`Card p-4`): `Buscar (usuario/legajo)`, `Estado`, `Nivel`, `Fecha desde/hasta` + `Limpiar`. `DataTable` tiene `showGlobalFilter={false} dateFilterColumns={[]}` para no duplicar.
 - Paginación server-side 10, orden `created_at desc`.
@@ -58,21 +60,25 @@ Comercio {
 **Acciones por fila:** Ver detalle, Editar, Habilitar/Deshabilitar, Eliminar (con `setComercioEstado`, `deleteComercio`).
 
 **Detalle (`ComercioDetalle`):**
+
 - `max-w-5xl` modal, `Información general` (usuario, legajo con `LegajoCell`, cliente, CUIT, categoría, nivel, estado, fechas, flags transfer/enlaces).
 - **Banderas habilitadas** como tabla horizontal (`Método | Tipo | Comisión JPay | Comisión PayWay | Comisión neta`).
 - **Impuestos totales por pagar** — Card agregado tras refactor impuestos: `MOCK_IMPUESTOS_POR_COBRAR` filtrado por legajo, fallback `metodosConfig.length*8500 + comisiones`. Muestra suma mock + link a impuestos.
 - Resumen con nota de QR/links.
 
 **Alta/Edición (`ComercioFormModal`):**
+
 - `FormDialog size="xl" (max-w-4xl)` para que banderas entren horizontal.
 - Campos: cliente (combobox búsqueda server-side debounce 350ms, `useClientesForSelect`), usuario email, categoría `select`, nivel, estado.
 - **Banderas habilitadas** re-maquetado en **fila horizontal por bandera**: header `Bandera/Método | JPay | PayWay | Neta`; cada fila `grid-cols-[1.6fr_1fr_1fr_1fr]` con `checkbox + nombre/tipo` + 2 `Input` % + `div` neta calculada `propia - payway`. `overflow-x-auto min-w-[680px]` evita apilar vertical. Validación `^[0-9]*[.,]?[0-9]*$`.
 
 **Sub-rutas:**
+
 - **Códigos de categoría** — CRUD `codigos_categoria` (código, nombre, descripción, estado).
 - **Métodos de pago** — catálogo `metodosPagoIniciales` (`src/data/metodos-pago.ts`: Visa/Mastercard/Amex/Cabal etc con `tipo`). Es la fuente para `metodosDisponibles` en gestión.
 
 **Interacción:**
+
 - Crear comercio → `createComercio({legajo, usuario, categoriaId, nivel, estado, metodosConfig})` → invalida `["comercios"]`.
 - `legajo` es FK real a `clientes.legajo`; el combobox impide texto libre.
 - `metodosConfig` se guarda como `jsonb` en `comercios.metodos_config`.
@@ -94,6 +100,7 @@ Comercio {
 ## 3. Link de Pago (`/admin/comercios/link-pago`)
 
 **Layout tabs:** `src/routes/admin.comercios.link-pago.tsx:14-19`
+
 ```
 Links de Pago (/) | Lotes (/lotes) | Contracargos (/contracargos) | Adelantos (/adelantos) | Resumen general (/resumen)
 ```
@@ -111,6 +118,7 @@ Links de Pago (/) | Lotes (/lotes) | Contracargos (/contracargos) | Adelantos (/
 **Concepto:** Lote **por bandera** generado por JPay en corte diario. Un comercio puede tener N lotes el mismo día (uno por Visa, otro Mastercard...). Agrupa pagos de esa bandera.
 
 **Modelo:**
+
 ```
 Lote {id, fecha DD/MM/YYYY, comercio, legajo, bandera, cantidadOps, importeBruto, impuestos, tasaPayWayPct/Monto, tasaPropiaPct/Monto, importeFinal, estado: Acreditado/Rechazado/Contracargo, linksIds[], cuotas?, costoPayWayPagoUnico?}
 ```
@@ -120,10 +128,12 @@ Lote {id, fecha DD/MM/YYYY, comercio, legajo, bandera, cantidadOps, importeBruto
 **Filtros unificados:** Solo contenedor blanco de `DataTable` con `Buscar (Comercio/Legajo) | Bandera enum | Fecha | Estado enum`. Eliminados recuadros amarillos de explicación y filtros externos duplicados.
 
 **Tabs internos:**
+
 - **Lotes por bandera** — tabla `Fecha | Lote | Comercio/Legajo | Bandera (pill) | Ops (+Xc si cuotas>1) | Importe a acreditar | Estado` + KPIs Acreditados/Contracargo/Rechazados.
 - **Resumen por comercio** — `ResumenComercio {comercio, legajo, cantidadLotes/Ops, totalBruto, totalImpuestos, totalPayWay, totalPropio, totalFinal, pendienteAcreditar, pendienteImpuestos}` agregado via `useMemo` groupBy. Columnas: `Comercio | Pendiente de acreditar (=máximo adelantable) | Pendiente impuestos | Comisión PayWay | Neto JPay | Total a pagar`. Acción `Ver detalle` abre `ComercioDetalleModal` con KPIs + sección **Adelantos** (`MOCK_ADELANTOS_BY_LEGAJO`: Pendiente/Aprobado).
 
 **Detalle Lote (`LoteDetalle`):**
+
 - Sin texto “Lote generado por JPay — corte diario”.
 - Header con `Fecha | Comercio | Bandera | Estado`.
 - **Detalle financiero:** `Importe bruto | Impuestos (-)| Menos impuestos | Tasa PayWay (3%) | Tasa JPay (neto: cobrada - PayWay) | [Costo PayWay por pago único si cuotas>1] | Total descuentos | Importe final`. Sin `Comisiones JPay` (eliminada).
@@ -155,6 +165,7 @@ Lote {id, fecha DD/MM/YYYY, comercio, legajo, bandera, cantidadOps, importeBruto
 - **Impuestos por pagar por comercio** — Card después del resultado, tabla `getImpuestosPorComercio()` (mock compartido `src/data/impuestos-por-cobrar.ts`) con `Comercio | Impuesto pendiente | Pagado | Total | Detalle (impuesto+bandera+lote)`.
 
 **Interacción Lotes ↔ Adelantos ↔ Resumen ↔ Impuestos:**
+
 - `Resumen por comercio.pendienteAcreditar` = `máximo adelantable` para Adelantos.
 - `Detalle comercio` muestra `Adelanto por aprobarse` si existe para ese legajo.
 - `Lotes por bandera` no incluyen adelantos (concepto consolidado solo en `Resumen por comercio/General`).
@@ -164,6 +175,7 @@ Lote {id, fecha DD/MM/YYYY, comercio, legajo, bandera, cantidadOps, importeBruto
 ## 4. Impuestos (`/admin/comercios/impuestos`)
 
 **Layout tabs:** `src/routes/admin.comercios.impuestos.tsx:17-22`
+
 ```
 Impuestos (/) | Usuarios con impuestos (/usuarios) | Ingresos Brutos (/ingresos-brutos) | Débitos y créditos (/debitos-creditos)
 ```
@@ -185,6 +197,7 @@ Impuestos (/) | Usuarios con impuestos (/usuarios) | Ingresos Brutos (/ingresos-
   - **Impuestos por cobrar** — nuevo `ImpuestosPorCobrarTab` con **2 sub-tabs** (`Impuestos por cobrar` vs `Historial`) en lugar de 3 bloques apilados. Eliminado filtro general fecha superior (duplicaba el del contenedor). Data: `MOCK_IMPUESTOS_POR_COBRAR` (5 usuarios, 14 registros con `usuario, legajo, loteId, bandera, impuesto, monto, estado pendiente/pagado, fechaLote`). `subTab` controla: por_cobrar muestra `loteActual` (IDs `LOTE-2026-09-07-*`) + KPIs pendiente; historial muestra pagados. Sin filtro general duplicado.
 
 **Interacción Impuestos ↔ Comercios/Usuarios:**
+
 - Asignar impuesto a legajo → `createImpuestoAsignacion` → `invalidar ["impuestos_asignaciones"]` → visible en `admin.general.usuarios.$legajo` y en `Lotes` si aplica retención.
 
 ### 4.3 Ingresos Brutos (`impuestos.ingresos-brutos.index.tsx`)
@@ -217,18 +230,19 @@ Impuestos (/) | Usuarios con impuestos (/usuarios) | Ingresos Brutos (/ingresos-
 
 **Flujo objetivo:** `qué impuesto → a qué usuario/comercio → cuánto → en qué lote/tramo → cuánto pagado → cuánto pendiente → detalle movimientos`
 
-| Capa | Fuente | Ejemplo | Estado | Lote/Tramo |
-|------|--------|---------|--------|------------|
-| Catálogo | `impuestos` (Externo IVA/IIBB) | `IVA 21% (Externo)` | Activo | — |
-| Asignación | `impuestos.usuarios` (LPF-20111111111 → IVA) | Legajo+Impuesto+Estado | Activo | — |
-| Por cobrar | `impuestos-por-cobrar.ts` + `impuestos.usuarios` tab por cobrar | `Juan Pérez — IVA $12.300 — pendiente — LOTE-2026-09-07-001 Visa` | pendiente | Lote actual (Visa) |
-| Lote | `link-pago/lotes` detalle financiero | `Impuestos $26.250 — Menos impuestos $1.223.750` | Acreditado | `LOTE-2026-09-07-001` |
-| Comercio | `gestion` detalle + `link-pago/resumen` impuestos por comercio | `Delta SRL — pendiente $45.000 — pagado $120.000` | — | Agregado por legajo |
-| Usuario detalle | `admin.general.usuarios.$legajo` tabs `Impuestos` + `Contexto Operativo` | `Impuestos pagados/pendientes` + `Impuestos por cobrar` mini tabla | — | Con `loteId` y `tasa variable` |
-| Ingresos Brutos | `ingresos-brutos` Reportes | `2026-03 Tramo 1 — 45 mov — $1.2M — $45k ret — 1.2% fijo` | Presentado/No | Tramo 1-3/Mensual + TXT |
-| Débitos/Créditos | `debitos-creditos` | `Excepción LPF-... — 1,2% — semanal` | Activo | Semanal |
+| Capa             | Fuente                                                                   | Ejemplo                                                            | Estado        | Lote/Tramo                     |
+| ---------------- | ------------------------------------------------------------------------ | ------------------------------------------------------------------ | ------------- | ------------------------------ |
+| Catálogo         | `impuestos` (Externo IVA/IIBB)                                           | `IVA 21% (Externo)`                                                | Activo        | —                              |
+| Asignación       | `impuestos.usuarios` (LPF-20111111111 → IVA)                             | Legajo+Impuesto+Estado                                             | Activo        | —                              |
+| Por cobrar       | `impuestos-por-cobrar.ts` + `impuestos.usuarios` tab por cobrar          | `Juan Pérez — IVA $12.300 — pendiente — LOTE-2026-09-07-001 Visa`  | pendiente     | Lote actual (Visa)             |
+| Lote             | `link-pago/lotes` detalle financiero                                     | `Impuestos $26.250 — Menos impuestos $1.223.750`                   | Acreditado    | `LOTE-2026-09-07-001`          |
+| Comercio         | `gestion` detalle + `link-pago/resumen` impuestos por comercio           | `Delta SRL — pendiente $45.000 — pagado $120.000`                  | —             | Agregado por legajo            |
+| Usuario detalle  | `admin.general.usuarios.$legajo` tabs `Impuestos` + `Contexto Operativo` | `Impuestos pagados/pendientes` + `Impuestos por cobrar` mini tabla | —             | Con `loteId` y `tasa variable` |
+| Ingresos Brutos  | `ingresos-brutos` Reportes                                               | `2026-03 Tramo 1 — 45 mov — $1.2M — $45k ret — 1.2% fijo`          | Presentado/No | Tramo 1-3/Mensual + TXT        |
+| Débitos/Créditos | `debitos-creditos`                                                       | `Excepción LPF-... — 1,2% — semanal`                               | Activo        | Semanal                        |
 
 **Tipos de impuestos:**
+
 - **Externos:** JPay retiene al cliente para pagar a ente (IVA, IIBB, Débitos/Créditos). Van en lotes/tramos, se descuentan de `Importe bruto`.
 - **Internos:** Ganancias propias de JPay (ej. `Ganancias 15% (Interno)`). Se exponen en catálogo pero no se retienen al cliente.
 

@@ -10,8 +10,10 @@ export type QrFilters = Pagination & {
 };
 
 // puntos_venta no tiene tipo/cajero/qr_url/alias en la base: se piden solo las columnas reales.
-const COLUMNS = "id, comercio_id, nombre, estado, created_at, comercios(id, usuario, legajo, clientes(nombre, correo))";
-const COLUMNS_LEGACY = "id, comercio_id, nombre, estado, created_at, comercios(id, usuario, legajo, clientes(nombre, correo))";
+const COLUMNS =
+  "id, comercio_id, nombre, estado, created_at, comercios(id, usuario, legajo, clientes(nombre, correo))";
+const COLUMNS_LEGACY =
+  "id, comercio_id, nombre, estado, created_at, comercios(id, usuario, legajo, clientes(nombre, correo))";
 
 function isMissingColumnError(error: unknown): boolean {
   const msg = (error as { message?: string })?.message ?? String(error);
@@ -51,7 +53,12 @@ export async function listQrPos(filters: QrFilters): Promise<Page<PuntoVenta>> {
   }
   if (error) throw new DataAccessError(error);
   const rows = (data ?? []) as PuntoVentaRow[];
-  return { rows: rows.map((r) => toPuntoVenta(r as never)), total: count ?? rows.length, page, pageSize };
+  return {
+    rows: rows.map((r) => toPuntoVenta(r as never)),
+    total: count ?? rows.length,
+    page,
+    pageSize,
+  };
 }
 
 export async function getQrPos(id: string): Promise<PuntoVenta | null> {
@@ -68,9 +75,19 @@ export async function getQrPos(id: string): Promise<PuntoVenta | null> {
 
 export async function updateQrEstado(id: string, estado: EstadoQr): Promise<PuntoVenta> {
   const sb = requireSupabase();
-  let { data, error } = await sb.from("puntos_venta").update({ estado }).eq("id", id).select(COLUMNS).single();
+  let { data, error } = await sb
+    .from("puntos_venta")
+    .update({ estado })
+    .eq("id", id)
+    .select(COLUMNS)
+    .single();
   if (error && isMissingColumnError(error)) {
-    const fb = await sb.from("puntos_venta").update({ estado }).eq("id", id).select(COLUMNS_LEGACY).single();
+    const fb = await sb
+      .from("puntos_venta")
+      .update({ estado })
+      .eq("id", id)
+      .select(COLUMNS_LEGACY)
+      .single();
     data = fb.data as typeof data;
     error = fb.error;
   }

@@ -81,12 +81,7 @@ function DocumentoMiniCard({
       className="group relative aspect-[3/4] rounded-lg border border-border overflow-hidden bg-muted hover:ring-2 hover:ring-ring transition disabled:cursor-default"
     >
       {preview ? (
-        <img
-          src={preview}
-          alt={label}
-          className="w-full h-full object-cover"
-          loading="lazy"
-        />
+        <img src={preview} alt={label} className="w-full h-full object-cover" loading="lazy" />
       ) : (
         <div className="flex h-full w-full items-center justify-center px-2 text-center text-[10px] text-muted-foreground">
           {resolved ? "Cargando…" : "Sin archivo"}
@@ -663,7 +658,14 @@ const movimientosOperativosColumns: Column<MovimientoOperativo>[] = [
     label: "Tipo",
     sortable: true,
     filterable: "enum",
-    filterOptions: ["Depósito", "Retiro", "Transferencia", "Cobro QR", "Pago de tarjeta", "Comisión"],
+    filterOptions: [
+      "Depósito",
+      "Retiro",
+      "Transferencia",
+      "Cobro QR",
+      "Pago de tarjeta",
+      "Comisión",
+    ],
     render: (r) => <span className="font-medium">{r.tipo}</span>,
   },
   {
@@ -740,7 +742,9 @@ const alertasOperativasColumns: Column<AlertaUsuario>[] = [
     filterable: "enum",
     filterOptions: ["Pendiente", "Revisado", "Resuelto"],
     render: (r) => (
-      <Badge tone={r.estado === "Pendiente" ? "warn" : r.estado === "Resuelto" ? "success" : "neutral"}>
+      <Badge
+        tone={r.estado === "Pendiente" ? "warn" : r.estado === "Resuelto" ? "success" : "neutral"}
+      >
         {r.estado}
       </Badge>
     ),
@@ -768,9 +772,7 @@ const bloqueosOperativosColumns: Column<AlertaUsuario>[] = [
     sortable: true,
     filterable: "enum",
     filterOptions: ["Activo", "Inactivo"],
-    render: (r) => (
-      <Badge tone={r.estado === "Activo" ? "danger" : "neutral"}>{r.estado}</Badge>
-    ),
+    render: (r) => <Badge tone={r.estado === "Activo" ? "danger" : "neutral"}>{r.estado}</Badge>,
   },
 ];
 
@@ -792,9 +794,7 @@ export function UserModal({
   const [editingValue, setEditingValue] = useState<string>("");
   const [previewImg, setPreviewImg] = useState<string | null>(null);
 
-  const [contextoSubTab, setContextoSubTab] = useState<"movimientos" | "impuestos">(
-    "movimientos",
-  );
+  const [contextoSubTab, setContextoSubTab] = useState<"movimientos" | "impuestos">("movimientos");
   const [riesgoSubTab, setRiesgoSubTab] = useState<"alertas" | "bloqueos">("alertas");
 
   const [validaciones, setValidaciones] = useState<ValidacionAutomatica[]>([]);
@@ -1402,7 +1402,9 @@ export function UserModal({
                     {paginated.map((sub) => (
                       <tr key={sub.id} className="border-b last:border-0 hover:bg-muted/30">
                         <td className="px-4 py-2.5 text-xs font-medium">{sub.nombre}</td>
-                        <td className="px-4 py-2.5 text-xs text-muted-foreground">{sub.apellido}</td>
+                        <td className="px-4 py-2.5 text-xs text-muted-foreground">
+                          {sub.apellido}
+                        </td>
                         <td className="px-4 py-2.5 text-xs text-muted-foreground">{sub.email}</td>
                         <td className="px-4 py-2.5">
                           <Badge tone={sub.estado === "Activa" ? "success" : "neutral"}>
@@ -1840,7 +1842,10 @@ export function UserModal({
           {modulos.map((m) => {
             const Icon = modIcon[m.clave];
             return (
-              <div key={m.clave} className="rounded-lg border border-border p-4 flex flex-col gap-3">
+              <div
+                key={m.clave}
+                className="rounded-lg border border-border p-4 flex flex-col gap-3"
+              >
                 <div className="flex items-center gap-2">
                   <span className="p-1.5 rounded-md bg-muted/60 text-muted-foreground">
                     <Icon size={16} />
@@ -1906,10 +1911,7 @@ export function UserModal({
               Ver y editar usuario —{" "}
               {user.tipoPersona === "juridica" ? "Persona Jurídica" : "Persona Física"}
             </h3>
-            <Badge
-              tone={statusTone[user.status]}
-              className="px-3.5 py-1.5 text-sm rounded-lg"
-            >
+            <Badge tone={statusTone[user.status]} className="px-3.5 py-1.5 text-sm rounded-lg">
               {statusLabel[user.status]}
             </Badge>
           </div>
@@ -2304,7 +2306,11 @@ function SubDetailModal({ sub, onClose }: { sub: Subcuenta; onClose: () => void 
     if (filterTipo !== "todos" && m.tipo !== filterTipo) return false;
     if (filterSearch) {
       const q = filterSearch.toLowerCase();
-      if (!m.txid.toLowerCase().includes(q) && !m.entidad.toLowerCase().includes(q) && !m.cbu.includes(q))
+      if (
+        !m.txid.toLowerCase().includes(q) &&
+        !m.entidad.toLowerCase().includes(q) &&
+        !m.cbu.includes(q)
+      )
         return false;
     }
     return true;
@@ -2313,9 +2319,7 @@ function SubDetailModal({ sub, onClose }: { sub: Subcuenta; onClose: () => void 
   const totalDepositos = allMoves
     .filter((m) => m.tipo === "ingreso")
     .reduce((a, m) => a + m.monto, 0);
-  const totalRetiros = allMoves
-    .filter((m) => m.tipo === "egreso")
-    .reduce((a, m) => a + m.monto, 0);
+  const totalRetiros = allMoves.filter((m) => m.tipo === "egreso").reduce((a, m) => a + m.monto, 0);
   const totalComisiones = allMoves
     .filter((m) => m.entidad === brand.company.legalName)
     .reduce((a, m) => a + m.monto, 0);
@@ -2370,14 +2374,18 @@ function SubDetailModal({ sub, onClose }: { sub: Subcuenta; onClose: () => void 
                   onClick={() => {
                     if (
                       confirmAction(
-                        sub.estado === "Activa" ? "pausar esta subcuenta" : "reactivar esta subcuenta",
+                        sub.estado === "Activa"
+                          ? "pausar esta subcuenta"
+                          : "reactivar esta subcuenta",
                         "Los fondos quedaran " +
                           (sub.estado === "Activa"
                             ? "congelados hasta que la reactives."
                             : "disponibles nuevamente."),
                       )
                     )
-                      toast.success(sub.estado === "Activa" ? "Subcuenta pausada" : "Subcuenta reactivada");
+                      toast.success(
+                        sub.estado === "Activa" ? "Subcuenta pausada" : "Subcuenta reactivada",
+                      );
                   }}
                   className="h-7 w-7 inline-flex items-center justify-center rounded-md border bg-card hover:bg-muted transition text-muted-foreground hover:text-foreground"
                   title={sub.estado === "Activa" ? "Deshabilitar cuenta" : "Reactivar cuenta"}
@@ -2525,11 +2533,18 @@ function SubDetailModal({ sub, onClose }: { sub: Subcuenta; onClose: () => void 
             <div className="flex items-center justify-between mb-4 gap-2 flex-wrap">
               <h3 className="text-sm font-semibold">Historial de movimientos</h3>
               <div className="flex gap-2">
-                <BtnOutline className="h-8 px-3 text-[11px]" onClick={() => toast.success("Reporte descargado (demo)")}>
+                <BtnOutline
+                  className="h-8 px-3 text-[11px]"
+                  onClick={() => toast.success("Reporte descargado (demo)")}
+                >
                   <Download size={12} /> DESCARGAR REPORTE
                 </BtnOutline>
-                <BtnOutline className="h-8 px-3 text-[11px]" onClick={() => setFilterOpen(!filterOpen)}>
-                  <Filter size={12} /> FILTRAR{filterOpen && <ChevronUp size={11} className="ml-1" />}
+                <BtnOutline
+                  className="h-8 px-3 text-[11px]"
+                  onClick={() => setFilterOpen(!filterOpen)}
+                >
+                  <Filter size={12} /> FILTRAR
+                  {filterOpen && <ChevronUp size={11} className="ml-1" />}
                 </BtnOutline>
               </div>
             </div>
@@ -2554,7 +2569,9 @@ function SubDetailModal({ sub, onClose }: { sub: Subcuenta; onClose: () => void 
                     </label>
                     <select
                       value={filterTipo}
-                      onChange={(e) => setFilterTipo(e.target.value as "todos" | "ingreso" | "egreso")}
+                      onChange={(e) =>
+                        setFilterTipo(e.target.value as "todos" | "ingreso" | "egreso")
+                      }
                       className="h-9 px-3 rounded-md border bg-card text-sm w-full"
                     >
                       <option value="todos">Todos</option>
@@ -2583,9 +2600,7 @@ function SubDetailModal({ sub, onClose }: { sub: Subcuenta; onClose: () => void 
                       className="mt-0.5 h-8 w-8 shrink-0 rounded-full inline-flex items-center justify-center text-xs"
                       style={{
                         background:
-                          m.tipo === "ingreso"
-                            ? "rgba(5,150,105,0.12)"
-                            : "rgba(220,38,38,0.12)",
+                          m.tipo === "ingreso" ? "rgba(5,150,105,0.12)" : "rgba(220,38,38,0.12)",
                       }}
                     >
                       {m.tipo === "ingreso" ? (
@@ -2660,9 +2675,7 @@ function SubDetailModal({ sub, onClose }: { sub: Subcuenta; onClose: () => void 
                   <Input placeholder="0,00" className="mt-1" />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-foreground mb-1">
-                    Concepto
-                  </label>
+                  <label className="block text-xs font-medium text-foreground mb-1">Concepto</label>
                   <Input placeholder="Fondeo, barrido, etc." className="mt-1" />
                 </div>
                 <button

@@ -1,7 +1,19 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { Eye, XCircle, RotateCcw, Trash2, AlertTriangle, Inbox, ShieldCheck, Ban, CheckCircle, Building2, Store } from "lucide-react";
+import {
+  Eye,
+  XCircle,
+  RotateCcw,
+  Trash2,
+  AlertTriangle,
+  Inbox,
+  ShieldCheck,
+  Ban,
+  CheckCircle,
+  Building2,
+  Store,
+} from "lucide-react";
 import { PageHeader } from "@/components/page-header";
 import { DataTable, type Column, type TableServerFilters } from "@/components/data-table";
 import { ConfirmDialog } from "@/components/confirm-dialog";
@@ -26,7 +38,13 @@ import { DataAccessError } from "@/lib/api/errors";
 import { useCan } from "@/lib/permissions";
 import { PermissionGuard } from "@/components/permission-guard";
 import type { Cliente, EstadoCliente } from "@/lib/api/types";
-import { ESTADO_LABEL, ESTADO_TONE, normalizarEstado, FILTRO_ESTADOS_OPCIONES, LABEL_A_ESTADO } from "@/lib/cliente-estados";
+import {
+  ESTADO_LABEL,
+  ESTADO_TONE,
+  normalizarEstado,
+  FILTRO_ESTADOS_OPCIONES,
+  LABEL_A_ESTADO,
+} from "@/lib/cliente-estados";
 import { toast } from "sonner";
 import { Pagination } from "@/components/pagination";
 import { pageTitle } from "@/brand/brand";
@@ -35,7 +53,10 @@ export const Route = createFileRoute("/admin/general/usuarios/juridicas")({
   head: () => ({
     meta: [
       { title: pageTitle("Personas jurídicas — Usuarios — Admin") },
-      { name: "description", content: "Gestión de personas jurídicas registradas en la plataforma." },
+      {
+        name: "description",
+        content: "Gestión de personas jurídicas registradas en la plataforma.",
+      },
     ],
   }),
   component: JuridicasPage,
@@ -52,7 +73,13 @@ function tipoSociedadToLabel(tipo: string | null | undefined): string {
   const t = tipo.trim().toLowerCase();
   if (t.includes("srl") || t.includes("responsabilidad limitada")) return "SRL";
   if (t.includes("sas")) return "SAS";
-  if (t.includes(" sa") || t.startsWith("sa") || t.includes("sociedad anonima") || t.includes("sociedad anónima")) return "SA";
+  if (
+    t.includes(" sa") ||
+    t.startsWith("sa") ||
+    t.includes("sociedad anonima") ||
+    t.includes("sociedad anónima")
+  )
+    return "SA";
   if (t.includes("sca") || t.includes("colectiva")) return "SCA";
   if (t.includes("scpa") || t.includes("comandita por acciones")) return "SCpA";
   if (t.includes("sc") || t.includes("comandita simple")) return "SC";
@@ -104,7 +131,11 @@ function EstadoMensaje({
         <p className="font-semibold">Ocurrió un error al cargar las personas jurídicas</p>
         <p className="mt-1">{mensaje}</p>
         {onRetry && (
-          <button type="button" onClick={onRetry} className="mt-2 inline-flex h-9 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground">
+          <button
+            type="button"
+            onClick={onRetry}
+            className="mt-2 inline-flex h-9 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground"
+          >
             Reintentar
           </button>
         )}
@@ -124,7 +155,9 @@ function JuridicasPage() {
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
   const [filtroEstado, setFiltroEstado] = useState("");
-  const estadoFiltroDb = filtroEstado ? (LABEL_A_ESTADO[filtroEstado] as EstadoCliente | undefined) : undefined;
+  const estadoFiltroDb = filtroEstado
+    ? (LABEL_A_ESTADO[filtroEstado] as EstadoCliente | undefined)
+    : undefined;
 
   // Buscar de la card: server-side contra toda la base (no solo la página).
   const [filtrosPanel, setFiltrosPanel] = useState<TableServerFilters>({
@@ -191,7 +224,10 @@ function JuridicasPage() {
     };
   });
 
-  const ejecutar = async (legajo: string, accion: "aprobar" | "activar" | "suspender" | "reactivar" | "deshabilitar" | "eliminar") => {
+  const ejecutar = async (
+    legajo: string,
+    accion: "aprobar" | "activar" | "suspender" | "reactivar" | "deshabilitar" | "eliminar",
+  ) => {
     try {
       const cliente = await getClienteByLegajo(legajo);
       if (!cliente) throw new Error("Cliente no encontrado");
@@ -204,7 +240,13 @@ function JuridicasPage() {
       else if (accion === "eliminar") res = await eliminarCliente(cliente);
       if (!res.ok) {
         toast.error(res.motivo ?? "No se pudo completar");
-        setConfirmAction({ title: "No se pudo completar", message: res.motivo ?? "Error", confirmLabel: "Cerrar", variant: "danger", onConfirm: () => setConfirmAction(null) });
+        setConfirmAction({
+          title: "No se pudo completar",
+          message: res.motivo ?? "Error",
+          confirmLabel: "Cerrar",
+          variant: "danger",
+          onConfirm: () => setConfirmAction(null),
+        });
         return;
       }
       toast.success("Estado actualizado");
@@ -212,15 +254,24 @@ function JuridicasPage() {
       setConfirmAction(null);
     } catch (e) {
       toast.error((e as Error).message);
-      setConfirmAction({ title: "Error", message: (e as Error).message, confirmLabel: "Cerrar", variant: "danger", onConfirm: () => setConfirmAction(null) });
+      setConfirmAction({
+        title: "Error",
+        message: (e as Error).message,
+        confirmLabel: "Cerrar",
+        variant: "danger",
+        onConfirm: () => setConfirmAction(null),
+      });
     }
   };
 
-  const verDetalle = (row: JuridicaRow) => navigate({ to: "/admin/general/usuarios/$legajo", params: { legajo: row.legajo } });
+  const verDetalle = (row: JuridicaRow) =>
+    navigate({ to: "/admin/general/usuarios/$legajo", params: { legajo: row.legajo } });
 
   const getActions = (row: JuridicaRow): ActionItem[] => {
     const norm = normalizarEstado(row.estadoRaw);
-    const items: ActionItem[] = [{ label: "Ver detalle", icon: Eye, onClick: () => verDetalle(row) }];
+    const items: ActionItem[] = [
+      { label: "Ver detalle", icon: Eye, onClick: () => verDetalle(row) },
+    ];
     if (norm === "registrado")
       items.push({
         label: "Preactivar (aprobar documentación)",
@@ -316,7 +367,10 @@ function JuridicasPage() {
 
   return (
     <PermissionGuard recurso="usuarios">
-      <PageHeader title="Personas jurídicas" description="Empresas y organizaciones — flujo homologado con personas físicas." />
+      <PageHeader
+        title="Personas jurídicas"
+        description="Empresas y organizaciones — flujo homologado con personas físicas."
+      />
 
       {isLoading ? (
         <div className="flex items-center justify-center rounded-xl border border-border bg-card py-16 text-sm text-muted-foreground">
@@ -324,7 +378,11 @@ function JuridicasPage() {
           Cargando…
         </div>
       ) : isError ? (
-        <EstadoMensaje tipo={err?.permission ? "permiso" : "error"} mensaje={err?.message ?? "Error desconocido"} onRetry={() => refetch()} />
+        <EstadoMensaje
+          tipo={err?.permission ? "permiso" : "error"}
+          mensaje={err?.message ?? "Error desconocido"}
+          onRetry={() => refetch()}
+        />
       ) : isEmpty ? (
         <EstadoMensaje tipo="vacio" mensaje="" />
       ) : (

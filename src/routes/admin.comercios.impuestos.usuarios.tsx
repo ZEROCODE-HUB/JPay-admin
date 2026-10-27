@@ -23,7 +23,11 @@ import { useCan } from "@/lib/permissions";
 import { PermissionGuard } from "@/components/permission-guard";
 import type { ImpuestoAsignacion, TipoImpuesto, TipoOperacion } from "@/lib/api/types";
 import { TIPOS_OPERACION } from "@/lib/api/types";
-import { MOCK_IMPUESTOS_POR_COBRAR, formatImpuestoMonto, type ImpuestoPorCobrar } from "@/data/impuestos-por-cobrar";
+import {
+  MOCK_IMPUESTOS_POR_COBRAR,
+  formatImpuestoMonto,
+  type ImpuestoPorCobrar,
+} from "@/data/impuestos-por-cobrar";
 
 export const Route = createFileRoute("/admin/comercios/impuestos/usuarios")({
   head: () => ({ meta: [{ title: pageTitle("Usuarios con impuestos — Admin") }] }),
@@ -113,19 +117,23 @@ function AsignacionFormModal({
   const [form, setForm] = useState<AsignacionForm>(() => ({
     clienteLegajo: asignacion?.clienteLegajo ?? "",
     impuestoId: asignacion?.impuestoId ?? "",
-    monto: asignacion?.monto === null || asignacion?.monto === undefined ? "" : String(asignacion.monto),
+    monto:
+      asignacion?.monto === null || asignacion?.monto === undefined ? "" : String(asignacion.monto),
     tipo: asignacion?.tipo ?? "Porcentaje",
     estado: asignacion?.estado ?? "Activo",
     tipoOperacion: asignacion?.tipoOperacion ?? "",
   }));
   const [clienteSearchInput, setClienteSearchInput] = useState(form.clienteLegajo);
   const debouncedClienteSearch = useDebouncedValue(clienteSearchInput, 350);
-  const { data: clientesFiltrados } = useClientesForSelect(asignacion ? undefined : debouncedClienteSearch);
+  const { data: clientesFiltrados } = useClientesForSelect(
+    asignacion ? undefined : debouncedClienteSearch,
+  );
   const clientesOptions = clientesFiltrados ?? [];
   const [comboboxOpen, setComboboxOpen] = useState(false);
 
   const legajoValido = /^[A-Z]{3}-\d{11}$/.test(form.clienteLegajo.trim());
-  const montoValido = form.monto.trim() === "" || (!isNaN(Number(form.monto)) && Number(form.monto) >= 0);
+  const montoValido =
+    form.monto.trim() === "" || (!isNaN(Number(form.monto)) && Number(form.monto) >= 0);
   const valido =
     form.clienteLegajo.trim() !== "" &&
     (!asignacion ? legajoValido : true) &&
@@ -163,7 +171,10 @@ function AsignacionFormModal({
           ) : (
             <div className="relative">
               <div className="relative">
-                <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+                <Search
+                  size={14}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"
+                />
                 <Input
                   id="as-legajo"
                   value={clienteSearchInput}
@@ -189,7 +200,9 @@ function AsignacionFormModal({
                 <div className="absolute z-20 mt-1 w-full rounded-md border border-input bg-card shadow-lg max-h-60 overflow-auto">
                   {(clientesOptions ?? []).length === 0 ? (
                     <div className="px-3 py-6 text-center text-sm text-muted-foreground">
-                      {debouncedClienteSearch ? "Sin resultados." : "Escribí correo o legajo para buscar (máx. 20)."}
+                      {debouncedClienteSearch
+                        ? "Sin resultados."
+                        : "Escribí correo o legajo para buscar (máx. 20)."}
                     </div>
                   ) : (
                     (clientesOptions ?? []).map((c) => (
@@ -205,7 +218,9 @@ function AsignacionFormModal({
                         className={`w-full text-left px-3 py-2 text-sm hover:bg-accent flex flex-col ${c.legajo === form.clienteLegajo ? "bg-accent" : ""}`}
                       >
                         <span className="font-medium">{c.correo}</span>
-                        <span className="text-xs text-muted-foreground font-mono">{c.legajo} · {c.nombre}</span>
+                        <span className="text-xs text-muted-foreground font-mono">
+                          {c.legajo} · {c.nombre}
+                        </span>
                       </button>
                     ))
                   )}
@@ -220,7 +235,9 @@ function AsignacionFormModal({
                 </p>
               )}
               {form.clienteLegajo.trim() !== "" && !legajoValido && (
-                <p className="text-xs text-danger-600 mt-1">Formato inválido. Ej: LPF-20111111111.</p>
+                <p className="text-xs text-danger-600 mt-1">
+                  Formato inválido. Ej: LPF-20111111111.
+                </p>
               )}
             </div>
           )}
@@ -272,7 +289,9 @@ function AsignacionFormModal({
             onChange={(e) => setForm({ ...form, monto: e.target.value })}
             placeholder="Ej: 3.5"
           />
-          <p className="text-[11px] text-muted-foreground mt-1">Editable por asignación — sobrescribe el % base del impuesto.</p>
+          <p className="text-[11px] text-muted-foreground mt-1">
+            Editable por asignación — sobrescribe el % base del impuesto.
+          </p>
         </div>
         <div className="sm:col-span-2">
           <Label htmlFor="as-tipo-operacion">Tipo de operación</Label>
@@ -280,7 +299,9 @@ function AsignacionFormModal({
             id="as-tipo-operacion"
             className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring/40"
             value={form.tipoOperacion}
-            onChange={(e) => setForm({ ...form, tipoOperacion: e.target.value as TipoOperacion | "" })}
+            onChange={(e) =>
+              setForm({ ...form, tipoOperacion: e.target.value as TipoOperacion | "" })
+            }
           >
             <option value="">Aplica a todas las operaciones</option>
             {TIPOS_OPERACION.map((t) => (
@@ -290,7 +311,8 @@ function AsignacionFormModal({
             ))}
           </select>
           <p className="text-[11px] text-muted-foreground mt-1">
-            Restringe el impuesto a un tipo de operación específico (Link de pago, E-commerce, Depósito o Retiro). Si lo dejás vacío, aplica a todas.
+            Restringe el impuesto a un tipo de operación específico (Link de pago, E-commerce,
+            Depósito o Retiro). Si lo dejás vacío, aplica a todas.
           </p>
         </div>
       </div>
@@ -311,38 +333,117 @@ function ImpuestosPorCobrarTab() {
   }, []);
 
   const columns: Column<ImpuestoPorCobrar>[] = [
-    { key: "usuario", label: "Usuario", filterable:true, render: (r)=> <span className="text-xs font-medium">{r.usuario}</span> },
-    { key: "legajo", label: "Legajo", render: (r)=> <span className="font-mono text-xs">{r.legajo}</span> },
-    { key: "loteId", label: "Lote", filterable:true, render: (r)=> <span className="font-mono text-xs font-semibold">{r.loteId}</span> },
-    { key: "bandera", label: "Bandera", filterable:"enum", filterOptions:["Visa","Mastercard","Amex","Cabal"], render: (r)=> <span className="inline-flex items-center rounded-full border px-2 py-0.5 text-xs bg-muted/50">{r.bandera}</span> },
-    { key: "impuesto", label: "Impuesto", filterable:true, render: (r)=> r.impuesto },
-    { key: "monto", label: "Monto", render: (r)=> <span className="font-mono tabular-nums">{formatImpuestoMonto(r.monto)}</span> },
-    { key: "estado", label: "Estado", filterable:"enum", filterOptions:["pendiente","pagado"], render: (r)=> <Badge tone={r.estado==="pendiente"?"warn":"success"}>{r.estado}</Badge> },
-    { key: "fechaLote", label: "Fecha lote", render: (r)=> <span className="font-mono text-xs">{r.fechaLote}</span> },
+    {
+      key: "usuario",
+      label: "Usuario",
+      filterable: true,
+      render: (r) => <span className="text-xs font-medium">{r.usuario}</span>,
+    },
+    {
+      key: "legajo",
+      label: "Legajo",
+      render: (r) => <span className="font-mono text-xs">{r.legajo}</span>,
+    },
+    {
+      key: "loteId",
+      label: "Lote",
+      filterable: true,
+      render: (r) => <span className="font-mono text-xs font-semibold">{r.loteId}</span>,
+    },
+    {
+      key: "bandera",
+      label: "Bandera",
+      filterable: "enum",
+      filterOptions: ["Visa", "Mastercard", "Amex", "Cabal"],
+      render: (r) => (
+        <span className="inline-flex items-center rounded-full border px-2 py-0.5 text-xs bg-muted/50">
+          {r.bandera}
+        </span>
+      ),
+    },
+    { key: "impuesto", label: "Impuesto", filterable: true, render: (r) => r.impuesto },
+    {
+      key: "monto",
+      label: "Monto",
+      render: (r) => <span className="font-mono tabular-nums">{formatImpuestoMonto(r.monto)}</span>,
+    },
+    {
+      key: "estado",
+      label: "Estado",
+      filterable: "enum",
+      filterOptions: ["pendiente", "pagado"],
+      render: (r) => <Badge tone={r.estado === "pendiente" ? "warn" : "success"}>{r.estado}</Badge>,
+    },
+    {
+      key: "fechaLote",
+      label: "Fecha lote",
+      render: (r) => <span className="font-mono text-xs">{r.fechaLote}</span>,
+    },
   ];
 
-  const loteActualIds = ["LOTE-2026-09-07-001","LOTE-2026-09-07-002","LOTE-2026-09-07-003","LOTE-2026-09-07-004","LOTE-2026-09-07-005"];
-  const loteActual = filtrados.filter(r=> loteActualIds.includes(r.loteId));
-  const historial = filtrados.filter(r=> !loteActualIds.includes(r.loteId));
-  const totalPendiente = filtrados.filter(r=>r.estado==="pendiente").reduce((a,b)=>a+b.monto,0);
-  const totalPagado = filtrados.filter(r=>r.estado==="pagado").reduce((a,b)=>a+b.monto,0);
+  const loteActualIds = [
+    "LOTE-2026-09-07-001",
+    "LOTE-2026-09-07-002",
+    "LOTE-2026-09-07-003",
+    "LOTE-2026-09-07-004",
+    "LOTE-2026-09-07-005",
+  ];
+  const loteActual = filtrados.filter((r) => loteActualIds.includes(r.loteId));
+  const historial = filtrados.filter((r) => !loteActualIds.includes(r.loteId));
+  const totalPendiente = filtrados
+    .filter((r) => r.estado === "pendiente")
+    .reduce((a, b) => a + b.monto, 0);
+  const totalPagado = filtrados
+    .filter((r) => r.estado === "pagado")
+    .reduce((a, b) => a + b.monto, 0);
 
   return (
     <div className="space-y-4">
       <div className="flex gap-2 border-b">
-        <button onClick={()=> setSubTab("por_cobrar")} className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${subTab==="por_cobrar" ? "border-primary text-primary-ink" : "border-transparent text-muted-foreground hover:text-foreground"}`}>Impuestos por cobrar</button>
-        <button onClick={()=> setSubTab("historial")} className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${subTab==="historial" ? "border-primary text-primary-ink" : "border-transparent text-muted-foreground hover:text-foreground"}`}>Historial</button>
+        <button
+          onClick={() => setSubTab("por_cobrar")}
+          className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${subTab === "por_cobrar" ? "border-primary text-primary-ink" : "border-transparent text-muted-foreground hover:text-foreground"}`}
+        >
+          Impuestos por cobrar
+        </button>
+        <button
+          onClick={() => setSubTab("historial")}
+          className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${subTab === "historial" ? "border-primary text-primary-ink" : "border-transparent text-muted-foreground hover:text-foreground"}`}
+        >
+          Historial
+        </button>
       </div>
-      <div className="text-xs text-muted-foreground">{filtrados.length} registro(s) · pendiente {formatImpuestoMonto(totalPendiente)} · pagado {formatImpuestoMonto(totalPagado)}</div>
-      {subTab==="por_cobrar" ? (
+      <div className="text-xs text-muted-foreground">
+        {filtrados.length} registro(s) · pendiente {formatImpuestoMonto(totalPendiente)} · pagado{" "}
+        {formatImpuestoMonto(totalPagado)}
+      </div>
+      {subTab === "por_cobrar" ? (
         <>
-          <Card className="p-3"><div className="text-xs text-muted-foreground">Impuestos por cobrar lote actual</div><div className="font-mono text-lg font-semibold mt-1">{formatImpuestoMonto(loteActual.filter(r=>r.estado==="pendiente").reduce((a,b)=>a+b.monto,0))}</div><div className="text-[11px] text-muted-foreground">Lote completo al corte y por bandera · {loteActual.length} items</div></Card>
-          <DataTable columns={columns} data={loteActual} keyExtractor={(r)=> r.id} />
+          <Card className="p-3">
+            <div className="text-xs text-muted-foreground">Impuestos por cobrar lote actual</div>
+            <div className="font-mono text-lg font-semibold mt-1">
+              {formatImpuestoMonto(
+                loteActual.filter((r) => r.estado === "pendiente").reduce((a, b) => a + b.monto, 0),
+              )}
+            </div>
+            <div className="text-[11px] text-muted-foreground">
+              Lote completo al corte y por bandera · {loteActual.length} items
+            </div>
+          </Card>
+          <DataTable columns={columns} data={loteActual} keyExtractor={(r) => r.id} />
         </>
       ) : (
         <>
-          <Card className="p-3"><div className="text-xs text-muted-foreground">Historial pagado</div><div className="font-mono text-lg font-semibold mt-1 text-emerald-700">{formatImpuestoMonto(totalPagado)}</div><div className="text-[11px] text-muted-foreground">Cuándo se pagaron · {historial.length} items</div></Card>
-          <DataTable columns={columns} data={historial} keyExtractor={(r)=> r.id} />
+          <Card className="p-3">
+            <div className="text-xs text-muted-foreground">Historial pagado</div>
+            <div className="font-mono text-lg font-semibold mt-1 text-emerald-700">
+              {formatImpuestoMonto(totalPagado)}
+            </div>
+            <div className="text-[11px] text-muted-foreground">
+              Cuándo se pagaron · {historial.length} items
+            </div>
+          </Card>
+          <DataTable columns={columns} data={historial} keyExtractor={(r) => r.id} />
         </>
       )}
     </div>
@@ -566,101 +667,129 @@ function Page() {
       />
 
       <div className="flex gap-2 mb-4 border-b">
-        <button onClick={()=> setTab("asignaciones")} className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${tab==="asignaciones" ? "border-primary text-primary-ink" : "border-transparent text-muted-foreground hover:text-foreground"}`}>Asignaciones</button>
-        <button onClick={()=> setTab("por_cobrar")} className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${tab==="por_cobrar" ? "border-primary text-primary-ink" : "border-transparent text-muted-foreground hover:text-foreground"}`}>Impuestos por cobrar</button>
+        <button
+          onClick={() => setTab("asignaciones")}
+          className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${tab === "asignaciones" ? "border-primary text-primary-ink" : "border-transparent text-muted-foreground hover:text-foreground"}`}
+        >
+          Asignaciones
+        </button>
+        <button
+          onClick={() => setTab("por_cobrar")}
+          className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${tab === "por_cobrar" ? "border-primary text-primary-ink" : "border-transparent text-muted-foreground hover:text-foreground"}`}
+        >
+          Impuestos por cobrar
+        </button>
       </div>
 
-      {tab==="por_cobrar" ? (
+      {tab === "por_cobrar" ? (
         <ImpuestosPorCobrarTab />
       ) : (
         <>
-            <div className="mb-4 bg-card border rounded-lg p-4 flex flex-wrap items-end gap-3">
-        <div className="flex-1 min-w-[200px]">
-          <Label htmlFor="buscar">Buscar</Label>
-          <Input
-            id="buscar"
-            value={searchInput}
-            onChange={(e) => {
-              setSearchInput(e.target.value);
-              setPage(0);
-            }}
-            placeholder="Código o nombre del impuesto…"
-          />
-        </div>
-        <div>
-          <Label htmlFor="f-estado">Estado</Label>
-          <select
-            id="f-estado"
-            className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring/40"
-            value={estadoFilter}
-            onChange={(e) => {
-              setEstadoFilter(e.target.value as "Activo" | "Inactivo" | "");
-              setPage(0);
-            }}
-          >
-            <option value="">Todos</option>
-            <option value="Activo">Activo</option>
-            <option value="Inactivo">Inactivo</option>
-          </select>
-        </div>
-        <div>
-          <Label htmlFor="f-desde">Fecha desde</Label>
-          <Input id="f-desde" type="date" value={searchDesde} onChange={(e)=> {setSearchDesde(e.target.value); setPage(0);}} className="h-9" />
-        </div>
-        <div>
-          <Label htmlFor="f-hasta">Fecha hasta</Label>
-          <Input id="f-hasta" type="date" value={searchHasta} onChange={(e)=> {setSearchHasta(e.target.value); setPage(0);}} className="h-9" />
-        </div>
-      </div>
-
-      {isLoading ? (
-        <div className="flex items-center justify-center rounded-xl border border-border bg-card py-16 text-sm text-muted-foreground">
-          <span className="inline-block w-4 h-4 border-2 border-muted-foreground/30 border-t-muted-foreground rounded-full animate-spin mr-2" />
-          Cargando asignaciones…
-        </div>
-      ) : isError ? (
-        <MensajeEstado
-          tipo={err?.permission ? "permiso" : "error"}
-          mensaje={err?.message ?? "Error desconocido"}
-          onRetry={() => refetch()}
-        />
-      ) : isEmpty ? (
-        <MensajeEstado tipo="vacio" mensaje="" />
-      ) : (
-        <>
-          <DataTable
-            columns={columns}
-            data={rows}
-            keyExtractor={(r) => r.id}
-            pageSize={PAGE_SIZE}
-            showDownloadButton={false}
-            actions={(r) => <ActionsDropdown actions={getActions(r)} />}
-          />
-          <div className="flex items-center justify-between mt-4 text-sm text-muted-foreground">
-            <span>
-              {total} asignacion(es) · página {page + 1} de {totalPaginas}
-            </span>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                disabled={page === 0 || isFetching}
-                onClick={() => setPage((p) => Math.max(0, p - 1))}
-                className="inline-flex h-9 items-center rounded-md border border-input bg-card px-3 text-sm font-medium text-foreground transition-colors hover:bg-accent disabled:opacity-50 disabled:cursor-not-allowed"
+          <div className="mb-4 bg-card border rounded-lg p-4 flex flex-wrap items-end gap-3">
+            <div className="flex-1 min-w-[200px]">
+              <Label htmlFor="buscar">Buscar</Label>
+              <Input
+                id="buscar"
+                value={searchInput}
+                onChange={(e) => {
+                  setSearchInput(e.target.value);
+                  setPage(0);
+                }}
+                placeholder="Código o nombre del impuesto…"
+              />
+            </div>
+            <div>
+              <Label htmlFor="f-estado">Estado</Label>
+              <select
+                id="f-estado"
+                className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring/40"
+                value={estadoFilter}
+                onChange={(e) => {
+                  setEstadoFilter(e.target.value as "Activo" | "Inactivo" | "");
+                  setPage(0);
+                }}
               >
-                Anterior
-              </button>
-              <button
-                type="button"
-                disabled={page + 1 >= totalPaginas || isFetching}
-                onClick={() => setPage((p) => p + 1)}
-                className="inline-flex h-9 items-center rounded-md border border-input bg-card px-3 text-sm font-medium text-foreground transition-colors hover:bg-accent disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Siguiente
-              </button>
+                <option value="">Todos</option>
+                <option value="Activo">Activo</option>
+                <option value="Inactivo">Inactivo</option>
+              </select>
+            </div>
+            <div>
+              <Label htmlFor="f-desde">Fecha desde</Label>
+              <Input
+                id="f-desde"
+                type="date"
+                value={searchDesde}
+                onChange={(e) => {
+                  setSearchDesde(e.target.value);
+                  setPage(0);
+                }}
+                className="h-9"
+              />
+            </div>
+            <div>
+              <Label htmlFor="f-hasta">Fecha hasta</Label>
+              <Input
+                id="f-hasta"
+                type="date"
+                value={searchHasta}
+                onChange={(e) => {
+                  setSearchHasta(e.target.value);
+                  setPage(0);
+                }}
+                className="h-9"
+              />
             </div>
           </div>
-        </>
-      )}
+
+          {isLoading ? (
+            <div className="flex items-center justify-center rounded-xl border border-border bg-card py-16 text-sm text-muted-foreground">
+              <span className="inline-block w-4 h-4 border-2 border-muted-foreground/30 border-t-muted-foreground rounded-full animate-spin mr-2" />
+              Cargando asignaciones…
+            </div>
+          ) : isError ? (
+            <MensajeEstado
+              tipo={err?.permission ? "permiso" : "error"}
+              mensaje={err?.message ?? "Error desconocido"}
+              onRetry={() => refetch()}
+            />
+          ) : isEmpty ? (
+            <MensajeEstado tipo="vacio" mensaje="" />
+          ) : (
+            <>
+              <DataTable
+                columns={columns}
+                data={rows}
+                keyExtractor={(r) => r.id}
+                pageSize={PAGE_SIZE}
+                showDownloadButton={false}
+                actions={(r) => <ActionsDropdown actions={getActions(r)} />}
+              />
+              <div className="flex items-center justify-between mt-4 text-sm text-muted-foreground">
+                <span>
+                  {total} asignacion(es) · página {page + 1} de {totalPaginas}
+                </span>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    disabled={page === 0 || isFetching}
+                    onClick={() => setPage((p) => Math.max(0, p - 1))}
+                    className="inline-flex h-9 items-center rounded-md border border-input bg-card px-3 text-sm font-medium text-foreground transition-colors hover:bg-accent disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Anterior
+                  </button>
+                  <button
+                    type="button"
+                    disabled={page + 1 >= totalPaginas || isFetching}
+                    onClick={() => setPage((p) => p + 1)}
+                    className="inline-flex h-9 items-center rounded-md border border-input bg-card px-3 text-sm font-medium text-foreground transition-colors hover:bg-accent disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Siguiente
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
         </>
       )}
 

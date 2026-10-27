@@ -65,7 +65,20 @@ const COLUMNS =
 
 export async function listComisiones(filters: ComisionFilters): Promise<Page<ComisionCliente>> {
   const sb = requireSupabase();
-  const { page, pageSize, search, tipo, tipos, modalidad, estado, clienteId, subcuentaId, alcance, legajo, cvu } = filters;
+  const {
+    page,
+    pageSize,
+    search,
+    tipo,
+    tipos,
+    modalidad,
+    estado,
+    clienteId,
+    subcuentaId,
+    alcance,
+    legajo,
+    cvu,
+  } = filters;
   const from = page * pageSize;
   const to = from + pageSize - 1;
 
@@ -90,7 +103,9 @@ export async function listComisiones(filters: ComisionFilters): Promise<Page<Com
   if (search?.trim()) {
     const q = `%${escapeLike(search)}%`;
     const clientes = await idsClientes(search);
-    query = query.or(`operacion.ilike.${q},descripcion.ilike.${q},cliente_id.in.${inList(clientes)}`);
+    query = query.or(
+      `operacion.ilike.${q},descripcion.ilike.${q},cliente_id.in.${inList(clientes)}`,
+    );
   }
 
   query = query.order("created_at", { ascending: false }).range(from, to);

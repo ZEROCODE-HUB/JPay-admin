@@ -61,9 +61,7 @@ export type AssignCvuResult = {
   stub: boolean;
 };
 
-export type CheckAliasResult =
-  | { disponible: true }
-  | { disponible: false; motivo?: string };
+export type CheckAliasResult = { disponible: true } | { disponible: false; motivo?: string };
 
 const isMissingBackendConfig = !env.BACKEND_URL;
 
@@ -90,10 +88,7 @@ async function postJson<T>(path: string, body: unknown): Promise<T> {
       body: JSON.stringify(body),
     });
   } catch (e) {
-    throw new BdcError(
-      `No pude conectar con el backend: ${(e as Error).message}`,
-      "server_error",
-    );
+    throw new BdcError(`No pude conectar con el backend: ${(e as Error).message}`, "server_error");
   }
   return parseBdcResponse<T>(res, path);
 }
@@ -114,11 +109,7 @@ async function parseBdcResponse<T>(res: Response, path: string): Promise<T> {
     }
     const body = parsed as { ok?: unknown } & Record<string, unknown>;
     if (body.ok !== true) {
-      throw new BdcError(
-        `Backend devolvio ok=false en ${path}`,
-        "server_error",
-        res.status,
-      );
+      throw new BdcError(`Backend devolvio ok=false en ${path}`, "server_error", res.status);
     }
     return body as T;
   }
@@ -131,11 +122,7 @@ async function parseBdcResponse<T>(res: Response, path: string): Promise<T> {
     typeof parsed === "object" && parsed !== null && "message" in parsed
       ? String((parsed as { message: unknown }).message)
       : `Error ${res.status} al llamar ${path}`;
-  throw new BdcError(
-    message,
-    (code as BdcErrorCode) ?? "unknown",
-    res.status,
-  );
+  throw new BdcError(message, (code as BdcErrorCode) ?? "unknown", res.status);
 }
 
 // ============================================================================

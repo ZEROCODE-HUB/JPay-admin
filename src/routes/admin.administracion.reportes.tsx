@@ -23,10 +23,7 @@ import { FormDialog } from "@/components/form-dialog";
 import { FileDropzone } from "@/components/file-dropzone";
 import { useEffect } from "react";
 import { isSupabaseConfigured, requireSupabase } from "@/lib/supabase";
-import {
-  listConciliacionesArchivos,
-  createConciliacionArchivo,
-} from "@/lib/api/conciliaciones";
+import { listConciliacionesArchivos, createConciliacionArchivo } from "@/lib/api/conciliaciones";
 import { parseBancoFile } from "@/lib/conciliacion/parse";
 import { cruzarConciliacion, type AnalisisResumen } from "@/lib/conciliacion/engine";
 import { listMovimientos } from "@/lib/api/movimientos";
@@ -60,7 +57,7 @@ const reports: ReportDef[] = [
     name: "Reportes BCRA",
     icon: Receipt,
     color: "text-emerald-500",
-    description: "Padrón de Personas Jurídicas — Com. \"A\" 8207 (SISCEN).",
+    description: 'Padrón de Personas Jurídicas — Com. "A" 8207 (SISCEN).',
   },
   {
     key: "afip",
@@ -220,9 +217,13 @@ function AnalisisConciliacionModal({
             bankRows = await parseBancoFile(archivo.rawFile);
           } else if (archivo.storagePath && isSupabaseConfigured) {
             const sb = requireSupabase();
-            const { data, error: dlErr } = await sb.storage.from("conciliaciones").download(archivo.storagePath);
+            const { data, error: dlErr } = await sb.storage
+              .from("conciliaciones")
+              .download(archivo.storagePath);
             if (dlErr) throw dlErr;
-            const file = new File([data], archivo.archivo, { type: (data as Blob).type || "application/octet-stream" });
+            const file = new File([data], archivo.archivo, {
+              type: (data as Blob).type || "application/octet-stream",
+            });
             bankRows = await parseBancoFile(file);
           } else if (archivo.downloadRows.length > 0) {
             // fallback mock -> convertir downloadRows a BankRow shape mínimo
@@ -294,7 +295,12 @@ function AnalisisConciliacionModal({
             let page = 0;
             const pageSize = 5000;
             while (true) {
-              const resPage = await listMovimientos({ page, pageSize, fechaDesde: desde, fechaHasta: hasta });
+              const resPage = await listMovimientos({
+                page,
+                pageSize,
+                fechaDesde: desde,
+                fechaHasta: hasta,
+              });
               all.push(...resPage.rows);
               movCountDebug = resPage.total ?? all.length;
               if (resPage.rows.length < pageSize) break;
@@ -324,7 +330,11 @@ function AnalisisConciliacionModal({
     };
   }, [archivo, allArchivos]);
 
-  const porcentaje = resumen ? (resumen.total > 0 ? Math.round((resumen.encontrados / resumen.total) * 10000) / 100 : 0) : 0;
+  const porcentaje = resumen
+    ? resumen.total > 0
+      ? Math.round((resumen.encontrados / resumen.total) * 10000) / 100
+      : 0
+    : 0;
   const fechaAnalisis = resumen?.fechaAnalisis ?? "";
 
   const Kpi = ({
@@ -356,19 +366,34 @@ function AnalisisConciliacionModal({
       <div className="relative bg-card rounded-xl w-full max-w-3xl max-h-[88vh] overflow-y-auto shadow-xl">
         <div className="sticky top-0 bg-card border-b border-border px-5 py-3.5 flex justify-between items-start z-10">
           <div>
-            <h3 className="font-display text-[15px] font-semibold leading-none">Análisis de conciliación</h3>
+            <h3 className="font-display text-[15px] font-semibold leading-none">
+              Análisis de conciliación
+            </h3>
             <p className="text-xs text-muted-foreground mt-1 font-mono">
               {archivo.archivo} · {archivo.fecha} {rangoLabel ? `· ${rangoLabel}` : ""}
             </p>
-            {rangoLabel && <p className="text-[11px] text-muted-foreground mt-0.5">Rango plataforma: {rangoLabel} — 1er reporte histórico, siguientes delta desde último.</p>}
+            {rangoLabel && (
+              <p className="text-[11px] text-muted-foreground mt-0.5">
+                Rango plataforma: {rangoLabel} — 1er reporte histórico, siguientes delta desde
+                último.
+              </p>
+            )}
           </div>
-          <button type="button" onClick={onClose} className="p-1.5 hover:bg-muted rounded-md leading-none">
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-1.5 hover:bg-muted rounded-md leading-none"
+          >
             ×
           </button>
         </div>
 
         <div className="p-5 space-y-4">
-          {loading && <p className="text-sm text-muted-foreground">Analizando… cruzando ID_DEBIN ↔ id_txn y montos…</p>}
+          {loading && (
+            <p className="text-sm text-muted-foreground">
+              Analizando… cruzando ID_DEBIN ↔ id_txn y montos…
+            </p>
+          )}
           {error && <p className="text-sm text-danger-600">Error: {error}</p>}
           {resumen && !loading && !error && (
             <>
@@ -391,7 +416,9 @@ function AnalisisConciliacionModal({
                   <Kpi label="Éxito" value={`${porcentaje}%`} accent />
                 </div>
                 {resumen.soloPlataforma > 0 && (
-                  <p className="text-[11px] text-amber-600 mt-2">+ {resumen.soloPlataforma} movimientos solo en plataforma (no están en banco)</p>
+                  <p className="text-[11px] text-amber-600 mt-2">
+                    + {resumen.soloPlataforma} movimientos solo en plataforma (no están en banco)
+                  </p>
                 )}
               </Card>
 
@@ -409,28 +436,88 @@ function AnalisisConciliacionModal({
 
               <Card className="p-4">
                 <h4 className="font-display text-[11px] font-semibold uppercase tracking-widest text-muted-foreground mb-3">
-                  No encontrados — detalle paginado (10 por página) · cruce ID_DEBIN → id_txn (+ fallback monto+fecha)
+                  No encontrados — detalle paginado (10 por página) · cruce ID_DEBIN → id_txn (+
+                  fallback monto+fecha)
                 </h4>
                 {(() => {
                   const noEncontrados = resumen.items.filter((it) => it.estado === "no_encontrado");
-                  if (noEncontrados.length === 0) return <span className="inline-flex rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">Sin IDs — todo conciliado</span>;
-                  type RowNE = { id: string; tipo: string; importe: number; fecha: string; cvu: string };
-                  const rows: RowNE[] = noEncontrados.map((it) => ({ id: it.bankRow.idDebin, tipo: it.bankRow.tipoMovCoelsa, importe: it.bankRow.importeCoelsa, fecha: it.bankRow.fechaHoraCoelsa || it.bankRow.fechaNegocio, cvu: it.bankRow.cvu }));
+                  if (noEncontrados.length === 0)
+                    return (
+                      <span className="inline-flex rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+                        Sin IDs — todo conciliado
+                      </span>
+                    );
+                  type RowNE = {
+                    id: string;
+                    tipo: string;
+                    importe: number;
+                    fecha: string;
+                    cvu: string;
+                  };
+                  const rows: RowNE[] = noEncontrados.map((it) => ({
+                    id: it.bankRow.idDebin,
+                    tipo: it.bankRow.tipoMovCoelsa,
+                    importe: it.bankRow.importeCoelsa,
+                    fecha: it.bankRow.fechaHoraCoelsa || it.bankRow.fechaNegocio,
+                    cvu: it.bankRow.cvu,
+                  }));
                   const cols: import("@/components/data-table").Column<RowNE>[] = [
-                    { key: "id", label: "ID_DEBIN", filterable: true, render: (r) => <span className="font-mono text-[11px]">{r.id}</span> },
-                    { key: "tipo", label: "Tipo", filterable: "enum", filterOptions: ["CREDITO", "DEBITO"], render: (r) => r.tipo },
-                    { key: "importe", label: "Importe", sortable: true, render: (r) => <span className="font-mono tabular-nums">{r.importe.toLocaleString("es-AR", { minimumFractionDigits: 2 })}</span> },
-                    { key: "fecha", label: "Fecha", sortable: true, render: (r) => <span className="font-mono text-xs">{r.fecha}</span> },
-                    { key: "cvu", label: "CVU", filterable: true, render: (r) => <span className="font-mono text-[11px]">{r.cvu || "—"}</span> },
+                    {
+                      key: "id",
+                      label: "ID_DEBIN",
+                      filterable: true,
+                      render: (r) => <span className="font-mono text-[11px]">{r.id}</span>,
+                    },
+                    {
+                      key: "tipo",
+                      label: "Tipo",
+                      filterable: "enum",
+                      filterOptions: ["CREDITO", "DEBITO"],
+                      render: (r) => r.tipo,
+                    },
+                    {
+                      key: "importe",
+                      label: "Importe",
+                      sortable: true,
+                      render: (r) => (
+                        <span className="font-mono tabular-nums">
+                          {r.importe.toLocaleString("es-AR", { minimumFractionDigits: 2 })}
+                        </span>
+                      ),
+                    },
+                    {
+                      key: "fecha",
+                      label: "Fecha",
+                      sortable: true,
+                      render: (r) => <span className="font-mono text-xs">{r.fecha}</span>,
+                    },
+                    {
+                      key: "cvu",
+                      label: "CVU",
+                      filterable: true,
+                      render: (r) => <span className="font-mono text-[11px]">{r.cvu || "—"}</span>,
+                    },
                   ];
-                  return <DataTable columns={cols} data={rows} keyExtractor={(r) => r.id} pageSize={10} />;
+                  return (
+                    <DataTable
+                      columns={cols}
+                      data={rows}
+                      keyExtractor={(r) => r.id}
+                      pageSize={10}
+                    />
+                  );
                 })()}
                 {resumen.idsDiferenciaMonto.length > 0 && (
                   <div className="mt-3">
-                    <div className="text-[11px] font-semibold text-muted-foreground mb-1.5">Diferencias de monto ({resumen.idsDiferenciaMonto.length})</div>
+                    <div className="text-[11px] font-semibold text-muted-foreground mb-1.5">
+                      Diferencias de monto ({resumen.idsDiferenciaMonto.length})
+                    </div>
                     <div className="flex flex-wrap gap-1">
                       {resumen.idsDiferenciaMonto.map((id) => (
-                        <span key={id} className="inline-flex rounded-md border border-danger-200 bg-danger-50 px-1.5 py-0.5 font-mono text-[11px] text-danger-700">
+                        <span
+                          key={id}
+                          className="inline-flex rounded-md border border-danger-200 bg-danger-50 px-1.5 py-0.5 font-mono text-[11px] text-danger-700"
+                        >
                           {id}
                         </span>
                       ))}
@@ -438,36 +525,66 @@ function AnalisisConciliacionModal({
                   </div>
                 )}
                 <p className="text-[11px] text-muted-foreground mt-3">
-                  Movimientos consultados en plataforma: {movCount} · Rango {rangoLabel || archivo.fecha} · Si ves 0, la tabla <code>movimientos</code> no tiene filas para ese rango o RLS lo bloquea; entonces 0 conciliados es esperado.
+                  Movimientos consultados en plataforma: {movCount} · Rango{" "}
+                  {rangoLabel || archivo.fecha} · Si ves 0, la tabla <code>movimientos</code> no
+                  tiene filas para ese rango o RLS lo bloquea; entonces 0 conciliados es esperado.
                 </p>
               </Card>
               <div className="grid lg:grid-cols-[1.35fr_0.65fr] gap-4">
                 <Card className="p-4">
-                  <h4 className="font-display text-[11px] font-semibold uppercase tracking-widest text-muted-foreground mb-3">IDs resumidos</h4>
+                  <h4 className="font-display text-[11px] font-semibold uppercase tracking-widest text-muted-foreground mb-3">
+                    IDs resumidos
+                  </h4>
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <div className="text-[11px] font-semibold text-muted-foreground mb-1.5">Depósitos (CREDITO)</div>
+                      <div className="text-[11px] font-semibold text-muted-foreground mb-1.5">
+                        Depósitos (CREDITO)
+                      </div>
                       {resumen.idsDepositosNoEncontrados.length === 0 ? (
-                        <span className="inline-flex rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">Sin IDs</span>
+                        <span className="inline-flex rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+                          Sin IDs
+                        </span>
                       ) : (
                         <div className="flex flex-wrap gap-1">
                           {resumen.idsDepositosNoEncontrados.slice(0, 20).map((id) => (
-                            <span key={id} className="inline-flex rounded-md border border-border bg-muted/40 px-1.5 py-0.5 font-mono text-[11px]">{id}</span>
+                            <span
+                              key={id}
+                              className="inline-flex rounded-md border border-border bg-muted/40 px-1.5 py-0.5 font-mono text-[11px]"
+                            >
+                              {id}
+                            </span>
                           ))}
-                          {resumen.idsDepositosNoEncontrados.length > 20 && <span className="text-xs text-muted-foreground">+{resumen.idsDepositosNoEncontrados.length - 20} más (ver tabla)</span>}
+                          {resumen.idsDepositosNoEncontrados.length > 20 && (
+                            <span className="text-xs text-muted-foreground">
+                              +{resumen.idsDepositosNoEncontrados.length - 20} más (ver tabla)
+                            </span>
+                          )}
                         </div>
                       )}
                     </div>
                     <div>
-                      <div className="text-[11px] font-semibold text-muted-foreground mb-1.5">Retiros (DEBITO)</div>
+                      <div className="text-[11px] font-semibold text-muted-foreground mb-1.5">
+                        Retiros (DEBITO)
+                      </div>
                       {resumen.idsRetirosNoEncontrados.length === 0 ? (
-                        <span className="inline-flex rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">Sin IDs</span>
+                        <span className="inline-flex rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+                          Sin IDs
+                        </span>
                       ) : (
                         <div className="flex flex-wrap gap-1">
                           {resumen.idsRetirosNoEncontrados.slice(0, 20).map((id) => (
-                            <span key={id} className="inline-flex rounded-md border border-amber-200 bg-amber-50 px-1.5 py-0.5 font-mono text-[11px] text-amber-800 dark:border-amber-900/40 dark:bg-amber-950/30 dark:text-amber-300">{id}</span>
+                            <span
+                              key={id}
+                              className="inline-flex rounded-md border border-amber-200 bg-amber-50 px-1.5 py-0.5 font-mono text-[11px] text-amber-800 dark:border-amber-900/40 dark:bg-amber-950/30 dark:text-amber-300"
+                            >
+                              {id}
+                            </span>
                           ))}
-                          {resumen.idsRetirosNoEncontrados.length > 20 && <span className="text-xs text-muted-foreground">+{resumen.idsRetirosNoEncontrados.length - 20} más</span>}
+                          {resumen.idsRetirosNoEncontrados.length > 20 && (
+                            <span className="text-xs text-muted-foreground">
+                              +{resumen.idsRetirosNoEncontrados.length - 20} más
+                            </span>
+                          )}
                         </div>
                       )}
                     </div>
@@ -476,9 +593,14 @@ function AnalisisConciliacionModal({
 
                 <Card className="p-4 flex flex-col justify-between">
                   <div>
-                    <h4 className="font-display text-[11px] font-semibold uppercase tracking-widest text-muted-foreground mb-2">Análisis</h4>
+                    <h4 className="font-display text-[11px] font-semibold uppercase tracking-widest text-muted-foreground mb-2">
+                      Análisis
+                    </h4>
                     <p className="font-mono text-xs font-medium tabular-nums">{fechaAnalisis}</p>
-                    <p className="text-[11px] text-muted-foreground mt-1 leading-snug">{resumen.encontrados} de {resumen.total} conciliados — mapeo ID_DEBIN= id_txn, |IMPORTE_COELSA|= monto_operacion</p>
+                    <p className="text-[11px] text-muted-foreground mt-1 leading-snug">
+                      {resumen.encontrados} de {resumen.total} conciliados — mapeo ID_DEBIN= id_txn,
+                      |IMPORTE_COELSA|= monto_operacion
+                    </p>
                   </div>
                   <BtnOutline
                     className="mt-3 h-7 text-xs px-2.5 w-full justify-center"
@@ -498,7 +620,12 @@ function AnalisisConciliacionModal({
                         const s = v == null ? "" : String(v);
                         return /[",\n;]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
                       };
-                      const csv = [cols.join(","), ...rows.map((r) => cols.map((c) => esc((r as Record<string, unknown>)[c])).join(","))].join("\n");
+                      const csv = [
+                        cols.join(","),
+                        ...rows.map((r) =>
+                          cols.map((c) => esc((r as Record<string, unknown>)[c])).join(","),
+                        ),
+                      ].join("\n");
                       downloadFile(`cruce_${archivo.archivo.replace(/\.[^.]+$/, "")}.csv`, csv);
                     }}
                   >
@@ -566,7 +693,10 @@ function Conciliaciones() {
     let downloadRows: Record<string, unknown>[] = [];
     try {
       parsed = await parseBancoFile(uploadForm.file);
-      downloadRows = parsed.map((b) => ({ ...b.raw, IMPORTE_COELSA: b.importeCoelsa })) as Record<string, unknown>[];
+      downloadRows = parsed.map((b) => ({ ...b.raw, IMPORTE_COELSA: b.importeCoelsa })) as Record<
+        string,
+        unknown
+      >[];
       toast.success(`Parseado: ${parsed.length} filas (mapeo ID_DEBIN→id_txn)`);
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e);
@@ -601,7 +731,14 @@ function Conciliaciones() {
         const msg = e instanceof Error ? e.message : String(e);
         if (/Could not find the table|PGRST205|does not exist/i.test(msg)) {
           setArchivos((prev) => [
-            { archivo: nombreArchivo, fecha: uploadForm.fecha, estado: "Pendiente", downloadRows, bankRows: parsed, rawFile: uploadForm.file },
+            {
+              archivo: nombreArchivo,
+              fecha: uploadForm.fecha,
+              estado: "Pendiente",
+              downloadRows,
+              bankRows: parsed,
+              rawFile: uploadForm.file,
+            },
             ...prev,
           ]);
           toast.success("Archivo cargado (modo local: aplicá migración 0016)");
@@ -615,7 +752,14 @@ function Conciliaciones() {
       }
     } else {
       setArchivos((prev) => [
-        { archivo: nombreArchivo, fecha: uploadForm.fecha, estado: "Pendiente", downloadRows, bankRows: parsed, rawFile: uploadForm.file },
+        {
+          archivo: nombreArchivo,
+          fecha: uploadForm.fecha,
+          estado: "Pendiente",
+          downloadRows,
+          bankRows: parsed,
+          rawFile: uploadForm.file,
+        },
         ...prev,
       ]);
       toast.success("Archivo cargado correctamente");
@@ -820,8 +964,8 @@ function ReportesBCRA() {
             Padrón de Clientes Personas Jurídicas
           </h4>
           <p className="text-xs text-muted-foreground mt-1">
-            Régimen Informativo de Proveedores de Servicios de Pago — Comunicación "A" 8207
-            (BCRA), presentado vía SISCEN. Se informa la nómina de clientes{" "}
+            Régimen Informativo de Proveedores de Servicios de Pago — Comunicación "A" 8207 (BCRA),
+            presentado vía SISCEN. Se informa la nómina de clientes{" "}
             <strong>Persona Jurídica</strong> activos.
           </p>
         </div>
@@ -863,16 +1007,16 @@ function ReportesBCRA() {
         </div>
 
         <p className="text-[11px] text-muted-foreground">
-          El archivo se genera sin fila de encabezado y con columnas de ancho fijo, según lo
-          exige el régimen. La razón social se completa a 80 caracteres y el código postal a 8.
+          El archivo se genera sin fila de encabezado y con columnas de ancho fijo, según lo exige
+          el régimen. La razón social se completa a 80 caracteres y el código postal a 8.
         </p>
       </Card>
 
       {generado && sinCP > 0 && (
         <p className="text-xs text-muted-foreground border-l-2 border-amber-500/60 pl-3">
-          <strong>Atención:</strong> {sinCP} cliente(s) no tienen código postal cargado, así que
-          esa celda queda en blanco. El régimen exige el dato: completá el CP en la ficha del
-          cliente antes de presentar.
+          <strong>Atención:</strong> {sinCP} cliente(s) no tienen código postal cargado, así que esa
+          celda queda en blanco. El régimen exige el dato: completá el CP en la ficha del cliente
+          antes de presentar.
         </p>
       )}
 
@@ -2399,25 +2543,104 @@ function ConciliacionesBLP() {
 
 function ReporteUnidadNegocio() {
   const data = [
-    { unidad: "CVU", generaPropio: "$ 450.000", payWay: "$ 320.000", neto: "$ 130.000", impuestos: "$ 45.000", total: "$ 945.000" },
-    { unidad: "CVU / CVU chica U", generaPropio: "$ 180.000", payWay: "$ 120.000", neto: "$ 60.000", impuestos: "$ 18.000", total: "$ 378.000" },
-    { unidad: "Pago por QR", generaPropio: "$ 95.000", payWay: "$ 70.000", neto: "$ 25.000", impuestos: "$ 12.000", total: "$ 202.000" },
-    { unidad: "Link de Pago", generaPropio: "$ 620.000", payWay: "$ 810.000", neto: "$ -190.000", impuestos: "$ 310.000", total: "$ 1.740.000" },
-    { unidad: "E-commerce", generaPropio: "$ 510.000", payWay: "$ 680.000", neto: "$ -170.000", impuestos: "$ 260.000", total: "$ 1.450.000" },
+    {
+      unidad: "CVU",
+      generaPropio: "$ 450.000",
+      payWay: "$ 320.000",
+      neto: "$ 130.000",
+      impuestos: "$ 45.000",
+      total: "$ 945.000",
+    },
+    {
+      unidad: "CVU / CVU chica U",
+      generaPropio: "$ 180.000",
+      payWay: "$ 120.000",
+      neto: "$ 60.000",
+      impuestos: "$ 18.000",
+      total: "$ 378.000",
+    },
+    {
+      unidad: "Pago por QR",
+      generaPropio: "$ 95.000",
+      payWay: "$ 70.000",
+      neto: "$ 25.000",
+      impuestos: "$ 12.000",
+      total: "$ 202.000",
+    },
+    {
+      unidad: "Link de Pago",
+      generaPropio: "$ 620.000",
+      payWay: "$ 810.000",
+      neto: "$ -190.000",
+      impuestos: "$ 310.000",
+      total: "$ 1.740.000",
+    },
+    {
+      unidad: "E-commerce",
+      generaPropio: "$ 510.000",
+      payWay: "$ 680.000",
+      neto: "$ -170.000",
+      impuestos: "$ 260.000",
+      total: "$ 1.450.000",
+    },
   ];
   const columns: Column<(typeof data)[number]>[] = [
-    { key: "unidad", label: "Unidad de negocio", filterable: true, render: (r) => <span className="font-semibold">{r.unidad}</span> },
-    { key: "generaPropio", label: `Genera ${brand.name}`, render: (r) => <span className="font-mono text-emerald-700">{r.generaPropio}</span> },
-    { key: "payWay", label: "Corresponde PayWay", render: (r) => <span className="font-mono">{r.payWay}</span> },
-    { key: "neto", label: "Neto", render: (r) => <span className="font-mono font-semibold">{r.neto}</span> },
-    { key: "impuestos", label: "Impuestos", render: (r) => <span className="font-mono">{r.impuestos}</span> },
-    { key: "total", label: "Total", render: (r) => <span className="font-mono font-semibold">{r.total}</span> },
-    { key: "xls", label: "XLS", render: (r) => <button onClick={() => downloadExcel(`unidad_${r.unidad}.xlsx`, [r])} className="inline-flex items-center gap-1 text-sm font-semibold text-primary-ink hover:underline"><Download size={14}/> XLS</button> },
+    {
+      key: "unidad",
+      label: "Unidad de negocio",
+      filterable: true,
+      render: (r) => <span className="font-semibold">{r.unidad}</span>,
+    },
+    {
+      key: "generaPropio",
+      label: `Genera ${brand.name}`,
+      render: (r) => <span className="font-mono text-emerald-700">{r.generaPropio}</span>,
+    },
+    {
+      key: "payWay",
+      label: "Corresponde PayWay",
+      render: (r) => <span className="font-mono">{r.payWay}</span>,
+    },
+    {
+      key: "neto",
+      label: "Neto",
+      render: (r) => <span className="font-mono font-semibold">{r.neto}</span>,
+    },
+    {
+      key: "impuestos",
+      label: "Impuestos",
+      render: (r) => <span className="font-mono">{r.impuestos}</span>,
+    },
+    {
+      key: "total",
+      label: "Total",
+      render: (r) => <span className="font-mono font-semibold">{r.total}</span>,
+    },
+    {
+      key: "xls",
+      label: "XLS",
+      render: (r) => (
+        <button
+          onClick={() => downloadExcel(`unidad_${r.unidad}.xlsx`, [r])}
+          className="inline-flex items-center gap-1 text-sm font-semibold text-primary-ink hover:underline"
+        >
+          <Download size={14} /> XLS
+        </button>
+      ),
+    },
   ];
   return (
     <div className="space-y-3">
-      <p className="text-sm text-muted-foreground">Análisis por unidad de negocio — cuánto deja cada unidad ({brand.name} vs PayWay vs neto).</p>
-      <DataTable columns={columns} data={data} keyExtractor={(r) => r.unidad} pageSize={10} showDownloadButton={false} />
+      <p className="text-sm text-muted-foreground">
+        Análisis por unidad de negocio — cuánto deja cada unidad ({brand.name} vs PayWay vs neto).
+      </p>
+      <DataTable
+        columns={columns}
+        data={data}
+        keyExtractor={(r) => r.unidad}
+        pageSize={10}
+        showDownloadButton={false}
+      />
     </div>
   );
 }

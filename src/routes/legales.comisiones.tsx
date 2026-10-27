@@ -27,7 +27,12 @@ type Fila = {
 };
 
 const filas: Fila[] = [
-  { op: `Transferencias entre cuentas ${brand.name}`, comPct: null, comFijo: null, comTexto: "Sin cargo" },
+  {
+    op: `Transferencias entre cuentas ${brand.name}`,
+    comPct: null,
+    comFijo: null,
+    comTexto: "Sin cargo",
+  },
   {
     op: "Transferencias inmediatas a CVU (hasta $ 500.000)",
     comPct: null,
@@ -114,7 +119,8 @@ function Page() {
         <div className="mt-4 flex items-start gap-2 rounded-lg border border-muted bg-muted/30 px-4 py-3 text-xs text-muted-foreground">
           <Info size={14} className="shrink-0 mt-0.5" />
           <p>
-            El impuesto (IVA {fmtPct(IVA)}) se aplica <strong>sobre la comision</strong> y {brand.name}
+            El impuesto (IVA {fmtPct(IVA)}) se aplica <strong>sobre la comision</strong> y{" "}
+            {brand.name}
             lo retiene y liquida por el servicio. Formula del total cobrado:{" "}
             <span className="font-mono">comision x (1 + {fmtPct(IVA)})</span>. Es independiente de
             retenciones impositivas que correspondan al comercio (Ingresos Brutos, debito/credito).

@@ -127,7 +127,8 @@ export async function listLineasMovimiento(filters: LineaFilters): Promise<Page<
   if (filters.txid?.trim()) q = q.ilike("id_txn", ilike(filters.txid));
   const cuitDigitos = (filters.cuit ?? "").replace(/\D/g, "");
   if (cuitDigitos) q = q.ilike("cuit", ilike(cuitDigitos));
-  if (filters.cvu?.trim()) q = q.or(`cvu.ilike.${ilike(filters.cvu)},cvu_propio.ilike.${ilike(filters.cvu)}`);
+  if (filters.cvu?.trim())
+    q = q.or(`cvu.ilike.${ilike(filters.cvu)},cvu_propio.ilike.${ilike(filters.cvu)}`);
   if (filters.tipoLinea) q = q.eq("tipo_linea", filters.tipoLinea);
   if (filters.tipoOperacion) q = q.eq("tipo_operacion", filters.tipoOperacion);
   if (filters.estadoCodigo) q = q.eq("estado_codigo", filters.estadoCodigo);
@@ -136,7 +137,9 @@ export async function listLineasMovimiento(filters: LineaFilters): Promise<Page<
   if (filters.fechaHasta) q = q.lte("fecha", filters.fechaHasta);
   if (filters.search?.trim()) {
     const s = ilike(filters.search);
-    q = q.or(`id_txn.ilike.${s},legajo.ilike.${s},email.ilike.${s},nombre.ilike.${s},nombre_destino.ilike.${s}`);
+    q = q.or(
+      `id_txn.ilike.${s},legajo.ilike.${s},email.ilike.${s},nombre.ilike.${s},nombre_destino.ilike.${s}`,
+    );
   }
 
   // Mas reciente primero; dentro de una operacion, en el orden de sus lineas.

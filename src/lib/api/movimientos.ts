@@ -69,13 +69,13 @@ export async function listMovimientos(filters: MovimientoFilters): Promise<Page<
   // la búsqueda de texto libre (ilike) NO fuerza exact por sí sola.
   const filtrosEstructuradosActivos = Boolean(
     estadoCodigo ||
-      tipo ||
-      clienteId ||
-      legajo ||
-      fechaDesde ||
-      fechaHasta ||
-      conImpuesto ||
-      conComision,
+    tipo ||
+    clienteId ||
+    legajo ||
+    fechaDesde ||
+    fechaHasta ||
+    conImpuesto ||
+    conComision,
   );
   const countModeEfectivo: "exact" | "planned" | "estimated" = filtrosEstructuradosActivos
     ? "exact"
@@ -130,7 +130,5 @@ export async function getMovimiento(id: string): Promise<Movimiento | null> {
   const sb = requireSupabase();
   const { data, error } = await sb.from("transactions").select(COLUMNS).eq("id", id).maybeSingle();
   if (error) throw new DataAccessError(error);
-  return data
-    ? toMovimiento(data as MovimientoRow)
-    : null;
+  return data ? toMovimiento(data as MovimientoRow) : null;
 }

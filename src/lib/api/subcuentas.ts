@@ -165,9 +165,12 @@ export type CvuRow = Subcuenta & {
   legajo: string;
 };
 
-const COLUMNS_WITH_CLIENTE = `${COLUMNS}, clientes(legajo, correo, nombre, cuit, tipo_persona)` as const;
+const COLUMNS_WITH_CLIENTE =
+  `${COLUMNS}, clientes(legajo, correo, nombre, cuit, tipo_persona)` as const;
 
-export async function listAllCvus(filters: CvuFilters): Promise<{ rows: CvuRow[]; total: number; page: number; pageSize: number }> {
+export async function listAllCvus(
+  filters: CvuFilters,
+): Promise<{ rows: CvuRow[]; total: number; page: number; pageSize: number }> {
   const sb = requireSupabase();
   const { page, pageSize, search, estado, fechaDesde, fechaHasta } = filters;
   const from = page * pageSize;
@@ -175,7 +178,9 @@ export async function listAllCvus(filters: CvuFilters): Promise<{ rows: CvuRow[]
   let query = sb.from("subaccounts").select(COLUMNS_WITH_CLIENTE, { count: "exact" });
   if (search?.trim()) {
     const q = search.trim().replace(/[%_]/g, "\\$&");
-    query = query.or(`cliente_legajo.ilike.%${q}%,email.ilike.%${q}%,nombre.ilike.%${q}%,cbu.ilike.%${q}%`);
+    query = query.or(
+      `cliente_legajo.ilike.%${q}%,email.ilike.%${q}%,nombre.ilike.%${q}%,cbu.ilike.%${q}%`,
+    );
   }
   if (estado) query = query.eq("estado", estado);
   if (fechaDesde) query = query.gte("created_at", `${fechaDesde}T00:00:00`);
@@ -183,13 +188,31 @@ export async function listAllCvus(filters: CvuFilters): Promise<{ rows: CvuRow[]
   query = query.order("created_at", { ascending: false }).range(from, to);
   const { data, error, count } = await query;
   if (error) throw new DataAccessError(error);
-  const rows = ((data ?? []) as (SubcuentaRow & { clientes?: { legajo: string; correo: string; nombre: string; cuit: string; tipo_persona: string } | null })[]).map((r) => {
+  const rows = (
+    (data ?? []) as (SubcuentaRow & {
+      clientes?: {
+        legajo: string;
+        correo: string;
+        nombre: string;
+        cuit: string;
+        tipo_persona: string;
+      } | null;
+    })[]
+  ).map((r) => {
     const base = toSubcuenta(r as SubcuentaRow);
-    const cli = r.clientes as unknown as { legajo: string; correo: string; nombre: string; cuit: string; tipo_persona: string } | null;
+    const cli = r.clientes as unknown as {
+      legajo: string;
+      correo: string;
+      nombre: string;
+      cuit: string;
+      tipo_persona: string;
+    } | null;
     return {
       ...base,
       legajo: r.cliente_legajo,
-      cliente: cli ? { correo: cli.correo, nombre: cli.nombre, cuit: cli.cuit, tipoPersona: cli.tipo_persona } : null,
+      cliente: cli
+        ? { correo: cli.correo, nombre: cli.nombre, cuit: cli.cuit, tipoPersona: cli.tipo_persona }
+        : null,
     } as CvuRow;
   });
   return { rows, total: count ?? rows.length, page, pageSize };
@@ -202,7 +225,11 @@ export function generarCbu(): string {
 }
 
 export function generarAlias(email: string): string {
-  const base = email.split("@")[0]?.toLowerCase().replace(/[^a-z0-9]/g, ".") ?? "usuario";
+  const base =
+    email
+      .split("@")[0]
+      ?.toLowerCase()
+      .replace(/[^a-z0-9]/g, ".") ?? "usuario";
   return `${base}.${Math.floor(100 + Math.random() * 900)}`;
 }
 
@@ -302,10 +329,7 @@ export async function updateSubcuenta(
   return toSubcuenta(data as SubcuentaRow);
 }
 
-export async function deleteSubcuenta(
-  clienteLegajo: string,
-  id: string,
-): Promise<void> {
+export async function deleteSubcuenta(clienteLegajo: string, id: string): Promise<void> {
   const sb = requireSupabase();
   const { error } = await sb
     .from("subaccounts")

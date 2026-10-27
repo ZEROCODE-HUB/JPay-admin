@@ -1,7 +1,18 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { keepPreviousData, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Eye, CheckCircle, XCircle, FileWarning, ShieldCheck, ArrowRightLeft, RefreshCw, Loader2, AlertTriangle, Landmark } from "lucide-react";
+import {
+  Eye,
+  CheckCircle,
+  XCircle,
+  FileWarning,
+  ShieldCheck,
+  ArrowRightLeft,
+  RefreshCw,
+  Loader2,
+  AlertTriangle,
+  Landmark,
+} from "lucide-react";
 import { toast } from "sonner";
 import { DataTable, type Column, type TableServerFilters } from "@/components/data-table";
 import { FormDialog } from "@/components/form-dialog";
@@ -36,7 +47,9 @@ export const Route = createFileRoute("/admin/general/alertas/")({
 
 const PAGE_SIZES = [10, 20, 50];
 const STATUS_OPTIONS = Object.values(ALERT_STATUS_LABEL);
-const STATUS_BY_LABEL = new Map(Object.entries(ALERT_STATUS_LABEL).map(([k, v]) => [v, k as AlertStatus]));
+const STATUS_BY_LABEL = new Map(
+  Object.entries(ALERT_STATUS_LABEL).map(([k, v]) => [v, k as AlertStatus]),
+);
 const STATUS_TONE: Record<AlertStatus, "warn" | "neutral" | "success" | "danger"> = {
   pending: "warn",
   in_review: "neutral",
@@ -45,9 +58,19 @@ const STATUS_TONE: Record<AlertStatus, "warn" | "neutral" | "success" | "danger"
 };
 
 const fmtFecha = (iso: string | null) =>
-  iso ? new Date(iso).toLocaleString("es-AR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "—";
+  iso
+    ? new Date(iso).toLocaleString("es-AR", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    : "—";
 const fmtMonto = (n: number | null) =>
-  n == null ? "—" : `$ ${n.toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  n == null
+    ? "—"
+    : `$ ${n.toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
 type Dictamen = { alert: AlertItem; resolution: AlertResolution };
 
@@ -128,7 +151,9 @@ function ListadoAlertas() {
       const r = await runComplianceSweep();
       toast.success(
         `Barrido ejecutado: ${r.coincidencias_revisadas} coincidencias PLAFT revisadas, ${r.alertas_nuevas} alertas nuevas.` +
-          (r.ultima_corrida_plaft ? ` Última corrida PLAFT: ${fmtFecha(r.ultima_corrida_plaft)}.` : " No hay corridas PLAFT registradas."),
+          (r.ultima_corrida_plaft
+            ? ` Última corrida PLAFT: ${fmtFecha(r.ultima_corrida_plaft)}.`
+            : " No hay corridas PLAFT registradas."),
       );
       await refrescar();
     } catch (e) {
@@ -143,11 +168,35 @@ function ListadoAlertas() {
       const todas = await listAllAlerts(filtros);
       descargarCsv(
         `alertas-${new Date().toISOString().slice(0, 10)}.csv`,
-        ["Legajo", "Correo", "Nombre", "Tipo", "Estado", "Activo", "Fecha de alerta", "Fecha de aceptación", "Vence", "Resolución", "Dictamen", "TXID", "Descripción"],
+        [
+          "Legajo",
+          "Correo",
+          "Nombre",
+          "Tipo",
+          "Estado",
+          "Activo",
+          "Fecha de alerta",
+          "Fecha de aceptación",
+          "Vence",
+          "Resolución",
+          "Dictamen",
+          "TXID",
+          "Descripción",
+        ],
         todas.map((a) => [
-          a.legajo, a.correo, a.nombre, a.type, ALERT_STATUS_LABEL[a.status], a.isActive ? "Sí" : "No",
-          a.createdAt, a.acceptedAt ?? "", a.dueAt, a.resolution ? ALERT_RESOLUTION_LABEL[a.resolution] : "",
-          a.resolutionNotes ?? "", a.idTxn ?? "", a.description,
+          a.legajo,
+          a.correo,
+          a.nombre,
+          a.type,
+          ALERT_STATUS_LABEL[a.status],
+          a.isActive ? "Sí" : "No",
+          a.createdAt,
+          a.acceptedAt ?? "",
+          a.dueAt,
+          a.resolution ? ALERT_RESOLUTION_LABEL[a.resolution] : "",
+          a.resolutionNotes ?? "",
+          a.idTxn ?? "",
+          a.description,
         ]),
       );
     } catch (e) {
@@ -164,25 +213,65 @@ function ListadoAlertas() {
     const abierta = a.status === "pending" || a.status === "in_review";
     return [
       { label: "Ver detalle", icon: Eye, onClick: () => setDetalle(a) },
-      ...(a.status === "pending" ? [{ label: "Aceptar (iniciar revisión)", icon: CheckCircle, onClick: () => void aceptar(a) }] : []),
+      ...(a.status === "pending"
+        ? [
+            {
+              label: "Aceptar (iniciar revisión)",
+              icon: CheckCircle,
+              onClick: () => void aceptar(a),
+            },
+          ]
+        : []),
       ...(abierta
         ? [
-            { label: "Resolver: operación justificada", icon: ShieldCheck, onClick: () => abrirDictamen(a, "justified") },
-            { label: "Registrar ROS", icon: FileWarning, variant: "danger" as const, onClick: () => abrirDictamen(a, "ros") },
-            { label: "Descartar: falso positivo", icon: XCircle, onClick: () => abrirDictamen(a, "false_positive") },
+            {
+              label: "Resolver: operación justificada",
+              icon: ShieldCheck,
+              onClick: () => abrirDictamen(a, "justified"),
+            },
+            {
+              label: "Registrar ROS",
+              icon: FileWarning,
+              variant: "danger" as const,
+              onClick: () => abrirDictamen(a, "ros"),
+            },
+            {
+              label: "Descartar: falso positivo",
+              icon: XCircle,
+              onClick: () => abrirDictamen(a, "false_positive"),
+            },
           ]
         : []),
       ...(a.idTxn
-        ? [{ label: "Ver operación", icon: ArrowRightLeft, onClick: () => navigate({ to: "/admin/general/movimientos", search: { txid: a.idTxn! } }) }]
+        ? [
+            {
+              label: "Ver operación",
+              icon: ArrowRightLeft,
+              onClick: () =>
+                navigate({ to: "/admin/general/movimientos", search: { txid: a.idTxn! } }),
+            },
+          ]
         : []),
     ];
   };
 
   const columns: Column<AlertItem>[] = [
-    { key: "legajo", label: "Legajo", minWidth: 130, render: (r) => <LegajoCell legajo={r.legajo} /> },
+    {
+      key: "legajo",
+      label: "Legajo",
+      minWidth: 130,
+      render: (r) => <LegajoCell legajo={r.legajo} />,
+    },
     { key: "correo", label: "Correo", minWidth: 180, maxWidth: 260, render: (r) => r.correo },
     { key: "nombre", label: "Nombre", minWidth: 160, maxWidth: 240, render: (r) => r.nombre },
-    { key: "type", label: "Tipo de alerta", minWidth: 200, maxWidth: 280, tooltip: (r) => r.description, render: (r) => r.type },
+    {
+      key: "type",
+      label: "Tipo de alerta",
+      minWidth: 200,
+      maxWidth: 280,
+      tooltip: (r) => r.description,
+      render: (r) => r.type,
+    },
     {
       key: "estado",
       label: "Estado",
@@ -192,7 +281,11 @@ function ListadoAlertas() {
       render: (r) => (
         <div className="flex flex-col gap-0.5">
           <Badge tone={STATUS_TONE[r.status]}>{ALERT_STATUS_LABEL[r.status]}</Badge>
-          {r.resolution && <span className="text-[11px] text-muted-foreground">{ALERT_RESOLUTION_LABEL[r.resolution]}</span>}
+          {r.resolution && (
+            <span className="text-[11px] text-muted-foreground">
+              {ALERT_RESOLUTION_LABEL[r.resolution]}
+            </span>
+          )}
         </div>
       ),
     },
@@ -202,10 +295,28 @@ function ListadoAlertas() {
       filterable: "enum",
       filterOptions: ["Sí", "No"],
       minWidth: 80,
-      render: (r) => <Badge tone={r.isActive ? "warn" : "neutral"}>{r.isActive ? "Sí" : "No"}</Badge>,
+      render: (r) => (
+        <Badge tone={r.isActive ? "warn" : "neutral"}>{r.isActive ? "Sí" : "No"}</Badge>
+      ),
     },
-    { key: "createdAt", label: "Fecha de alerta", filterable: "date", minWidth: 150, render: (r) => <span className="font-mono tabular-nums text-xs">{fmtFecha(r.createdAt)}</span> },
-    { key: "acceptedAt", label: "Fecha de aceptación", filterable: "date", minWidth: 150, render: (r) => <span className="font-mono tabular-nums text-xs">{fmtFecha(r.acceptedAt)}</span> },
+    {
+      key: "createdAt",
+      label: "Fecha de alerta",
+      filterable: "date",
+      minWidth: 150,
+      render: (r) => (
+        <span className="font-mono tabular-nums text-xs">{fmtFecha(r.createdAt)}</span>
+      ),
+    },
+    {
+      key: "acceptedAt",
+      label: "Fecha de aceptación",
+      filterable: "date",
+      minWidth: 150,
+      render: (r) => (
+        <span className="font-mono tabular-nums text-xs">{fmtFecha(r.acceptedAt)}</span>
+      ),
+    },
   ];
 
   return (
@@ -219,7 +330,8 @@ function ListadoAlertas() {
               <Landmark size={14} /> Simular depósito
             </BtnOutline>
             <BtnOutline onClick={() => void barrer()} disabled={barriendo}>
-              {barriendo ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />} Ejecutar barrido de compliance
+              {barriendo ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />}{" "}
+              Ejecutar barrido de compliance
             </BtnOutline>
           </div>
         }
@@ -229,7 +341,11 @@ function ListadoAlertas() {
         <div className="flex flex-col items-center gap-3 rounded-lg border border-danger-200 bg-danger-50 px-6 py-10 text-center text-sm text-danger-700">
           <AlertTriangle size={24} />
           <p>No se pudieron cargar las alertas: {(lista.error as Error).message}</p>
-          <button type="button" onClick={() => lista.refetch()} className="h-9 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground">
+          <button
+            type="button"
+            onClick={() => lista.refetch()}
+            className="h-9 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground"
+          >
             Reintentar
           </button>
         </div>
@@ -269,7 +385,15 @@ function ListadoAlertas() {
       )}
 
       {detalle && (
-        <FormDialog open onClose={() => setDetalle(null)} title="Detalle de alerta" description={detalle.type} onSubmit={() => setDetalle(null)} submitLabel="Cerrar" size="lg">
+        <FormDialog
+          open
+          onClose={() => setDetalle(null)}
+          title="Detalle de alerta"
+          description={detalle.type}
+          onSubmit={() => setDetalle(null)}
+          submitLabel="Cerrar"
+          size="lg"
+        >
           <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
             <Campo label="Legajo" value={detalle.legajo} mono />
             <Campo label="Cliente" value={`${detalle.nombre} · ${detalle.correo}`} />
@@ -277,33 +401,66 @@ function ListadoAlertas() {
             <Campo label="Regla" value={detalle.ruleCode ?? "—"} mono />
             <Campo label="Fecha de alerta" value={fmtFecha(detalle.createdAt)} />
             <Campo label="Vencimiento normativo" value={fmtFecha(detalle.dueAt)} />
-            <Campo label="Aceptada" value={detalle.acceptedAt ? `${fmtFecha(detalle.acceptedAt)} · ${detalle.acceptedByName ?? "—"}` : "—"} />
-            <Campo label="Cerrada" value={detalle.resolvedAt ? `${fmtFecha(detalle.resolvedAt)} · ${detalle.resolvedByName ?? "—"}` : "—"} />
-            {detalle.resolution && <Campo label="Resolución" value={ALERT_RESOLUTION_LABEL[detalle.resolution]} />}
-            {detalle.resolutionNotes && <Campo label="Dictamen" value={detalle.resolutionNotes} full />}
+            <Campo
+              label="Aceptada"
+              value={
+                detalle.acceptedAt
+                  ? `${fmtFecha(detalle.acceptedAt)} · ${detalle.acceptedByName ?? "—"}`
+                  : "—"
+              }
+            />
+            <Campo
+              label="Cerrada"
+              value={
+                detalle.resolvedAt
+                  ? `${fmtFecha(detalle.resolvedAt)} · ${detalle.resolvedByName ?? "—"}`
+                  : "—"
+              }
+            />
+            {detalle.resolution && (
+              <Campo label="Resolución" value={ALERT_RESOLUTION_LABEL[detalle.resolution]} />
+            )}
+            {detalle.resolutionNotes && (
+              <Campo label="Dictamen" value={detalle.resolutionNotes} full />
+            )}
             <Campo label="Descripción" value={detalle.description} full />
             {detalle.idTxn && (
               <>
                 <Campo label="Operación (TXID)" value={detalle.idTxn} mono />
-                <Campo label="Monto / tipo" value={`${fmtMonto(detalle.montoOperacion)} · ${detalle.tipoOperacion ?? "—"}`} />
+                <Campo
+                  label="Monto / tipo"
+                  value={`${fmtMonto(detalle.montoOperacion)} · ${detalle.tipoOperacion ?? "—"}`}
+                />
               </>
             )}
-            {detalle.plaftMatchId != null && <Campo label="Coincidencia PLAFT" value={`#${detalle.plaftMatchId}`} mono />}
+            {detalle.plaftMatchId != null && (
+              <Campo label="Coincidencia PLAFT" value={`#${detalle.plaftMatchId}`} mono />
+            )}
             {Object.keys(detalle.details).length > 0 && (
               <div className="col-span-2">
                 <div className="text-xs text-muted-foreground mb-1">Datos del evento</div>
-                <pre className="rounded-md bg-muted/50 p-3 text-xs overflow-x-auto">{JSON.stringify(detalle.details, null, 2)}</pre>
+                <pre className="rounded-md bg-muted/50 p-3 text-xs overflow-x-auto">
+                  {JSON.stringify(detalle.details, null, 2)}
+                </pre>
               </div>
             )}
           </div>
           {(detalle.status === "pending" || detalle.status === "in_review") && (
             <div className="mt-4 flex flex-wrap gap-2 border-t pt-4">
               {detalle.status === "pending" && (
-                <BtnOutline onClick={() => void aceptar(detalle).then(() => setDetalle(null))}><CheckCircle size={14} /> Aceptar</BtnOutline>
+                <BtnOutline onClick={() => void aceptar(detalle).then(() => setDetalle(null))}>
+                  <CheckCircle size={14} /> Aceptar
+                </BtnOutline>
               )}
-              <BtnOutline onClick={() => abrirDictamen(detalle, "justified")}><ShieldCheck size={14} /> Justificada</BtnOutline>
-              <BtnOutline onClick={() => abrirDictamen(detalle, "ros")}><FileWarning size={14} /> ROS</BtnOutline>
-              <BtnOutline onClick={() => abrirDictamen(detalle, "false_positive")}><XCircle size={14} /> Falso positivo</BtnOutline>
+              <BtnOutline onClick={() => abrirDictamen(detalle, "justified")}>
+                <ShieldCheck size={14} /> Justificada
+              </BtnOutline>
+              <BtnOutline onClick={() => abrirDictamen(detalle, "ros")}>
+                <FileWarning size={14} /> ROS
+              </BtnOutline>
+              <BtnOutline onClick={() => abrirDictamen(detalle, "false_positive")}>
+                <XCircle size={14} /> Falso positivo
+              </BtnOutline>
             </div>
           )}
         </FormDialog>
@@ -320,22 +477,29 @@ function ListadoAlertas() {
         >
           {dictamen.resolution === "ros" && (
             <div className="mb-3 rounded-md border border-danger-200 bg-danger-50 px-3 py-2 text-xs text-danger-700">
-              Registra que la operatoria no tiene justificación económica ni legal y corresponde un Reporte de Operación Sospechosa ante la UIF.
+              Registra que la operatoria no tiene justificación económica ni legal y corresponde un
+              Reporte de Operación Sospechosa ante la UIF.
             </div>
           )}
           {dictamen.resolution === "false_positive" && dictamen.alert.plaftMatchId != null && (
             <div className="mb-3 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
-              Esta coincidencia REPET queda descartada y no vuelve a generar alertas. Otras coincidencias del cliente sí.
+              Esta coincidencia REPET queda descartada y no vuelve a generar alertas. Otras
+              coincidencias del cliente sí.
             </div>
           )}
-          <label className="text-xs font-semibold text-foreground mb-1.5 block">Dictamen del analista</label>
+          <label className="text-xs font-semibold text-foreground mb-1.5 block">
+            Dictamen del analista
+          </label>
           <textarea
             value={notas}
             onChange={(e) => setNotas(e.target.value)}
             placeholder="Fundamento de la resolución, documentación revisada…"
             className="w-full h-28 rounded-md border border-input bg-card px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring/40 resize-none"
           />
-          <p className="text-[11px] text-muted-foreground mt-1">Cerrar la alerta no desbloquea la cuenta: los bloqueos se liberan desde el listado de bloqueos.</p>
+          <p className="text-[11px] text-muted-foreground mt-1">
+            Cerrar la alerta no desbloquea la cuenta: los bloqueos se liberan desde el listado de
+            bloqueos.
+          </p>
         </FormDialog>
       )}
 
@@ -344,7 +508,17 @@ function ListadoAlertas() {
   );
 }
 
-function Campo({ label, value, mono, full }: { label: string; value: string; mono?: boolean; full?: boolean }) {
+function Campo({
+  label,
+  value,
+  mono,
+  full,
+}: {
+  label: string;
+  value: string;
+  mono?: boolean;
+  full?: boolean;
+}) {
   return (
     <div className={full ? "col-span-2" : undefined}>
       <div className="text-xs text-muted-foreground">{label}</div>
@@ -357,7 +531,8 @@ function Campo({ label, value, mono, full }: { label: string; value: string; mon
 function SimularDepositoDialog({ onClose, onDone }: { onClose: () => void; onDone: () => void }) {
   const [form, setForm] = useState({ cbu: "", importe: "", cuit: "", titular: "", cbuOrigen: "" });
   const [enviando, setEnviando] = useState(false);
-  const inputCls = "w-full h-9 rounded-md border border-input bg-card px-3 text-sm outline-none focus:ring-2 focus:ring-ring/40";
+  const inputCls =
+    "w-full h-9 rounded-md border border-input bg-card px-3 text-sm outline-none focus:ring-2 focus:ring-ring/40";
 
   const enviar = async () => {
     const importe = Number(form.importe);
@@ -387,7 +562,11 @@ function SimularDepositoDialog({ onClose, onDone }: { onClose: () => void; onDon
         onDone();
         onClose();
       } else {
-        toast.error(r.estado === "sin_subcuenta" ? "No hay ninguna subcuenta con ese CVU" : `Resultado: ${r.estado}`);
+        toast.error(
+          r.estado === "sin_subcuenta"
+            ? "No hay ninguna subcuenta con ese CVU"
+            : `Resultado: ${r.estado}`,
+        );
       }
     } catch (e) {
       toast.error((e as Error).message);
@@ -407,24 +586,51 @@ function SimularDepositoDialog({ onClose, onDone }: { onClose: () => void; onDon
     >
       <div className="grid grid-cols-2 gap-3">
         <div className="col-span-2">
-          <label className="text-xs font-semibold mb-1.5 block">CVU destino (subcuenta del cliente)</label>
-          <input className={`${inputCls} font-mono`} value={form.cbu} onChange={(e) => setForm({ ...form, cbu: e.target.value })} placeholder="0000003100..." />
+          <label className="text-xs font-semibold mb-1.5 block">
+            CVU destino (subcuenta del cliente)
+          </label>
+          <input
+            className={`${inputCls} font-mono`}
+            value={form.cbu}
+            onChange={(e) => setForm({ ...form, cbu: e.target.value })}
+            placeholder="0000003100..."
+          />
         </div>
         <div>
           <label className="text-xs font-semibold mb-1.5 block">Importe (ARS)</label>
-          <input className={inputCls} type="number" min={0} step="0.01" value={form.importe} onChange={(e) => setForm({ ...form, importe: e.target.value })} />
+          <input
+            className={inputCls}
+            type="number"
+            min={0}
+            step="0.01"
+            value={form.importe}
+            onChange={(e) => setForm({ ...form, importe: e.target.value })}
+          />
         </div>
         <div>
           <label className="text-xs font-semibold mb-1.5 block">CUIT del depositante</label>
-          <input className={`${inputCls} font-mono`} value={form.cuit} onChange={(e) => setForm({ ...form, cuit: e.target.value })} placeholder="20123456789" />
+          <input
+            className={`${inputCls} font-mono`}
+            value={form.cuit}
+            onChange={(e) => setForm({ ...form, cuit: e.target.value })}
+            placeholder="20123456789"
+          />
         </div>
         <div>
           <label className="text-xs font-semibold mb-1.5 block">Titular del depositante</label>
-          <input className={inputCls} value={form.titular} onChange={(e) => setForm({ ...form, titular: e.target.value })} />
+          <input
+            className={inputCls}
+            value={form.titular}
+            onChange={(e) => setForm({ ...form, titular: e.target.value })}
+          />
         </div>
         <div>
           <label className="text-xs font-semibold mb-1.5 block">CBU de origen</label>
-          <input className={`${inputCls} font-mono`} value={form.cbuOrigen} onChange={(e) => setForm({ ...form, cbuOrigen: e.target.value })} />
+          <input
+            className={`${inputCls} font-mono`}
+            value={form.cbuOrigen}
+            onChange={(e) => setForm({ ...form, cbuOrigen: e.target.value })}
+          />
         </div>
       </div>
     </FormDialog>

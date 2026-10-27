@@ -86,10 +86,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "description", content: `Panel de administración de la plataforma ${brand.name}.` },
       { name: "author", content: brand.name },
       { property: "og:title", content: pageTitle() },
-      { property: "og:description", content: `Panel de administración de la plataforma ${brand.name}.` },
+      {
+        property: "og:description",
+        content: `Panel de administración de la plataforma ${brand.name}.`,
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:title", content: pageTitle() },
-      { name: "twitter:description", content: `Panel de administración de la plataforma ${brand.name}.` },
+      {
+        name: "twitter:description",
+        content: `Panel de administración de la plataforma ${brand.name}.`,
+      },
       { property: "og:image", content: brand.assets.ogImage.src },
       { property: "og:image:width", content: String(brand.assets.ogImage.width) },
       { property: "og:image:height", content: String(brand.assets.ogImage.height) },
@@ -104,7 +110,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       // Tipografías de la marca (src/brand/brand.json → fonts.stylesheets)
       ...brand.fontStylesheets.map((href) => ({ rel: "stylesheet", href })),
       // Monoespaciada de la UI (no es de marca)
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap",
+      },
     ],
   }),
   shellComponent: RootShell,

@@ -72,9 +72,7 @@ export type ResultadoRetenciones = {
  *
  * IIBB queda con monto 0 y motivo "Carga manual hasta Fase 2".
  */
-export async function calcularRetencionesLote(
-  loteId: string,
-): Promise<ResultadoRetenciones> {
+export async function calcularRetencionesLote(loteId: string): Promise<ResultadoRetenciones> {
   const sb = requireSupabase();
   const { data, error } = await sb.rpc("calcular_retenciones_lote", {
     p_lote_id: loteId,

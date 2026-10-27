@@ -2,7 +2,17 @@ import { createFileRoute } from "@tanstack/react-router";
 import { brand, pageTitle } from "@/brand/brand";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
-import { Eye, Edit3, CheckCircle, XCircle, Trash2, Plus, AlertTriangle, Inbox, HelpCircle } from "lucide-react";
+import {
+  Eye,
+  Edit3,
+  CheckCircle,
+  XCircle,
+  Trash2,
+  Plus,
+  AlertTriangle,
+  Inbox,
+  HelpCircle,
+} from "lucide-react";
 import {
   PageHeader,
   Badge,
@@ -119,7 +129,9 @@ function formatPct(n: number): string {
 
 function BanderasSection({ comercioId }: { comercioId: string }) {
   const [banderas, setBanderas] = useState<import("@/lib/api/types").ComercioBandera[]>([]);
-  const [banderasCatalogo, setBanderasCatalogo] = useState<import("@/lib/api/banderas").Bandera[]>([]);
+  const [banderasCatalogo, setBanderasCatalogo] = useState<import("@/lib/api/banderas").Bandera[]>(
+    [],
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
@@ -128,11 +140,16 @@ function BanderasSection({ comercioId }: { comercioId: string }) {
   const [formBanderaCustom, setFormBanderaCustom] = useState("");
   const [formComisionPropia, setFormComisionPropia] = useState("");
   const [formPayway, setFormPayway] = useState("");
-  const [formEstado, setFormEstado] = useState<import("@/lib/api/types").ComercioBanderaEstado>("Activo");
+  const [formEstado, setFormEstado] =
+    useState<import("@/lib/api/types").ComercioBanderaEstado>("Activo");
   const [formMetodoKey, setFormMetodoKey] = useState("");
   const [saving, setSaving] = useState(false);
-  const [confirmDelete, setConfirmDelete] = useState<import("@/lib/api/types").ComercioBandera | null>(null);
-  const [cuotasBandera, setCuotasBandera] = useState<import("@/lib/api/types").ComercioBandera | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<
+    import("@/lib/api/types").ComercioBandera | null
+  >(null);
+  const [cuotasBandera, setCuotasBandera] = useState<
+    import("@/lib/api/types").ComercioBandera | null
+  >(null);
   const [cuotas, setCuotas] = useState<import("@/lib/api/types").ComercioBanderaCuota[]>([]);
   const [cuotasLoading, setCuotasLoading] = useState(false);
   const [showCuotaForm, setShowCuotaForm] = useState(false);
@@ -140,7 +157,9 @@ function BanderasSection({ comercioId }: { comercioId: string }) {
   const [cuotaTasa, setCuotaTasa] = useState("");
   const [cuotaEstado, setCuotaEstado] = useState<"Activo" | "Inactivo">("Activo");
   const [savingCuota, setSavingCuota] = useState(false);
-  const [confirmDeleteCuota, setConfirmDeleteCuota] = useState<import("@/lib/api/types").ComercioBanderaCuota | null>(null);
+  const [confirmDeleteCuota, setConfirmDeleteCuota] = useState<
+    import("@/lib/api/types").ComercioBanderaCuota | null
+  >(null);
 
   const cargar = async () => {
     setLoading(true);
@@ -155,7 +174,9 @@ function BanderasSection({ comercioId }: { comercioId: string }) {
         banderasMod.listBanderas(),
       ]);
       setBanderas(data);
-      setBanderasCatalogo(catalog.filter((b: import("@/lib/api/banderas").Bandera) => b.estado === "Activo"));
+      setBanderasCatalogo(
+        catalog.filter((b: import("@/lib/api/banderas").Bandera) => b.estado === "Activo"),
+      );
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -298,7 +319,9 @@ function BanderasSection({ comercioId }: { comercioId: string }) {
   return (
     <Card className="p-5">
       <div className="flex items-center justify-between mb-4">
-        <h4 className="font-display text-xs font-semibold uppercase tracking-wide text-muted-foreground">Banderas</h4>
+        <h4 className="font-display text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          Banderas
+        </h4>
         <BtnPrimary type="button" onClick={openCreate} className="h-8 px-3 text-xs">
           <Plus size={14} /> Agregar bandera
         </BtnPrimary>
@@ -308,10 +331,14 @@ function BanderasSection({ comercioId }: { comercioId: string }) {
       ) : error ? (
         <div className="rounded-lg border border-danger-200 bg-danger-50 px-3 py-3 text-sm text-danger-700 flex items-center justify-between">
           <span>{error}</span>
-          <BtnOutline type="button" onClick={cargar} className="h-7 text-xs">Reintentar</BtnOutline>
+          <BtnOutline type="button" onClick={cargar} className="h-7 text-xs">
+            Reintentar
+          </BtnOutline>
         </div>
       ) : banderas.length === 0 ? (
-        <div className="border border-dashed rounded-lg py-8 text-center text-sm text-muted-foreground">Sin banderas habilitadas para este comercio.</div>
+        <div className="border border-dashed rounded-lg py-8 text-center text-sm text-muted-foreground">
+          Sin banderas habilitadas para este comercio.
+        </div>
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
@@ -319,27 +346,63 @@ function BanderasSection({ comercioId }: { comercioId: string }) {
               <tr className="border-b bg-muted/50 text-left">
                 <th className="px-3 py-2.5 font-display font-semibold text-foreground">Bandera</th>
                 <th className="px-3 py-2.5 font-display font-semibold text-foreground">Método</th>
-                <th className="px-3 py-2.5 font-display font-semibold text-foreground text-right">% Comisión {brand.name}</th>
-                <th className="px-3 py-2.5 font-display font-semibold text-foreground text-right">% Comisión PayWay</th>
-                <th className="px-3 py-2.5 font-display font-semibold text-foreground text-right">% Neto</th>
+                <th className="px-3 py-2.5 font-display font-semibold text-foreground text-right">
+                  % Comisión {brand.name}
+                </th>
+                <th className="px-3 py-2.5 font-display font-semibold text-foreground text-right">
+                  % Comisión PayWay
+                </th>
+                <th className="px-3 py-2.5 font-display font-semibold text-foreground text-right">
+                  % Neto
+                </th>
                 <th className="px-3 py-2.5 font-display font-semibold text-foreground">Estado</th>
-                <th className="px-3 py-2.5 font-display font-semibold text-foreground text-right">Acciones</th>
+                <th className="px-3 py-2.5 font-display font-semibold text-foreground text-right">
+                  Acciones
+                </th>
               </tr>
             </thead>
             <tbody>
               {banderas.map((b) => (
                 <tr key={b.id} className="border-b last:border-0">
                   <td className="px-3 py-2.5 font-medium">{b.bandera}</td>
-                  <td className="px-3 py-2.5 font-mono text-xs text-muted-foreground">{b.metodoKey || "-"}</td>
-                  <td className="px-3 py-2.5 text-right font-mono tabular-nums">{formatPct(b.comisionPropia)}</td>
-                  <td className="px-3 py-2.5 text-right font-mono tabular-nums">{formatPct(b.comisionPayway)}</td>
-                  <td className="px-3 py-2.5 text-right font-mono tabular-nums font-semibold">{formatPct(b.comisionNeta)}</td>
-                  <td className="px-3 py-2.5"><Badge tone={b.estado === "Activo" ? "success" : "neutral"}>{b.estado}</Badge></td>
+                  <td className="px-3 py-2.5 font-mono text-xs text-muted-foreground">
+                    {b.metodoKey || "-"}
+                  </td>
+                  <td className="px-3 py-2.5 text-right font-mono tabular-nums">
+                    {formatPct(b.comisionPropia)}
+                  </td>
+                  <td className="px-3 py-2.5 text-right font-mono tabular-nums">
+                    {formatPct(b.comisionPayway)}
+                  </td>
+                  <td className="px-3 py-2.5 text-right font-mono tabular-nums font-semibold">
+                    {formatPct(b.comisionNeta)}
+                  </td>
+                  <td className="px-3 py-2.5">
+                    <Badge tone={b.estado === "Activo" ? "success" : "neutral"}>{b.estado}</Badge>
+                  </td>
                   <td className="px-3 py-2.5 text-right">
                     <span className="inline-flex gap-1">
-                      <button type="button" onClick={() => cargarCuotas(b)} className="h-7 px-2 rounded-md border bg-card text-xs hover:bg-accent inline-flex items-center gap-1">Cuotas</button>
-                      <button type="button" onClick={() => openEdit(b)} className="h-7 px-2 rounded-md border bg-card text-xs hover:bg-accent inline-flex items-center gap-1"><Edit3 size={12} /> Editar</button>
-                      <button type="button" onClick={() => setConfirmDelete(b)} className="h-7 px-2 rounded-md border border-danger-200 text-danger-600 bg-card text-xs hover:bg-danger-50 inline-flex items-center gap-1"><Trash2 size={12} /> Eliminar</button>
+                      <button
+                        type="button"
+                        onClick={() => cargarCuotas(b)}
+                        className="h-7 px-2 rounded-md border bg-card text-xs hover:bg-accent inline-flex items-center gap-1"
+                      >
+                        Cuotas
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => openEdit(b)}
+                        className="h-7 px-2 rounded-md border bg-card text-xs hover:bg-accent inline-flex items-center gap-1"
+                      >
+                        <Edit3 size={12} /> Editar
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setConfirmDelete(b)}
+                        className="h-7 px-2 rounded-md border border-danger-200 text-danger-600 bg-card text-xs hover:bg-danger-50 inline-flex items-center gap-1"
+                      >
+                        <Trash2 size={12} /> Eliminar
+                      </button>
                     </span>
                   </td>
                 </tr>
@@ -351,9 +414,16 @@ function BanderasSection({ comercioId }: { comercioId: string }) {
       {showForm && (
         <FormDialog
           open
-          onClose={() => { setShowForm(false); setEditing(null); }}
+          onClose={() => {
+            setShowForm(false);
+            setEditing(null);
+          }}
           title={editing ? "Editar bandera" : "Agregar bandera"}
-          description={editing ? `Editando ${editing.bandera}` : "Seleccioná una bandera o ingresá texto libre."}
+          description={
+            editing
+              ? `Editando ${editing.bandera}`
+              : "Seleccioná una bandera o ingresá texto libre."
+          }
           onSubmit={guardar}
           submitLabel={saving ? "Guardando…" : editing ? "Guardar" : "Agregar"}
           isSubmitting={saving}
@@ -364,7 +434,9 @@ function BanderasSection({ comercioId }: { comercioId: string }) {
               <select
                 value={formBanderaId}
                 onChange={(e) => {
-                  const selected = banderasCatalogo.find((b: import("@/lib/api/banderas").Bandera) => b.id === e.target.value);
+                  const selected = banderasCatalogo.find(
+                    (b: import("@/lib/api/banderas").Bandera) => b.id === e.target.value,
+                  );
                   setFormBanderaId(e.target.value);
                   setFormMetodoKey(selected?.metodoKey || "");
                 }}
@@ -372,7 +444,9 @@ function BanderasSection({ comercioId }: { comercioId: string }) {
               >
                 <option value="">Seleccionar…</option>
                 {banderasCatalogo.map((b) => (
-                  <option key={b.id} value={b.id}>{b.nombre}</option>
+                  <option key={b.id} value={b.id}>
+                    {b.nombre}
+                  </option>
                 ))}
                 <option value="__custom__">Otra (texto libre)…</option>
               </select>
@@ -399,11 +473,29 @@ function BanderasSection({ comercioId }: { comercioId: string }) {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <Label>% Comisión {brand.name}</Label>
-                <Input value={formComisionPropia} onChange={(e) => { const v = e.target.value; if (v === "" || /^[0-9]*[.,]?[0-9]*$/.test(v)) setFormComisionPropia(v); }} placeholder="0.00" className="font-mono" inputMode="decimal" />
+                <Input
+                  value={formComisionPropia}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    if (v === "" || /^[0-9]*[.,]?[0-9]*$/.test(v)) setFormComisionPropia(v);
+                  }}
+                  placeholder="0.00"
+                  className="font-mono"
+                  inputMode="decimal"
+                />
               </div>
               <div>
                 <Label>% Comisión PayWay</Label>
-                <Input value={formPayway} onChange={(e) => { const v = e.target.value; if (v === "" || /^[0-9]*[.,]?[0-9]*$/.test(v)) setFormPayway(v); }} placeholder="0.00" className="font-mono" inputMode="decimal" />
+                <Input
+                  value={formPayway}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    if (v === "" || /^[0-9]*[.,]?[0-9]*$/.test(v)) setFormPayway(v);
+                  }}
+                  placeholder="0.00"
+                  className="font-mono"
+                  inputMode="decimal"
+                />
               </div>
             </div>
             <div className="rounded-md bg-muted px-3 py-2 flex justify-between text-sm">
@@ -412,7 +504,13 @@ function BanderasSection({ comercioId }: { comercioId: string }) {
             </div>
             <div>
               <Label>Estado</Label>
-              <select value={formEstado} onChange={(e) => setFormEstado(e.target.value as import("@/lib/api/types").ComercioBanderaEstado)} className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm">
+              <select
+                value={formEstado}
+                onChange={(e) =>
+                  setFormEstado(e.target.value as import("@/lib/api/types").ComercioBanderaEstado)
+                }
+                className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
+              >
                 <option value="Activo">Activo</option>
                 <option value="Inactivo">Inactivo</option>
               </select>
@@ -437,20 +535,41 @@ function BanderasSection({ comercioId }: { comercioId: string }) {
         <Card className="p-5 mt-4">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h4 className="font-display text-sm font-semibold">Cuotas de {cuotasBandera.bandera} (TEM por cuota)</h4>
-              <p className="text-xs text-muted-foreground">Tasa efectiva mensual que se cobra al comercio por cada cantidad de cuotas.</p>
+              <h4 className="font-display text-sm font-semibold">
+                Cuotas de {cuotasBandera.bandera} (TEM por cuota)
+              </h4>
+              <p className="text-xs text-muted-foreground">
+                Tasa efectiva mensual que se cobra al comercio por cada cantidad de cuotas.
+              </p>
             </div>
             <div className="flex gap-2">
-              <BtnPrimary type="button" onClick={() => { setCuotaValor("1"); setCuotaTasa(""); setCuotaEstado("Activo"); setShowCuotaForm(true); }} className="h-8 text-xs">
+              <BtnPrimary
+                type="button"
+                onClick={() => {
+                  setCuotaValor("1");
+                  setCuotaTasa("");
+                  setCuotaEstado("Activo");
+                  setShowCuotaForm(true);
+                }}
+                className="h-8 text-xs"
+              >
                 <Plus size={14} /> Agregar cuota
               </BtnPrimary>
-              <BtnOutline type="button" onClick={() => setCuotasBandera(null)} className="h-8 text-xs">Cerrar</BtnOutline>
+              <BtnOutline
+                type="button"
+                onClick={() => setCuotasBandera(null)}
+                className="h-8 text-xs"
+              >
+                Cerrar
+              </BtnOutline>
             </div>
           </div>
           {cuotasLoading ? (
             <p className="text-sm text-muted-foreground">Cargando cuotas…</p>
           ) : cuotas.length === 0 ? (
-            <p className="text-sm text-muted-foreground border border-dashed rounded-lg py-6 text-center">Sin cuotas configuradas. Agregá la primera.</p>
+            <p className="text-sm text-muted-foreground border border-dashed rounded-lg py-6 text-center">
+              Sin cuotas configuradas. Agregá la primera.
+            </p>
           ) : (
             <table className="w-full text-sm">
               <thead>
@@ -466,9 +585,17 @@ function BanderasSection({ comercioId }: { comercioId: string }) {
                   <tr key={c.id} className="border-b last:border-0">
                     <td className="px-3 py-2 font-mono font-semibold">{c.cuotas}x</td>
                     <td className="px-3 py-2 text-right font-mono">{formatPct(c.tasaMensual)}</td>
-                    <td className="px-3 py-2"><Badge tone={c.estado === "Activo" ? "success" : "neutral"}>{c.estado}</Badge></td>
+                    <td className="px-3 py-2">
+                      <Badge tone={c.estado === "Activo" ? "success" : "neutral"}>{c.estado}</Badge>
+                    </td>
                     <td className="px-3 py-2 text-right">
-                      <button type="button" onClick={() => setConfirmDeleteCuota(c)} className="h-7 px-2 rounded-md border border-danger-200 text-danger-600 bg-card text-xs hover:bg-danger-50 inline-flex items-center gap-1"><Trash2 size={12} /> Eliminar</button>
+                      <button
+                        type="button"
+                        onClick={() => setConfirmDeleteCuota(c)}
+                        className="h-7 px-2 rounded-md border border-danger-200 text-danger-600 bg-card text-xs hover:bg-danger-50 inline-flex items-center gap-1"
+                      >
+                        <Trash2 size={12} /> Eliminar
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -480,21 +607,51 @@ function BanderasSection({ comercioId }: { comercioId: string }) {
 
       {/* Form cuota */}
       {showCuotaForm && (
-        <FormDialog open onClose={() => setShowCuotaForm(false)} title={`Agregar cuota a ${cuotasBandera?.bandera}`} onSubmit={guardarCuota} submitLabel={savingCuota ? "Guardando…" : "Agregar"} isSubmitting={savingCuota}>
+        <FormDialog
+          open
+          onClose={() => setShowCuotaForm(false)}
+          title={`Agregar cuota a ${cuotasBandera?.bandera}`}
+          onSubmit={guardarCuota}
+          submitLabel={savingCuota ? "Guardando…" : "Agregar"}
+          isSubmitting={savingCuota}
+        >
           <div className="space-y-4">
             <div>
               <Label>Número de cuotas</Label>
-              <Input type="number" value={cuotaValor} onChange={(e) => setCuotaValor(e.target.value)} min={1} max={48} />
-              <p className="text-[11px] text-muted-foreground mt-1">Ej: 1 = pago único, 3 = 3 cuotas.</p>
+              <Input
+                type="number"
+                value={cuotaValor}
+                onChange={(e) => setCuotaValor(e.target.value)}
+                min={1}
+                max={48}
+              />
+              <p className="text-[11px] text-muted-foreground mt-1">
+                Ej: 1 = pago único, 3 = 3 cuotas.
+              </p>
             </div>
             <div>
               <Label>TEM — Tasa Efectiva Mensual (%)</Label>
-              <Input value={cuotaTasa} onChange={(e) => { const v = e.target.value; if (v === "" || /^[0-9]*[.,]?[0-9]*$/.test(v)) setCuotaTasa(v); }} placeholder="0.00" className="font-mono" inputMode="decimal" />
-              <p className="text-[11px] text-muted-foreground mt-1">Tasa mensual que se cobra al comercio. No editar TNA.</p>
+              <Input
+                value={cuotaTasa}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  if (v === "" || /^[0-9]*[.,]?[0-9]*$/.test(v)) setCuotaTasa(v);
+                }}
+                placeholder="0.00"
+                className="font-mono"
+                inputMode="decimal"
+              />
+              <p className="text-[11px] text-muted-foreground mt-1">
+                Tasa mensual que se cobra al comercio. No editar TNA.
+              </p>
             </div>
             <div>
               <Label>Estado</Label>
-              <select value={cuotaEstado} onChange={(e) => setCuotaEstado(e.target.value as "Activo" | "Inactivo")} className="w-full h-10 rounded-md border bg-background px-3 text-sm">
+              <select
+                value={cuotaEstado}
+                onChange={(e) => setCuotaEstado(e.target.value as "Activo" | "Inactivo")}
+                className="w-full h-10 rounded-md border bg-background px-3 text-sm"
+              >
                 <option value="Activo">Activo</option>
                 <option value="Inactivo">Inactivo</option>
               </select>
@@ -504,7 +661,15 @@ function BanderasSection({ comercioId }: { comercioId: string }) {
       )}
 
       {confirmDeleteCuota && (
-        <ConfirmDialog open onClose={() => setConfirmDeleteCuota(null)} title="Eliminar cuota" message={`¿Eliminar la cuota ${confirmDeleteCuota.cuotas}x de ${cuotasBandera?.bandera}?`} confirmLabel="Eliminar" variant="danger" onConfirm={eliminarCuota} />
+        <ConfirmDialog
+          open
+          onClose={() => setConfirmDeleteCuota(null)}
+          title="Eliminar cuota"
+          message={`¿Eliminar la cuota ${confirmDeleteCuota.cuotas}x de ${cuotasBandera?.bandera}?`}
+          confirmLabel="Eliminar"
+          variant="danger"
+          onConfirm={eliminarCuota}
+        />
       )}
     </Card>
   );
@@ -531,7 +696,10 @@ function ComercioDetalle({ comercio, onClose }: { comercio: Comercio; onClose: (
           {comercio.estado === "Pendiente de aprobación" && (
             <div className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800">
               <p className="font-semibold">Comercio pendiente de aprobación</p>
-              <p className="text-xs mt-1">Este comercio no puede operar hasta que se le asigne CVU y comisión. El estado actual no permite transacciones ni acreditaciones.</p>
+              <p className="text-xs mt-1">
+                Este comercio no puede operar hasta que se le asigne CVU y comisión. El estado
+                actual no permite transacciones ni acreditaciones.
+              </p>
             </div>
           )}
 
@@ -572,7 +740,10 @@ function ComercioDetalle({ comercio, onClose }: { comercio: Comercio; onClose: (
                 }
               />
               <Field label="Nivel" value={comercio.nivel} />
-              <Field label="site_id (Payway)" value={<span className="font-mono text-xs">{comercio.siteId ?? "—"}</span>} />
+              <Field
+                label="site_id (Payway)"
+                value={<span className="font-mono text-xs">{comercio.siteId ?? "—"}</span>}
+              />
               <Field
                 label="Estado"
                 value={<Badge tone={estadoBadgeTone(comercio.estado)}>{comercio.estado}</Badge>}
@@ -590,37 +761,52 @@ function ComercioDetalle({ comercio, onClose }: { comercio: Comercio; onClose: (
 
           <BanderasSection comercioId={comercio.id} />
 
-                    <Card className="p-5">
+          <Card className="p-5">
             <h4 className="font-display text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-3">
               Impuestos por pagar — lote de acreditación
             </h4>
             {(() => {
-              const porCobrar = MOCK_IMPUESTOS_POR_COBRAR.filter((r) => r.legajo === comercio.legajo && r.estado === "pendiente");
-              const porLote = new Map<string, {total: number; count: number}>();
+              const porCobrar = MOCK_IMPUESTOS_POR_COBRAR.filter(
+                (r) => r.legajo === comercio.legajo && r.estado === "pendiente",
+              );
+              const porLote = new Map<string, { total: number; count: number }>();
               for (const r of porCobrar) {
-                const cur = porLote.get(r.loteId) ?? {total:0, count:0};
+                const cur = porLote.get(r.loteId) ?? { total: 0, count: 0 };
                 cur.total += r.monto;
                 cur.count += 1;
                 porLote.set(r.loteId, cur);
               }
-              const total = porCobrar.reduce((a,b)=>a+b.monto,0);
+              const total = porCobrar.reduce((a, b) => a + b.monto, 0);
               if (porCobrar.length === 0) {
                 return (
-                  <div className="text-sm text-muted-foreground">Sin impuestos pendientes para este comercio según lotes de acreditación.</div>
+                  <div className="text-sm text-muted-foreground">
+                    Sin impuestos pendientes para este comercio según lotes de acreditación.
+                  </div>
                 );
               }
               return (
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <div className="text-2xl font-mono font-semibold tabular-nums">{formatImpuestoMonto(total)}</div>
+                    <div className="text-2xl font-mono font-semibold tabular-nums">
+                      {formatImpuestoMonto(total)}
+                    </div>
                     <Badge tone="warn">Por pagar</Badge>
                   </div>
-                  <div className="text-xs text-muted-foreground">Suma real de impuestos pendientes agrupada por lote de acreditación</div>
+                  <div className="text-xs text-muted-foreground">
+                    Suma real de impuestos pendientes agrupada por lote de acreditación
+                  </div>
                   <div className="space-y-1.5">
-                    {Array.from(porLote.entries()).map(([loteId, v])=> (
-                      <div key={loteId} className="flex justify-between text-sm border rounded px-3 py-1.5 bg-muted/30">
-                        <span className="font-mono text-xs">{loteId} · {v.count} impuesto(s)</span>
-                        <span className="font-mono font-semibold">{formatImpuestoMonto(v.total)}</span>
+                    {Array.from(porLote.entries()).map(([loteId, v]) => (
+                      <div
+                        key={loteId}
+                        className="flex justify-between text-sm border rounded px-3 py-1.5 bg-muted/30"
+                      >
+                        <span className="font-mono text-xs">
+                          {loteId} · {v.count} impuesto(s)
+                        </span>
+                        <span className="font-mono font-semibold">
+                          {formatImpuestoMonto(v.total)}
+                        </span>
                       </div>
                     ))}
                   </div>
@@ -636,7 +822,9 @@ function ComercioDetalle({ comercio, onClose }: { comercio: Comercio; onClose: (
               </h4>
             </div>
             <div className="px-5 pb-5 pt-3 text-sm text-muted-foreground">
-              Los puntos de venta / QR se gestionan en <span className="font-semibold">Pagos con QR</span> y los enlaces en <span className="font-semibold">Enlaces de pago</span>.
+              Los puntos de venta / QR se gestionan en{" "}
+              <span className="font-semibold">Pagos con QR</span> y los enlaces en{" "}
+              <span className="font-semibold">Enlaces de pago</span>.
             </div>
           </Card>
         </div>
@@ -740,7 +928,9 @@ function ComercioFormModal({
     comercio ? undefined : debouncedClienteSearch,
   );
   const clientesOptionsRaw = comercio ? clientes : (clientesFiltrados ?? clientes);
-  const clientesOptions = [...(clientesOptionsRaw ?? [])].sort((a,b)=> (a.legajo ?? '').localeCompare(b.legajo ?? ''));
+  const clientesOptions = [...(clientesOptionsRaw ?? [])].sort((a, b) =>
+    (a.legajo ?? "").localeCompare(b.legajo ?? ""),
+  );
   const [comboboxOpen, setComboboxOpen] = useState(false);
 
   const guardar = () => {
@@ -781,11 +971,18 @@ function ComercioFormModal({
             Cliente (legajo)
           </LabelAyuda>
           {comercio ? (
-            <Input id="gc-cliente" value={`${clienteSeleccionado?.nombre ?? comercio.legajo} · ${comercio.legajo}`} disabled />
+            <Input
+              id="gc-cliente"
+              value={`${clienteSeleccionado?.nombre ?? comercio.legajo} · ${comercio.legajo}`}
+              disabled
+            />
           ) : (
             <div className="relative">
               <div className="relative">
-                <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+                <Search
+                  size={14}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"
+                />
                 <Input
                   id="gc-cliente"
                   value={clienteSearchInput}
@@ -805,7 +1002,9 @@ function ComercioFormModal({
                 <div className="absolute z-20 mt-1 w-full rounded-md border border-input bg-card shadow-lg max-h-60 overflow-auto">
                   {(clientesOptions ?? []).length === 0 ? (
                     <div className="px-3 py-6 text-center text-sm text-muted-foreground">
-                      {debouncedClienteSearch ? "Sin resultados." : "Escribí para buscar (máx. 20 resultados)."}
+                      {debouncedClienteSearch
+                        ? "Sin resultados."
+                        : "Escribí para buscar (máx. 20 resultados)."}
                     </div>
                   ) : (
                     (clientesOptions ?? []).map((c) => (
@@ -834,7 +1033,8 @@ function ComercioFormModal({
               )}
               {clienteLegajo && clienteSeleccionado && (
                 <p className="text-xs text-muted-foreground mt-1">
-                  Seleccionado: <span className="font-mono">{clienteSeleccionado.legajo}</span> · {clienteSeleccionado.correo}
+                  Seleccionado: <span className="font-mono">{clienteSeleccionado.legajo}</span> ·{" "}
+                  {clienteSeleccionado.correo}
                 </p>
               )}
             </div>
@@ -962,12 +1162,15 @@ function ComercioFormModal({
             onChange={(e) => setEjecutivoId(e.target.value)}
           >
             <option value="">Sin asignar</option>
-            {adminUsers.filter(u => u.activo).map((u) => (
-              <option key={u.id} value={u.id}>{u.nombre} · {u.email}</option>
-            ))}
+            {adminUsers
+              .filter((u) => u.activo)
+              .map((u) => (
+                <option key={u.id} value={u.id}>
+                  {u.nombre} · {u.email}
+                </option>
+              ))}
           </select>
         </div>
-
       </div>
 
       {comercio && (
@@ -1160,7 +1363,9 @@ function Page() {
       render: (r) => (
         <div>
           <div className="font-semibold">{r.usuario}</div>
-          {r.cliente?.nombre && <div className="text-xs text-muted-foreground">{r.cliente.nombre}</div>}
+          {r.cliente?.nombre && (
+            <div className="text-xs text-muted-foreground">{r.cliente.nombre}</div>
+          )}
           <LegajoCell legajo={r.legajo} className="text-xs" />
         </div>
       ),
@@ -1203,7 +1408,9 @@ function Page() {
         r.ejecutivo ? (
           <div className="text-sm">
             <div className="font-medium truncate max-w-[140px]">{r.ejecutivo.nombre}</div>
-            <div className="text-xs text-muted-foreground truncate max-w-[140px]">{r.ejecutivo.email}</div>
+            <div className="text-xs text-muted-foreground truncate max-w-[140px]">
+              {r.ejecutivo.email}
+            </div>
           </div>
         ) : (
           <span className="text-xs text-muted-foreground">Sin asignar</span>
@@ -1413,7 +1620,10 @@ function Page() {
 
       <ConfirmDialog
         open={!!confirmDelete}
-        onClose={() => { setConfirmDelete(null); setDeshabilitarMotivo(""); }}
+        onClose={() => {
+          setConfirmDelete(null);
+          setDeshabilitarMotivo("");
+        }}
         title="Deshabilitar comercio"
         message={`¿Deshabilitar el comercio "${confirmDelete?.usuario}"? El comercio pasará a estado "Desactivado" y no podrá operar. Esta acción queda registrada en el historial.`}
         confirmLabel="Deshabilitar"

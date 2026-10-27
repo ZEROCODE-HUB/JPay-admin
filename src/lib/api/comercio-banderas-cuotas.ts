@@ -15,7 +15,9 @@ function toComercioBanderaCuota(r: ComercioBanderaCuotaRow): ComercioBanderaCuot
   };
 }
 
-export async function listCuotasByComercioBandera(comercioBanderaId: string): Promise<ComercioBanderaCuota[]> {
+export async function listCuotasByComercioBandera(
+  comercioBanderaId: string,
+): Promise<ComercioBanderaCuota[]> {
   const sb = requireSupabase();
   const { data, error } = await sb
     .from("comercio_banderas_cuotas")
@@ -56,7 +58,12 @@ export async function updateComercioBanderaCuota(
   if (input.cuotas !== undefined) payload.cuotas = input.cuotas;
   if (input.tasaMensual !== undefined) payload.tasa_mensual = input.tasaMensual;
   if (input.estado !== undefined) payload.estado = input.estado;
-  const { data, error } = await sb.from("comercio_banderas_cuotas").update(payload).eq("id", id).select(COLUMNS).single();
+  const { data, error } = await sb
+    .from("comercio_banderas_cuotas")
+    .update(payload)
+    .eq("id", id)
+    .select(COLUMNS)
+    .single();
   if (error) throw new DataAccessError(error);
   return toComercioBanderaCuota(data as ComercioBanderaCuotaRow);
 }

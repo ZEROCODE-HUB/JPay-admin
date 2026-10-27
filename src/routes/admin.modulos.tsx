@@ -63,16 +63,31 @@ function Page() {
 
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
         <Stat label="Módulos totales" value={String(modules.length)} />
-        <Stat label="Operativos" value={String(operativos)} sub={`${Math.round((operativos / modules.length) * 100)}%`} />
-        <Stat label="Degradados" value={String(degradados)} sub={`${Math.round((degradados / modules.length) * 100)}%`} />
-        <Stat label="Caídos" value={String(caidos)} sub={`${Math.round((caidos / modules.length) * 100)}%`} />
+        <Stat
+          label="Operativos"
+          value={String(operativos)}
+          sub={`${Math.round((operativos / modules.length) * 100)}%`}
+        />
+        <Stat
+          label="Degradados"
+          value={String(degradados)}
+          sub={`${Math.round((degradados / modules.length) * 100)}%`}
+        />
+        <Stat
+          label="Caídos"
+          value={String(caidos)}
+          sub={`${Math.round((caidos / modules.length) * 100)}%`}
+        />
         <Stat label="Latencia promedio" value="215 ms" sub="últimos 5 min" />
       </div>
 
       <Card>
         <div className="space-y-1">
           {modules.map((m) => (
-            <div key={m.name} className="flex items-center justify-between py-2.5 border-b last:border-0">
+            <div
+              key={m.name}
+              className="flex items-center justify-between py-2.5 border-b last:border-0"
+            >
               <div className="flex items-center gap-3">
                 <StatusIcon status={m.status} />
                 <span className="font-medium text-sm">{m.name}</span>

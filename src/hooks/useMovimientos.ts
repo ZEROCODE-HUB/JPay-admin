@@ -34,15 +34,17 @@ export function useMovimientos(filters: MovimientoFilters) {
   const rows = query.data?.rows ?? [];
   const filtrosEstructuradosActivos = Boolean(
     filters.estadoCodigo ||
-      filters.tipo ||
-      filters.clienteId ||
-      filters.legajo ||
-      filters.fechaDesde ||
-      filters.fechaHasta ||
-      filters.conImpuesto ||
-      filters.conComision,
+    filters.tipo ||
+    filters.clienteId ||
+    filters.legajo ||
+    filters.fechaDesde ||
+    filters.fechaHasta ||
+    filters.conImpuesto ||
+    filters.conComision,
   );
-  const countModeEfectivo = filtrosEstructuradosActivos ? "exact" : (filters.countMode ?? "estimated");
+  const countModeEfectivo = filtrosEstructuradosActivos
+    ? "exact"
+    : (filters.countMode ?? "estimated");
   const isEstimated = countModeEfectivo !== "exact";
 
   return {

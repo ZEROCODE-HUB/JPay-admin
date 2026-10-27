@@ -133,7 +133,10 @@ function ComisionFormFields({
       <div className="relative">
         <Label htmlFor="com-correo">Email del cliente</Label>
         <div className="relative">
-          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+          <Search
+            size={14}
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"
+          />
           <Input
             id="com-correo"
             value={searchInput}
@@ -160,13 +163,23 @@ function ComisionFormFields({
                 onMouseDown={(e) => {
                   e.preventDefault();
                   setSearchInput(c.correo);
-                  onChange({ ...draft, correo: c.correo, legajo: c.legajo, subcuentaId: null, cuit: (c.cuit as string) ?? draft.cuit, tipoPersona: (c.tipoPersona as ComisionDraft["tipoPersona"]) ?? draft.tipoPersona } as ComisionDraft);
+                  onChange({
+                    ...draft,
+                    correo: c.correo,
+                    legajo: c.legajo,
+                    subcuentaId: null,
+                    cuit: (c.cuit as string) ?? draft.cuit,
+                    tipoPersona:
+                      (c.tipoPersona as ComisionDraft["tipoPersona"]) ?? draft.tipoPersona,
+                  } as ComisionDraft);
                   setOpen(false);
                 }}
                 className="w-full text-left px-3 py-2 text-sm hover:bg-accent flex flex-col"
               >
                 <span className="font-medium">{c.correo}</span>
-                <span className="text-xs text-muted-foreground font-mono">{c.legajo} · {c.nombre}</span>
+                <span className="text-xs text-muted-foreground font-mono">
+                  {c.legajo} · {c.nombre}
+                </span>
               </button>
             ))}
           </div>
@@ -207,7 +220,9 @@ function ComisionFormFields({
           onChange={(e) => onChange({ ...draft, cuit: e.target.value })}
           placeholder="20-12345678-9"
         />
-        <p className="text-[11px] text-muted-foreground mt-1">Se autocompleta al seleccionar email, editable si hace falta.</p>
+        <p className="text-[11px] text-muted-foreground mt-1">
+          Se autocompleta al seleccionar email, editable si hace falta.
+        </p>
       </div>
       <div>
         <Label htmlFor="com-operacion">Tipo de operación</Label>
@@ -297,7 +312,8 @@ function ComisionFormFields({
           <option>Deshabilitado</option>
         </select>
         <p className="text-[11px] text-muted-foreground mt-1">
-          Solo puede haber <strong>una Habilitada</strong> por CVU (o por cliente) y tipo (las deshabilitadas quedan como historial).
+          Solo puede haber <strong>una Habilitada</strong> por CVU (o por cliente) y tipo (las
+          deshabilitadas quedan como historial).
         </p>
       </div>
       <div className="sm:col-span-2">
@@ -709,7 +725,10 @@ function ComisionesPage() {
                   <label className="text-xs font-medium text-muted-foreground">Alcance</label>
                   <select
                     value={alcance}
-                    onChange={(e) => { setAlcance(e.target.value as typeof alcance); setPage(0); }}
+                    onChange={(e) => {
+                      setAlcance(e.target.value as typeof alcance);
+                      setPage(0);
+                    }}
                     className="h-9 w-full rounded-md border border-input bg-card px-3 text-sm"
                   >
                     <option value="">Todos</option>
@@ -721,7 +740,10 @@ function ComisionesPage() {
                   <label className="text-xs font-medium text-muted-foreground">Legajo</label>
                   <input
                     value={legajoFiltro}
-                    onChange={(e) => { setLegajoFiltro(e.target.value); setPage(0); }}
+                    onChange={(e) => {
+                      setLegajoFiltro(e.target.value);
+                      setPage(0);
+                    }}
                     placeholder="LPJ-30..."
                     className="h-9 w-full rounded-md border border-input bg-card px-3 text-sm font-mono"
                   />
@@ -730,7 +752,10 @@ function ComisionesPage() {
                   <label className="text-xs font-medium text-muted-foreground">CVU</label>
                   <input
                     value={cvuFiltro}
-                    onChange={(e) => { setCvuFiltro(e.target.value); setPage(0); }}
+                    onChange={(e) => {
+                      setCvuFiltro(e.target.value);
+                      setPage(0);
+                    }}
                     placeholder="0000003100..."
                     className="h-9 w-full rounded-md border border-input bg-card px-3 text-sm font-mono"
                   />

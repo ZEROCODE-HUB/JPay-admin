@@ -41,7 +41,12 @@ export function ConfirmDialog({
       <div className="relative bg-card rounded-lg w-full max-w-sm shadow-xl p-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-display font-semibold text-lg">{title}</h3>
-          <button type="button" onClick={onClose} disabled={loading} className="p-1.5 hover:bg-muted rounded-md disabled:opacity-50">
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={loading}
+            className="p-1.5 hover:bg-muted rounded-md disabled:opacity-50"
+          >
             <X size={18} />
           </button>
         </div>
@@ -57,7 +62,9 @@ export function ConfirmDialog({
             onClick={handleConfirm}
             disabled={loading}
           >
-            {loading && <span className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
+            {loading && (
+              <span className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            )}
             {confirmLabel}
           </BtnPrimary>
         </div>

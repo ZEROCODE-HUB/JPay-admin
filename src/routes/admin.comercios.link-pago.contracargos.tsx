@@ -66,7 +66,7 @@ export const Route = createFileRoute("/admin/comercios/link-pago/contracargos")(
 const ESTADO_LABEL: Record<EstadoContra, string> = {
   Simulado: "Simulado",
   Abierto: "Abierto",
-  "En_mediación": "En mediación",
+  En_mediación: "En mediación",
   En_mediacion: "En mediación",
   Cerrado_acreditado: "Cerrado acreditado",
   Cerrado_retenido: "Cerrado retenido",
@@ -120,7 +120,13 @@ function diasHabilesRestantes(fechaLimite: string): number {
   return count;
 }
 
-function PlazoMediacion({ fechaLimite, enviadoAt }: { fechaLimite: string | null; enviadoAt: string | null }) {
+function PlazoMediacion({
+  fechaLimite,
+  enviadoAt,
+}: {
+  fechaLimite: string | null;
+  enviadoAt: string | null;
+}) {
   if (!fechaLimite) {
     return (
       <p className="text-xs text-muted-foreground">
@@ -163,13 +169,7 @@ function PlazoMediacion({ fechaLimite, enviadoAt }: { fechaLimite: string | null
 // Detalle (modal de gestión)
 // ---------------------------------------------------------------------------
 
-function Detalle({
-  c,
-  onClose,
-}: {
-  c: Contra;
-  onClose: () => void;
-}) {
+function Detalle({ c, onClose }: { c: Contra; onClose: () => void }) {
   const qc = useQueryClient();
   const { can } = useCan();
   const puedeGestionar = can("modificar", "comercios");
@@ -331,10 +331,7 @@ function Detalle({
               )}
             </p>
           </div>
-          <button
-            onClick={onClose}
-            className="p-1.5 hover:bg-muted rounded-md"
-          >
+          <button onClick={onClose} className="p-1.5 hover:bg-muted rounded-md">
             <X size={18} />
           </button>
         </div>
@@ -378,9 +375,8 @@ function Detalle({
           {/* Flujo */}
           <div className="rounded-lg bg-muted/40 border px-3 py-2 text-xs flex items-center gap-1.5 flex-wrap">
             <span className="font-semibold">Flujo:</span>
-            <span>Visa</span> <ArrowRight size={12} /> <span>PayWay</span>{" "}
-            <ArrowRight size={12} /> <span>{brand.name}</span>{" "}
-            <ArrowRight size={12} /> <span>comprador</span>
+            <span>Visa</span> <ArrowRight size={12} /> <span>PayWay</span> <ArrowRight size={12} />{" "}
+            <span>{brand.name}</span> <ArrowRight size={12} /> <span>comprador</span>
           </div>
 
           {/* Link original */}
@@ -656,8 +652,8 @@ function Detalle({
                     <p className="text-xs text-muted-foreground mt-1">Buscando lotes…</p>
                   ) : lotes.length === 0 ? (
                     <p className="text-xs text-amber-700 mt-1">
-                      Este comercio no tiene lotes en Programado/Pendiente.
-                      El contracargo quedará cerrado pero sin impacto.
+                      Este comercio no tiene lotes en Programado/Pendiente. El contracargo quedará
+                      cerrado pero sin impacto.
                     </p>
                   ) : (
                     <select
@@ -840,8 +836,8 @@ function CrearModal({ onClose }: { onClose: () => void }) {
         </div>
         <div className="p-6 space-y-4">
           <p className="text-xs text-muted-foreground">
-            Cargá los datos del contracargo para simular el impacto sin afectar la
-            caja ni los lotes.
+            Cargá los datos del contracargo para simular el impacto sin afectar la caja ni los
+            lotes.
           </p>
           <div>
             <Label>Comercio</Label>
@@ -941,14 +937,10 @@ function Page() {
     if (!sb) return;
     const ch = sb
       .channel("realtime-contracargos-admin")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "contracargos" },
-        () => {
-          qc.invalidateQueries({ queryKey: ["contracargos"] });
-          qc.invalidateQueries({ queryKey: ["lotes"] });
-        },
-      )
+      .on("postgres_changes", { event: "*", schema: "public", table: "contracargos" }, () => {
+        qc.invalidateQueries({ queryKey: ["contracargos"] });
+        qc.invalidateQueries({ queryKey: ["lotes"] });
+      })
       .subscribe();
     return () => {
       sb.removeChannel(ch);
@@ -999,12 +991,8 @@ function Page() {
       filterable: true,
       render: (r) => (
         <div>
-          <div className="font-semibold text-sm truncate max-w-[140px]">
-            {r.comercioNombre}
-          </div>
-          <div className="font-mono text-xs text-muted-foreground">
-            {r.comercioLegajo}
-          </div>
+          <div className="font-semibold text-sm truncate max-w-[140px]">{r.comercioNombre}</div>
+          <div className="font-mono text-xs text-muted-foreground">{r.comercioLegajo}</div>
         </div>
       ),
     },
@@ -1023,9 +1011,7 @@ function Page() {
       filterable: true,
       render: (r) => (
         <div className="space-y-0.5">
-          {r.ticketPayway && (
-            <span className="font-mono text-xs block">{r.ticketPayway}</span>
-          )}
+          {r.ticketPayway && <span className="font-mono text-xs block">{r.ticketPayway}</span>}
           {r.siteTransactionId && (
             <span
               className="font-mono text-[10px] text-muted-foreground block truncate max-w-[160px]"
@@ -1060,7 +1046,7 @@ function Page() {
   const kpis: Record<EstadoContra, number> = {
     Simulado: 0,
     Abierto: 0,
-    "En_mediación": 0,
+    En_mediación: 0,
     En_mediacion: 0,
     Cerrado_acreditado: 0,
     Cerrado_retenido: 0,
@@ -1074,9 +1060,9 @@ function Page() {
         description="Gestión de contracargos de links de pago. Simular impacto → confirmar para aplicar."
       />
       <div className="rounded-lg border bg-muted/30 px-3 py-2 text-xs text-muted-foreground mb-4">
-        <strong>Flujo:</strong> Simular (carga manual) → Confirmar (aplica
-        descuento al lote) → En mediación (doc) → Cerrado acreditado / retenido.
-        Los contracargos de simulación no afectan la caja ni los lotes.
+        <strong>Flujo:</strong> Simular (carga manual) → Confirmar (aplica descuento al lote) → En
+        mediación (doc) → Cerrado acreditado / retenido. Los contracargos de simulación no afectan
+        la caja ni los lotes.
       </div>
 
       <div className="flex items-center justify-between mb-4 gap-3">

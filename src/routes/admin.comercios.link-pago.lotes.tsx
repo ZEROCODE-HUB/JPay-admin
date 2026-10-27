@@ -59,7 +59,10 @@ export const Route = createFileRoute("/admin/comercios/link-pago/lotes")({
   head: () => ({
     meta: [
       { title: pageTitle("Lotes de Acreditación — Links de Pago — Admin") },
-      { name: "description", content: `Lotes generados por ${brand.name} para acreditar pagos a comercios.` },
+      {
+        name: "description",
+        content: `Lotes generados por ${brand.name} para acreditar pagos a comercios.`,
+      },
     ],
   }),
 });
@@ -82,12 +85,15 @@ function tone(e: EstadoLote): "success" | "warn" | "danger" | "neutral" {
  * que el operador note que hay un estado que no está en la lista y lo
  * revise, en vez de mostrarlo silenciosamente como neutral.
  */
-function estadoMovimientoTone(codigo: string | null | undefined): "success" | "warn" | "danger" | "neutral" {
+function estadoMovimientoTone(
+  codigo: string | null | undefined,
+): "success" | "warn" | "danger" | "neutral" {
   if (!codigo) return "neutral";
   const c = codigo.toUpperCase();
   if (c === "APROBADO" || c === "ACREDITADO" || c === "COMPLETADO") return "success";
   if (c === "RECHAZADO" || c === "CANCELADO" || c === "DEVUELTO") return "danger";
-  if (c === "PENDIENTE" || c === "EN_PROGRESO" || c === "EN_REVISION" || c === "REQUIERE_ACCION") return "warn";
+  if (c === "PENDIENTE" || c === "EN_PROGRESO" || c === "EN_REVISION" || c === "REQUIERE_ACCION")
+    return "warn";
   return "warn";
 }
 
@@ -168,12 +174,9 @@ function totalDescuentos(l: LoteAcreditacion): number {
   // Si los 3 snapshots están en 0 y el legacy > 0, usamos el legacy
   // (lotes viejos acreditados con la fórmula hardcoded). Si no, usamos
   // la suma de los snapshots reales del motor de retenciones.
-  const totalReal =
-    (l.ivaMonto ?? 0) + (l.debitoCreditoMonto ?? 0) + (l.iibbMonto ?? 0);
+  const totalReal = (l.ivaMonto ?? 0) + (l.debitoCreditoMonto ?? 0) + (l.iibbMonto ?? 0);
   const usarLegacy = totalReal === 0 && (l.impuestos ?? 0) > 0;
-  const impuestos = usarLegacy
-    ? (l.impuestos ?? 0)
-    : totalReal;
+  const impuestos = usarLegacy ? (l.impuestos ?? 0) : totalReal;
   return (
     impuestos +
     tasas.paywayMonto +
@@ -233,7 +236,10 @@ function LoteDetalle({
     const data = [
       { Campo: "Código", Valor: lote.codigo },
       { Campo: "Fecha estimada", Valor: parseDateLocal(lote.fecha).toLocaleDateString("es-AR") },
-      { Campo: "Fecha cobro real", Valor: lote.fechaCobroReal ? fmtFechaCorta(lote.fechaCobroReal) : "—" },
+      {
+        Campo: "Fecha cobro real",
+        Valor: lote.fechaCobroReal ? fmtFechaCorta(lote.fechaCobroReal) : "—",
+      },
       { Campo: "Comercio", Valor: lote.comercio?.nombreComercio ?? lote.comercio?.usuario ?? "—" },
       { Campo: "Legajo", Valor: lote.comercio?.legajo ?? lote.comercioId },
       { Campo: "Bandera", Valor: lote.bandera },
@@ -279,10 +285,16 @@ function LoteDetalle({
             </p>
           </div>
           <div className="flex gap-2">
-            <button onClick={exportLote} className="p-1.5 hover:bg-muted rounded-md" title="Exportar a Excel">
+            <button
+              onClick={exportLote}
+              className="p-1.5 hover:bg-muted rounded-md"
+              title="Exportar a Excel"
+            >
               <Download size={18} />
             </button>
-            <button onClick={onClose} className="p-1.5 hover:bg-muted rounded-md">✕</button>
+            <button onClick={onClose} className="p-1.5 hover:bg-muted rounded-md">
+              ✕
+            </button>
           </div>
         </div>
         <div className="p-6 space-y-4">
@@ -313,7 +325,9 @@ function LoteDetalle({
               <div className="font-semibold mt-1 truncate">
                 {lote.comercio?.nombreComercio ?? lote.comercio?.usuario ?? "—"}
               </div>
-              <div className="font-mono text-xs text-muted-foreground">{lote.comercio?.legajo ?? lote.comercioId}</div>
+              <div className="font-mono text-xs text-muted-foreground">
+                {lote.comercio?.legajo ?? lote.comercioId}
+              </div>
             </Card>
             <Card className="p-3">
               <div className="text-xs text-muted-foreground">Bandera</div>
@@ -336,9 +350,7 @@ function LoteDetalle({
               <h4 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                 Detalle financiero del lote
               </h4>
-              {loteEstimado && (
-                <Badge tone="neutral">Proyección — sujeto al CSV de Payway</Badge>
-              )}
+              {loteEstimado && <Badge tone="neutral">Proyección — sujeto al CSV de Payway</Badge>}
             </div>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
@@ -373,7 +385,8 @@ function LoteDetalle({
                           <Receipt size={12} /> IVA
                           {lote.tasaPropiaPct > 0 && (
                             <span className="text-[10px] text-muted-foreground/70">
-                              ({(iva / Math.max(lote.tasaPropiaMonto, 0.01) * 100).toFixed(0)}% s/comision)
+                              ({((iva / Math.max(lote.tasaPropiaMonto, 0.01)) * 100).toFixed(0)}%
+                              s/comision)
                             </span>
                           )}
                         </span>
@@ -400,9 +413,7 @@ function LoteDetalle({
                       <div className="flex justify-between text-xs">
                         <span className="text-muted-foreground flex items-center gap-1">
                           <Receipt size={12} /> Impuestos
-                          <span className="text-[10px] text-muted-foreground/70">
-                            (legacy)
-                          </span>
+                          <span className="text-[10px] text-muted-foreground/70">(legacy)</span>
                         </span>
                         <span className="font-mono text-danger-600">- {fmt(legacy)}</span>
                       </div>
@@ -417,7 +428,9 @@ function LoteDetalle({
                     )}
                     <div className="flex justify-between text-xs font-medium">
                       <span className="text-muted-foreground">Menos impuestos</span>
-                      <span className={`font-mono ${loteEstimado ? "text-muted-foreground/70" : ""}`}>
+                      <span
+                        className={`font-mono ${loteEstimado ? "text-muted-foreground/70" : ""}`}
+                      >
                         {fmt(lote.importeBruto - (usarLegacy ? legacy : totalReal))}
                       </span>
                     </div>
@@ -473,7 +486,9 @@ function LoteDetalle({
                 <div className="flex justify-between text-xs">
                   <span className="text-muted-foreground flex items-center gap-1">
                     <Receipt size={12} /> Contracargo{" "}
-                    <Badge tone="danger" className="ml-1">retenido</Badge>
+                    <Badge tone="danger" className="ml-1">
+                      retenido
+                    </Badge>
                   </span>
                   <span className="font-mono text-danger-600">- {fmt(contracargo)}</span>
                 </div>
@@ -489,17 +504,15 @@ function LoteDetalle({
               </p>
               {loteEstimado && (
                 <p className="text-[11px] text-amber-700 bg-amber-50 border border-amber-200 rounded px-2 py-1.5">
-                  El 0,45% de cierre de lote se calcula y debita únicamente
-                  al confirmar la liquidación (estado Pendiente → Acreditado).
-                  Hasta entonces los importes son una proyección.
+                  El 0,45% de cierre de lote se calcula y debita únicamente al confirmar la
+                  liquidación (estado Pendiente → Acreditado). Hasta entonces los importes son una
+                  proyección.
                 </p>
               )}
               <div className="border-t my-2" />
               <div className="flex justify-between text-xs text-muted-foreground">
                 <span>Total descuentos</span>
-                <span
-                  className={`font-mono ${loteEstimado ? "text-muted-foreground/70" : ""}`}
-                >
+                <span className={`font-mono ${loteEstimado ? "text-muted-foreground/70" : ""}`}>
                   - {fmt(totalDesc)}
                 </span>
               </div>
@@ -531,7 +544,9 @@ function LoteDetalle({
               {lote.resueltoPor && (
                 <p className="text-[11px] text-muted-foreground">
                   Resuelto por {lote.resueltoPor}{" "}
-                  {lote.fechaResolucion ? `· ${new Date(lote.fechaResolucion).toLocaleString("es-AR")}` : ""}
+                  {lote.fechaResolucion
+                    ? `· ${new Date(lote.fechaResolucion).toLocaleString("es-AR")}`
+                    : ""}
                 </p>
               )}
             </div>
@@ -543,8 +558,8 @@ function LoteDetalle({
             </h4>
             {movs.length === 0 ? (
               <p className="text-sm text-muted-foreground">
-                Sin movimientos vinculados — el lote aún no tiene movimientos asignados o no se
-                pudo cargar.
+                Sin movimientos vinculados — el lote aún no tiene movimientos asignados o no se pudo
+                cargar.
               </p>
             ) : (
               <div className="overflow-x-auto max-h-64 overflow-y-auto border rounded-lg">
@@ -566,7 +581,9 @@ function LoteDetalle({
                           <div className="font-medium truncate max-w-[140px]">
                             {m.cliente?.nombre ?? "—"}
                           </div>
-                          <div className="text-muted-foreground text-[10px]">{m.cliente?.correo}</div>
+                          <div className="text-muted-foreground text-[10px]">
+                            {m.cliente?.correo}
+                          </div>
                         </td>
                         <td className="px-3 py-2 text-right font-mono font-semibold">
                           {fmt(m.montoOperacion)}
@@ -713,7 +730,9 @@ function ComercioDetalleModal({
               {data.legajo} · {data.cantidadLotes} lotes · {data.cantidadOps} ops
             </p>
           </div>
-          <button onClick={onClose} className="p-1.5 hover:bg-muted rounded-md">✕</button>
+          <button onClick={onClose} className="p-1.5 hover:bg-muted rounded-md">
+            ✕
+          </button>
         </div>
         <div className="p-6 space-y-4">
           <div className="grid grid-cols-2 gap-3">
@@ -722,7 +741,9 @@ function ComercioDetalleModal({
               <div className="font-mono font-semibold mt-1">{fmt(data.pendienteAcreditar)}</div>
               <div className="text-[11px] text-muted-foreground">
                 Máximo adelantable{" "}
-                {data.totalContracargo ? `— contracargo ${fmt(data.totalContracargo)} descontado` : ""}
+                {data.totalContracargo
+                  ? `— contracargo ${fmt(data.totalContracargo)} descontado`
+                  : ""}
               </div>
             </Card>
             <Card className="p-3">
@@ -883,9 +904,11 @@ function Page() {
   const [detail, setDetail] = useState<LoteAcreditacion | null>(null);
   const [comercioDetail, setComercioDetail] = useState<ResumenComercio | null>(null);
   const [confirm, setConfirm] = useState<{ title: string; message: string } | null>(null);
-  const [contracargoModal, setContracargoModal] = useState<
-    { lote: LoteAcreditacion; notas: string; contracargoMonto: string } | null
-  >(null);
+  const [contracargoModal, setContracargoModal] = useState<{
+    lote: LoteAcreditacion;
+    notas: string;
+    contracargoMonto: string;
+  } | null>(null);
   // Cargar CSV: null = cerrado. Si trae `lote`, modo per-lote; si no, modo general.
   const [cargarCsv, setCargarCsv] = useState<{ lote: LoteAcreditacion | null } | null>(null);
   const [confirmarAcreditacion, setConfirmarAcreditacion] = useState<LoteAcreditacion | null>(null);
@@ -930,7 +953,8 @@ function Page() {
   // mutación, así que las cards se refrescan solas.
   const resumenQuery = useQuery({
     queryKey: ["lotes-resumen", fechaDesde, fechaHasta],
-    queryFn: () => resumenLotes({ fechaDesde: fechaDesde || undefined, fechaHasta: fechaHasta || undefined }),
+    queryFn: () =>
+      resumenLotes({ fechaDesde: fechaDesde || undefined, fechaHasta: fechaHasta || undefined }),
   });
   const resumen = resumenQuery.data;
 
@@ -1107,9 +1131,7 @@ function Page() {
   };
 
   const getActions = (r: LoteAcreditacion): ActionItem[] => {
-    const base: ActionItem[] = [
-      { label: "Ver detalle", icon: Eye, onClick: () => setDetail(r) },
-    ];
+    const base: ActionItem[] = [{ label: "Ver detalle", icon: Eye, onClick: () => setDetail(r) }];
     if (r.estado === "Programado") {
       base.push({
         label: "Subir CSV",
@@ -1136,7 +1158,11 @@ function Page() {
         icon: Gavel,
         disabled: !puedeGestionar,
         onClick: () =>
-          setContracargoModal({ lote: r, notas: "", contracargoMonto: String(r.contracargoMonto ?? "") }),
+          setContracargoModal({
+            lote: r,
+            notas: "",
+            contracargoMonto: String(r.contracargoMonto ?? ""),
+          }),
       });
     }
     return base;
@@ -1181,7 +1207,11 @@ function Page() {
       return (
         <button
           onClick={() =>
-            setContracargoModal({ lote: r, notas: "", contracargoMonto: String(r.contracargoMonto ?? "") })
+            setContracargoModal({
+              lote: r,
+              notas: "",
+              contracargoMonto: String(r.contracargoMonto ?? ""),
+            })
           }
           className="h-8 px-3 rounded-md text-xs font-semibold bg-card border text-foreground hover:bg-muted inline-flex items-center gap-1"
         >
@@ -1301,9 +1331,7 @@ function Page() {
           >
             - {fmt(totalDescuentos(r))}
             {estimado && (
-              <span className="ml-1 text-[10px] text-muted-foreground/70">
-                (sin 0,45%)
-              </span>
+              <span className="ml-1 text-[10px] text-muted-foreground/70">(sin 0,45%)</span>
             )}
           </span>
         );
@@ -1364,7 +1392,9 @@ function Page() {
       key: "pendienteAcreditar",
       label: "Pendiente de acreditar",
       minWidth: 150,
-      render: (r) => <span className="font-mono text-xs font-semibold">{fmt(r.pendienteAcreditar)}</span>,
+      render: (r) => (
+        <span className="font-mono text-xs font-semibold">{fmt(r.pendienteAcreditar)}</span>
+      ),
     },
     {
       key: "pendienteImpuestos",
@@ -1382,13 +1412,17 @@ function Page() {
       key: "totalPropio",
       label: `Neto ${brand.name}`,
       minWidth: 140,
-      render: (r) => <span className="font-mono text-xs text-emerald-700">{fmt(r.totalPropio)}</span>,
+      render: (r) => (
+        <span className="font-mono text-xs text-emerald-700">{fmt(r.totalPropio)}</span>
+      ),
     },
     {
       key: "totalFinal",
       label: "Total a pagar",
       minWidth: 140,
-      render: (r) => <span className="font-mono font-semibold text-emerald-700">{fmt(r.totalFinal)}</span>,
+      render: (r) => (
+        <span className="font-mono font-semibold text-emerald-700">{fmt(r.totalFinal)}</span>
+      ),
     },
   ];
 
@@ -1430,7 +1464,9 @@ function Page() {
             <span>Programados</span>
             <Badge tone="neutral">est.</Badge>
           </div>
-          <div className="font-mono text-xl font-semibold mt-1">{resumen?.programados.cantidad ?? 0}</div>
+          <div className="font-mono text-xl font-semibold mt-1">
+            {resumen?.programados.cantidad ?? 0}
+          </div>
           <div className="text-[11px] text-muted-foreground mt-0.5 font-mono">
             {fmt(resumen?.programados.monto ?? 0)}
           </div>
@@ -1478,7 +1514,10 @@ function Page() {
           <div className="flex-1 min-w-[180px]">
             <Label>Buscar</Label>
             <div className="relative">
-              <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+              <Search
+                size={14}
+                className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"
+              />
               <Input
                 value={search}
                 onChange={(e) => {
@@ -1581,7 +1620,9 @@ function Page() {
         <button
           onClick={() => setTab("lotes")}
           className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-            tab === "lotes" ? "border-primary text-primary-ink" : "border-transparent text-muted-foreground hover:text-foreground"
+            tab === "lotes"
+              ? "border-primary text-primary-ink"
+              : "border-transparent text-muted-foreground hover:text-foreground"
           }`}
         >
           Lotes por bandera
@@ -1589,7 +1630,9 @@ function Page() {
         <button
           onClick={() => setTab("resumen")}
           className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-            tab === "resumen" ? "border-primary text-primary-ink" : "border-transparent text-muted-foreground hover:text-foreground"
+            tab === "resumen"
+              ? "border-primary text-primary-ink"
+              : "border-transparent text-muted-foreground hover:text-foreground"
           }`}
         >
           Resumen por comercio
@@ -1605,7 +1648,10 @@ function Page() {
         <div className="flex flex-col items-center gap-3 rounded-xl border border-danger-200 bg-danger-50 px-6 py-12 text-center text-sm text-danger-700">
           <AlertTriangle size={28} />
           <p>{err?.message ?? "Error"}</p>
-          <button onClick={() => refetch()} className="h-9 px-4 rounded-md bg-primary text-primary-foreground">
+          <button
+            onClick={() => refetch()}
+            className="h-9 px-4 rounded-md bg-primary text-primary-foreground"
+          >
             Reintentar
           </button>
         </div>
@@ -1653,9 +1699,9 @@ function Page() {
       ) : (
         <>
           <p className="text-sm text-muted-foreground mb-3">
-            Total consolidado que corresponde pagar a cada comercio (suma de todos sus lotes
-            por bandera). Pendiente de acreditar = máximo adelantable. Agregación client-side
-            sobre la página actual; para total global sin paginación usar query separada.
+            Total consolidado que corresponde pagar a cada comercio (suma de todos sus lotes por
+            bandera). Pendiente de acreditar = máximo adelantable. Agregación client-side sobre la
+            página actual; para total global sin paginación usar query separada.
           </p>
           <DataTable
             columns={resumenColumns}
@@ -1694,7 +1740,11 @@ function Page() {
       )}
 
       {comercioDetail && (
-        <ComercioDetalleModal data={comercioDetail} lotes={lotes} onClose={() => setComercioDetail(null)} />
+        <ComercioDetalleModal
+          data={comercioDetail}
+          lotes={lotes}
+          onClose={() => setComercioDetail(null)}
+        />
       )}
 
       {contracargoModal && (
@@ -1737,7 +1787,8 @@ function Page() {
                       contracargoModal.lote.impuestos -
                       tasas.paywayMonto -
                       tasas.propiaMonto -
-                      (parseFloat(contracargoModal.contracargoMonto.replace(",", ".") || "0") || 0) -
+                      (parseFloat(contracargoModal.contracargoMonto.replace(",", ".") || "0") ||
+                        0) -
                       (contracargoModal.lote.comisionCierreLoteMonto ?? 0),
                   );
                 })()}
@@ -1747,7 +1798,9 @@ function Page() {
               <label className="text-xs font-semibold">Notas</label>
               <textarea
                 value={contracargoModal.notas}
-                onChange={(e) => setContracargoModal({ ...contracargoModal, notas: e.target.value })}
+                onChange={(e) =>
+                  setContracargoModal({ ...contracargoModal, notas: e.target.value })
+                }
                 rows={3}
                 placeholder="Motivo, ticket PayWay, notas internas..."
                 className="mt-1 w-full rounded-md border bg-background px-3 py-2 text-sm"

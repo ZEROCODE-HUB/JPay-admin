@@ -388,7 +388,15 @@ function SectionCard({
   );
 }
 
-function KpiCard({ label, value, tone }: { label: string; value: string; tone?: "default" | "muted" }) {
+function KpiCard({
+  label,
+  value,
+  tone,
+}: {
+  label: string;
+  value: string;
+  tone?: "default" | "muted";
+}) {
   return (
     <div className="rounded-xl border border-border bg-card p-4">
       <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{label}</p>
@@ -608,39 +616,37 @@ function AccionesMenu({
       >
         <MoreVertical size={16} />
       </button>
-      {open && createPortal(
-        <>
-          <div className="fixed inset-0 z-30" onClick={() => setOpen(false)} />
-          <div
-            className="fixed z-40 w-44 overflow-hidden rounded-md border border-border bg-card shadow-lg"
-            style={{ top: pos.top, left: pos.left }}
-          >
-            {items.map((it) => (
-              <button
-                key={it.label}
-                type="button"
-                disabled={it.disabled}
-                onClick={() => {
-                  setOpen(false);
-                  it.onClick();
-                }}
-                className="block w-full px-3 py-2 text-left text-sm hover:bg-accent disabled:opacity-50 disabled:hover:bg-transparent"
-              >
-                {it.label}
-              </button>
-            ))}
-          </div>
-        </>,
-        document.body,
-      )}
+      {open &&
+        createPortal(
+          <>
+            <div className="fixed inset-0 z-30" onClick={() => setOpen(false)} />
+            <div
+              className="fixed z-40 w-44 overflow-hidden rounded-md border border-border bg-card shadow-lg"
+              style={{ top: pos.top, left: pos.left }}
+            >
+              {items.map((it) => (
+                <button
+                  key={it.label}
+                  type="button"
+                  disabled={it.disabled}
+                  onClick={() => {
+                    setOpen(false);
+                    it.onClick();
+                  }}
+                  className="block w-full px-3 py-2 text-left text-sm hover:bg-accent disabled:opacity-50 disabled:hover:bg-transparent"
+                >
+                  {it.label}
+                </button>
+              ))}
+            </div>
+          </>,
+          document.body,
+        )}
     </div>
   );
 }
 
-function toDetalleMovimiento(
-  m: Movimiento,
-  catalogo: EstadoMovimiento[],
-): DetailMovimiento {
+function toDetalleMovimiento(m: Movimiento, catalogo: EstadoMovimiento[]): DetailMovimiento {
   return {
     clienteId: m.clienteId,
     legajo: m.legajo,
@@ -780,7 +786,7 @@ function TablaImpuestos({
 
 function camposIdentificacion(c: Cliente) {
   const partes = c.nombre.trim().split(/\s+/);
-  const apellidoDerivado = c.tipoPersona === "juridica" ? "—" : (partes.slice(1).join(" ") || "—");
+  const apellidoDerivado = c.tipoPersona === "juridica" ? "—" : partes.slice(1).join(" ") || "—";
   const nombreDerivado = c.tipoPersona === "juridica" ? c.nombre : (partes[0] ?? c.nombre);
   const personal: { label: string; valor: string }[] = [
     { label: "Legajo", valor: c.legajo },
@@ -812,20 +818,20 @@ function camposIdentificacion(c: Cliente) {
   const empresa: { label: string; valor: string }[] = [
     { label: "CUIT de la empresa", valor: c.cuit ?? "—" },
     { label: "Tipo de empresa", valor: c.tipoSociedad ?? "—" },
-    { label: "Nombre legal", valor: c.nombreLegal ?? (c.tipoPersona === "juridica" ? c.nombre : "—") },
+    {
+      label: "Nombre legal",
+      valor: c.nombreLegal ?? (c.tipoPersona === "juridica" ? c.nombre : "—"),
+    },
     { label: "Nombre comercial", valor: c.nombreFantasia ?? "—" },
-    { label: "Fecha de inscripción", valor: c.fechaInscripcion ? fmtFecha(c.fechaInscripcion) : "—" },
+    {
+      label: "Fecha de inscripción",
+      valor: c.fechaInscripcion ? fmtFecha(c.fechaInscripcion) : "—",
+    },
   ];
   return { personal, compliance, empresa };
 }
 
-function SubcuentasTab({
-  legajo,
-  onEximirCuit,
-}: {
-  legajo: string;
-  onEximirCuit: () => void;
-}) {
+function SubcuentasTab({ legajo, onEximirCuit }: { legajo: string; onEximirCuit: () => void }) {
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [masivaOpen, setMasivaOpen] = useState(false);
@@ -1456,7 +1462,15 @@ function ApiUsuariosInline({
               <td className="px-4 py-3">{u.usuario}</td>
               <td className="px-4 py-3">{u.nombreCompleto}</td>
               <td className="px-4 py-3">
-                <Badge tone={u.estado === "Producción" ? "success" : u.estado === "Homologación" ? "warn" : "neutral"}>
+                <Badge
+                  tone={
+                    u.estado === "Producción"
+                      ? "success"
+                      : u.estado === "Homologación"
+                        ? "warn"
+                        : "neutral"
+                  }
+                >
                   {u.estado}
                 </Badge>
               </td>
@@ -1524,7 +1538,13 @@ function ApiUsuariosModal({
           data={query.data! as never}
           keyExtractor={(u) => u.id}
           emptyMessage="Sin usuarios API"
-          actions={(u: { id: string; codigoUsuarioApi: string; usuario: string; nombreCompleto: string; estado: string }) => (
+          actions={(u: {
+            id: string;
+            codigoUsuarioApi: string;
+            usuario: string;
+            nombreCompleto: string;
+            estado: string;
+          }) => (
             <button
               type="button"
               onClick={() => setDetalle(u)}
@@ -1620,16 +1640,11 @@ function CargaMasivaSubcuentas({
   };
 
   return (
-    <ModalDialog
-      open={open}
-      onClose={onClose}
-      title="Carga masiva de subcuentas"
-      size="lg"
-    >
+    <ModalDialog open={open} onClose={onClose} title="Carga masiva de subcuentas" size="lg">
       <div className="space-y-3">
         <p className="text-xs text-muted-foreground">
-          Columnas esperadas: <code>nombre, apellido, email, cbu, tipo</code>. La primera fila
-          puede ser el encabezado.
+          Columnas esperadas: <code>nombre, apellido, email, cbu, tipo</code>. La primera fila puede
+          ser el encabezado.
         </p>
         <input
           type="file"
@@ -1638,9 +1653,7 @@ function CargaMasivaSubcuentas({
           className="block w-full text-sm file:mr-3 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-1.5 file:text-primary-foreground"
         />
         {vista.length > 0 && (
-          <p className="text-xs text-muted-foreground">
-            {vista.length} fila(s) detectada(s).
-          </p>
+          <p className="text-xs text-muted-foreground">{vista.length} fila(s) detectada(s).</p>
         )}
         {err && <p className="text-sm text-danger-600">{err}</p>}
         <div className="flex justify-end gap-2">
@@ -1827,11 +1840,9 @@ function ApiDetalleModal({
   });
   const [logDetalle, setLogDetalle] = useState<ApiUsuarioLog | null>(null);
   const queryClient = useQueryClient();
-  const credencialActiva =
-    usuario?.estado === "Producción" || usuario?.estado === "Homologación";
+  const credencialActiva = usuario?.estado === "Producción" || usuario?.estado === "Homologación";
   const cambiarCredencial = useMutation({
-    mutationFn: (estado: EstadoApiUsuario) =>
-      setApiUsuarioEstado(effectiveId!, estado),
+    mutationFn: (estado: EstadoApiUsuario) => setApiUsuarioEstado(effectiveId!, estado),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["api_usuarios"] });
       queryClient.invalidateQueries({ queryKey: ["cliente_api_usuarios"] });
@@ -1923,7 +1934,9 @@ function ApiDetalleModal({
                   <td className="px-3 py-2 font-medium font-mono break-all">
                     {usuario?.codigoUsuarioApi ?? "—"}
                   </td>
-                  <td className="px-3 py-2">Creado a través de solicitud de registro de usuario.</td>
+                  <td className="px-3 py-2">
+                    Creado a través de solicitud de registro de usuario.
+                  </td>
                   <td className="px-3 py-2">{fmtFechaHora(usuario?.createdAt)}</td>
                   <td className="px-3 py-2">
                     <Badge tone={credencialActiva ? "success" : "danger"}>
@@ -2092,7 +2105,9 @@ function ApiDetalleModal({
               </div>
               <div className="flex justify-between gap-2 border-b border-border pb-1">
                 <span className="text-muted-foreground">Endpoint</span>
-                <span className="font-medium font-mono break-all">{logDetalle.detalle.endpoint}</span>
+                <span className="font-medium font-mono break-all">
+                  {logDetalle.detalle.endpoint}
+                </span>
               </div>
               <div className="flex justify-between gap-2 border-b border-border pb-1">
                 <span className="text-muted-foreground">Tiempo de Respuesta</span>
@@ -2170,7 +2185,9 @@ function PlaftRiesgoModal({
 
   const submit = () => {
     if (motivo.trim().length < 10) {
-      setMotivoError("Describí brevemente por qué (mín. 10 caracteres). Queda en la auditoría PLAFT.");
+      setMotivoError(
+        "Describí brevemente por qué (mín. 10 caracteres). Queda en la auditoría PLAFT.",
+      );
       return;
     }
     onSubmit(nivel, motivo.trim(), vigenteHasta || null);
@@ -2182,8 +2199,8 @@ function PlaftRiesgoModal({
         <div>
           <h3 className="font-display font-semibold text-lg">Nivel de riesgo PLAFT</h3>
           <p className="text-xs text-muted-foreground mt-1">
-            Legajo <span className="font-mono">{legajo}</span>. La evaluación vigente anterior se cierra
-            automáticamente; toda la historia queda registrada.
+            Legajo <span className="font-mono">{legajo}</span>. La evaluación vigente anterior se
+            cierra automáticamente; toda la historia queda registrada.
           </p>
         </div>
 
@@ -2301,9 +2318,13 @@ function PlaftPerfilModal({
 
   useEffect(() => {
     if (open) {
-      setLimiteTransferencia(initial.limiteTransferencia != null ? String(initial.limiteTransferencia) : "");
+      setLimiteTransferencia(
+        initial.limiteTransferencia != null ? String(initial.limiteTransferencia) : "",
+      );
       setLimiteOpsDiarias(initial.limiteOpsDiarias != null ? String(initial.limiteOpsDiarias) : "");
-      setLimiteMontoDiario(initial.limiteMontoDiario != null ? String(initial.limiteMontoDiario) : "");
+      setLimiteMontoDiario(
+        initial.limiteMontoDiario != null ? String(initial.limiteMontoDiario) : "",
+      );
     }
   }, [open, initial]);
 
@@ -2369,8 +2390,8 @@ function PlaftPerfilModal({
         </div>
 
         <p className="text-xs text-muted-foreground">
-          El motor de alertas (cuando esté activo) comparará estas cifras con los movimientos del cliente y
-          disparará automáticamente alertas de exceso / variación cuando corresponda.
+          El motor de alertas (cuando esté activo) comparará estas cifras con los movimientos del
+          cliente y disparará automáticamente alertas de exceso / variación cuando corresponda.
         </p>
 
         <div className="flex justify-end gap-2 pt-2">
@@ -2404,9 +2425,13 @@ function ClienteDetailPage() {
   const { can } = useCan();
   const puedeModificar = can("modificar", "usuarios");
 
-  const { cliente: clienteReal, isLoading, isError, error, refetch } = useClienteByLegajo(
-    legajo ?? null,
-  );
+  const {
+    cliente: clienteReal,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useClienteByLegajo(legajo ?? null);
 
   // Las personas jurídicas de la lista son mock; si el backend no tiene la fila
   // pero coincide con el catálogo mock, sintetizamos un cliente para poder
@@ -2428,7 +2453,8 @@ function ClienteDetailPage() {
             if (e === "Rechazado" || e === "Deshabilitado") return "deshabilitado" as const;
             if (e === "Pre-activado" || e === "Preactivado") return "preactivado" as const;
             if (e === "Registrado") return "registrado" as const;
-            if (e === "Pendiente de verificación de email") return "pendiente_verificacion" as const;
+            if (e === "Pendiente de verificación de email")
+              return "pendiente_verificacion" as const;
             if (e === "Activado") return "activado" as const;
             return "registrado" as const;
           })(),
@@ -2590,7 +2616,9 @@ function ClienteDetailPage() {
     staleTime: 30_000,
   });
   const riesgoVigente = (evaluacionesQuery.data ?? []).find((e) => e.vigente_hasta == null);
-  const evaluacionesAnteriores = (evaluacionesQuery.data ?? []).filter((e) => e.vigente_hasta != null);
+  const evaluacionesAnteriores = (evaluacionesQuery.data ?? []).filter(
+    (e) => e.vigente_hasta != null,
+  );
 
   const registrarRiesgoMutation = useMutation({
     mutationFn: registrarEvaluacionRiesgo,
@@ -2655,7 +2683,13 @@ function ClienteDetailPage() {
       else if (accion === "deshabilitar") res = await deshabilitarCliente(c);
       else if (accion === "eliminar") res = await eliminarCliente(c);
       if (!res.ok) {
-        setConfirmAction({ title: "No se pudo actualizar", message: res.motivo ?? "No se pudo completar", confirmLabel: "Cerrar", variant: "danger", onConfirm: () => setConfirmAction(null) });
+        setConfirmAction({
+          title: "No se pudo actualizar",
+          message: res.motivo ?? "No se pudo completar",
+          confirmLabel: "Cerrar",
+          variant: "danger",
+          onConfirm: () => setConfirmAction(null),
+        });
         toast.error(res.motivo ?? "No se pudo completar");
         return;
       }
@@ -2787,7 +2821,9 @@ function ClienteDetailPage() {
   const { personal: personalRaw, compliance } = camposIdentificacion(cliente);
   const cuentasCount = subcuentasQuery.isLoading ? "…" : String(subcuentasQuery.data?.length ?? 0);
   const personal = personalRaw.map((p) =>
-    p.label === "Cant. cuentas bancarias" || p.label === "Cant. cuentas virtuales" ? { ...p, valor: cuentasCount } : p
+    p.label === "Cant. cuentas bancarias" || p.label === "Cant. cuentas virtuales"
+      ? { ...p, valor: cuentasCount }
+      : p,
   );
 
   const tabLabel = (t: { key: TabKey; label: string }) => {
@@ -2803,7 +2839,9 @@ function ClienteDetailPage() {
   const linksPago = linksPagoQuery.data ?? [];
   const apiUsuariosVinculados = clienteApiUsuariosQuery.data ?? [];
   // cantidad real prevalece sobre desnormalizado cliente_modulos.cantidad
-  const apiCantidadReal = clienteApiUsuariosQuery.isSuccess ? apiUsuariosVinculados.length : (apiModulo?.cantidad ?? 0);
+  const apiCantidadReal = clienteApiUsuariosQuery.isSuccess
+    ? apiUsuariosVinculados.length
+    : (apiModulo?.cantidad ?? 0);
 
   const alertasHabilitadas = (paramAlertasQuery.data ?? []).filter((p) => p.habilitado).length;
   const bloqueosHabilitados = (paramBloqueosQuery.data ?? []).filter((p) => p.habilitado).length;
@@ -2839,7 +2877,12 @@ function ClienteDetailPage() {
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <Badge tone={(estadoTone[cliente.estado] ?? "neutral") as "success" | "danger" | "warn" | "neutral"}>
+            <Badge
+              tone={
+                (estadoTone[cliente.estado] ?? "neutral") as
+                  "success" | "danger" | "warn" | "neutral"
+              }
+            >
               {estadoLabel[cliente.estado] ?? cliente.estado}
             </Badge>
             {(() => {
@@ -2848,7 +2891,8 @@ function ClienteDetailPage() {
               const isPreactivado = norm === "preactivado";
               const isActivado = norm === "activado" || norm === "activo";
               const isSuspendido = norm === "suspendido";
-              const isTerminal = norm === "deshabilitado" || norm === "eliminado" || norm === "rechazado";
+              const isTerminal =
+                norm === "deshabilitado" || norm === "eliminado" || norm === "rechazado";
               return (
                 <>
                   {isRegistrado && puedeModificar && (
@@ -2982,7 +3026,9 @@ function ClienteDetailPage() {
         {(() => {
           const norm = (cliente.estado as string).toLowerCase();
           if (norm === "preactivado") {
-            const hasCbu = Boolean(cliente.cbu && !cliente.cbuCancelado) || (subcuentasQuery.data?.length ?? 0) > 0;
+            const hasCbu =
+              Boolean(cliente.cbu && !cliente.cbuCancelado) ||
+              (subcuentasQuery.data?.length ?? 0) > 0;
             const hasCom = (comisionesRealesQuery.data?.rows.length ?? 0) > 0;
             return (
               <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
@@ -2991,15 +3037,20 @@ function ClienteDetailPage() {
                   <li>CVU: {hasCbu ? "✓ cargado" : "✗ pendiente"}</li>
                   <li>Comisión: {hasCom ? "✓ cargada" : "✗ pendiente"}</li>
                 </ul>
-                {!hasCbu && <p className="mt-1 text-xs">Cargar CVU en la pestaña Subcuentas y CVUs.</p>}
-                {!hasCom && <p className="mt-1 text-xs">Cargar comisión en Admin → Usuarios → Comisiones.</p>}
+                {!hasCbu && (
+                  <p className="mt-1 text-xs">Cargar CVU en la pestaña Subcuentas y CVUs.</p>
+                )}
+                {!hasCom && (
+                  <p className="mt-1 text-xs">Cargar comisión en Admin → Usuarios → Comisiones.</p>
+                )}
               </div>
             );
           }
           if (norm === "pendiente_verificacion") {
             return (
               <div className="mt-4 rounded-xl border border-border bg-muted/30 px-4 py-3 text-sm text-muted-foreground">
-                Usuario pendiente de verificación de email. Debe verificar su correo para pasar a Registrado.
+                Usuario pendiente de verificación de email. Debe verificar su correo para pasar a
+                Registrado.
               </div>
             );
           }
@@ -3102,7 +3153,9 @@ function ClienteDetailPage() {
               <div className="rounded-xl border border-border bg-card p-4">
                 <div className="flex flex-wrap items-end gap-3">
                   <div>
-                    <label className="mb-1 block text-xs font-semibold text-muted-foreground">Fecha desde</label>
+                    <label className="mb-1 block text-xs font-semibold text-muted-foreground">
+                      Fecha desde
+                    </label>
                     <input
                       type="date"
                       value={movDesde}
@@ -3111,7 +3164,9 @@ function ClienteDetailPage() {
                     />
                   </div>
                   <div>
-                    <label className="mb-1 block text-xs font-semibold text-muted-foreground">Fecha hasta</label>
+                    <label className="mb-1 block text-xs font-semibold text-muted-foreground">
+                      Fecha hasta
+                    </label>
                     <input
                       type="date"
                       value={movHasta}
@@ -3130,7 +3185,9 @@ function ClienteDetailPage() {
                     Limpiar
                   </button>
                   <span className="text-xs text-muted-foreground">
-                    {movimientosStatsQuery.isFetching ? "Actualizando…" : `${totalMovimientos} movimiento(s) en el período`}
+                    {movimientosStatsQuery.isFetching
+                      ? "Actualizando…"
+                      : `${totalMovimientos} movimiento(s) en el período`}
                   </span>
                 </div>
               </div>
@@ -3138,24 +3195,31 @@ function ClienteDetailPage() {
               {/* KPIs generales */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
                 <div className="rounded-xl border border-border bg-card p-4">
-                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Saldo total de la cuenta</p>
+                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                    Saldo total de la cuenta
+                  </p>
                   <p className="mt-2 text-2xl font-semibold tabular-nums">{fmtMonto(saldoTotal)}</p>
                   <p className="mt-1 text-xs text-muted-foreground">
-                    Disponible + retenido · {(subcuentasQuery.data?.length ?? 0) > 0
+                    Disponible + retenido ·{" "}
+                    {(subcuentasQuery.data?.length ?? 0) > 0
                       ? `1 principal + ${subcuentasQuery.data!.length} subcuenta(s)`
                       : "sin subcuentas"}
                     {subcuentasQuery.isLoading ? " (cargando…)" : ""}
                   </p>
                 </div>
                 <div className="rounded-xl border border-border bg-card p-4">
-                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Total de movimientos</p>
+                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                    Total de movimientos
+                  </p>
                   <p className="mt-2 text-2xl font-semibold tabular-nums">{totalMovimientos}</p>
                   <p className="mt-1 text-xs text-muted-foreground">
                     {Object.keys(porTipo).length} tipo(s) distinto(s)
                   </p>
                 </div>
                 <div className="rounded-xl border border-border bg-card p-4">
-                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Movimientos por tipo</p>
+                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                    Movimientos por tipo
+                  </p>
                   {Object.keys(porTipo).length === 0 ? (
                     <p className="mt-3 text-sm text-muted-foreground">Sin datos en el período.</p>
                   ) : (
@@ -3163,9 +3227,14 @@ function ClienteDetailPage() {
                       {Object.entries(porTipo)
                         .sort((a, b) => b[1] - a[1])
                         .map(([tipo, cant]) => (
-                          <li key={tipo} className="flex items-center justify-between gap-2 text-sm">
+                          <li
+                            key={tipo}
+                            className="flex items-center justify-between gap-2 text-sm"
+                          >
                             <span className="text-muted-foreground">{tipo}</span>
-                            <span className="font-mono font-semibold tabular-nums rounded-full bg-muted px-2 py-0.5 text-xs">{cant}</span>
+                            <span className="font-mono font-semibold tabular-nums rounded-full bg-muted px-2 py-0.5 text-xs">
+                              {cant}
+                            </span>
                           </li>
                         ))}
                     </ul>
@@ -3194,7 +3263,8 @@ function ClienteDetailPage() {
                 />
                 <div className="mt-3 flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">
-                    {totalMovimientos} total · página {movPage + 1} de {Math.max(1, Math.ceil(totalMovimientos / 10))}
+                    {totalMovimientos} total · página {movPage + 1} de{" "}
+                    {Math.max(1, Math.ceil(totalMovimientos / 10))}
                   </span>
                   <div className="flex gap-2">
                     <button
@@ -3237,39 +3307,91 @@ function ClienteDetailPage() {
                 const mockForLegajo = MOCK_IMPUESTOS_POR_COBRAR.filter((r) => r.legajo === legajo);
                 const pendientes = mockForLegajo.filter((r) => r.estado === "pendiente");
                 const pagados = mockForLegajo.filter((r) => r.estado === "pagado");
-                const fallbackPend = pendientes.length ? pendientes : MOCK_IMPUESTOS_POR_COBRAR.filter((r) => r.estado === "pendiente").slice(0, 2).map((r) => ({ ...r, legajo }));
-                const fallbackPag = pagados.length ? pagados : MOCK_IMPUESTOS_POR_COBRAR.filter((r) => r.estado === "pagado").slice(0, 2).map((r) => ({ ...r, legajo }));
+                const fallbackPend = pendientes.length
+                  ? pendientes
+                  : MOCK_IMPUESTOS_POR_COBRAR.filter((r) => r.estado === "pendiente")
+                      .slice(0, 2)
+                      .map((r) => ({ ...r, legajo }));
+                const fallbackPag = pagados.length
+                  ? pagados
+                  : MOCK_IMPUESTOS_POR_COBRAR.filter((r) => r.estado === "pagado")
+                      .slice(0, 2)
+                      .map((r) => ({ ...r, legajo }));
                 const pendRows = pendientes.length ? pendientes : fallbackPend;
                 const pagRows = pagados.length ? pagados : fallbackPag;
                 return (
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mt-4">
                     <div className="rounded-xl border border-border bg-card p-4">
-                      <h4 className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Impuestos pendientes de pago</h4>
-                      {pendRows.length === 0 ? <p className="text-xs text-muted-foreground">Sin pendientes.</p> : (
+                      <h4 className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                        Impuestos pendientes de pago
+                      </h4>
+                      {pendRows.length === 0 ? (
+                        <p className="text-xs text-muted-foreground">Sin pendientes.</p>
+                      ) : (
                         <div className="overflow-x-auto">
                           <table className="w-full text-xs">
-                            <thead><tr className="border-b text-left uppercase tracking-wide text-muted-foreground"><th className="px-2 py-1.5">Impuesto</th><th className="px-2 py-1.5">Lote</th><th className="px-2 py-1.5 text-right">Monto</th><th className="px-2 py-1.5">Bandera</th></tr></thead>
-                            <tbody>{pendRows.map((r) => (
-                              <tr key={r.id} className="border-b last:border-0"><td className="px-2 py-1.5 font-medium">{r.impuesto}</td><td className="px-2 py-1.5 font-mono">{r.loteId}</td><td className="px-2 py-1.5 text-right font-mono">{formatImpuestoMonto(r.monto)}</td><td className="px-2 py-1.5">{r.bandera}</td></tr>
-                            ))}</tbody>
+                            <thead>
+                              <tr className="border-b text-left uppercase tracking-wide text-muted-foreground">
+                                <th className="px-2 py-1.5">Impuesto</th>
+                                <th className="px-2 py-1.5">Lote</th>
+                                <th className="px-2 py-1.5 text-right">Monto</th>
+                                <th className="px-2 py-1.5">Bandera</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {pendRows.map((r) => (
+                                <tr key={r.id} className="border-b last:border-0">
+                                  <td className="px-2 py-1.5 font-medium">{r.impuesto}</td>
+                                  <td className="px-2 py-1.5 font-mono">{r.loteId}</td>
+                                  <td className="px-2 py-1.5 text-right font-mono">
+                                    {formatImpuestoMonto(r.monto)}
+                                  </td>
+                                  <td className="px-2 py-1.5">{r.bandera}</td>
+                                </tr>
+                              ))}
+                            </tbody>
                           </table>
                         </div>
                       )}
-                      <p className="text-[11px] text-muted-foreground mt-2">Mock tasa variable � lote correspondiente</p>
+                      <p className="text-[11px] text-muted-foreground mt-2">
+                        Mock tasa variable � lote correspondiente
+                      </p>
                     </div>
                     <div className="rounded-xl border border-border bg-card p-4">
-                      <h4 className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Impuestos pagados</h4>
-                      {pagRows.length === 0 ? <p className="text-xs text-muted-foreground">Sin pagados.</p> : (
+                      <h4 className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                        Impuestos pagados
+                      </h4>
+                      {pagRows.length === 0 ? (
+                        <p className="text-xs text-muted-foreground">Sin pagados.</p>
+                      ) : (
                         <div className="overflow-x-auto">
                           <table className="w-full text-xs">
-                            <thead><tr className="border-b text-left uppercase tracking-wide text-muted-foreground"><th className="px-2 py-1.5">Impuesto</th><th className="px-2 py-1.5">Lote</th><th className="px-2 py-1.5 text-right">Monto</th><th className="px-2 py-1.5">Fecha lote</th></tr></thead>
-                            <tbody>{pagRows.map((r) => (
-                              <tr key={r.id} className="border-b last:border-0"><td className="px-2 py-1.5 font-medium">{r.impuesto}</td><td className="px-2 py-1.5 font-mono">{r.loteId}</td><td className="px-2 py-1.5 text-right font-mono">{formatImpuestoMonto(r.monto)}</td><td className="px-2 py-1.5 font-mono">{r.fechaLote}</td></tr>
-                            ))}</tbody>
+                            <thead>
+                              <tr className="border-b text-left uppercase tracking-wide text-muted-foreground">
+                                <th className="px-2 py-1.5">Impuesto</th>
+                                <th className="px-2 py-1.5">Lote</th>
+                                <th className="px-2 py-1.5 text-right">Monto</th>
+                                <th className="px-2 py-1.5">Fecha lote</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {pagRows.map((r) => (
+                                <tr key={r.id} className="border-b last:border-0">
+                                  <td className="px-2 py-1.5 font-medium">{r.impuesto}</td>
+                                  <td className="px-2 py-1.5 font-mono">{r.loteId}</td>
+                                  <td className="px-2 py-1.5 text-right font-mono">
+                                    {formatImpuestoMonto(r.monto)}
+                                  </td>
+                                  <td className="px-2 py-1.5 font-mono">{r.fechaLote}</td>
+                                </tr>
+                              ))}
+                            </tbody>
                           </table>
                         </div>
                       )}
-                      <p className="text-[11px] text-muted-foreground mt-2">Detalle y lote correspondiente (mock)</p>
+                      <p className="text-[11px] text-muted-foreground mt-2">
+                        Detalle y lote correspondiente (mock)
+                      </p>
                     </div>
                   </div>
                 );
@@ -3306,7 +3428,11 @@ function ClienteDetailPage() {
                   onClick={() =>
                     downloadCSV("validaciones.csv", [
                       ["Proveedor", "Estado", "Fecha"],
-                      ...(validacionesQuery.data ?? []).map((v) => [v.proveedor, v.estado, v.fecha]),
+                      ...(validacionesQuery.data ?? []).map((v) => [
+                        v.proveedor,
+                        v.estado,
+                        v.fecha,
+                      ]),
                     ])
                   }
                   className="inline-flex items-center gap-1.5 h-9 rounded-md border border-input px-3 text-sm font-medium text-foreground hover:bg-accent"
@@ -3343,20 +3469,30 @@ function ClienteDetailPage() {
                   value={
                     comisionesRealesQuery.isError
                       ? "Por definir"
-                      : String((comisionesRealesQuery.data?.rows ?? []).filter((c) => c.tipo === "Depósito" || c.tipo === "Retiro").length)
+                      : String(
+                          (comisionesRealesQuery.data?.rows ?? []).filter(
+                            (c) => c.tipo === "Depósito" || c.tipo === "Retiro",
+                          ).length,
+                        )
                   }
                 />
                 <KpiCard
                   label="Impuestos"
-                  value={impuestosQuery.isError ? "Por definir" : String(impuestosQuery.rows.length)}
+                  value={
+                    impuestosQuery.isError ? "Por definir" : String(impuestosQuery.rows.length)
+                  }
                 />
                 <KpiCard
                   label="Alertas"
-                  value={alertasQuery.isError ? "Por definir" : String(alertasQuery.data?.length ?? 0)}
+                  value={
+                    alertasQuery.isError ? "Por definir" : String(alertasQuery.data?.length ?? 0)
+                  }
                 />
                 <KpiCard
                   label="Bloqueos"
-                  value={bloqueosQuery.isError ? "Por definir" : String(bloqueosQuery.data?.length ?? 0)}
+                  value={
+                    bloqueosQuery.isError ? "Por definir" : String(bloqueosQuery.data?.length ?? 0)
+                  }
                 />
                 <KpiCard
                   label="Módulos inferidos"
@@ -3368,44 +3504,106 @@ function ClienteDetailPage() {
                 <MiniDashboard
                   titulo="CVUs recientes"
                   columnas={[
-                    { label: "Nombre", render: (s: Subcuenta) => `${s.nombre} ${s.apellido}`.trim() },
+                    {
+                      label: "Nombre",
+                      render: (s: Subcuenta) => `${s.nombre} ${s.apellido}`.trim(),
+                    },
                     { label: "Email", render: (s: Subcuenta) => s.email },
                     { label: "Estado", render: (s: Subcuenta) => s.estado },
                   ]}
                   datos={(subcuentasQuery.data ?? []).slice(0, 10)}
                 />
                 <div className="rounded-lg border border-border p-4">
-                  <h4 className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Últimas comisiones</h4>
+                  <h4 className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    Últimas comisiones
+                  </h4>
                   {(() => {
-                    const comisionesFiltradas = (comisionesRealesQuery.data?.rows ?? []).filter((c) => c.tipo === "Depósito" || c.tipo === "Retiro");
+                    const comisionesFiltradas = (comisionesRealesQuery.data?.rows ?? []).filter(
+                      (c) => c.tipo === "Depósito" || c.tipo === "Retiro",
+                    );
                     return comisionesFiltradas.length === 0 ? (
                       <p className="text-xs text-muted-foreground">Sin comisiones registradas.</p>
                     ) : (
                       <div className="overflow-x-auto">
                         <table className="w-full text-xs">
-                          <thead><tr className="border-b text-left uppercase tracking-wide text-muted-foreground"><th className="px-2 py-1.5">Operación</th><th className="px-2 py-1.5">Tipo</th><th className="px-2 py-1.5">Estado</th><th className="px-2 py-1.5 text-right">Detalle</th></tr></thead>
-                          <tbody>{comisionesFiltradas.slice(0,10).map((c) => (
-                            <tr key={c.id} className="border-b last:border-0"><td className="px-2 py-1.5 font-mono">{c.operacion}</td><td className="px-2 py-1.5">{c.tipo}</td><td className="px-2 py-1.5"><Badge tone={c.estado==="Habilitado"?"success":"neutral"}>{c.estado}</Badge></td><td className="px-2 py-1.5 text-right"><button onClick={()=>setComisionDetail(c)} className="inline-flex items-center gap-1 h-6 px-2 rounded border text-[11px] hover:bg-accent"><Eye size={11}/> Ver detalle</button></td></tr>
-                          ))}</tbody>
+                          <thead>
+                            <tr className="border-b text-left uppercase tracking-wide text-muted-foreground">
+                              <th className="px-2 py-1.5">Operación</th>
+                              <th className="px-2 py-1.5">Tipo</th>
+                              <th className="px-2 py-1.5">Estado</th>
+                              <th className="px-2 py-1.5 text-right">Detalle</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {comisionesFiltradas.slice(0, 10).map((c) => (
+                              <tr key={c.id} className="border-b last:border-0">
+                                <td className="px-2 py-1.5 font-mono">{c.operacion}</td>
+                                <td className="px-2 py-1.5">{c.tipo}</td>
+                                <td className="px-2 py-1.5">
+                                  <Badge tone={c.estado === "Habilitado" ? "success" : "neutral"}>
+                                    {c.estado}
+                                  </Badge>
+                                </td>
+                                <td className="px-2 py-1.5 text-right">
+                                  <button
+                                    onClick={() => setComisionDetail(c)}
+                                    className="inline-flex items-center gap-1 h-6 px-2 rounded border text-[11px] hover:bg-accent"
+                                  >
+                                    <Eye size={11} /> Ver detalle
+                                  </button>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
                         </table>
                       </div>
                     );
                   })()}
                 </div>
                 <div className="rounded-lg border border-border p-4 mt-3">
-                  <h4 className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Comisiones Link de Pago / E-commerce</h4>
-                  <p className="text-[11px] text-muted-foreground mb-2">Se gestionan separadamente.</p>
+                  <h4 className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    Comisiones Link de Pago / E-commerce
+                  </h4>
+                  <p className="text-[11px] text-muted-foreground mb-2">
+                    Se gestionan separadamente.
+                  </p>
                   {(() => {
-                    const comisionesLink = (comisionesRealesQuery.data?.rows ?? []).filter((c) => c.tipo === "Link de pago" || c.tipo === "E-commerce");
+                    const comisionesLink = (comisionesRealesQuery.data?.rows ?? []).filter(
+                      (c) => c.tipo === "Link de pago" || c.tipo === "E-commerce",
+                    );
                     return comisionesLink.length === 0 ? (
-                      <p className="text-xs text-muted-foreground">Sin comisiones de Link de Pago / E-commerce.</p>
+                      <p className="text-xs text-muted-foreground">
+                        Sin comisiones de Link de Pago / E-commerce.
+                      </p>
                     ) : (
                       <div className="overflow-x-auto">
                         <table className="w-full text-xs">
-                          <thead><tr className="border-b text-left uppercase tracking-wide text-muted-foreground"><th className="px-2 py-1.5">Tipo</th><th className="px-2 py-1.5">Porcentaje</th><th className="px-2 py-1.5">Estado</th></tr></thead>
-                          <tbody>{comisionesLink.slice(0,10).map((c) => (
-                            <tr key={c.id} className="border-b last:border-0"><td className="px-2 py-1.5">{c.tipo}</td><td className="px-2 py-1.5 font-mono">{c.porcentaje != null ? c.porcentaje + "%" : c.montoFijo != null ? "$ " + c.montoFijo : "—"}</td><td className="px-2 py-1.5"><Badge tone={c.estado==="Habilitado"?"success":"neutral"}>{c.estado}</Badge></td></tr>
-                          ))}</tbody>
+                          <thead>
+                            <tr className="border-b text-left uppercase tracking-wide text-muted-foreground">
+                              <th className="px-2 py-1.5">Tipo</th>
+                              <th className="px-2 py-1.5">Porcentaje</th>
+                              <th className="px-2 py-1.5">Estado</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {comisionesLink.slice(0, 10).map((c) => (
+                              <tr key={c.id} className="border-b last:border-0">
+                                <td className="px-2 py-1.5">{c.tipo}</td>
+                                <td className="px-2 py-1.5 font-mono">
+                                  {c.porcentaje != null
+                                    ? c.porcentaje + "%"
+                                    : c.montoFijo != null
+                                      ? "$ " + c.montoFijo
+                                      : "—"}
+                                </td>
+                                <td className="px-2 py-1.5">
+                                  <Badge tone={c.estado === "Habilitado" ? "success" : "neutral"}>
+                                    {c.estado}
+                                  </Badge>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
                         </table>
                       </div>
                     );
@@ -3424,18 +3622,32 @@ function ClienteDetailPage() {
                   datos={impuestosQuery.rows.slice(0, 10)}
                 />
                 {(() => {
-                  const porCobrar = MOCK_IMPUESTOS_POR_COBRAR.filter((r) => r.legajo === legajo && r.estado === "pendiente").slice(0, 10);
-                  const fallback = porCobrar.length ? porCobrar : MOCK_IMPUESTOS_POR_COBRAR.filter((r) => r.estado === "pendiente").slice(0, 5);
+                  const porCobrar = MOCK_IMPUESTOS_POR_COBRAR.filter(
+                    (r) => r.legajo === legajo && r.estado === "pendiente",
+                  ).slice(0, 10);
+                  const fallback = porCobrar.length
+                    ? porCobrar
+                    : MOCK_IMPUESTOS_POR_COBRAR.filter((r) => r.estado === "pendiente").slice(0, 5);
                   const rows = porCobrar.length ? porCobrar : fallback;
                   return (
                     <MiniDashboard
                       titulo="Impuestos por cobrar"
                       columnas={[
-                        { label: "Impuesto", render: (r: typeof rows[number]) => r.impuesto },
-                        { label: "Lote", render: (r: typeof rows[number]) => <span className="font-mono text-[11px]">{r.loteId}</span> },
-                        { label: "Bandera", render: (r: typeof rows[number]) => r.bandera },
-                        { label: "Monto", render: (r: typeof rows[number]) => <span className="font-mono">{formatImpuestoMonto(r.monto)}</span> },
-                        { label: "Estado", render: (r: typeof rows[number]) => r.estado },
+                        { label: "Impuesto", render: (r: (typeof rows)[number]) => r.impuesto },
+                        {
+                          label: "Lote",
+                          render: (r: (typeof rows)[number]) => (
+                            <span className="font-mono text-[11px]">{r.loteId}</span>
+                          ),
+                        },
+                        { label: "Bandera", render: (r: (typeof rows)[number]) => r.bandera },
+                        {
+                          label: "Monto",
+                          render: (r: (typeof rows)[number]) => (
+                            <span className="font-mono">{formatImpuestoMonto(r.monto)}</span>
+                          ),
+                        },
+                        { label: "Estado", render: (r: (typeof rows)[number]) => r.estado },
                       ]}
                       datos={rows}
                     />
@@ -3446,7 +3658,8 @@ function ClienteDetailPage() {
                   columnas={[
                     {
                       label: "Tipo",
-                      render: (r: { tipo: string; parametro?: string }) => r.tipo || r.parametro || "—",
+                      render: (r: { tipo: string; parametro?: string }) =>
+                        r.tipo || r.parametro || "—",
                     },
                     {
                       label: "Estado",
@@ -3471,15 +3684,49 @@ function ClienteDetailPage() {
                 />
               </div>
               {comisionDetail && (
-                <ModalDialog open={!!comisionDetail} onClose={() => setComisionDetail(null)} title="Detalle de comisión" description={`${comisionDetail.operacion} · ${comisionDetail.tipo}`}>
+                <ModalDialog
+                  open={!!comisionDetail}
+                  onClose={() => setComisionDetail(null)}
+                  title="Detalle de comisión"
+                  description={`${comisionDetail.operacion} · ${comisionDetail.tipo}`}
+                >
                   <div className="grid grid-cols-2 gap-3 text-sm">
-                    <div><span className="text-muted-foreground">Operación</span><div className="font-mono font-semibold">{comisionDetail.operacion}</div></div>
-                    <div><span className="text-muted-foreground">Tipo</span><div>{comisionDetail.tipo}</div></div>
-                    <div><span className="text-muted-foreground">Modalidad</span><div>{comisionDetail.modalidad}</div></div>
-                    <div><span className="text-muted-foreground">Estado</span><div><Badge tone={comisionDetail.estado==="Habilitado"?"success":"neutral"}>{comisionDetail.estado}</Badge></div></div>
-                    <div><span className="text-muted-foreground">Porcentaje</span><div className="font-mono">{comisionDetail.porcentaje ?? "—"}%</div></div>
-                    <div><span className="text-muted-foreground">Monto fijo</span><div className="font-mono">{comisionDetail.montoFijo != null ? `$ ${comisionDetail.montoFijo}` : "—"}</div></div>
-                    <div className="col-span-2"><span className="text-muted-foreground">Descripción</span><div>{comisionDetail.descripcion ?? "—"}</div></div>
+                    <div>
+                      <span className="text-muted-foreground">Operación</span>
+                      <div className="font-mono font-semibold">{comisionDetail.operacion}</div>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Tipo</span>
+                      <div>{comisionDetail.tipo}</div>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Modalidad</span>
+                      <div>{comisionDetail.modalidad}</div>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Estado</span>
+                      <div>
+                        <Badge
+                          tone={comisionDetail.estado === "Habilitado" ? "success" : "neutral"}
+                        >
+                          {comisionDetail.estado}
+                        </Badge>
+                      </div>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Porcentaje</span>
+                      <div className="font-mono">{comisionDetail.porcentaje ?? "—"}%</div>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Monto fijo</span>
+                      <div className="font-mono">
+                        {comisionDetail.montoFijo != null ? `$ ${comisionDetail.montoFijo}` : "—"}
+                      </div>
+                    </div>
+                    <div className="col-span-2">
+                      <span className="text-muted-foreground">Descripción</span>
+                      <div>{comisionDetail.descripcion ?? "—"}</div>
+                    </div>
                   </div>
                 </ModalDialog>
               )}
@@ -3521,11 +3768,15 @@ function ClienteDetailPage() {
                       {riesgoVigente ? riesgoVigente.nivel.toUpperCase() : "Sin evaluar"}
                     </div>
                     <div className="text-xs text-muted-foreground">
-                      Vigente desde: {riesgoVigente ? new Date(riesgoVigente.vigente_desde).toLocaleDateString("es-AR") : "—"}
+                      Vigente desde:{" "}
+                      {riesgoVigente
+                        ? new Date(riesgoVigente.vigente_desde).toLocaleDateString("es-AR")
+                        : "—"}
                     </div>
                   </div>
                   <p className="mt-3 text-xs text-foreground">
-                    {riesgoVigente?.motivo ?? "El cliente no tiene evaluación de riesgo vigente. Completá una evaluación inicial."}
+                    {riesgoVigente?.motivo ??
+                      "El cliente no tiene evaluación de riesgo vigente. Completá una evaluación inicial."}
                   </p>
                   {evaluacionesAnteriores.length > 0 && (
                     <details className="mt-3">
@@ -3535,7 +3786,9 @@ function ClienteDetailPage() {
                       <ul className="mt-2 space-y-1 text-xs text-muted-foreground">
                         {evaluacionesAnteriores.slice(0, 5).map((e) => (
                           <li key={e.id}>
-                            <span className="font-medium text-foreground">{e.nivel.toUpperCase()}</span>
+                            <span className="font-medium text-foreground">
+                              {e.nivel.toUpperCase()}
+                            </span>
                             {" · "}
                             {new Date(e.created_at).toLocaleDateString("es-AR")}
                             {" — "}
@@ -3563,7 +3816,9 @@ function ClienteDetailPage() {
                   </div>
                   <div className="grid grid-cols-3 gap-3">
                     <div>
-                      <div className="text-[10px] text-muted-foreground uppercase">Monto máx. transferencia</div>
+                      <div className="text-[10px] text-muted-foreground uppercase">
+                        Monto máx. transferencia
+                      </div>
                       <div className="text-sm font-semibold tabular-nums">
                         {cliente.limiteTransferencia != null
                           ? new Intl.NumberFormat("es-AR", {
@@ -3575,13 +3830,17 @@ function ClienteDetailPage() {
                       </div>
                     </div>
                     <div>
-                      <div className="text-[10px] text-muted-foreground uppercase">Ops. diarias máx.</div>
+                      <div className="text-[10px] text-muted-foreground uppercase">
+                        Ops. diarias máx.
+                      </div>
                       <div className="text-sm font-semibold tabular-nums">
                         {cliente.limiteOpsDiarias ?? "—"}
                       </div>
                     </div>
                     <div>
-                      <div className="text-[10px] text-muted-foreground uppercase">Monto diario máx.</div>
+                      <div className="text-[10px] text-muted-foreground uppercase">
+                        Monto diario máx.
+                      </div>
                       <div className="text-sm font-semibold tabular-nums">
                         {cliente.limiteMontoDiario != null
                           ? new Intl.NumberFormat("es-AR", {
@@ -3594,8 +3853,8 @@ function ClienteDetailPage() {
                     </div>
                   </div>
                   <p className="mt-3 text-xs text-muted-foreground">
-                    Editar este perfil sólo lo debería hacer Compliance. Cualquier cambio queda registrado en la
-                    ficha del cliente.
+                    Editar este perfil sólo lo debería hacer Compliance. Cualquier cambio queda
+                    registrado en la ficha del cliente.
                   </p>
                 </div>
               </div>
@@ -3675,7 +3934,9 @@ function ClienteDetailPage() {
                   {alertasQuery.isLoading ? (
                     <p className="text-sm text-muted-foreground">Cargando…</p>
                   ) : alertasQuery.isError ? (
-                    <p className="text-sm text-danger-600">{(alertasQuery.error as Error).message}</p>
+                    <p className="text-sm text-danger-600">
+                      {(alertasQuery.error as Error).message}
+                    </p>
                   ) : (
                     <DataTable
                       columns={riesgoColumns}
@@ -3701,7 +3962,9 @@ function ClienteDetailPage() {
                   {bloqueosQuery.isLoading ? (
                     <p className="text-sm text-muted-foreground">Cargando…</p>
                   ) : bloqueosQuery.isError ? (
-                    <p className="text-sm text-danger-600">{(bloqueosQuery.error as Error).message}</p>
+                    <p className="text-sm text-danger-600">
+                      {(bloqueosQuery.error as Error).message}
+                    </p>
                   ) : (
                     <DataTable
                       columns={bloqueosColumns}
@@ -3753,11 +4016,11 @@ function ClienteDetailPage() {
                 <div>
                   {/* Sub-tabs */}
                   <div className="flex gap-1 border-b border-border mb-4">
-                    {([
+                    {[
                       { key: "pct" as const, label: "PCT", icon: Landmark },
                       { key: "links" as const, label: "Links de pago", icon: Link2 },
                       { key: "api" as const, label: "API externa", icon: Globe },
-                    ]).map((st) => (
+                    ].map((st) => (
                       <button
                         key={st.key}
                         type="button"
@@ -3809,8 +4072,12 @@ function ClienteDetailPage() {
                               {comerciosPst.map((c) => (
                                 <tr key={c.id} className="border-b border-border last:border-b-0">
                                   <td className="px-4 py-3 font-medium">{c.nombre}</td>
-                                  <td className="px-4 py-3 text-muted-foreground">{c.email ?? "—"}</td>
-                                  <td className="px-4 py-3 font-mono text-xs">{c.legajo_comercio ?? "—"}</td>
+                                  <td className="px-4 py-3 text-muted-foreground">
+                                    {c.email ?? "—"}
+                                  </td>
+                                  <td className="px-4 py-3 font-mono text-xs">
+                                    {c.legajo_comercio ?? "—"}
+                                  </td>
                                   <td className="px-4 py-3 text-right">
                                     <button
                                       type="button"
@@ -3878,14 +4145,31 @@ function ClienteDetailPage() {
                                   <td className="px-4 py-3 font-medium">{l.comercio_nombre}</td>
                                   <td className="px-4 py-3">
                                     {l.url ? (
-                                      <a href={l.url} target="_blank" rel="noreferrer" className="text-xs font-medium text-primary-ink break-all hover:underline">
+                                      <a
+                                        href={l.url}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="text-xs font-medium text-primary-ink break-all hover:underline"
+                                      >
                                         {l.url.length > 40 ? l.url.slice(0, 40) + "…" : l.url}
                                       </a>
-                                    ) : "—"}
+                                    ) : (
+                                      "—"
+                                    )}
                                   </td>
-                                  <td className="px-4 py-3 text-right tabular-nums">{l.monto != null ? fmtMonto(l.monto) : "—"}</td>
+                                  <td className="px-4 py-3 text-right tabular-nums">
+                                    {l.monto != null ? fmtMonto(l.monto) : "—"}
+                                  </td>
                                   <td className="px-4 py-3">
-                                    <Badge tone={l.estado === "Activo" ? "success" : l.estado === "Pendiente" ? "warn" : "neutral"}>
+                                    <Badge
+                                      tone={
+                                        l.estado === "Activo"
+                                          ? "success"
+                                          : l.estado === "Pendiente"
+                                            ? "warn"
+                                            : "neutral"
+                                      }
+                                    >
                                       {l.estado ?? "—"}
                                     </Badge>
                                   </td>
@@ -3919,19 +4203,22 @@ function ClienteDetailPage() {
                         <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground mb-2">
                           Usuarios asociados
                         </div>
-                        <div className="text-2xl font-semibold tabular-nums">
-                          {apiCantidadReal}
-                        </div>
+                        <div className="text-2xl font-semibold tabular-nums">{apiCantidadReal}</div>
                         <p className="mt-1 text-xs text-muted-foreground">
                           {apiCantidadReal === 0
                             ? "Sin vínculos de API externa para este cliente."
                             : `${apiCantidadReal} usuario(s) API vinculado(s) a este cliente.`}
                         </p>
                         {clienteApiUsuariosQuery.isError && (
-                          <p className="mt-1 text-xs text-amber-700">No se pudo cargar desde Supabase (fallback a cliente_modulos).</p>
+                          <p className="mt-1 text-xs text-amber-700">
+                            No se pudo cargar desde Supabase (fallback a cliente_modulos).
+                          </p>
                         )}
                       </div>
-                      <ApiUsuariosInline legajo={legajo} onVerDetalle={(id) => setApiDetalleId(id)} />
+                      <ApiUsuariosInline
+                        legajo={legajo}
+                        onVerDetalle={(id) => setApiDetalleId(id)}
+                      />
                     </div>
                   )}
                 </div>

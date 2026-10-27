@@ -54,7 +54,9 @@ export async function listAlertRules(): Promise<AlertRule[]> {
   const sb = requireSupabase();
   const { data, error } = await sb
     .from("alert_rules")
-    .select("id, code, name, category, description, action, parameters, is_enabled, sort_order, updated_at")
+    .select(
+      "id, code, name, category, description, action, parameters, is_enabled, sort_order, updated_at",
+    )
     .order("sort_order", { ascending: true });
   if (error) throw new DataAccessError(error);
   return ((data ?? []) as AlertRuleRow[]).map((r) => ({
@@ -77,7 +79,11 @@ export async function saveAlertRules(
 ): Promise<void> {
   const sb = requireSupabase();
   const { error } = await sb.rpc("guardar_alert_rules", {
-    p_rules: rules.map((r) => ({ code: r.code, is_enabled: r.isEnabled, parameters: r.parameters })),
+    p_rules: rules.map((r) => ({
+      code: r.code,
+      is_enabled: r.isEnabled,
+      parameters: r.parameters,
+    })),
   });
   if (error) throw new DataAccessError(error);
 }
@@ -111,7 +117,8 @@ type ClientBlockParameterRow = {
 
 export type ClientBlockParameterFilters = Pagination & { search?: string };
 
-const COLS = "id, client_id, legajo, correo, nombre, individual_min_wages, company_min_wages, updated_at";
+const COLS =
+  "id, client_id, legajo, correo, nombre, individual_min_wages, company_min_wages, updated_at";
 
 const toParam = (r: ClientBlockParameterRow): ClientBlockParameter => ({
   id: r.id,
@@ -136,7 +143,10 @@ export async function listClientBlockParameters(
   const sb = requireSupabase();
   const { page, pageSize } = filters;
   const from = page * pageSize;
-  const q = filtrar(sb.from("v_client_block_parameters").select(COLS, { count: "exact" }), filters.search)
+  const q = filtrar(
+    sb.from("v_client_block_parameters").select(COLS, { count: "exact" }),
+    filters.search,
+  )
     .order("legajo", { ascending: true })
     .range(from, from + pageSize - 1);
   const { data, error, count } = await q;
@@ -146,7 +156,9 @@ export async function listClientBlockParameters(
 }
 
 /** Todas las filas que respetan el filtro (para exportar). */
-export async function listAllClientBlockParameters(search?: string): Promise<ClientBlockParameter[]> {
+export async function listAllClientBlockParameters(
+  search?: string,
+): Promise<ClientBlockParameter[]> {
   const sb = requireSupabase();
   const { data, error } = await filtrar(sb.from("v_client_block_parameters").select(COLS), search)
     .order("legajo", { ascending: true })
@@ -179,7 +191,11 @@ export async function deleteClientBlockParameter(id: string): Promise<void> {
 }
 
 /** CSV con comillas y separador coma (Excel lo abre bien con BOM). */
-export function descargarCsv(nombre: string, cabecera: string[], filas: (string | number | null)[][]): void {
+export function descargarCsv(
+  nombre: string,
+  cabecera: string[],
+  filas: (string | number | null)[][],
+): void {
   const celda = (v: string | number | null) => {
     const s = v == null ? "" : String(v);
     return /[",\n;]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;

@@ -24,7 +24,8 @@ function PagosQrPage() {
     setComision(v);
     if (v !== "") {
       const n = parseFloat(v.replace(",", "."));
-      if (!isNaN(n) && n > 0.8) setErr(`La comisión ${brand.name} para QR no puede superar el 0,8%`);
+      if (!isNaN(n) && n > 0.8)
+        setErr(`La comisión ${brand.name} para QR no puede superar el 0,8%`);
       else setErr(null);
     } else setErr(null);
   };
@@ -41,18 +42,38 @@ function PagosQrPage() {
   return (
     <div className="space-y-4">
       <Card className="p-4">
-        <h4 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-3">Comisión {brand.name} — Pago por QR</h4>
+        <h4 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-3">
+          Comisión {brand.name} — Pago por QR
+        </h4>
         <div className="flex items-end gap-3 max-w-sm">
           <div className="flex-1">
             <Label htmlFor="qr-comision">Comisión {brand.name} (%)</Label>
-            <Input id="qr-comision" value={comision} onChange={(e)=> onChange(e.target.value)} placeholder="0.50" className="h-9" inputMode="decimal" />
-            <p className="text-[11px] text-muted-foreground mt-1">Máximo 0,8%. Se valida al guardar y al escribir.</p>
+            <Input
+              id="qr-comision"
+              value={comision}
+              onChange={(e) => onChange(e.target.value)}
+              placeholder="0.50"
+              className="h-9"
+              inputMode="decimal"
+            />
+            <p className="text-[11px] text-muted-foreground mt-1">
+              Máximo 0,8%. Se valida al guardar y al escribir.
+            </p>
             {err && <p className="text-xs text-danger-600 mt-1">{err}</p>}
           </div>
-          <button onClick={guardar} className="h-9 px-4 rounded-md bg-primary text-primary-foreground text-sm font-semibold">Guardar</button>
+          <button
+            onClick={guardar}
+            className="h-9 px-4 rounded-md bg-primary text-primary-foreground text-sm font-semibold"
+          >
+            Guardar
+          </button>
         </div>
       </Card>
-      <MovimientosSubRoute titulo="Pagos QR" descripcion="Movimientos de pago PCT (QR)." tipoCode="pago_pct" />
+      <MovimientosSubRoute
+        titulo="Pagos QR"
+        descripcion="Movimientos de pago PCT (QR)."
+        tipoCode="pago_pct"
+      />
     </div>
   );
 }

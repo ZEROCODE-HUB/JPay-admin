@@ -3,7 +3,8 @@ import type { TablesInsert, TablesUpdate } from "@/lib/database.types";
 import { DataAccessError } from "./errors";
 import type { ComercioBandera, ComercioBanderaEstado, ComercioBanderaRow } from "./types";
 
-const COLUMNS = "id, comercio_id, bandera, bandera_id, metodo_key, comision_molipay, comision_payway, comision_neta, estado, created_at, updated_at";
+const COLUMNS =
+  "id, comercio_id, bandera, bandera_id, metodo_key, comision_molipay, comision_payway, comision_neta, estado, created_at, updated_at";
 
 function toBandera(r: ComercioBanderaRow): ComercioBandera {
   return {
@@ -34,7 +35,14 @@ export async function listByComercio(comercioId: string): Promise<ComercioBander
 
 export async function createBandera(
   comercioId: string,
-  input: { bandera: string; comisionPropia: number; comisionPayway: number; estado?: ComercioBanderaEstado; banderaId?: string; metodoKey?: string },
+  input: {
+    bandera: string;
+    comisionPropia: number;
+    comisionPayway: number;
+    estado?: ComercioBanderaEstado;
+    banderaId?: string;
+    metodoKey?: string;
+  },
 ): Promise<ComercioBandera> {
   const sb = requireSupabase();
   const payload: TablesInsert<"comercio_banderas"> = {
@@ -46,14 +54,25 @@ export async function createBandera(
   };
   if (input.banderaId) payload.bandera_id = input.banderaId;
   if (input.metodoKey) payload.metodo_key = input.metodoKey;
-  const { data, error } = await sb.from("comercio_banderas").insert(payload).select(COLUMNS).single();
+  const { data, error } = await sb
+    .from("comercio_banderas")
+    .insert(payload)
+    .select(COLUMNS)
+    .single();
   if (error) throw new DataAccessError(error);
   return toBandera(data as ComercioBanderaRow);
 }
 
 export async function updateBandera(
   id: string,
-  input: Partial<{ bandera: string; comisionPropia: number; comisionPayway: number; estado: ComercioBanderaEstado; banderaId?: string; metodoKey?: string }>,
+  input: Partial<{
+    bandera: string;
+    comisionPropia: number;
+    comisionPayway: number;
+    estado: ComercioBanderaEstado;
+    banderaId?: string;
+    metodoKey?: string;
+  }>,
 ): Promise<ComercioBandera> {
   const sb = requireSupabase();
   const payload: TablesUpdate<"comercio_banderas"> = {};
@@ -63,7 +82,12 @@ export async function updateBandera(
   if (input.estado !== undefined) payload.estado = input.estado;
   if (input.banderaId !== undefined) payload.bandera_id = input.banderaId || null;
   if (input.metodoKey !== undefined) payload.metodo_key = input.metodoKey || null;
-  const { data, error } = await sb.from("comercio_banderas").update(payload).eq("id", id).select(COLUMNS).single();
+  const { data, error } = await sb
+    .from("comercio_banderas")
+    .update(payload)
+    .eq("id", id)
+    .select(COLUMNS)
+    .single();
   if (error) throw new DataAccessError(error);
   return toBandera(data as ComercioBanderaRow);
 }
@@ -74,14 +98,20 @@ export async function deleteBandera(id: string): Promise<void> {
   if (error) throw new DataAccessError(error);
 }
 
-export async function setBanderaEstado(id: string, estado: ComercioBanderaEstado): Promise<ComercioBandera> {
+export async function setBanderaEstado(
+  id: string,
+  estado: ComercioBanderaEstado,
+): Promise<ComercioBandera> {
   return updateBandera(id, { estado });
 }
 
 export async function listBanderasByComercioIds(comercioIds: string[]): Promise<ComercioBandera[]> {
   if (comercioIds.length === 0) return [];
   const sb = requireSupabase();
-  const { data, error } = await sb.from("comercio_banderas").select(COLUMNS).in("comercio_id", comercioIds);
+  const { data, error } = await sb
+    .from("comercio_banderas")
+    .select(COLUMNS)
+    .in("comercio_id", comercioIds);
   if (error) throw new DataAccessError(error);
   return ((data ?? []) as ComercioBanderaRow[]).map(toBandera);
 }

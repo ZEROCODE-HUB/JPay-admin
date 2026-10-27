@@ -42,7 +42,8 @@ export type BanderaCuota = {
   estado: "Activo" | "Inactivo";
 };
 
-const BANDERA_COLUMNS = "id, nombre, tipo, metodo_key, dias_habiles_acreditacion, estado, created_at, updated_at";
+const BANDERA_COLUMNS =
+  "id, nombre, tipo, metodo_key, dias_habiles_acreditacion, estado, created_at, updated_at";
 const BANDERA_CUOTA_COLUMNS = "id, bandera_id, cuotas, ten, coeficiente, estado";
 
 function toBandera(r: BanderaRow): Bandera {
@@ -82,12 +83,21 @@ export async function listBanderas(estado?: string): Promise<Bandera[]> {
 
 export async function getBandera(id: string): Promise<Bandera | null> {
   const sb = requireSupabase();
-  const { data, error } = await sb.from("banderas").select(BANDERA_COLUMNS).eq("id", id).maybeSingle();
+  const { data, error } = await sb
+    .from("banderas")
+    .select(BANDERA_COLUMNS)
+    .eq("id", id)
+    .maybeSingle();
   if (error) throw new DataAccessError(error);
   return data ? toBandera(data as BanderaRow) : null;
 }
 
-export async function createBandera(input: { nombre: string; tipo: string; diasHabilesAcreditacion: number; estado?: string }): Promise<Bandera> {
+export async function createBandera(input: {
+  nombre: string;
+  tipo: string;
+  diasHabilesAcreditacion: number;
+  estado?: string;
+}): Promise<Bandera> {
   const sb = requireSupabase();
   const payload = {
     nombre: input.nombre.trim(),
@@ -95,7 +105,11 @@ export async function createBandera(input: { nombre: string; tipo: string; diasH
     dias_habiles_acreditacion: input.diasHabilesAcreditacion,
     estado: input.estado ?? "Activo",
   };
-  const { data, error } = await sb.from("banderas").insert(payload).select(BANDERA_COLUMNS).single();
+  const { data, error } = await sb
+    .from("banderas")
+    .insert(payload)
+    .select(BANDERA_COLUMNS)
+    .single();
   if (error) throw new DataAccessError(error);
   return toBandera(data as BanderaRow);
 }
@@ -108,9 +122,15 @@ export async function updateBandera(
   const payload: TablesUpdate<"banderas"> = {};
   if (input.nombre !== undefined) payload.nombre = input.nombre.trim();
   if (input.tipo !== undefined) payload.tipo = input.tipo;
-  if (input.diasHabilesAcreditacion !== undefined) payload.dias_habiles_acreditacion = input.diasHabilesAcreditacion;
+  if (input.diasHabilesAcreditacion !== undefined)
+    payload.dias_habiles_acreditacion = input.diasHabilesAcreditacion;
   if (input.estado !== undefined) payload.estado = input.estado;
-  const { data, error } = await sb.from("banderas").update(payload).eq("id", id).select(BANDERA_COLUMNS).single();
+  const { data, error } = await sb
+    .from("banderas")
+    .update(payload)
+    .eq("id", id)
+    .select(BANDERA_COLUMNS)
+    .single();
   if (error) throw new DataAccessError(error);
   return toBandera(data as BanderaRow);
 }
@@ -132,9 +152,13 @@ export async function listCuotasByBandera(banderaId: string): Promise<BanderaCuo
   return ((data ?? []) as BanderaCuotaRow[]).map(toBanderaCuota);
 }
 
-export async function createBanderaCuota(
-  input: { banderaId: string; cuotas: number; ten?: number; coeficiente?: number; estado?: string },
-): Promise<BanderaCuota> {
+export async function createBanderaCuota(input: {
+  banderaId: string;
+  cuotas: number;
+  ten?: number;
+  coeficiente?: number;
+  estado?: string;
+}): Promise<BanderaCuota> {
   const sb = requireSupabase();
   const payload = {
     bandera_id: input.banderaId,
@@ -143,7 +167,11 @@ export async function createBanderaCuota(
     coeficiente: input.coeficiente ?? 1,
     estado: input.estado ?? "Activo",
   };
-  const { data, error } = await sb.from("banderas_cuotas").insert(payload).select(BANDERA_CUOTA_COLUMNS).single();
+  const { data, error } = await sb
+    .from("banderas_cuotas")
+    .insert(payload)
+    .select(BANDERA_CUOTA_COLUMNS)
+    .single();
   if (error) throw new DataAccessError(error);
   return toBanderaCuota(data as BanderaCuotaRow);
 }
@@ -158,7 +186,12 @@ export async function updateBanderaCuota(
   if (input.ten !== undefined) payload.ten = input.ten;
   if (input.coeficiente !== undefined) payload.coeficiente = input.coeficiente;
   if (input.estado !== undefined) payload.estado = input.estado;
-  const { data, error } = await sb.from("banderas_cuotas").update(payload).eq("id", id).select(BANDERA_CUOTA_COLUMNS).single();
+  const { data, error } = await sb
+    .from("banderas_cuotas")
+    .update(payload)
+    .eq("id", id)
+    .select(BANDERA_CUOTA_COLUMNS)
+    .single();
   if (error) throw new DataAccessError(error);
   return toBanderaCuota(data as BanderaCuotaRow);
 }
@@ -171,7 +204,11 @@ export async function deleteBanderaCuota(id: string): Promise<void> {
 
 export async function getBanderaByNombre(nombre: string): Promise<Bandera | null> {
   const sb = requireSupabase();
-  const { data, error } = await sb.from("banderas").select(BANDERA_COLUMNS).eq("nombre", nombre).maybeSingle();
+  const { data, error } = await sb
+    .from("banderas")
+    .select(BANDERA_COLUMNS)
+    .eq("nombre", nombre)
+    .maybeSingle();
   if (error) throw new DataAccessError(error);
   return data ? toBandera(data as BanderaRow) : null;
 }

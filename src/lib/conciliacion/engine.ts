@@ -1,7 +1,8 @@
 import type { BankRow } from "./parse";
 import type { Movimiento } from "@/lib/api/types";
 
-export type CruceEstado = "conciliado" | "no_encontrado" | "monto_diferencia" | "no_completada" | "solo_plataforma";
+export type CruceEstado =
+  "conciliado" | "no_encontrado" | "monto_diferencia" | "no_completada" | "solo_plataforma";
 
 export type CruceItem = {
   bankRow: BankRow;
@@ -46,12 +47,19 @@ function isDebito(tipo: string): boolean {
 function parseBancoFechaHora(s: string): Date | null {
   const m = s.trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{1,2}):(\d{1,2}))?/);
   if (!m) return null;
-  const d = Number(m[1]), mo = Number(m[2]) - 1, y = Number(m[3]);
-  const h = m[4] ? Number(m[4]) : 0, mi = m[5] ? Number(m[5]) : 0, se = m[6] ? Number(m[6]) : 0;
+  const d = Number(m[1]),
+    mo = Number(m[2]) - 1,
+    y = Number(m[3]);
+  const h = m[4] ? Number(m[4]) : 0,
+    mi = m[5] ? Number(m[5]) : 0,
+    se = m[6] ? Number(m[6]) : 0;
   return new Date(y, mo, d, h, mi, se);
 }
 
-export function cruzarConciliacion(bankRows: BankRow[], movimientos: Movimiento[]): AnalisisResumen {
+export function cruzarConciliacion(
+  bankRows: BankRow[],
+  movimientos: Movimiento[],
+): AnalisisResumen {
   const total = bankRows.length;
   const byIdTxn = new Map<string, Movimiento>();
   for (const m of movimientos) {
@@ -96,7 +104,12 @@ export function cruzarConciliacion(bankRows: BankRow[], movimientos: Movimiento[
     // NO COMPLETADA -> no se concilia, se cuenta aparte y no se busca en plataforma
     if (b.estadoCoelsa.trim().toUpperCase() === "NO COMPLETADA") {
       noCompletados++;
-      items.push({ bankRow: b, movimiento: null, estado: "no_completada", detalle: "NO COMPLETADA (banco)" });
+      items.push({
+        bankRow: b,
+        movimiento: null,
+        estado: "no_completada",
+        detalle: "NO COMPLETADA (banco)",
+      });
       continue;
     }
 
@@ -126,7 +139,12 @@ export function cruzarConciliacion(bankRows: BankRow[], movimientos: Movimiento[
       noEncontrados++;
       if (credito) idsDepositosNoEncontrados.push(b.idDebin);
       if (debito) idsRetirosNoEncontrados.push(b.idDebin);
-      items.push({ bankRow: b, movimiento: null, estado: "no_encontrado", detalle: "Sin match por ID_DEBIN (ni fallback monto+fecha) en plataforma" });
+      items.push({
+        bankRow: b,
+        movimiento: null,
+        estado: "no_encontrado",
+        detalle: "Sin match por ID_DEBIN (ni fallback monto+fecha) en plataforma",
+      });
       continue;
     }
 
@@ -147,7 +165,14 @@ export function cruzarConciliacion(bankRows: BankRow[], movimientos: Movimiento[
     encontrados++;
     if (credito) depEncontrados++;
     if (debito) retEncontrados++;
-    items.push({ bankRow: b, movimiento: mov, estado: "conciliado", detalle: fallback ? "Conciliado por fallback |monto|+fecha (ID distinto)" : "Conciliado por ID_DEBIN + monto" });
+    items.push({
+      bankRow: b,
+      movimiento: mov,
+      estado: "conciliado",
+      detalle: fallback
+        ? "Conciliado por fallback |monto|+fecha (ID distinto)"
+        : "Conciliado por ID_DEBIN + monto",
+    });
   }
 
   // Solo en plataforma: mov cuyo id_txn no está en banco (útil para detectar faltantes del banco)

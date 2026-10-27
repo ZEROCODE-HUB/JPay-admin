@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
 /** Nombre del bucket de Storage donde el onboarding guarda las imágenes. */
-export const STORAGE_BUCKET =
-  (import.meta.env.VITE_STORAGE_BUCKET as string | undefined) ?? "kyc";
+export const STORAGE_BUCKET = (import.meta.env.VITE_STORAGE_BUCKET as string | undefined) ?? "kyc";
 
 /**
  * Resuelve la URL visible de un documento.
@@ -55,9 +54,7 @@ export function useDocumentoUrl(raw: string | null, legajo: string): string | nu
       }
       // Fallback: intento directo desde el cliente.
       try {
-        const { data, error } = await sb.storage
-          .from(STORAGE_BUCKET)
-          .createSignedUrl(p, 60 * 60);
+        const { data, error } = await sb.storage.from(STORAGE_BUCKET).createSignedUrl(p, 60 * 60);
         if (!error && data?.signedUrl) return data.signedUrl;
       } catch {
         /* bucket sin política de lectura o inexistente */
@@ -134,16 +131,12 @@ function escribirCache(cache: CacheShape) {
  * Las URLs firmadas se cachean en sessionStorage (1 h) para no refirmar al
  * volver a la pestaña.
  */
-export function useDocumentosUrls(
-  docs: DocumentoParaResolver[],
-  legajo: string,
-): DocumentosUrls {
+export function useDocumentosUrls(docs: DocumentoParaResolver[], legajo: string): DocumentosUrls {
   const [out, setOut] = useState<DocumentosUrls>({ urls: {}, thumbs: {} });
 
   // Clave estable basada en el contenido (no en la referencia del array),
   // para no recrear el efecto en cada render mientras los datos cargan.
-  const key =
-    docs.map((d) => `${d.id}:${d.url ?? ""}`).join("|") + `@${legajo}`;
+  const key = docs.map((d) => `${d.id}:${d.url ?? ""}`).join("|") + `@${legajo}`;
 
   useEffect(() => {
     let cancelled = false;

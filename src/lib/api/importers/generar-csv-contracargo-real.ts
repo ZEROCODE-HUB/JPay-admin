@@ -92,9 +92,7 @@ function buildCsvLine(fields: string[]): string {
  * Genera el CSV y lo devuelve como string + filename. No lo descarga:
  * eso lo hace el componente que lo llama.
  */
-export async function generarCsvContracargoDemo(
-  cantidad = 5,
-): Promise<CsvGenerado> {
+export async function generarCsvContracargoDemo(cantidad = 5): Promise<CsvGenerado> {
   const sb = requireSupabase();
 
   // Traemos los últimos N pagos con TID
@@ -121,9 +119,7 @@ export async function generarCsvContracargoDemo(
   }
 
   const fecha = new Date();
-  const periodo = `${fecha.getFullYear()}-${String(
-    fecha.getMonth() + 1,
-  ).padStart(2, "0")}`;
+  const periodo = `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, "0")}`;
   const fechaFmt = `${String(fecha.getDate()).padStart(2, "0")}/${String(
     fecha.getMonth() + 1,
   ).padStart(2, "0")}/${fecha.getFullYear()}`;
@@ -157,7 +153,10 @@ export async function generarCsvContracargoDemo(
       : fechaFmt;
     // Codigo de autorizacion PayWay: derivado del TID para que sea
     // estable
-    const codAut = `PW-TKT-${p.site_transaction_id.replace(/[^A-Z0-9]/gi, "").slice(-6).toUpperCase()}`;
+    const codAut = `PW-TKT-${p.site_transaction_id
+      .replace(/[^A-Z0-9]/gi, "")
+      .slice(-6)
+      .toUpperCase()}`;
 
     lineas.push(
       buildCsvLine([

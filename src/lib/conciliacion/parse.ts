@@ -67,7 +67,11 @@ export function parseImporte(raw: string): number {
 }
 
 export function normalizeHeader(h: string): string {
-  return h.trim().replace(/\r/g, "").replace(/\n/g, "").replace(/_x000d_$/i, "");
+  return h
+    .trim()
+    .replace(/\r/g, "")
+    .replace(/\n/g, "")
+    .replace(/_x000d_$/i, "");
 }
 
 export async function parseBancoFile(file: File): Promise<BankRow[]> {

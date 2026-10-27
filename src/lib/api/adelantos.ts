@@ -324,11 +324,7 @@ export async function rechazarAdelanto(id: string, notas?: string): Promise<Adel
   };
   // Las notas se concatenan al motivo existente
   if (notas && notas.trim().length > 0) {
-    const { data: actual } = await sb
-      .from("adelantos")
-      .select("motivo")
-      .eq("id", id)
-      .maybeSingle();
+    const { data: actual } = await sb.from("adelantos").select("motivo").eq("id", id).maybeSingle();
     const previo = (actual?.motivo ?? "").toString().trim();
     payload.motivo = previo ? `${previo}\n${notas.trim()}` : notas.trim();
   }
@@ -385,7 +381,8 @@ export async function updateAdelanto(
 
   const payload: TablesUpdate<"adelantos"> = {};
   if (input.montoSolicitado !== undefined) payload.monto_solicitado = input.montoSolicitado;
-  if (input.plazoAdelantadoDias !== undefined) payload.plazo_adelantado_dias = input.plazoAdelantadoDias;
+  if (input.plazoAdelantadoDias !== undefined)
+    payload.plazo_adelantado_dias = input.plazoAdelantadoDias;
   if (input.tasaInteresPct !== undefined) payload.tasa_interes_pct = input.tasaInteresPct;
   if (input.motivo !== undefined) payload.motivo = input.motivo;
   if (input.fechaAcreditacion !== undefined) payload.fecha_acreditacion = input.fechaAcreditacion;

@@ -160,13 +160,17 @@ export async function listAlerts(f: AlertFilters & Pagination): Promise<Page<Ale
 /** Todas las alertas que cumplen el filtro (para el CSV). */
 export async function listAllAlerts(f: AlertFilters): Promise<AlertItem[]> {
   const sb = requireSupabase();
-  const { data, error } = await filtrosAlertas(sb.from("v_alerts").select(ALERT_COLS), f).limit(MAX_EXPORT);
+  const { data, error } = await filtrosAlertas(sb.from("v_alerts").select(ALERT_COLS), f).limit(
+    MAX_EXPORT,
+  );
   if (error) throw new DataAccessError(error);
   return ((data ?? []) as AlertRow[]).map(toAlert);
 }
 
 async function rpc<T = unknown>(
-  llamar: (sb: SupabaseClient<Database>) => PromiseLike<{ data: unknown; error: PostgrestError | null }>,
+  llamar: (
+    sb: SupabaseClient<Database>,
+  ) => PromiseLike<{ data: unknown; error: PostgrestError | null }>,
 ): Promise<T> {
   const sb = requireSupabase();
   const { data, error } = await llamar(sb);
@@ -181,9 +185,11 @@ export const resolveAlert = (id: string, resolution: AlertResolution, notes: str
 
 /** Barrido manual (reemplaza al cron mientras no exista): consume coincidencias PLAFT pendientes. */
 export const runComplianceSweep = () =>
-  rpc<{ coincidencias_revisadas: number; alertas_nuevas: number; ultima_corrida_plaft: string | null }>(
-    (sb) => sb.rpc("ejecutar_barrido_compliance"),
-  );
+  rpc<{
+    coincidencias_revisadas: number;
+    alertas_nuevas: number;
+    ultima_corrida_plaft: string | null;
+  }>((sb) => sb.rpc("ejecutar_barrido_compliance"));
 
 export type SimulatedDeposit = {
   estado: string;
@@ -196,7 +202,13 @@ export type SimulatedDeposit = {
 };
 
 /** Depósito entrante simulado (solo desarrollo) para probar las reglas de depósitos. */
-export const simulateDeposit = (input: { cbuDestino: string; importe: number; cuitOrigen?: string; titularOrigen?: string; cbuOrigen?: string }) =>
+export const simulateDeposit = (input: {
+  cbuDestino: string;
+  importe: number;
+  cuitOrigen?: string;
+  titularOrigen?: string;
+  cbuOrigen?: string;
+}) =>
   rpc<SimulatedDeposit>((sb) =>
     sb.rpc("simular_deposito_entrante", {
       p_cbu_destino: input.cbuDestino,
@@ -345,12 +357,19 @@ export async function listBlocks(f: BlockFilters & Pagination): Promise<Page<Acc
 
 export async function listAllBlocks(f: BlockFilters): Promise<AccountBlock[]> {
   const sb = requireSupabase();
-  const { data, error } = await filtrosBloqueos(sb.from("v_account_blocks").select(BLOCK_COLS), f).limit(MAX_EXPORT);
+  const { data, error } = await filtrosBloqueos(
+    sb.from("v_account_blocks").select(BLOCK_COLS),
+    f,
+  ).limit(MAX_EXPORT);
   if (error) throw new DataAccessError(error);
   return ((data ?? []) as BlockRow[]).map(toBlock);
 }
 
-export const createManualBlock = (input: { legajo: string; subaccountId: string | null; reason: string }) =>
+export const createManualBlock = (input: {
+  legajo: string;
+  subaccountId: string | null;
+  reason: string;
+}) =>
   rpc<string>((sb) =>
     sb.rpc("crear_bloqueo_manual", {
       p_legajo: input.legajo,
@@ -363,7 +382,9 @@ export const createManualBlock = (input: { legajo: string; subaccountId: string 
 export const acceptBlock = (id: string) => rpc((sb) => sb.rpc("aceptar_bloqueo", { p_id: id }));
 
 export const releaseBlock = (id: string, notes: string) =>
-  rpc<{ ok: boolean; depositos_liberados: number; monto_liberado: number }>((sb) => sb.rpc("liberar_bloqueo", { p_id: id, p_notes: notes }));
+  rpc<{ ok: boolean; depositos_liberados: number; monto_liberado: number }>((sb) =>
+    sb.rpc("liberar_bloqueo", { p_id: id, p_notes: notes }),
+  );
 
 // ============================================================================
 // SMVM (valor de referencia de las reglas en salarios mínimos)

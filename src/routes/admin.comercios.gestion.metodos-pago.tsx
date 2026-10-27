@@ -13,7 +13,18 @@ import {
   Input,
   Label,
 } from "@/components/portal-shell";
-import { listBanderas, createBandera, updateBandera, deleteBandera, listCuotasByBandera, createBanderaCuota, updateBanderaCuota, deleteBanderaCuota, type Bandera, type BanderaCuota } from "@/lib/api/banderas";
+import {
+  listBanderas,
+  createBandera,
+  updateBandera,
+  deleteBandera,
+  listCuotasByBandera,
+  createBanderaCuota,
+  updateBanderaCuota,
+  deleteBanderaCuota,
+  type Bandera,
+  type BanderaCuota,
+} from "@/lib/api/banderas";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/admin/comercios/gestion/metodos-pago")({
@@ -69,12 +80,14 @@ function MetodoPagoModal({
       setLoadingCuotas(true);
       listCuotasByBandera(metodo.id)
         .then((cq) => {
-          setCuotas(cq.map((c, i) => ({
-            key: i + 1,
-            numero: String(c.cuotas),
-            ten: String(c.ten),
-            coeficiente: String(c.coeficiente),
-          })));
+          setCuotas(
+            cq.map((c, i) => ({
+              key: i + 1,
+              numero: String(c.cuotas),
+              ten: String(c.ten),
+              coeficiente: String(c.coeficiente),
+            })),
+          );
         })
         .finally(() => setLoadingCuotas(false));
     }
@@ -117,7 +130,9 @@ function MetodoPagoModal({
               {metodo ? "Editar método de pago" : "Crear método de pago"}
             </h3>
             <p className="text-sm text-muted-foreground mt-0.5">
-              {metodo ? `Configuración del método de pago "${metodo.nombre}".` : "Complete los datos del nuevo método de pago."}
+              {metodo
+                ? `Configuración del método de pago "${metodo.nombre}".`
+                : "Complete los datos del nuevo método de pago."}
             </p>
           </div>
           <button type="button" onClick={onClose} className="p-1.5 hover:bg-muted rounded-md">
@@ -137,7 +152,12 @@ function MetodoPagoModal({
               </div>
               <div>
                 <Label htmlFor="mp-nombre">Nombre</Label>
-                <Input id="mp-nombre" value={nombre} onChange={(e) => setNombre(e.target.value)} placeholder="Ej: Visa Débito" />
+                <Input
+                  id="mp-nombre"
+                  value={nombre}
+                  onChange={(e) => setNombre(e.target.value)}
+                  placeholder="Ej: Visa Débito"
+                />
               </div>
               <div>
                 <Label htmlFor="mp-tipo">Tipo</Label>
@@ -148,13 +168,21 @@ function MetodoPagoModal({
                   onChange={(e) => setTipo(e.target.value)}
                 >
                   {TIPOS_METODO.map((t) => (
-                    <option key={t} value={t}>{t}</option>
+                    <option key={t} value={t}>
+                      {t}
+                    </option>
                   ))}
                 </select>
               </div>
               <div>
                 <Label htmlFor="mp-dias">Días hábiles acreditación</Label>
-                <Input id="mp-dias" type="number" min={1} value={diasHabiles} onChange={(e) => setDiasHabiles(Number(e.target.value))} />
+                <Input
+                  id="mp-dias"
+                  type="number"
+                  min={1}
+                  value={diasHabiles}
+                  onChange={(e) => setDiasHabiles(Number(e.target.value))}
+                />
               </div>
             </div>
             {metodo && (
@@ -167,7 +195,9 @@ function MetodoPagoModal({
                   onChange={(e) => setEstado(e.target.value as typeof estado)}
                 >
                   {ESTADOS.map((e) => (
-                    <option key={e} value={e}>{e}</option>
+                    <option key={e} value={e}>
+                      {e}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -186,9 +216,15 @@ function MetodoPagoModal({
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="border-b bg-muted/50 text-left">
-                        <th className="px-3 py-2.5 font-display font-semibold text-foreground">N° de cuota</th>
-                        <th className="px-3 py-2.5 font-display font-semibold text-foreground">TEN (%)</th>
-                        <th className="px-3 py-2.5 font-display font-semibold text-foreground">Coeficiente</th>
+                        <th className="px-3 py-2.5 font-display font-semibold text-foreground">
+                          N° de cuota
+                        </th>
+                        <th className="px-3 py-2.5 font-display font-semibold text-foreground">
+                          TEN (%)
+                        </th>
+                        <th className="px-3 py-2.5 font-display font-semibold text-foreground">
+                          Coeficiente
+                        </th>
                         <th className="px-3 py-2.5 w-10" />
                       </tr>
                     </thead>
@@ -203,16 +239,36 @@ function MetodoPagoModal({
                         cuotas.map((c) => (
                           <tr key={c.key} className="border-b last:border-0">
                             <td className="px-3 py-2">
-                              <Input aria-label="Número de cuota" value={c.numero} onChange={(e) => updateCuota(c.key, "numero", e.target.value)} className="w-20 h-9" />
+                              <Input
+                                aria-label="Número de cuota"
+                                value={c.numero}
+                                onChange={(e) => updateCuota(c.key, "numero", e.target.value)}
+                                className="w-20 h-9"
+                              />
                             </td>
                             <td className="px-3 py-2">
-                              <Input aria-label="TEN" value={c.ten} onChange={(e) => updateCuota(c.key, "ten", e.target.value)} className="w-28 h-9" />
+                              <Input
+                                aria-label="TEN"
+                                value={c.ten}
+                                onChange={(e) => updateCuota(c.key, "ten", e.target.value)}
+                                className="w-28 h-9"
+                              />
                             </td>
                             <td className="px-3 py-2">
-                              <Input aria-label="Coeficiente" value={c.coeficiente} onChange={(e) => updateCuota(c.key, "coeficiente", e.target.value)} className="w-28 h-9" />
+                              <Input
+                                aria-label="Coeficiente"
+                                value={c.coeficiente}
+                                onChange={(e) => updateCuota(c.key, "coeficiente", e.target.value)}
+                                className="w-28 h-9"
+                              />
                             </td>
                             <td className="px-3 py-2 text-right">
-                              <button type="button" onClick={() => removeCuota(c.key)} className="p-1.5 text-danger-600 hover:bg-muted rounded-md" title="Eliminar cuota">
+                              <button
+                                type="button"
+                                onClick={() => removeCuota(c.key)}
+                                className="p-1.5 text-danger-600 hover:bg-muted rounded-md"
+                                title="Eliminar cuota"
+                              >
                                 <Trash2 size={15} />
                               </button>
                             </td>
@@ -222,7 +278,11 @@ function MetodoPagoModal({
                     </tbody>
                   </table>
                 </div>
-                <button type="button" onClick={addCuota} className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-primary-ink hover:text-primary-ink/80 transition-colors">
+                <button
+                  type="button"
+                  onClick={addCuota}
+                  className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-primary-ink hover:text-primary-ink/80 transition-colors"
+                >
                   <Plus size={14} /> Agregar cuota
                 </button>
               </>
@@ -233,14 +293,22 @@ function MetodoPagoModal({
         <div className="sticky bottom-0 bg-card border-t border-border px-6 py-4 flex justify-between gap-2">
           <div>
             {metodo && onDelete && (
-              <BtnOutline type="button" onClick={onDelete} className="text-danger-600 hover:bg-danger-50">
+              <BtnOutline
+                type="button"
+                onClick={onDelete}
+                className="text-danger-600 hover:bg-danger-50"
+              >
                 Eliminar
               </BtnOutline>
             )}
           </div>
           <div className="flex gap-2">
-            <BtnOutline type="button" onClick={onClose}>Cancelar</BtnOutline>
-            <BtnPrimary type="button" onClick={guardar}>{metodo ? "Guardar" : "Crear método de pago"}</BtnPrimary>
+            <BtnOutline type="button" onClick={onClose}>
+              Cancelar
+            </BtnOutline>
+            <BtnPrimary type="button" onClick={guardar}>
+              {metodo ? "Guardar" : "Crear método de pago"}
+            </BtnPrimary>
           </div>
         </div>
       </div>
@@ -383,7 +451,12 @@ function Page() {
             </p>
             <div className="flex justify-end gap-2 mt-4">
               <BtnOutline onClick={() => setConfirmDelete(null)}>Cancelar</BtnOutline>
-              <BtnPrimary onClick={() => handleDelete(confirmDelete)} className="bg-danger-600 hover:bg-danger-700">Eliminar</BtnPrimary>
+              <BtnPrimary
+                onClick={() => handleDelete(confirmDelete)}
+                className="bg-danger-600 hover:bg-danger-700"
+              >
+                Eliminar
+              </BtnPrimary>
             </div>
           </div>
         </div>

@@ -12,10 +12,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
-import {
-  parsePaywayFile,
-  type ParsedPaywayFile,
-} from "@/lib/api/importers/payway-chargebacks";
+import { parsePaywayFile, type ParsedPaywayFile } from "@/lib/api/importers/payway-chargebacks";
 import { importChargebacksFromPayway, type ImportRowResult } from "@/lib/api/contracargos-import";
 import {
   generarCsvContracargoDemo,
@@ -153,9 +150,7 @@ export function ImportarContracargosModal({ onClose }: { onClose: () => void }) 
                 <p className="text-sm font-medium">
                   Arrastrá el archivo acá o hacé click para seleccionar
                 </p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  CSV o XLSX — hasta 10MB
-                </p>
+                <p className="text-xs text-muted-foreground mt-1">CSV o XLSX — hasta 10MB</p>
                 <input
                   ref={inputRef}
                   type="file"
@@ -200,9 +195,7 @@ export function ImportarContracargosModal({ onClose }: { onClose: () => void }) 
             </div>
           )}
 
-          {phase === "preview" && parsed && (
-            <Preview parsed={parsed} />
-          )}
+          {phase === "preview" && parsed && <Preview parsed={parsed} />}
 
           {phase === "done" && results && summary && (
             <Results summary={summary} results={results} />
@@ -221,20 +214,13 @@ export function ImportarContracargosModal({ onClose }: { onClose: () => void }) 
               >
                 Cambiar archivo
               </BtnOutline>
-              <BtnPrimary
-                onClick={onImport}
-                disabled={(parsed?.rows.length ?? 0) === 0}
-              >
+              <BtnPrimary onClick={onImport} disabled={(parsed?.rows.length ?? 0) === 0}>
                 Importar {parsed?.rows.length} fila(s)
               </BtnPrimary>
             </>
           )}
-          {phase === "done" && (
-            <BtnPrimary onClick={onClose}>Cerrar</BtnPrimary>
-          )}
-          {phase === "idle" && (
-            <BtnOutline onClick={onClose}>Cancelar</BtnOutline>
-          )}
+          {phase === "done" && <BtnPrimary onClick={onClose}>Cerrar</BtnPrimary>}
+          {phase === "idle" && <BtnOutline onClick={onClose}>Cancelar</BtnOutline>}
         </div>
       </div>
     </div>
@@ -248,7 +234,8 @@ function Preview({ parsed }: { parsed: ParsedPaywayFile }) {
       <div className="rounded-md bg-blue-50 border border-blue-200 px-3 py-2 text-xs flex items-start gap-2">
         <Info size={14} className="text-blue-600 mt-0.5 shrink-0" />
         <div>
-          <strong>Vista previa</strong> ({parsed.totalRows} fila(s) en total). Se importarán sólo las que matcheen con un pago existente.
+          <strong>Vista previa</strong> ({parsed.totalRows} fila(s) en total). Se importarán sólo
+          las que matcheen con un pago existente.
           {parsed.unresolvedHeaders.length > 0 && (
             <p className="mt-1 text-amber-700">
               ⚠ Headers no reconocidos: {parsed.unresolvedHeaders.join(", ")}
@@ -307,7 +294,8 @@ function Preview({ parsed }: { parsed: ParsedPaywayFile }) {
 
       {parsed.rows.some((r) => r.errors.length > 0) && (
         <div className="rounded-md bg-amber-50 border border-amber-200 px-3 py-2 text-xs text-amber-800">
-          Hay {parsed.rows.filter((r) => r.errors.length > 0).length} fila(s) con errores de parseo. Se omitirán al importar.
+          Hay {parsed.rows.filter((r) => r.errors.length > 0).length} fila(s) con errores de parseo.
+          Se omitirán al importar.
         </div>
       )}
     </div>
@@ -348,9 +336,7 @@ function Results({
                 <td className="px-2 py-1.5">
                   <StatusBadge status={r.status} />
                 </td>
-                <td className="px-2 py-1.5 text-muted-foreground">
-                  {r.message ?? "—"}
-                </td>
+                <td className="px-2 py-1.5 text-muted-foreground">{r.message ?? "—"}</td>
               </tr>
             ))}
           </tbody>

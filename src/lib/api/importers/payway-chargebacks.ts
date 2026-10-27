@@ -43,10 +43,7 @@ function detectFormat(file: File): "csv" | "xlsx" | null {
  * Lee el archivo y devuelve un array de objetos (uno por fila) donde
  * las claves son los headers crudos (primera fila).
  */
-async function readRows(
-  file: File,
-  format: "csv" | "xlsx",
-): Promise<Record<string, string>[]> {
+async function readRows(file: File, format: "csv" | "xlsx"): Promise<Record<string, string>[]> {
   const buf = await file.arrayBuffer();
 
   if (format === "xlsx") {
@@ -80,10 +77,7 @@ async function readRows(
  * de headers: devuelve TODO en orden. Lo usamos para encontrar la
  * fila de headers aunque haya un título arriba.
  */
-async function readMatrix(
-  file: File,
-  format: "csv" | "xlsx",
-): Promise<string[][]> {
+async function readMatrix(file: File, format: "csv" | "xlsx"): Promise<string[][]> {
   const buf = await file.arrayBuffer();
   const wb = XLSX.read(buf, { type: "array", raw: false });
   const sheetName = wb.SheetNames[0];
@@ -170,7 +164,9 @@ export function parseFecha(raw: string | undefined): string | null {
   }
 
   // DD/MM/YYYY o DD-MM-YYYY
-  const m = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})(?:\s+(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?)?$/);
+  const m = s.match(
+    /^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})(?:\s+(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?)?$/,
+  );
   if (m) {
     const [, dd, mm, yyyy, hh, mi, ss] = m;
     const year = yyyy.length === 2 ? 2000 + Number(yyyy) : Number(yyyy);
@@ -208,9 +204,7 @@ export function parseTarjetaMasked(raw: string | undefined): string | null {
 export async function parsePaywayFile(file: File): Promise<ParsedPaywayFile> {
   const format = detectFormat(file);
   if (!format) {
-    throw new Error(
-      "Formato no soportado. Acepta .csv o .xlsx (máx 10MB).",
-    );
+    throw new Error("Formato no soportado. Acepta .csv o .xlsx (máx 10MB).");
   }
   if (file.size > 10 * 1024 * 1024) {
     throw new Error("El archivo supera los 10MB. Dividilo en partes más chicas.");
@@ -276,25 +270,19 @@ export async function parsePaywayFile(file: File): Promise<ParsedPaywayFile> {
     }
     const monto = parseMonto(parsed.monto);
     if (monto == null) {
-      errors.push(
-        `Fila ${idx + 2}: monto inválido "${parsed.monto ?? ""}".`,
-      );
+      errors.push(`Fila ${idx + 2}: monto inválido "${parsed.monto ?? ""}".`);
     } else if (monto <= 0) {
       errors.push(`Fila ${idx + 2}: monto debe ser mayor a 0.`);
     }
 
     const fecha = parseFecha(parsed.fechaTransaccion);
     if (parsed.fechaTransaccion && !fecha) {
-      errors.push(
-        `Fila ${idx + 2}: fecha inválida "${parsed.fechaTransaccion}".`,
-      );
+      errors.push(`Fila ${idx + 2}: fecha inválida "${parsed.fechaTransaccion}".`);
     }
 
     const tarjeta = parseTarjetaMasked(parsed.nroTarjeta);
     if (parsed.nroTarjeta && !tarjeta) {
-      errors.push(
-        `Fila ${idx + 2}: no se pudo enmascarar la tarjeta "${parsed.nroTarjeta}".`,
-      );
+      errors.push(`Fila ${idx + 2}: no se pudo enmascarar la tarjeta "${parsed.nroTarjeta}".`);
     }
 
     return {

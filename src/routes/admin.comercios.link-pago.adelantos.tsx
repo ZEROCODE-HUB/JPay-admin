@@ -15,7 +15,15 @@ import {
   X,
 } from "lucide-react";
 import { DataTable, type Column } from "@/components/data-table";
-import { PageHeader, Badge, Card, Input, Label, BtnOutline, BtnPrimary } from "@/components/portal-shell";
+import {
+  PageHeader,
+  Badge,
+  Card,
+  Input,
+  Label,
+  BtnOutline,
+  BtnPrimary,
+} from "@/components/portal-shell";
 import { ActionsDropdown, type ActionItem } from "@/components/actions-dropdown";
 import { PermissionGuard } from "@/components/permission-guard";
 import { ConfirmDialog } from "@/components/confirm-dialog";
@@ -161,7 +169,7 @@ function Detalle({
 
   const interesEstimado = useMemo(() => {
     if (tasaPctNum == null) return 0;
-    return Math.round((a.importeSolicitado * tasaPctNum) / 100 * 100) / 100;
+    return Math.round(((a.importeSolicitado * tasaPctNum) / 100) * 100) / 100;
   }, [a.importeSolicitado, tasaPctNum]);
 
   const netoEstimado = useMemo(
@@ -193,7 +201,12 @@ function Detalle({
     setBusy(true);
     try {
       const r = await aprobarAdelanto(a.fullId, tasaPctNum, notas.trim() || undefined);
-      onSave({ ...a, estado: "Aprobado", tasaInteresPct: r.tasaPct, motivo: notas.trim() || a.motivo });
+      onSave({
+        ...a,
+        estado: "Aprobado",
+        tasaInteresPct: r.tasaPct,
+        motivo: notas.trim() || a.motivo,
+      });
       toast.success(`Adelanto aprobado — TEM ${r.tasaPct}%`);
       onClose();
     } catch (e) {
@@ -263,7 +276,9 @@ function Detalle({
           </div>
           <div className="flex items-center gap-2">
             <Badge tone={tone(a.estado)}>{a.estado}</Badge>
-            <button onClick={onClose} className="p-1.5 hover:bg-muted rounded-md">✕</button>
+            <button onClick={onClose} className="p-1.5 hover:bg-muted rounded-md">
+              ✕
+            </button>
           </div>
         </div>
         <div className="p-6 space-y-4">
@@ -275,7 +290,8 @@ function Detalle({
                 <span className="font-mono font-semibold">{fmt(tope)}</span>
               </span>
               <span className="text-amber-700">
-                Importe solicitado: <span className="font-mono font-semibold">{fmt(a.importeSolicitado)}</span>
+                Importe solicitado:{" "}
+                <span className="font-mono font-semibold">{fmt(a.importeSolicitado)}</span>
               </span>
             </div>
           )}
@@ -334,16 +350,16 @@ function Detalle({
               </div>
               <div>
                 <span className="text-muted-foreground">Importe solicitado</span>
-                <div className="font-mono font-semibold text-base">
-                  {fmt(a.importeSolicitado)}
-                </div>
+                <div className="font-mono font-semibold text-base">{fmt(a.importeSolicitado)}</div>
               </div>
               <div>
                 <span className="text-muted-foreground flex items-center gap-1">
                   <Clock size={12} /> Plazo solicitado
                 </span>
                 <div className="font-semibold">{a.plazoSolicitado}</div>
-                <div className="text-xs text-muted-foreground">Contractual: {a.plazoContractual}</div>
+                <div className="text-xs text-muted-foreground">
+                  Contractual: {a.plazoContractual}
+                </div>
               </div>
               {a.motivo && (
                 <div className="col-span-2">
@@ -376,7 +392,8 @@ function Detalle({
               {/* TEM — siempre editable cuando el adelanto no está cerrado */}
               <div>
                 <Label htmlFor="tasa-interes">
-                  Tasa de interés (TEM) — {a.estado === "Aprobado" ? "ajuste" : "requerida para aprobar"}
+                  Tasa de interés (TEM) —{" "}
+                  {a.estado === "Aprobado" ? "ajuste" : "requerida para aprobar"}
                 </Label>
                 <Input
                   id="tasa-interes"
@@ -393,11 +410,16 @@ function Detalle({
                 {tasaPctNum != null && tasaPctNum > 0 && (
                   <div className="text-[11px] text-muted-foreground mt-1 flex items-center gap-3">
                     <span>
-                      Interés: <span className="font-mono font-semibold text-danger-600">- {fmt(interesEstimado)}</span>
+                      Interés:{" "}
+                      <span className="font-mono font-semibold text-danger-600">
+                        - {fmt(interesEstimado)}
+                      </span>
                     </span>
                     <span>
                       Neto a depositar:{" "}
-                      <span className="font-mono font-semibold text-emerald-700">{fmt(netoEstimado)}</span>
+                      <span className="font-mono font-semibold text-emerald-700">
+                        {fmt(netoEstimado)}
+                      </span>
                     </span>
                     <span>
                       TNA: <span className="font-mono">{(tasaPctNum * 12).toFixed(1)}%</span>
@@ -432,12 +454,16 @@ function Detalle({
                   <BtnPrimary
                     disabled={busy || poolInsuficiente}
                     onClick={handleAcreditar}
-                    className={poolInsuficiente
-                      ? "bg-danger-300 cursor-not-allowed"
-                      : "bg-emerald-600 hover:bg-emerald-700"}
-                    title={poolInsuficiente
-                      ? "Pool de Recaudación insuficiente para financiar este adelanto. La RPC rechazará la operación."
-                      : "Descuenta de la subcuenta Recaudación (pool global) y acredita el neto en la Operativa del comercio"}
+                    className={
+                      poolInsuficiente
+                        ? "bg-danger-300 cursor-not-allowed"
+                        : "bg-emerald-600 hover:bg-emerald-700"
+                    }
+                    title={
+                      poolInsuficiente
+                        ? "Pool de Recaudación insuficiente para financiar este adelanto. La RPC rechazará la operación."
+                        : "Descuenta de la subcuenta Recaudación (pool global) y acredita el neto en la Operativa del comercio"
+                    }
                   >
                     <Banknote size={14} className="mr-1" />
                     {poolInsuficiente ? "Pool insuficiente" : "Acreditar y mover saldo"}
@@ -471,7 +497,9 @@ function Detalle({
                   <span className="font-mono">{a.legajo}</span> el {a.fechaAcreditacion}.
                 </p>
               ) : (
-                <p>Este adelanto fue cancelado por el comercio. No se pueden revertir las acciones.</p>
+                <p>
+                  Este adelanto fue cancelado por el comercio. No se pueden revertir las acciones.
+                </p>
               )}
             </Card>
           )}
@@ -487,12 +515,11 @@ function Detalle({
                 <div className="font-mono text-danger-600 text-right">
                   - {fmt(a.importeSolicitado)}
                 </div>
-                <div className="text-muted-foreground">
-                  Interés (TEM {a.tasaInteresPct ?? 0}%)
-                </div>
+                <div className="text-muted-foreground">Interés (TEM {a.tasaInteresPct ?? 0}%)</div>
                 <div className="font-mono text-danger-600 text-right">
-                  - {fmt(
-                    Math.round((a.importeSolicitado * (a.tasaInteresPct ?? 0)) / 100 * 100) / 100,
+                  -{" "}
+                  {fmt(
+                    Math.round(((a.importeSolicitado * (a.tasaInteresPct ?? 0)) / 100) * 100) / 100,
                   )}
                 </div>
                 <div className="text-muted-foreground font-semibold">Neto a Operativa</div>
@@ -500,7 +527,7 @@ function Detalle({
                   +{" "}
                   {fmt(
                     a.importeSolicitado -
-                      Math.round((a.importeSolicitado * (a.tasaInteresPct ?? 0)) / 100 * 100) /
+                      Math.round(((a.importeSolicitado * (a.tasaInteresPct ?? 0)) / 100) * 100) /
                         100,
                   )}
                 </div>
@@ -553,8 +580,7 @@ function Page() {
 
   // Marker interno: id de adelanto a abrir cuando aparezca en la
   // grilla. Se limpia cuando el modal se cierra.
-  const [pendingDeepLinkAdelantoId, setPendingDeepLinkAdelantoId] =
-    useState<string | null>(null);
+  const [pendingDeepLinkAdelantoId, setPendingDeepLinkAdelantoId] = useState<string | null>(null);
 
   // Pool de Recaudación: KPIs globales que se muestran SIEMPRE en la
   // cabecera de la pantalla. Refresca cada 30s para mantener el saldo
@@ -585,7 +611,11 @@ function Page() {
         .in("id", comerciosIds);
       if (error) throw new Error(error.message);
       const map: Record<string, ComercioResumen> = {};
-      for (const r of (data ?? []) as { id: string; nombre_comercio: string | null; legajo: string }[]) {
+      for (const r of (data ?? []) as {
+        id: string;
+        nombre_comercio: string | null;
+        legajo: string;
+      }[]) {
         map[r.id] = {
           id: r.id,
           nombre: r.nombre_comercio || "(sin nombre)",
@@ -718,9 +748,7 @@ function Page() {
       key: "importeSolicitado",
       label: "Importe",
       render: (r) => (
-        <span className="font-mono tabular-nums font-semibold">
-          {fmt(r.importeSolicitado)}
-        </span>
+        <span className="font-mono tabular-nums font-semibold">{fmt(r.importeSolicitado)}</span>
       ),
     },
     {
@@ -818,8 +846,8 @@ function Page() {
             {poolCabecera ? fmt(poolCabecera.poolRecaudacionTotal) : "—"}
           </div>
           <div className="text-[11px] text-muted-foreground mt-1">
-            Suma de saldo_disponible de todas las subcuentas tipo=Recaudación.
-            Es la única fuente de fondeo para los adelantos.
+            Suma de saldo_disponible de todas las subcuentas tipo=Recaudación. Es la única fuente de
+            fondeo para los adelantos.
           </div>
         </Card>
         <Card className="p-4">
@@ -830,8 +858,8 @@ function Page() {
             {poolCabecera ? fmt(poolCabecera.adelantosEnCurso) : "—"}
           </div>
           <div className="text-[11px] text-muted-foreground mt-1">
-            Capital prestado pendiente de reponer: Aprobados (aún no desembolsados)
-            + Acreditados (aún no repuestos por el lote real de Payway).
+            Capital prestado pendiente de reponer: Aprobados (aún no desembolsados) + Acreditados
+            (aún no repuestos por el lote real de Payway).
           </div>
         </Card>
         <Card

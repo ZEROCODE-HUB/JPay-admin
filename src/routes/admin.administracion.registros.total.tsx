@@ -28,8 +28,8 @@ function Page() {
       <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4 mb-6 flex gap-3">
         <AlertTriangle size={18} className="text-amber-600 shrink-0 mt-0.5" />
         <div className="text-sm text-amber-800 dark:text-amber-300">
-          Detecta cuando {brand.name} informa a clientes un monto mayor al real en la cuenta recaudadora
-          — <strong>control crítico</strong>.
+          Detecta cuando {brand.name} informa a clientes un monto mayor al real en la cuenta
+          recaudadora — <strong>control crítico</strong>.
         </div>
       </div>
 

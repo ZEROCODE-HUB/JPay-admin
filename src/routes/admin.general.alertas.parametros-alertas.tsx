@@ -44,7 +44,11 @@ const GROUPS: GroupView[] = [
         switchLabel: "Límite de depósito excedido",
         numbers: [
           { key: "min_wages_count", label: "Salario mínimo (cantidad)", integer: true },
-          { key: "min_wage_deposits_per_transfer", label: "Depósitos de salario mínimo por transferencia", integer: true },
+          {
+            key: "min_wage_deposits_per_transfer",
+            label: "Depósitos de salario mínimo por transferencia",
+            integer: true,
+          },
         ],
       },
     ],
@@ -70,7 +74,11 @@ const GROUPS: GroupView[] = [
         switchLabel: "Control de intentos fallidos",
         numbers: [
           { key: "max_attempts", label: "Intentos fallidos permitidos", integer: true },
-          { key: "window_seconds", label: "Tiempo de evaluación de retiros fallidos (segundos)", integer: true },
+          {
+            key: "window_seconds",
+            label: "Tiempo de evaluación de retiros fallidos (segundos)",
+            integer: true,
+          },
         ],
       },
     ],
@@ -82,7 +90,11 @@ const GROUPS: GroupView[] = [
         code: "repeated_transfers",
         switchLabel: "Operaciones repetitivas",
         numbers: [
-          { key: "threshold", label: "Umbral de operaciones repetidas (mismo destino)", integer: true },
+          {
+            key: "threshold",
+            label: "Umbral de operaciones repetidas (mismo destino)",
+            integer: true,
+          },
           { key: "window_minutes", label: "Ventana de evaluación (minutos)", integer: true },
         ],
       },
@@ -94,7 +106,9 @@ const GROUPS: GroupView[] = [
       {
         code: "transfers_per_hour",
         switchLabel: "Límite de transferencias por hora",
-        numbers: [{ key: "max_per_hour", label: "Transferencias por hora (máximo)", integer: true }],
+        numbers: [
+          { key: "max_per_hour", label: "Transferencias por hora (máximo)", integer: true },
+        ],
       },
     ],
   },
@@ -154,26 +168,40 @@ const POLITICAS: { value: MinorsPolicy; label: string }[] = [
 const CODES = GROUPS.flatMap((g) => g.rules.map((r) => r.code));
 
 /** Estado editable: numeros como texto para no perder lo que se esta tipeando. */
-type Draft = Record<string, { isEnabled: boolean; values: Record<string, string>; policy?: MinorsPolicy; days?: ScheduleDay[] }>;
+type Draft = Record<
+  string,
+  {
+    isEnabled: boolean;
+    values: Record<string, string>;
+    policy?: MinorsPolicy;
+    days?: ScheduleDay[];
+  }
+>;
 
 function toDraft(rules: AlertRule[]): Draft {
   const d: Draft = {};
   for (const r of rules) {
     if (!CODES.includes(r.code)) continue;
     const values: Record<string, string> = {};
-    for (const [k, v] of Object.entries(r.parameters)) if (typeof v === "number") values[k] = String(v);
+    for (const [k, v] of Object.entries(r.parameters))
+      if (typeof v === "number") values[k] = String(v);
     d[r.code] = {
       isEnabled: r.isEnabled,
       values,
       policy: (r.parameters.policy as MinorsPolicy | undefined) ?? undefined,
-      days: Array.isArray(r.parameters.days) ? (r.parameters.days as ScheduleDay[]).map((x) => ({ ...x })) : undefined,
+      days: Array.isArray(r.parameters.days)
+        ? (r.parameters.days as ScheduleDay[]).map((x) => ({ ...x }))
+        : undefined,
     };
   }
   return d;
 }
 
 /** Valida y arma los parametros a guardar; devuelve errores por campo. */
-function construir(draft: Draft): { rules: { code: AlertRuleCode; isEnabled: boolean; parameters: AlertRuleParameters }[]; errores: Record<string, string> } {
+function construir(draft: Draft): {
+  rules: { code: AlertRuleCode; isEnabled: boolean; parameters: AlertRuleParameters }[];
+  errores: Record<string, string>;
+} {
   const errores: Record<string, string> = {};
   const rules: { code: AlertRuleCode; isEnabled: boolean; parameters: AlertRuleParameters }[] = [];
   for (const g of GROUPS) {
@@ -190,8 +218,12 @@ function construir(draft: Draft): { rules: { code: AlertRuleCode; isEnabled: boo
         else if (f.integer && !Number.isInteger(n)) errores[id] = "Debe ser un número entero";
         else parameters[f.key] = n;
       }
-      if (rv.code === "abnormal_volume" && typeof parameters.min_amount === "number" && typeof parameters.max_amount === "number"
-          && parameters.min_amount > parameters.max_amount) {
+      if (
+        rv.code === "abnormal_volume" &&
+        typeof parameters.min_amount === "number" &&
+        typeof parameters.max_amount === "number" &&
+        parameters.min_amount > parameters.max_amount
+      ) {
         errores["abnormal_volume.min_amount"] = "El mínimo no puede superar al máximo";
       }
       if (rv.code === "withdrawal_failed_attempts" && parameters.window_seconds === 0) {
@@ -203,14 +235,19 @@ function construir(draft: Draft): { rules: { code: AlertRuleCode; isEnabled: boo
       if (rv.code === "company_account_affinity" && parameters.window_days === 0) {
         errores["company_account_affinity.window_days"] = "Debe ser mayor a 0";
       }
-      if (rv.code === "plaft_screening" && typeof parameters.threshold === "number" && parameters.threshold > 100) {
+      if (
+        rv.code === "plaft_screening" &&
+        typeof parameters.threshold === "number" &&
+        parameters.threshold > 100
+      ) {
         errores["plaft_screening.threshold"] = "Va de 0 a 100";
       }
       if (rv.code === "minors_transfer_policy") parameters.policy = d.policy ?? "block";
       if (rv.code === "unusual_hours") {
         parameters.days = d.days ?? [];
         (d.days ?? []).forEach((day) => {
-          if (day.enabled && day.start >= day.end) errores[`unusual_hours.day${day.day}`] = "El inicio debe ser anterior al fin";
+          if (day.enabled && day.start >= day.end)
+            errores[`unusual_hours.day${day.day}`] = "El inicio debe ser anterior al fin";
         });
       }
       rules.push({ code: rv.code, isEnabled: d.isEnabled, parameters });
@@ -219,7 +256,15 @@ function construir(draft: Draft): { rules: { code: AlertRuleCode; isEnabled: boo
   return { rules, errores };
 }
 
-function Toggle({ enabled, onClick, label }: { enabled: boolean; onClick: () => void; label: string }) {
+function Toggle({
+  enabled,
+  onClick,
+  label,
+}: {
+  enabled: boolean;
+  onClick: () => void;
+  label: string;
+}) {
   return (
     <button
       type="button"
@@ -245,7 +290,13 @@ const ErrorCampo = ({ msg }: { msg?: string }) =>
 
 function Page() {
   const queryClient = useQueryClient();
-  const { data: rules, isLoading, isError, error, refetch } = useQuery({
+  const {
+    data: rules,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: ["alert_rules"],
     queryFn: listAlertRules,
   });
@@ -259,7 +310,10 @@ function Page() {
     if (original) setDraft(structuredClone(original));
   }, [original]);
 
-  const sinCambios = useMemo(() => JSON.stringify(original) === JSON.stringify(draft), [original, draft]);
+  const sinCambios = useMemo(
+    () => JSON.stringify(original) === JSON.stringify(draft),
+    [original, draft],
+  );
   const faltantes = original ? CODES.filter((c) => !original[c]) : [];
 
   const patch = (code: string, fn: (d: Draft[string]) => void) =>
@@ -311,7 +365,11 @@ function Page() {
         <div className="flex flex-col items-center gap-3 rounded-lg border border-danger-200 bg-danger-50 px-6 py-10 text-center text-sm text-danger-700">
           <AlertTriangle size={24} />
           <p>No se pudo cargar la configuración: {(error as Error)?.message}</p>
-          <button type="button" onClick={() => refetch()} className="h-9 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground">
+          <button
+            type="button"
+            onClick={() => refetch()}
+            className="h-9 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground"
+          >
             Reintentar
           </button>
         </div>
@@ -319,13 +377,23 @@ function Page() {
         <div className="bg-card border rounded-lg p-4 md:p-6">
           {faltantes.length > 0 && (
             <div className="mb-4 rounded-md border border-danger-200 bg-danger-50 px-3 py-2 text-xs text-danger-700">
-              Faltan reglas en la base ({faltantes.join(", ")}). Aplicá la migración de configuración de alertas.
+              Faltan reglas en la base ({faltantes.join(", ")}). Aplicá la migración de
+              configuración de alertas.
             </div>
           )}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {GROUPS.map((g) => (
-              <div key={g.title} className={g.full ? "break-inside-avoid md:col-span-2 lg:col-span-full" : "break-inside-avoid"}>
-                <h4 className="font-display text-sm font-semibold text-foreground mb-3 pb-2 border-b border-border">{g.title}</h4>
+              <div
+                key={g.title}
+                className={
+                  g.full
+                    ? "break-inside-avoid md:col-span-2 lg:col-span-full"
+                    : "break-inside-avoid"
+                }
+              >
+                <h4 className="font-display text-sm font-semibold text-foreground mb-3 pb-2 border-b border-border">
+                  {g.title}
+                </h4>
                 <div className="space-y-3">
                   {g.rules.map((rv) => {
                     const d = draft[rv.code];
@@ -334,21 +402,38 @@ function Page() {
                       <div key={rv.code} className="space-y-3">
                         <div className="flex items-center justify-between gap-3">
                           <span className="text-xs text-muted-foreground">{rv.switchLabel}</span>
-                          <Toggle label={rv.switchLabel} enabled={d.isEnabled} onClick={() => patch(rv.code, (x) => { x.isEnabled = !x.isEnabled; })} />
+                          <Toggle
+                            label={rv.switchLabel}
+                            enabled={d.isEnabled}
+                            onClick={() =>
+                              patch(rv.code, (x) => {
+                                x.isEnabled = !x.isEnabled;
+                              })
+                            }
+                          />
                         </div>
 
                         {rv.numbers?.map((f) => {
                           const id = `${rv.code}.${f.key}`;
                           return (
                             <div key={id}>
-                              <label htmlFor={id} className="block text-xs font-semibold text-muted-foreground mb-1">{f.label}</label>
+                              <label
+                                htmlFor={id}
+                                className="block text-xs font-semibold text-muted-foreground mb-1"
+                              >
+                                {f.label}
+                              </label>
                               <input
                                 id={id}
                                 type="number"
                                 min={0}
                                 step={f.integer ? 1 : "any"}
                                 value={d.values[f.key] ?? ""}
-                                onChange={(e) => patch(rv.code, (x) => { x.values[f.key] = e.target.value; })}
+                                onChange={(e) =>
+                                  patch(rv.code, (x) => {
+                                    x.values[f.key] = e.target.value;
+                                  })
+                                }
                                 aria-invalid={Boolean(errores[id])}
                                 className={`w-full h-9 rounded-md border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring/40 ${errores[id] ? "border-danger-400" : "border-input"}`}
                               />
@@ -359,50 +444,86 @@ function Page() {
 
                         {rv.code === "minors_transfer_policy" && (
                           <div>
-                            <label htmlFor="politica-menores" className="block text-xs font-semibold text-muted-foreground mb-1">Política</label>
+                            <label
+                              htmlFor="politica-menores"
+                              className="block text-xs font-semibold text-muted-foreground mb-1"
+                            >
+                              Política
+                            </label>
                             <select
                               id="politica-menores"
                               value={d.policy ?? "block"}
-                              onChange={(e) => patch(rv.code, (x) => { x.policy = e.target.value as MinorsPolicy; })}
+                              onChange={(e) =>
+                                patch(rv.code, (x) => {
+                                  x.policy = e.target.value as MinorsPolicy;
+                                })
+                              }
                               className="w-full h-9 rounded-md border border-input bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring/40"
                             >
-                              {POLITICAS.map((p) => <option key={p.value} value={p.value}>{p.label}</option>)}
+                              {POLITICAS.map((p) => (
+                                <option key={p.value} value={p.value}>
+                                  {p.label}
+                                </option>
+                              ))}
                             </select>
                           </div>
                         )}
 
-                        {rv.code === "unusual_hours" && (d.days ?? []).map((day, i) => (
-                          <div key={day.day}>
-                            <div className="flex flex-wrap items-center gap-3 rounded-md border border-border px-3 py-2">
-                              <div className="flex items-center gap-3">
-                                <span className="text-xs font-medium text-foreground w-24">{dayNames[day.day - 1]}</span>
-                                <Toggle label={dayNames[day.day - 1]} enabled={day.enabled} onClick={() => patch(rv.code, (x) => { x.days![i].enabled = !x.days![i].enabled; })} />
+                        {rv.code === "unusual_hours" &&
+                          (d.days ?? []).map((day, i) => (
+                            <div key={day.day}>
+                              <div className="flex flex-wrap items-center gap-3 rounded-md border border-border px-3 py-2">
+                                <div className="flex items-center gap-3">
+                                  <span className="text-xs font-medium text-foreground w-24">
+                                    {dayNames[day.day - 1]}
+                                  </span>
+                                  <Toggle
+                                    label={dayNames[day.day - 1]}
+                                    enabled={day.enabled}
+                                    onClick={() =>
+                                      patch(rv.code, (x) => {
+                                        x.days![i].enabled = !x.days![i].enabled;
+                                      })
+                                    }
+                                  />
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <label className="text-[10px] font-semibold text-muted-foreground">
+                                    Inicio
+                                  </label>
+                                  <input
+                                    type="time"
+                                    value={day.start}
+                                    disabled={!day.enabled}
+                                    onChange={(e) =>
+                                      patch(rv.code, (x) => {
+                                        x.days![i].start = e.target.value;
+                                      })
+                                    }
+                                    className="h-8 w-32 rounded-md border border-input bg-background px-2 text-sm outline-none focus:ring-2 focus:ring-ring/40 disabled:opacity-50"
+                                  />
+                                </div>
+                                <span className="text-xs text-muted-foreground">→</span>
+                                <div className="flex items-center gap-2">
+                                  <label className="text-[10px] font-semibold text-muted-foreground">
+                                    Fin
+                                  </label>
+                                  <input
+                                    type="time"
+                                    value={day.end}
+                                    disabled={!day.enabled}
+                                    onChange={(e) =>
+                                      patch(rv.code, (x) => {
+                                        x.days![i].end = e.target.value;
+                                      })
+                                    }
+                                    className="h-8 w-32 rounded-md border border-input bg-background px-2 text-sm outline-none focus:ring-2 focus:ring-ring/40 disabled:opacity-50"
+                                  />
+                                </div>
                               </div>
-                              <div className="flex items-center gap-2">
-                                <label className="text-[10px] font-semibold text-muted-foreground">Inicio</label>
-                                <input
-                                  type="time"
-                                  value={day.start}
-                                  disabled={!day.enabled}
-                                  onChange={(e) => patch(rv.code, (x) => { x.days![i].start = e.target.value; })}
-                                  className="h-8 w-32 rounded-md border border-input bg-background px-2 text-sm outline-none focus:ring-2 focus:ring-ring/40 disabled:opacity-50"
-                                />
-                              </div>
-                              <span className="text-xs text-muted-foreground">→</span>
-                              <div className="flex items-center gap-2">
-                                <label className="text-[10px] font-semibold text-muted-foreground">Fin</label>
-                                <input
-                                  type="time"
-                                  value={day.end}
-                                  disabled={!day.enabled}
-                                  onChange={(e) => patch(rv.code, (x) => { x.days![i].end = e.target.value; })}
-                                  className="h-8 w-32 rounded-md border border-input bg-background px-2 text-sm outline-none focus:ring-2 focus:ring-ring/40 disabled:opacity-50"
-                                />
-                              </div>
+                              <ErrorCampo msg={errores[`unusual_hours.day${day.day}`]} />
                             </div>
-                            <ErrorCampo msg={errores[`unusual_hours.day${day.day}`]} />
-                          </div>
-                        ))}
+                          ))}
                       </div>
                     );
                   })}
@@ -412,7 +533,9 @@ function Page() {
           </div>
 
           <div className="flex items-center justify-end gap-3 pt-6 mt-6 border-t border-border">
-            {!sinCambios && <span className="text-xs text-muted-foreground">Hay cambios sin guardar</span>}
+            {!sinCambios && (
+              <span className="text-xs text-muted-foreground">Hay cambios sin guardar</span>
+            )}
             <button
               type="button"
               onClick={() => void guardar()}

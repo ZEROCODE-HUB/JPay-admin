@@ -45,9 +45,7 @@ import * as XLSX from "xlsx";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 
-export const Route = createFileRoute(
-  "/admin/comercios/link-pago/calendario-acreditaciones",
-)({
+export const Route = createFileRoute("/admin/comercios/link-pago/calendario-acreditaciones")({
   component: Page,
   head: () => ({
     meta: [
@@ -168,17 +166,12 @@ function DiaDetalleModal({
 
   const totalBruto = items.reduce((s, i) => s + i.importeBruto, 0);
   const totalNeto = items.reduce((s, i) => s + i.importeNeto, 0);
-  const totalAdelantos = items.reduce(
-    (s, i) => s + (i.adelantosReservadosTotal ?? 0),
-    0,
-  );
+  const totalAdelantos = items.reduce((s, i) => s + (i.adelantosReservadosTotal ?? 0), 0);
 
   // Por comercio del día, ¿hay adelanto aprobado?
   const tieneAdelantoAprobado = (comercioId: string): boolean => {
     const adels = adelantosPorComercio?.[comercioId] ?? [];
-    return adels.some(
-      (a) => a.estado === "Aprobado" || a.estado === "Pendiente",
-    );
+    return adels.some((a) => a.estado === "Aprobado" || a.estado === "Pendiente");
   };
 
   const irAAdelantos = (comercioId: string, adelantoId?: string) => {
@@ -220,10 +213,8 @@ function DiaDetalleModal({
                 <CalendarDays size={18} /> {fechaFormateada}
               </h3>
               <p className="text-sm text-muted-foreground">
-                {items.length} lote{items.length !== 1 ? "s" : ""} · {items.reduce(
-                  (s, i) => s + i.cantidadOperaciones,
-                  0,
-                )} operaciones
+                {items.length} lote{items.length !== 1 ? "s" : ""} ·{" "}
+                {items.reduce((s, i) => s + i.cantidadOperaciones, 0)} operaciones
               </p>
             </div>
             <div className="flex items-center gap-2">
@@ -251,10 +242,7 @@ function DiaDetalleModal({
                 )}
                 PDF
               </button>
-              <button
-                onClick={onClose}
-                className="p-1.5 hover:bg-muted rounded-md"
-              >
+              <button onClick={onClose} className="p-1.5 hover:bg-muted rounded-md">
                 <X size={18} />
               </button>
             </div>
@@ -290,9 +278,8 @@ function DiaDetalleModal({
               it.importeNeto - (it.adelantosAplicadosDia ?? 0),
               0,
             );
-            const comisionCierrePct = it.importeBruto > 0
-              ? (it.comisionCierreLoteMonto / it.importeBruto) * 100
-              : 0;
+            const comisionCierrePct =
+              it.importeBruto > 0 ? (it.comisionCierreLoteMonto / it.importeBruto) * 100 : 0;
 
             return (
               <Card key={it.id} className="p-4">
@@ -300,9 +287,7 @@ function DiaDetalleModal({
                   <div className="flex items-center gap-2 min-w-0">
                     <Building2 size={16} className="text-muted-foreground shrink-0" />
                     <div className="min-w-0">
-                      <div className="font-semibold text-sm truncate">
-                        {it.comercioNombre}
-                      </div>
+                      <div className="font-semibold text-sm truncate">{it.comercioNombre}</div>
                       <div className="text-xs text-muted-foreground">
                         {it.comercioLegajo} · {it.bandera} · {it.codigo}
                       </div>
@@ -319,7 +304,12 @@ function DiaDetalleModal({
                     </div>
                     <div className="text-amber-700 mt-1">
                       {adelantosComercio
-                        .filter((a) => a.estado !== "Acreditado" && a.estado !== "Rechazado" && a.estado !== "Cancelado")
+                        .filter(
+                          (a) =>
+                            a.estado !== "Acreditado" &&
+                            a.estado !== "Rechazado" &&
+                            a.estado !== "Cancelado",
+                        )
                         .map((a) => (
                           <button
                             key={a.id}
@@ -388,18 +378,14 @@ function DiaDetalleModal({
                       )}
                       {it.adelantosAplicadosDia > 0 && (
                         <tr className="text-amber-700">
-                          <td className="py-1">
-                            (-) Adelanto aplicado a este día
-                          </td>
+                          <td className="py-1">(-) Adelanto aplicado a este día</td>
                           <td className="text-right">-{fmt(it.adelantosAplicadosDia)}</td>
                           <td className="text-right" />
                         </tr>
                       )}
                       <tr className="border-t-2 font-semibold">
                         <td className="py-1.5">= Neto a depositar</td>
-                        <td className="text-right text-emerald-700">
-                          {fmt(netoDespuesAdelantos)}
-                        </td>
+                        <td className="text-right text-emerald-700">{fmt(netoDespuesAdelantos)}</td>
                         <td className="text-right" />
                       </tr>
                     </tbody>
@@ -547,14 +533,7 @@ function Page() {
 
   // Calendario del mes
   const { data: acreditaciones, isLoading } = useQuery<CalendarioAcreditacion[]>({
-    queryKey: [
-      "calendario-acreditaciones",
-      mes,
-      anio,
-      comercioFilter,
-      banderaFilter,
-      estadoFilter,
-    ],
+    queryKey: ["calendario-acreditaciones", mes, anio, comercioFilter, banderaFilter, estadoFilter],
     queryFn: () =>
       listCalendarioAcreditaciones({
         mes,
@@ -572,23 +551,15 @@ function Page() {
     if (!sb) return;
     const ch = sb
       .channel("realtime-calendario-acreditaciones")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "lotes_acreditacion" },
-        () => {
-          qc.invalidateQueries({ queryKey: ["calendario-acreditaciones"] });
-          qc.invalidateQueries({ queryKey: ["calendario-resumen"] });
-        },
-      )
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "adelantos" },
-        () => {
-          qc.invalidateQueries({ queryKey: ["calendario-acreditaciones"] });
-          qc.invalidateQueries({ queryKey: ["calendario-resumen"] });
-          qc.invalidateQueries({ queryKey: ["calendario-adelantos-dia"] });
-        },
-      )
+      .on("postgres_changes", { event: "*", schema: "public", table: "lotes_acreditacion" }, () => {
+        qc.invalidateQueries({ queryKey: ["calendario-acreditaciones"] });
+        qc.invalidateQueries({ queryKey: ["calendario-resumen"] });
+      })
+      .on("postgres_changes", { event: "*", schema: "public", table: "adelantos" }, () => {
+        qc.invalidateQueries({ queryKey: ["calendario-acreditaciones"] });
+        qc.invalidateQueries({ queryKey: ["calendario-resumen"] });
+        qc.invalidateQueries({ queryKey: ["calendario-adelantos-dia"] });
+      })
       .subscribe();
     return () => {
       sb.removeChannel(ch);
@@ -603,7 +574,12 @@ function Page() {
     let diaSemana = primerDia.getDay();
     diaSemana = diaSemana === 0 ? 6 : diaSemana - 1;
     for (let i = diaSemana - 1; i >= 0; i--) {
-      dias.push({ fecha: new Date(anio, mes - 1, -i), esActual: false, esPasado: false, esOtroMes: true });
+      dias.push({
+        fecha: new Date(anio, mes - 1, -i),
+        esActual: false,
+        esPasado: false,
+        esOtroMes: true,
+      });
     }
     for (let d = 1; d <= ultimoDia.getDate(); d++) {
       const fecha = new Date(anio, mes - 1, d);
@@ -619,7 +595,12 @@ function Page() {
     const restante = 7 - (dias.length % 7);
     if (restante < 7) {
       for (let i = 1; i <= restante; i++) {
-        dias.push({ fecha: new Date(anio, mes, i), esActual: false, esPasado: false, esOtroMes: true });
+        dias.push({
+          fecha: new Date(anio, mes, i),
+          esActual: false,
+          esPasado: false,
+          esOtroMes: true,
+        });
       }
     }
     return dias;
@@ -715,9 +696,7 @@ function Page() {
             >
               <ChevronLeft size={16} />
             </button>
-            <span className="font-semibold min-w-[160px] text-center capitalize">
-              {nombreMes}
-            </span>
+            <span className="font-semibold min-w-[160px] text-center capitalize">{nombreMes}</span>
             <button
               onClick={mesSiguiente}
               className="h-8 w-8 rounded-md border bg-card hover:bg-muted flex items-center justify-center"
@@ -804,10 +783,7 @@ function Page() {
         <Card className="overflow-hidden">
           <div className="grid grid-cols-7 border-b bg-muted/30">
             {DIAS_SEMANA.map((d) => (
-              <div
-                key={d}
-                className="p-2 text-center text-xs font-semibold text-muted-foreground"
-              >
+              <div key={d} className="p-2 text-center text-xs font-semibold text-muted-foreground">
                 {d}
               </div>
             ))}
@@ -818,10 +794,7 @@ function Page() {
               const items = acreditacionesPorFecha.get(fechaKey) ?? [];
               const tieneItems = items.length > 0;
               const totalBruto = items.reduce((s, i) => s + i.importeBruto, 0);
-              const totalAdelantos = items.reduce(
-                (s, i) => s + (i.adelantosAplicadosDia ?? 0),
-                0,
-              );
+              const totalAdelantos = items.reduce((s, i) => s + (i.adelantosAplicadosDia ?? 0), 0);
               const netoDespuesAdelantos = Math.max(
                 items.reduce((s, i) => s + i.importeNeto, 0) - totalAdelantos,
                 0,
@@ -861,9 +834,7 @@ function Page() {
                 >
                   <div className="flex justify-between items-start mb-1">
                     <span
-                      className={`text-sm font-semibold ${
-                        dia.esActual ? "text-primary-ink" : ""
-                      }`}
+                      className={`text-sm font-semibold ${dia.esActual ? "text-primary-ink" : ""}`}
                     >
                       {fechaCorta(dia.fecha)}
                     </span>
@@ -876,9 +847,7 @@ function Page() {
 
                   {tieneItems && (
                     <div className="space-y-1">
-                      <div className="font-mono text-sm font-semibold">
-                        {fmt(totalBruto)}
-                      </div>
+                      <div className="font-mono text-sm font-semibold">{fmt(totalBruto)}</div>
                       {items.slice(0, 2).map((it) => {
                         const color = ESTADO_COLORS[it.estadoCalculado] ?? ESTADO_COLORS.pendiente;
                         return (
@@ -903,13 +872,9 @@ function Page() {
                             <AlertTriangle size={10} /> Adelanto
                           </div>
                           <div className="font-mono">-{fmt(totalAdelantos)}</div>
-                          <div className="font-mono">
-                            Libre: {fmt(netoDespuesAdelantos)}
-                          </div>
+                          <div className="font-mono">Libre: {fmt(netoDespuesAdelantos)}</div>
                           {cupoAgotado && (
-                            <div className="text-danger-700 font-semibold mt-0.5">
-                              Cupo agotado
-                            </div>
+                            <div className="text-danger-700 font-semibold mt-0.5">Cupo agotado</div>
                           )}
                         </div>
                       )}

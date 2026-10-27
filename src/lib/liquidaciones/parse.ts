@@ -448,7 +448,8 @@ export function generarCsvLiquidacionTest(
   // Línea de título sin tildes para no romper la lectura si Excel la
   // toma como texto libre y la reparte en columnas con tab.
   const lineaTitulo = `Detalle de Liquidaciones de Payway Test - Lote ${lote.codigo} - Liquidacion ${fecha}`;
-  const encabezado = "FECHA;MARCA;ESTABLECIMIENTO;TOTAL_BRUTO;COSTO_DE_SERVICIO;IMPUESTOS;TOTAL_NETO";
+  const encabezado =
+    "FECHA;MARCA;ESTABLECIMIENTO;TOTAL_BRUTO;COSTO_DE_SERVICIO;IMPUESTOS;TOTAL_NETO";
   const fila = [
     fecha,
     lote.bandera,

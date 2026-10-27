@@ -1,7 +1,15 @@
 import { requireSupabase } from "@/lib/supabase";
 import type { TablesUpdate } from "@/lib/database.types";
 import { DataAccessError } from "./errors";
-import type { EstadoLote, LoteAcreditacion, LoteAcreditacionRow, Movimiento, MovimientoRow, Page, Pagination } from "./types";
+import type {
+  EstadoLote,
+  LoteAcreditacion,
+  LoteAcreditacionRow,
+  Movimiento,
+  MovimientoRow,
+  Page,
+  Pagination,
+} from "./types";
 import { toMovimiento } from "./mappers";
 
 const COLUMNS =
@@ -28,14 +36,18 @@ function toLote(r: LoteAcreditacionRow): LoteAcreditacion {
     tasaPropiaPct: Number(r.tasa_molipay_pct),
     tasaPropiaMonto: Number(r.tasa_molipay_monto),
     cuotas: r.cuotas != null ? Number(r.cuotas) : null,
-    costoPaywayPagoUnico: r.costo_payway_pago_unico != null ? Number(r.costo_payway_pago_unico) : null,
+    costoPaywayPagoUnico:
+      r.costo_payway_pago_unico != null ? Number(r.costo_payway_pago_unico) : null,
     contracargoMonto: Number(r.contracargo_monto ?? 0),
-    comisionCierreLotePct: r.comision_cierre_lote_pct != null ? Number(r.comision_cierre_lote_pct) : null,
-    comisionCierreLoteMonto: r.comision_cierre_lote_monto != null ? Number(r.comision_cierre_lote_monto) : null,
+    comisionCierreLotePct:
+      r.comision_cierre_lote_pct != null ? Number(r.comision_cierre_lote_pct) : null,
+    comisionCierreLoteMonto:
+      r.comision_cierre_lote_monto != null ? Number(r.comision_cierre_lote_monto) : null,
     importeNeto: Number(r.importe_neto),
     estado: r.estado,
     esEstimado: r.es_estimado ?? true,
-    diasHabilesAplicados: r.dias_habiles_aplicados != null ? Number(r.dias_habiles_aplicados) : null,
+    diasHabilesAplicados:
+      r.dias_habiles_aplicados != null ? Number(r.dias_habiles_aplicados) : null,
     fechaEstimadaRecalcular: r.fecha_estimada_recalcular ?? false,
     resueltoPor: r.resuelto_por,
     fechaResolucion: r.fecha_resolucion,
@@ -108,7 +120,9 @@ async function resolverComercioIdsPorTexto(texto: string): Promise<string[]> {
       .or(`cuit.ilike.%${qq}%,correo.ilike.%${qq}%,nombre.ilike.%${qq}%`)
       .limit(50);
     if (!error && clientes && clientes.length > 0) {
-      const legajos = Array.from(new Set((clientes as { legajo: string }[]).map((c) => c.legajo).filter(Boolean)));
+      const legajos = Array.from(
+        new Set((clientes as { legajo: string }[]).map((c) => c.legajo).filter(Boolean)),
+      );
       if (legajos.length > 0) {
         const { data: cs, error: e2 } = await sb
           .from("comercios")
@@ -160,7 +174,11 @@ export async function listLotes(filters: LotesFilters): Promise<Page<LoteAcredit
 
 export async function getLote(id: string): Promise<LoteAcreditacion | null> {
   const sb = requireSupabase();
-  const { data, error } = await sb.from("lotes_acreditacion").select(COLUMNS).eq("id", id).maybeSingle();
+  const { data, error } = await sb
+    .from("lotes_acreditacion")
+    .select(COLUMNS)
+    .eq("id", id)
+    .maybeSingle();
   if (error) throw new DataAccessError(error);
   if (!data) return null;
   return toLote(data as LoteAcreditacionRow);
@@ -168,19 +186,21 @@ export async function getLote(id: string): Promise<LoteAcreditacion | null> {
 
 export async function listLoteMovimientos(loteId: string): Promise<Movimiento[]> {
   const sb = requireSupabase();
-  const { data: links, error } = await sb.from("lote_movimientos").select("movimiento_id").eq("lote_id", loteId);
+  const { data: links, error } = await sb
+    .from("lote_movimientos")
+    .select("movimiento_id")
+    .eq("lote_id", loteId);
   if (error) throw new DataAccessError(error);
   const movimientoIds = (links ?? []).map((r: { movimiento_id: string }) => r.movimiento_id);
   if (movimientoIds.length === 0) return [];
-  const COLUMNS = "id, cliente_id, legajo, id_txn, tipo, cvu, monto_operacion, comision, impuesto, monto_cobrado, fecha, created_at, estado_id, comercio_id, bandera_id, bandera, estados_movimiento(codigo, nombre, es_final), clientes!transactions_cliente_id_fkey(correo, nombre, cuit)";
+  const COLUMNS =
+    "id, cliente_id, legajo, id_txn, tipo, cvu, monto_operacion, comision, impuesto, monto_cobrado, fecha, created_at, estado_id, comercio_id, bandera_id, bandera, estados_movimiento(codigo, nombre, es_final), clientes!transactions_cliente_id_fkey(correo, nombre, cuit)";
   const { data: movimientos, error: movError } = await sb
     .from("transactions")
     .select(COLUMNS)
     .in("id", movimientoIds);
   if (movError) throw new DataAccessError(movError);
-  return (movimientos ?? []).map((r) =>
-    toMovimiento(r as MovimientoRow),
-  );
+  return (movimientos ?? []).map((r) => toMovimiento(r as MovimientoRow));
 }
 
 export async function getLotePaywaySnapshotForMovimientos(
@@ -188,7 +208,10 @@ export async function getLotePaywaySnapshotForMovimientos(
 ): Promise<Map<string, { pct: number; monto: number; loteId: string }>> {
   if (movimientoIds.length === 0) return new Map();
   const sb = requireSupabase();
-  const { data: links, error: linkErr } = await sb.from("lote_movimientos").select("lote_id, movimiento_id").in("movimiento_id", movimientoIds);
+  const { data: links, error: linkErr } = await sb
+    .from("lote_movimientos")
+    .select("lote_id, movimiento_id")
+    .in("movimiento_id", movimientoIds);
   if (linkErr) throw new DataAccessError(linkErr);
   const loteIds = [...new Set((links ?? []).map((r: { lote_id: string }) => r.lote_id))];
   if (loteIds.length === 0) return new Map();
@@ -198,15 +221,27 @@ export async function getLotePaywaySnapshotForMovimientos(
     .in("id", loteIds);
   if (loteErr) throw new DataAccessError(loteErr);
   const loteMap = new Map<string, { pct: number; monto: number; cantidad: number }>(
-    (lotes ?? []).map((l: { id: string; tasa_payway_pct: number; tasa_payway_monto: number; cantidad_operaciones: number }) => [
-      l.id,
-      { pct: Number(l.tasa_payway_pct), monto: Number(l.tasa_payway_monto), cantidad: Number(l.cantidad_operaciones) },
-    ]),
+    (lotes ?? []).map(
+      (l: {
+        id: string;
+        tasa_payway_pct: number;
+        tasa_payway_monto: number;
+        cantidad_operaciones: number;
+      }) => [
+        l.id,
+        {
+          pct: Number(l.tasa_payway_pct),
+          monto: Number(l.tasa_payway_monto),
+          cantidad: Number(l.cantidad_operaciones),
+        },
+      ],
+    ),
   );
   const result = new Map<string, { pct: number; monto: number; loteId: string }>();
-  for (const link of links ?? [] as { lote_id: string; movimiento_id: string }[]) {
+  for (const link of links ?? ([] as { lote_id: string; movimiento_id: string }[])) {
     const lote = loteMap.get(link.lote_id);
-    if (lote) result.set(link.movimiento_id, { pct: lote.pct, monto: lote.monto, loteId: link.lote_id });
+    if (lote)
+      result.set(link.movimiento_id, { pct: lote.pct, monto: lote.monto, loteId: link.lote_id });
   }
   return result;
 }
@@ -291,17 +326,20 @@ export async function updateLote(id: string, input: UpdateLoteInput): Promise<Lo
     }
 
     // Calcular comision_cierre_lote_monto = importe_bruto * comision_cierre_lote_pct / 100
-    const comisionCierreLoteMonto = Number(current.importeBruto) * (comisionCierreLotePct ?? 0.45) / 100;
+    const comisionCierreLoteMonto =
+      (Number(current.importeBruto) * (comisionCierreLotePct ?? 0.45)) / 100;
     payload.comision_cierre_lote_monto = comisionCierreLoteMonto;
 
     // Siempre recalcular importe_neto: bruto - impuestos - payway - comisión de la plataforma - contracargo - cierre_lote
-    const contracargo = input.contracargoMonto !== undefined ? input.contracargoMonto : current.contracargoMonto;
-    const importeNeto = Number(current.importeBruto)
-      - Number(current.impuestos)
-      - Number(current.tasaPaywayMonto)
-      - Number(current.tasaPropiaMonto)
-      - Number(contracargo ?? 0)
-      - comisionCierreLoteMonto;
+    const contracargo =
+      input.contracargoMonto !== undefined ? input.contracargoMonto : current.contracargoMonto;
+    const importeNeto =
+      Number(current.importeBruto) -
+      Number(current.impuestos) -
+      Number(current.tasaPaywayMonto) -
+      Number(current.tasaPropiaMonto) -
+      Number(contracargo ?? 0) -
+      comisionCierreLoteMonto;
     payload.importe_neto = importeNeto;
   }
 
@@ -322,7 +360,12 @@ export async function updateLote(id: string, input: UpdateLoteInput): Promise<Lo
     }
   }
 
-  const { data, error } = await sb.from("lotes_acreditacion").update(payload).eq("id", id).select(COLUMNS).single();
+  const { data, error } = await sb
+    .from("lotes_acreditacion")
+    .update(payload)
+    .eq("id", id)
+    .select(COLUMNS)
+    .single();
   if (error) throw new DataAccessError(error);
   return toLote(data as LoteAcreditacionRow);
 }
@@ -483,5 +526,9 @@ export async function resolverContracargo(
   accion: "Acreditar",
   args: { contracargoMonto?: number; notas?: string },
 ): Promise<LoteAcreditacion> {
-  return updateLote(id, { estado: "Acreditado", contracargoMonto: args.contracargoMonto, notasResolucion: args.notas ?? null });
+  return updateLote(id, {
+    estado: "Acreditado",
+    contracargoMonto: args.contracargoMonto,
+    notasResolucion: args.notas ?? null,
+  });
 }

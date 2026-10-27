@@ -1,7 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { keepPreviousData, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Save, ShieldAlert, Plus, Eye, Edit3, Trash2, Loader2, Search, AlertTriangle } from "lucide-react";
+import {
+  Save,
+  ShieldAlert,
+  Plus,
+  Eye,
+  Edit3,
+  Trash2,
+  Loader2,
+  Search,
+  AlertTriangle,
+} from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/page-header";
 import { DataTable, type Column, type TableServerFilters } from "@/components/data-table";
@@ -63,7 +73,12 @@ function SmvmCard() {
       ) : (
         <div className="flex flex-wrap items-end gap-4">
           <div className="min-w-[240px]">
-            <label htmlFor="smvm" className="block text-xs font-semibold text-muted-foreground mb-1">Valor vigente (ARS)</label>
+            <label
+              htmlFor="smvm"
+              className="block text-xs font-semibold text-muted-foreground mb-1"
+            >
+              Valor vigente (ARS)
+            </label>
             <input
               id="smvm"
               type="number"
@@ -78,14 +93,18 @@ function SmvmCard() {
           <button
             type="button"
             onClick={() => void guardar()}
-            disabled={guardando || q.isLoading || valor === (q.data && q.data > 0 ? String(q.data) : "")}
+            disabled={
+              guardando || q.isLoading || valor === (q.data && q.data > 0 ? String(q.data) : "")
+            }
             className="inline-flex items-center gap-2 h-10 px-6 rounded-md bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90 disabled:opacity-50"
           >
-            {guardando ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} Guardar SMVM
+            {guardando ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}{" "}
+            Guardar SMVM
           </button>
           {q.data === 0 && (
             <p className="w-full text-[11px] font-medium text-amber-700">
-              Sin SMVM configurado, las reglas expresadas en salarios mínimos (alertas y bloqueos) no se evalúan.
+              Sin SMVM configurado, las reglas expresadas en salarios mínimos (alertas y bloqueos)
+              no se evalúan.
             </p>
           )}
         </div>
@@ -156,7 +175,10 @@ function ClienteParamFields({
         ) : (
           <>
             <div className="relative">
-              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+              <Search
+                size={14}
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"
+              />
               <input
                 value={busqueda}
                 onChange={(e) => {
@@ -186,19 +208,25 @@ function ClienteParamFields({
                     className="w-full text-left px-3 py-2 text-sm hover:bg-accent flex flex-col"
                   >
                     <span className="font-medium">{c.correo}</span>
-                    <span className="text-xs text-muted-foreground font-mono">{c.legajo} · {c.nombre}</span>
+                    <span className="text-xs text-muted-foreground font-mono">
+                      {c.legajo} · {c.nombre}
+                    </span>
                   </button>
                 ))}
               </div>
             )}
             {draft.legajo && (
-              <p className="text-[11px] text-emerald-700 mt-1">Seleccionado: <span className="font-mono">{draft.legajo}</span></p>
+              <p className="text-[11px] text-emerald-700 mt-1">
+                Seleccionado: <span className="font-mono">{draft.legajo}</span>
+              </p>
             )}
           </>
         )}
       </div>
       <div>
-        <label className="text-xs font-semibold text-foreground mb-1.5 block">Salarios mínimos por persona</label>
+        <label className="text-xs font-semibold text-foreground mb-1.5 block">
+          Salarios mínimos por persona
+        </label>
         <input
           type="number"
           min={0}
@@ -210,7 +238,9 @@ function ClienteParamFields({
         />
       </div>
       <div>
-        <label className="text-xs font-semibold text-foreground mb-1.5 block">Salarios mínimos por empresa</label>
+        <label className="text-xs font-semibold text-foreground mb-1.5 block">
+          Salarios mínimos por empresa
+        </label>
         <input
           type="number"
           min={0}
@@ -235,19 +265,31 @@ function Page() {
   const reglas = useQuery({ queryKey: ["alert_rules"], queryFn: listAlertRules });
   const regla = reglas.data?.find((r) => r.code === REGLA_GLOBAL);
   const generales = {
-    persona: typeof regla?.parameters.individual_min_wages === "number" ? (regla.parameters.individual_min_wages as number) : null,
-    empresa: typeof regla?.parameters.company_min_wages === "number" ? (regla.parameters.company_min_wages as number) : null,
+    persona:
+      typeof regla?.parameters.individual_min_wages === "number"
+        ? (regla.parameters.individual_min_wages as number)
+        : null,
+    empresa:
+      typeof regla?.parameters.company_min_wages === "number"
+        ? (regla.parameters.company_min_wages as number)
+        : null,
   };
   const [params, setParams] = useState({ persona: "", empresa: "" });
   const [errGen, setErrGen] = useState<{ persona?: string; empresa?: string }>({});
   const [guardandoGen, setGuardandoGen] = useState(false);
 
   useEffect(() => {
-    if (regla) setParams({ persona: String(generales.persona ?? ""), empresa: String(generales.empresa ?? "") });
+    if (regla)
+      setParams({
+        persona: String(generales.persona ?? ""),
+        empresa: String(generales.empresa ?? ""),
+      });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [regla?.updatedAt]);
 
-  const genSinCambios = params.persona === String(generales.persona ?? "") && params.empresa === String(generales.empresa ?? "");
+  const genSinCambios =
+    params.persona === String(generales.persona ?? "") &&
+    params.empresa === String(generales.empresa ?? "");
 
   const guardarGenerales = async () => {
     if (!regla) return;
@@ -265,7 +307,11 @@ function Page() {
         {
           code: REGLA_GLOBAL,
           isEnabled: regla.isEnabled,
-          parameters: { ...regla.parameters, individual_min_wages: p.value, company_min_wages: e.value },
+          parameters: {
+            ...regla.parameters,
+            individual_min_wages: p.value,
+            company_min_wages: e.value,
+          },
         },
       ]);
       await queryClient.invalidateQueries({ queryKey: ["alert_rules"] });
@@ -335,9 +381,18 @@ function Page() {
     setGuardando(true);
     setErrDraft(null);
     try {
-      await saveClientBlockParameter({ id: draft.id, legajo: draft.legajo, individualMinWages: p.value, companyMinWages: e.value });
+      await saveClientBlockParameter({
+        id: draft.id,
+        legajo: draft.legajo,
+        individualMinWages: p.value,
+        companyMinWages: e.value,
+      });
       await refrescar();
-      toast.success(dialogo === "nuevo" ? "Parámetros del cliente agregados" : "Parámetros del cliente actualizados");
+      toast.success(
+        dialogo === "nuevo"
+          ? "Parámetros del cliente agregados"
+          : "Parámetros del cliente actualizados",
+      );
       setDialogo(null);
     } catch (err) {
       setErrDraft((err as Error).message);
@@ -351,7 +406,9 @@ function Page() {
     try {
       await deleteClientBlockParameter(borrando.id);
       await refrescar();
-      toast.success("Configuración individual eliminada: el cliente vuelve a usar los valores generales");
+      toast.success(
+        "Configuración individual eliminada: el cliente vuelve a usar los valores generales",
+      );
     } catch (err) {
       toast.error(`No se pudo eliminar: ${(err as Error).message}`);
     } finally {
@@ -364,8 +421,20 @@ function Page() {
       const todas = await listAllClientBlockParameters(search || undefined);
       descargarCsv(
         `parametros-bloqueos-${new Date().toISOString().slice(0, 10)}.csv`,
-        ["Legajo", "Usuario (correo)", "Nombre", "Salarios mínimos por persona", "Salarios mínimos por empresa"],
-        todas.map((r) => [r.legajo, r.correo, r.nombre, r.individualMinWages ?? "General", r.companyMinWages ?? "General"]),
+        [
+          "Legajo",
+          "Usuario (correo)",
+          "Nombre",
+          "Salarios mínimos por persona",
+          "Salarios mínimos por empresa",
+        ],
+        todas.map((r) => [
+          r.legajo,
+          r.correo,
+          r.nombre,
+          r.individualMinWages ?? "General",
+          r.companyMinWages ?? "General",
+        ]),
       );
     } catch (err) {
       toast.error(`No se pudo exportar: ${(err as Error).message}`);
@@ -380,17 +449,34 @@ function Page() {
 
   const columns: Column<ClientBlockParameter>[] = useMemo(
     () => [
-      { key: "legajo", label: "Legajo", filterable: true, render: (r) => <LegajoCell legajo={r.legajo} /> },
+      {
+        key: "legajo",
+        label: "Legajo",
+        filterable: true,
+        render: (r) => <LegajoCell legajo={r.legajo} />,
+      },
       { key: "correo", label: "Usuario (correo)", filterable: true, render: (r) => r.correo },
       {
         key: "persona",
         label: "Cantidad de salarios mínimos depositados por persona",
-        render: (r) => <span className={`font-mono tabular-nums ${r.individualMinWages == null ? "text-muted-foreground" : ""}`}>{fmtUmbral(r.individualMinWages)}</span>,
+        render: (r) => (
+          <span
+            className={`font-mono tabular-nums ${r.individualMinWages == null ? "text-muted-foreground" : ""}`}
+          >
+            {fmtUmbral(r.individualMinWages)}
+          </span>
+        ),
       },
       {
         key: "empresa",
         label: "Cantidad de salarios mínimos depositados por empresa",
-        render: (r) => <span className={`font-mono tabular-nums ${r.companyMinWages == null ? "text-muted-foreground" : ""}`}>{fmtUmbral(r.companyMinWages)}</span>,
+        render: (r) => (
+          <span
+            className={`font-mono tabular-nums ${r.companyMinWages == null ? "text-muted-foreground" : ""}`}
+          >
+            {fmtUmbral(r.companyMinWages)}
+          </span>
+        ),
       },
     ],
     [],
@@ -427,17 +513,34 @@ function Page() {
         ) : reglas.isError || !regla ? (
           <div className="flex items-center gap-2 rounded-md border border-danger-200 bg-danger-50 px-3 py-2 text-xs text-danger-700">
             <AlertTriangle size={14} />
-            {reglas.isError ? `No se pudo cargar: ${(reglas.error as Error).message}` : "Falta la regla de bloqueo en la base: aplicá la migración de configuración de alertas."}
+            {reglas.isError
+              ? `No se pudo cargar: ${(reglas.error as Error).message}`
+              : "Falta la regla de bloqueo en la base: aplicá la migración de configuración de alertas."}
           </div>
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              {([
-                ["persona", "Cantidad de salarios mínimos depositados por persona", "Si una persona física supera este acumulado de depósitos, la cuenta se bloquea automáticamente."],
-                ["empresa", "Cantidad de salarios mínimos depositados por empresa", "Si una persona jurídica supera este acumulado de depósitos, la cuenta se bloquea automáticamente."],
-              ] as const).map(([k, label, ayuda]) => (
+              {(
+                [
+                  [
+                    "persona",
+                    "Cantidad de salarios mínimos depositados por persona",
+                    "Si una persona física supera este acumulado de depósitos, la cuenta se bloquea automáticamente.",
+                  ],
+                  [
+                    "empresa",
+                    "Cantidad de salarios mínimos depositados por empresa",
+                    "Si una persona jurídica supera este acumulado de depósitos, la cuenta se bloquea automáticamente.",
+                  ],
+                ] as const
+              ).map(([k, label, ayuda]) => (
                 <div key={k}>
-                  <label htmlFor={`gen-${k}`} className="block text-xs font-semibold text-muted-foreground mb-1">{label}</label>
+                  <label
+                    htmlFor={`gen-${k}`}
+                    className="block text-xs font-semibold text-muted-foreground mb-1"
+                  >
+                    {label}
+                  </label>
                   <input
                     id={`gen-${k}`}
                     type="number"
@@ -474,9 +577,12 @@ function Page() {
       <div className="bg-card border rounded-lg p-6 mt-6">
         <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
           <div>
-            <h3 className="font-display text-sm font-semibold text-foreground">Parámetros de usuarios</h3>
+            <h3 className="font-display text-sm font-semibold text-foreground">
+              Parámetros de usuarios
+            </h3>
             <p className="text-xs text-muted-foreground mt-0.5">
-              Umbrales de depósitos configurados individualmente por usuario (reemplazan a los generales)
+              Umbrales de depósitos configurados individualmente por usuario (reemplazan a los
+              generales)
             </p>
           </div>
           <BtnPrimary onClick={abrirNuevo}>
@@ -486,7 +592,8 @@ function Page() {
 
         {lista.isError ? (
           <div className="flex items-center gap-2 rounded-md border border-danger-200 bg-danger-50 px-3 py-2 text-xs text-danger-700">
-            <AlertTriangle size={14} /> No se pudieron cargar los parámetros: {(lista.error as Error).message}
+            <AlertTriangle size={14} /> No se pudieron cargar los parámetros:{" "}
+            {(lista.error as Error).message}
           </div>
         ) : (
           <>
@@ -528,17 +635,32 @@ function Page() {
         <FormDialog
           open
           onClose={() => setDialogo(null)}
-          title={dialogo === "nuevo" ? "Agregar nuevos parámetros de usuario" : "Editar parámetros de usuario"}
-          description={dialogo === "nuevo" ? "Configure umbrales de depósitos para un usuario" : `Editando parámetros de ${draft.correo}`}
+          title={
+            dialogo === "nuevo"
+              ? "Agregar nuevos parámetros de usuario"
+              : "Editar parámetros de usuario"
+          }
+          description={
+            dialogo === "nuevo"
+              ? "Configure umbrales de depósitos para un usuario"
+              : `Editando parámetros de ${draft.correo}`
+          }
           onSubmit={() => void guardarDraft()}
-          submitLabel={guardando ? "Guardando…" : dialogo === "nuevo" ? "Agregar" : "Guardar cambios"}
+          submitLabel={
+            guardando ? "Guardando…" : dialogo === "nuevo" ? "Agregar" : "Guardar cambios"
+          }
         >
           {errDraft && (
             <div className="mb-3 flex items-start gap-2 rounded-md border border-danger-200 bg-danger-50 px-3 py-2 text-xs text-danger-700">
               <AlertTriangle size={14} className="mt-0.5 shrink-0" /> {errDraft}
             </div>
           )}
-          <ClienteParamFields draft={draft} onChange={setDraft} editando={dialogo === "editar"} generales={generales} />
+          <ClienteParamFields
+            draft={draft}
+            onChange={setDraft}
+            editando={dialogo === "editar"}
+            generales={generales}
+          />
         </FormDialog>
       )}
 
@@ -552,12 +674,36 @@ function Page() {
           submitLabel="Cerrar"
         >
           <div className="grid grid-cols-2 gap-3 text-sm">
-            <div><span className="text-muted-foreground">Legajo:</span> <span className="font-mono tabular-nums font-medium">{viendo.legajo}</span></div>
-            <div><span className="text-muted-foreground">Usuario:</span> <span className="font-medium">{viendo.correo}</span></div>
-            <div><span className="text-muted-foreground">Nombre:</span> <span className="font-medium">{viendo.nombre}</span></div>
-            <div><span className="text-muted-foreground">Actualizado:</span> <span className="font-medium">{new Date(viendo.updatedAt).toLocaleString("es-AR")}</span></div>
-            <div><span className="text-muted-foreground">Salarios mínimos por persona:</span> <span className="font-mono tabular-nums font-medium">{viendo.individualMinWages ?? `General (${generales.persona ?? "—"})`}</span></div>
-            <div><span className="text-muted-foreground">Salarios mínimos por empresa:</span> <span className="font-mono tabular-nums font-medium">{viendo.companyMinWages ?? `General (${generales.empresa ?? "—"})`}</span></div>
+            <div>
+              <span className="text-muted-foreground">Legajo:</span>{" "}
+              <span className="font-mono tabular-nums font-medium">{viendo.legajo}</span>
+            </div>
+            <div>
+              <span className="text-muted-foreground">Usuario:</span>{" "}
+              <span className="font-medium">{viendo.correo}</span>
+            </div>
+            <div>
+              <span className="text-muted-foreground">Nombre:</span>{" "}
+              <span className="font-medium">{viendo.nombre}</span>
+            </div>
+            <div>
+              <span className="text-muted-foreground">Actualizado:</span>{" "}
+              <span className="font-medium">
+                {new Date(viendo.updatedAt).toLocaleString("es-AR")}
+              </span>
+            </div>
+            <div>
+              <span className="text-muted-foreground">Salarios mínimos por persona:</span>{" "}
+              <span className="font-mono tabular-nums font-medium">
+                {viendo.individualMinWages ?? `General (${generales.persona ?? "—"})`}
+              </span>
+            </div>
+            <div>
+              <span className="text-muted-foreground">Salarios mínimos por empresa:</span>{" "}
+              <span className="font-mono tabular-nums font-medium">
+                {viendo.companyMinWages ?? `General (${generales.empresa ?? "—"})`}
+              </span>
+            </div>
           </div>
         </FormDialog>
       )}

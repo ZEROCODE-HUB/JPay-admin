@@ -103,9 +103,11 @@ function toEnlace(r: EnlacePagoRow): EnlacePago {
   const pago: PagoInfo | null =
     estado === "Pagado" || estado === "Contracargo"
       ? {
-          metodoPago: r.metodo_pago ?? (r.metodos_pago?.[0] ?? "Tarjeta"),
+          metodoPago: r.metodo_pago ?? r.metodos_pago?.[0] ?? "Tarjeta",
           tipoTarjeta: r.tipo_tarjeta ?? (Math.random() > 0.5 ? "Crédito" : "Débito"),
-          marcaTarjeta: r.marca_tarjeta ?? ["Visa", "Mastercard", "Amex", "Cabal"][Math.floor(Math.random() * 4)],
+          marcaTarjeta:
+            r.marca_tarjeta ??
+            ["Visa", "Mastercard", "Amex", "Cabal"][Math.floor(Math.random() * 4)],
           cuotas: r.cuotas ?? (estado === "Pagado" ? (Math.random() > 0.6 ? 1 : 3) : 1),
           importePagado: r.monto ?? null,
           fechaPago: r.updated_at ?? r.created_at,
@@ -152,12 +154,16 @@ export type EnlaceFilters = Pagination & {
   estado?: string;
 };
 
-const COLUMNS = "id, cliente_legajo, comercio_nombre, url, monto, estado, referencia, notas, expira_en, pagos_parciales, metodos_pago, vistas, pagos, created_at, clientes(correo, nombre)";
-const COLUMNS_LEGACY = "id, cliente_legajo, comercio_nombre, url, monto, estado, created_at, clientes(correo, nombre)";
+const COLUMNS =
+  "id, cliente_legajo, comercio_nombre, url, monto, estado, referencia, notas, expira_en, pagos_parciales, metodos_pago, vistas, pagos, created_at, clientes(correo, nombre)";
+const COLUMNS_LEGACY =
+  "id, cliente_legajo, comercio_nombre, url, monto, estado, created_at, clientes(correo, nombre)";
 
 function isMissingColumnError(error: unknown): boolean {
   const msg = (error as { message?: string })?.message ?? String(error);
-  return /column.*does not exist|PGRST204|schema cache|cajero|referencia|notas|expira_en|pagos_parciales|metodos_pago|vistas|pagos/i.test(msg);
+  return /column.*does not exist|PGRST204|schema cache|cajero|referencia|notas|expira_en|pagos_parciales|metodos_pago|vistas|pagos/i.test(
+    msg,
+  );
 }
 
 export async function listEnlaces(filters: EnlaceFilters): Promise<Page<EnlacePago>> {
@@ -171,9 +177,13 @@ export async function listEnlaces(filters: EnlaceFilters): Promise<Page<EnlacePa
     if (search?.trim()) {
       const q = search.trim().replace(/[%_]/g, "\\$&");
       if (withRefSearch) {
-        query = query.or(`url.ilike.%${q}%,comercio_nombre.ilike.%${q}%,cliente_legajo.ilike.%${q}%,referencia.ilike.%${q}%`);
+        query = query.or(
+          `url.ilike.%${q}%,comercio_nombre.ilike.%${q}%,cliente_legajo.ilike.%${q}%,referencia.ilike.%${q}%`,
+        );
       } else {
-        query = query.or(`url.ilike.%${q}%,comercio_nombre.ilike.%${q}%,cliente_legajo.ilike.%${q}%`);
+        query = query.or(
+          `url.ilike.%${q}%,comercio_nombre.ilike.%${q}%,cliente_legajo.ilike.%${q}%`,
+        );
       }
     }
     if (estado) query = query.eq("estado", estado);
@@ -196,9 +206,17 @@ export async function listEnlaces(filters: EnlaceFilters): Promise<Page<EnlacePa
 
 export async function getEnlace(id: string): Promise<EnlacePago | null> {
   const sb = requireSupabase();
-  let { data, error } = await sb.from("cliente_links_pago").select(COLUMNS).eq("id", id).maybeSingle();
+  let { data, error } = await sb
+    .from("cliente_links_pago")
+    .select(COLUMNS)
+    .eq("id", id)
+    .maybeSingle();
   if (error && isMissingColumnError(error)) {
-    const fb = await sb.from("cliente_links_pago").select(COLUMNS_LEGACY).eq("id", id).maybeSingle();
+    const fb = await sb
+      .from("cliente_links_pago")
+      .select(COLUMNS_LEGACY)
+      .eq("id", id)
+      .maybeSingle();
     data = fb.data as typeof data;
     error = fb.error;
   }
@@ -208,9 +226,19 @@ export async function getEnlace(id: string): Promise<EnlacePago | null> {
 
 export async function updateEnlaceEstado(id: string, estado: string): Promise<EnlacePago> {
   const sb = requireSupabase();
-  let { data, error } = await sb.from("cliente_links_pago").update({ estado }).eq("id", id).select(COLUMNS).single();
+  let { data, error } = await sb
+    .from("cliente_links_pago")
+    .update({ estado })
+    .eq("id", id)
+    .select(COLUMNS)
+    .single();
   if (error && isMissingColumnError(error)) {
-    const fb = await sb.from("cliente_links_pago").update({ estado }).eq("id", id).select(COLUMNS_LEGACY).single();
+    const fb = await sb
+      .from("cliente_links_pago")
+      .update({ estado })
+      .eq("id", id)
+      .select(COLUMNS_LEGACY)
+      .single();
     data = fb.data as typeof data;
     error = fb.error;
   }
@@ -220,6 +248,9 @@ export async function updateEnlaceEstado(id: string, estado: string): Promise<En
 
 export async function deleteEnlace(id: string): Promise<void> {
   const sb = requireSupabase();
-  const { error } = await sb.from("cliente_links_pago").update({ estado: "Eliminado" }).eq("id", id);
+  const { error } = await sb
+    .from("cliente_links_pago")
+    .update({ estado: "Eliminado" })
+    .eq("id", id);
   if (error) throw new DataAccessError(error);
 }

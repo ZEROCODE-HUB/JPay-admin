@@ -67,7 +67,7 @@ async function obtenerCvu(input: {
 }): Promise<AsignarCvuResult> {
   const cuit = input.cliente.cuit.replace(/\D/g, "");
   const titular = input.cliente.nombre.trim();
-  const aliasFinal = ((input.alias ?? "").trim() || generarAlias(input.cliente.correo));
+  const aliasFinal = (input.alias ?? "").trim() || generarAlias(input.cliente.correo);
   const idempotencyKey = crypto.randomUUID();
 
   try {
@@ -141,9 +141,7 @@ export async function asignarCvuParaNuevo(input: {
   const nombre = isJuridica
     ? input.cliente.nombre
     : (input.cliente.nombre.split(" ")[0] ?? input.cliente.nombre);
-  const apellido = isJuridica
-    ? ""
-    : input.cliente.nombre.split(" ").slice(1).join(" ") || "";
+  const apellido = isJuridica ? "" : input.cliente.nombre.split(" ").slice(1).join(" ") || "";
 
   try {
     await createSubcuenta(input.cliente.legajo, {

@@ -15,49 +15,49 @@
 
 ## 1. Tablas REALES en producción (verificadas vía `information_schema.columns`)
 
-| Tabla | Columnas clave | Notas |
-|---|---|---|
-| `admin_users` | id (uuid FK auth.users), legajo (text, único), email, nombre, activo (bool), **rol_id (uuid FK roles)**, created_at, updated_at | Ya NO tiene columna `rol`. |
-| `clientes` | id, legajo, tipo_persona (`fisica`/`juridica`), correo, nombre, cuit, estado (`activo`/`suspendido`/`rechazado`), fecha_alta (date), created_at, updated_at | |
-| `comisiones_cliente` | id, cliente_id (FK), **operacion (text, código único)**, **tipo (`Depósito`/`Retiro`/`Link de pago`/`E-commerce`)**, modalidad (`Porcentaje`/`Fijo`), porcentaje, monto_fijo, porcentaje_impuesto (default 21), estado (`Habilitado`/`Deshabilitado`), descripcion, created_at, updated_at | `operacion` = código; `tipo` = categoría. |
-| `conciliaciones` | id, movimiento_id (FK), fecha_conciliacion (date), estado_conciliacion (text), monto_diferencia (numeric), archivo_origen (text), created_at | |
-| `estados_movimiento` | **id (smallint PK)**, codigo (text, único), nombre (text), es_final (bool), requiere_conciliacion (bool), created_at | |
-| `estados_por_tipo` | tipo_movimiento (text), estado_id (smallint FK) — PK compuesta | Define la máquina de estados. |
-| `movimientos` | id, cliente_id (FK), legajo, id_txn, tipo (text), cvu, monto_operacion, comision, impuesto, monto_cobrado, fecha (timestamptz), created_at, **estado_id (smallint FK estados_movimiento)** | Ya NO tiene columna `estado`. |
-| `movimientos_transiciones` | id (uuid), movimiento_id (FK), estado_anterior_id (smallint), estado_nuevo_id (smallint), origen (text), admin_user_id (uuid FK), comentario (text), fecha (timestamptz) | **Ya existe en prod** con trigger `trg_log_transicion_movimiento` + `REVOKE UPDATE, DELETE` (append-only). |
-| `permisos` | id, rol_id (FK), recurso_id (FK), puede_leer, puede_crear, puede_modificar, puede_borrar (bool) | |
-| `recursos` | id (uuid), codigo (text, único), nombre (text), modulo (text) | |
-| `roles` | id (uuid), nombre (text, único), descripcion (text), created_at, updated_at | |
-| `auditoria_legajos` | id_txn (text), legajo (text), fecha (timestamptz), observacion (text) | **Vacía, sin PK, sin lógica/trigger.** No construir nada sobre ella. |
-| `comercios` | id (uuid PK), usuario (text, email), legajo (text, **FK real a `clientes.legajo`**), categoria_id (integer, **FK a `codigos_categoria.id`**), estado (`CHECK`: Activado/Desactivado/Pendiente de aprobación/Rechazado/Suspendido), nivel (`CHECK`: Pequeño/Mediano/Grande/Premium/Estándar/Básico/Enterprise), created_at, updated_at | Alta vía `comercios.ts` (API). El legajo NO es texto libre: debe existir en `clientes`. |
-| `puntos_venta` | id (uuid PK), comercio_id (uuid, **FK a `comercios.id` CASCADE**), nombre (text), estado (`CHECK`: Activado/Desactivado), created_at | Se consulta embebida en `comercios` (relación `puntos_venta`). |
-| `resolvers` | id (uuid PK), nombre (text), cuit (text, `CHECK` 11 dígitos), url (text), estado (`CHECK`: Activo/Inactivo), nombre_reverso, formato_web, pcp_id, id_pcp (campos separados), token, as_header (bool), soa (bool), created_at, updated_at | Alta/edición vía `resolvers.ts` (API). |
-| `codigos_categoria` | id (integer PK, auto-generado), codigo (text **UNIQUE**, ej. "CAT-001"), nombre (text), descripcion (text), estado (`CHECK`: activo/inactivo), created_at, updated_at | Catálogo para `comercios.categoria_id` (FK `comercios_categoria_id_fkey` recreada y verificada). Sembrada con 10 categorías reales (CAT-001…CAT-010). |
-| `api_usuarios` | id (uuid PK), **codigo_usuario_api** (text, UNIQUE, ej. "1001" — antes "legajo" en mock, NO es clientes.legajo), usuario (text, email), nombre_completo (text), estado (`CHECK`: Pendiente Validación/Homologación/Producción/Suspendido/Deshabilitado), created_at, updated_at | Usuarios con acceso a APIs externas. El campo antes llamado "legajo" en mock se renombró a `codigo_usuario_api` (numérico libre, NO es clientes.legajo). |
-| `api_endpoints` | id (uuid PK), nombre (text), path (text), metodo (`CHECK`: GET/POST/PUT/DELETE/PATCH), descripcion (text), grupo (`CHECK`: Autenticación/Enlaces de pago/QR/SubAccounts/Transfer/User/Webhooks), estado (`CHECK`: Habilitado/Deshabilitado), rec (bool), created_at, updated_at | Catálogo independiente de endpoints de la API externa. Sin relación a usuarios/comercios. |
-| `api_restricciones` | id (uuid PK), **api_usuario_id** (uuid, **FK real a `api_usuarios.id` CASCADE**), estado (`CHECK`: Restringiendo/No restringiendo), fecha_creacion (timestamptz), fecha_expiracion (date), created_at | Restricciones por usuario de API. FK real a `api_usuarios` (no matching por string). Join trae email/nombre_completo desde `api_usuarios`. |
-| `impuestos` | id (uuid PK), codigo (text UNIQUE), nombre (text), descripcion (text), tipo (`CHECK`: Porcentaje/Fijo/Otro), monto (numeric 14,4 NULL si tipo=Otro), estado (`CHECK`: Activo/Inactivo default Activo), created_at, updated_at | Catálogo principal de impuestos. DDL en `0004_impuestos_completo.sql`. |
-| `impuestos_alicuotas` | id (uuid PK), impuesto_id (FK a `impuestos.id` CASCADE), codigo (text), tasa (numeric), descripcion (text), estado (`CHECK`: Activa/Inactiva default Activa), created_at, updated_at | Alícuotas por impuesto. Se consulta embebida (`impuestos_alicuotas`) al traer un impuesto. |
-| `impuestos_asignaciones` | id (uuid PK), **cliente_legajo (text, FK real a `clientes.legajo` CASCADE)**, impuesto_id (FK a `impuestos.id`), tipo (`CHECK`: Porcentaje/Fijo/Otro), monto (numeric NULL), estado (Activo/Inactivo), fecha_asignacion (date), created_at, updated_at | Asignación de impuestos a clientes. Respeta la regla "legajo siempre es un cliente" (§9). Joins embebidos: `impuestos`, `clientes`. |
-| `ib_padrones` | id (uuid PK), impuesto_id (FK a `impuestos.id`), nombre (text), archivo (text), estado (`CHECK`: Cargando/Procesando/Finalizado/Error default Cargando), progreso (int 0-100), created_at, updated_at | Padrones de Ingresos Brutos. |
-| `ib_normalizacion_preview` | id (uuid PK), padron_id (FK a `ib_padrones.id`), kpis_json (jsonb), creados_json (jsonb), desactivados_json (jsonb), omitidos_json (jsonb), aplicado (bool default false), created_at | Preview-first: el preview NUNCA se crea con aplicado=true; solo se marca true vía acción explícita "Aplicar". |
-| `dc_excepciones` | id (uuid PK), email (text), **cuit (text CHECK 11 dígitos)**, tipo (`CHECK`: Alta manual/Convenio multilateral/Exención), **direccion (`CHECK`: Entrantes/Salientes — NUNCA 'Ambos')**, motivo (text), vigencia_desde (date), vigencia_hasta (date nullable), autorizacion_codigo (text nullable), estado (Activo/Inactivo), created_at, updated_at | Excepciones Débito/Crédito. Tipo="Ambos" del formulario → frontend hace **2 INSERTs** (uno por dirección) vía `createDcExcepcionAmbos`. |
-| `dc_sync_retroactivo` | id (uuid PK), cuit (text CHECK 11 dígitos), desde (date), hasta (date nullable), preview_json (jsonb), aplicado (bool default false), created_at, updated_at | Sincronización retroactiva D/C. Preview-first igual que normalización IB. |
+| Tabla                      | Columnas clave                                                                                                                                                                                                                                                                                                                                      | Notas                                                                                                                                                    |
+| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `admin_users`              | id (uuid FK auth.users), legajo (text, único), email, nombre, activo (bool), **rol_id (uuid FK roles)**, created_at, updated_at                                                                                                                                                                                                                     | Ya NO tiene columna `rol`.                                                                                                                               |
+| `clientes`                 | id, legajo, tipo_persona (`fisica`/`juridica`), correo, nombre, cuit, estado (`activo`/`suspendido`/`rechazado`), fecha_alta (date), created_at, updated_at                                                                                                                                                                                         |                                                                                                                                                          |
+| `comisiones_cliente`       | id, cliente_id (FK), **operacion (text, código único)**, **tipo (`Depósito`/`Retiro`/`Link de pago`/`E-commerce`)**, modalidad (`Porcentaje`/`Fijo`), porcentaje, monto_fijo, porcentaje_impuesto (default 21), estado (`Habilitado`/`Deshabilitado`), descripcion, created_at, updated_at                                                          | `operacion` = código; `tipo` = categoría.                                                                                                                |
+| `conciliaciones`           | id, movimiento_id (FK), fecha_conciliacion (date), estado_conciliacion (text), monto_diferencia (numeric), archivo_origen (text), created_at                                                                                                                                                                                                        |                                                                                                                                                          |
+| `estados_movimiento`       | **id (smallint PK)**, codigo (text, único), nombre (text), es_final (bool), requiere_conciliacion (bool), created_at                                                                                                                                                                                                                                |                                                                                                                                                          |
+| `estados_por_tipo`         | tipo_movimiento (text), estado_id (smallint FK) — PK compuesta                                                                                                                                                                                                                                                                                      | Define la máquina de estados.                                                                                                                            |
+| `movimientos`              | id, cliente_id (FK), legajo, id_txn, tipo (text), cvu, monto_operacion, comision, impuesto, monto_cobrado, fecha (timestamptz), created_at, **estado_id (smallint FK estados_movimiento)**                                                                                                                                                          | Ya NO tiene columna `estado`.                                                                                                                            |
+| `movimientos_transiciones` | id (uuid), movimiento_id (FK), estado_anterior_id (smallint), estado_nuevo_id (smallint), origen (text), admin_user_id (uuid FK), comentario (text), fecha (timestamptz)                                                                                                                                                                            | **Ya existe en prod** con trigger `trg_log_transicion_movimiento` + `REVOKE UPDATE, DELETE` (append-only).                                               |
+| `permisos`                 | id, rol_id (FK), recurso_id (FK), puede_leer, puede_crear, puede_modificar, puede_borrar (bool)                                                                                                                                                                                                                                                     |                                                                                                                                                          |
+| `recursos`                 | id (uuid), codigo (text, único), nombre (text), modulo (text)                                                                                                                                                                                                                                                                                       |                                                                                                                                                          |
+| `roles`                    | id (uuid), nombre (text, único), descripcion (text), created_at, updated_at                                                                                                                                                                                                                                                                         |                                                                                                                                                          |
+| `auditoria_legajos`        | id_txn (text), legajo (text), fecha (timestamptz), observacion (text)                                                                                                                                                                                                                                                                               | **Vacía, sin PK, sin lógica/trigger.** No construir nada sobre ella.                                                                                     |
+| `comercios`                | id (uuid PK), usuario (text, email), legajo (text, **FK real a `clientes.legajo`**), categoria_id (integer, **FK a `codigos_categoria.id`**), estado (`CHECK`: Activado/Desactivado/Pendiente de aprobación/Rechazado/Suspendido), nivel (`CHECK`: Pequeño/Mediano/Grande/Premium/Estándar/Básico/Enterprise), created_at, updated_at               | Alta vía `comercios.ts` (API). El legajo NO es texto libre: debe existir en `clientes`.                                                                  |
+| `puntos_venta`             | id (uuid PK), comercio_id (uuid, **FK a `comercios.id` CASCADE**), nombre (text), estado (`CHECK`: Activado/Desactivado), created_at                                                                                                                                                                                                                | Se consulta embebida en `comercios` (relación `puntos_venta`).                                                                                           |
+| `resolvers`                | id (uuid PK), nombre (text), cuit (text, `CHECK` 11 dígitos), url (text), estado (`CHECK`: Activo/Inactivo), nombre_reverso, formato_web, pcp_id, id_pcp (campos separados), token, as_header (bool), soa (bool), created_at, updated_at                                                                                                            | Alta/edición vía `resolvers.ts` (API).                                                                                                                   |
+| `codigos_categoria`        | id (integer PK, auto-generado), codigo (text **UNIQUE**, ej. "CAT-001"), nombre (text), descripcion (text), estado (`CHECK`: activo/inactivo), created_at, updated_at                                                                                                                                                                               | Catálogo para `comercios.categoria_id` (FK `comercios_categoria_id_fkey` recreada y verificada). Sembrada con 10 categorías reales (CAT-001…CAT-010).    |
+| `api_usuarios`             | id (uuid PK), **codigo_usuario_api** (text, UNIQUE, ej. "1001" — antes "legajo" en mock, NO es clientes.legajo), usuario (text, email), nombre_completo (text), estado (`CHECK`: Pendiente Validación/Homologación/Producción/Suspendido/Deshabilitado), created_at, updated_at                                                                     | Usuarios con acceso a APIs externas. El campo antes llamado "legajo" en mock se renombró a `codigo_usuario_api` (numérico libre, NO es clientes.legajo). |
+| `api_endpoints`            | id (uuid PK), nombre (text), path (text), metodo (`CHECK`: GET/POST/PUT/DELETE/PATCH), descripcion (text), grupo (`CHECK`: Autenticación/Enlaces de pago/QR/SubAccounts/Transfer/User/Webhooks), estado (`CHECK`: Habilitado/Deshabilitado), rec (bool), created_at, updated_at                                                                     | Catálogo independiente de endpoints de la API externa. Sin relación a usuarios/comercios.                                                                |
+| `api_restricciones`        | id (uuid PK), **api_usuario_id** (uuid, **FK real a `api_usuarios.id` CASCADE**), estado (`CHECK`: Restringiendo/No restringiendo), fecha_creacion (timestamptz), fecha_expiracion (date), created_at                                                                                                                                               | Restricciones por usuario de API. FK real a `api_usuarios` (no matching por string). Join trae email/nombre_completo desde `api_usuarios`.               |
+| `impuestos`                | id (uuid PK), codigo (text UNIQUE), nombre (text), descripcion (text), tipo (`CHECK`: Porcentaje/Fijo/Otro), monto (numeric 14,4 NULL si tipo=Otro), estado (`CHECK`: Activo/Inactivo default Activo), created_at, updated_at                                                                                                                       | Catálogo principal de impuestos. DDL en `0004_impuestos_completo.sql`.                                                                                   |
+| `impuestos_alicuotas`      | id (uuid PK), impuesto_id (FK a `impuestos.id` CASCADE), codigo (text), tasa (numeric), descripcion (text), estado (`CHECK`: Activa/Inactiva default Activa), created_at, updated_at                                                                                                                                                                | Alícuotas por impuesto. Se consulta embebida (`impuestos_alicuotas`) al traer un impuesto.                                                               |
+| `impuestos_asignaciones`   | id (uuid PK), **cliente_legajo (text, FK real a `clientes.legajo` CASCADE)**, impuesto_id (FK a `impuestos.id`), tipo (`CHECK`: Porcentaje/Fijo/Otro), monto (numeric NULL), estado (Activo/Inactivo), fecha_asignacion (date), created_at, updated_at                                                                                              | Asignación de impuestos a clientes. Respeta la regla "legajo siempre es un cliente" (§9). Joins embebidos: `impuestos`, `clientes`.                      |
+| `ib_padrones`              | id (uuid PK), impuesto_id (FK a `impuestos.id`), nombre (text), archivo (text), estado (`CHECK`: Cargando/Procesando/Finalizado/Error default Cargando), progreso (int 0-100), created_at, updated_at                                                                                                                                               | Padrones de Ingresos Brutos.                                                                                                                             |
+| `ib_normalizacion_preview` | id (uuid PK), padron_id (FK a `ib_padrones.id`), kpis_json (jsonb), creados_json (jsonb), desactivados_json (jsonb), omitidos_json (jsonb), aplicado (bool default false), created_at                                                                                                                                                               | Preview-first: el preview NUNCA se crea con aplicado=true; solo se marca true vía acción explícita "Aplicar".                                            |
+| `dc_excepciones`           | id (uuid PK), email (text), **cuit (text CHECK 11 dígitos)**, tipo (`CHECK`: Alta manual/Convenio multilateral/Exención), **direccion (`CHECK`: Entrantes/Salientes — NUNCA 'Ambos')**, motivo (text), vigencia_desde (date), vigencia_hasta (date nullable), autorizacion_codigo (text nullable), estado (Activo/Inactivo), created_at, updated_at | Excepciones Débito/Crédito. Tipo="Ambos" del formulario → frontend hace **2 INSERTs** (uno por dirección) vía `createDcExcepcionAmbos`.                  |
+| `dc_sync_retroactivo`      | id (uuid PK), cuit (text CHECK 11 dígitos), desde (date), hasta (date nullable), preview_json (jsonb), aplicado (bool default false), created_at, updated_at                                                                                                                                                                                        | Sincronización retroactiva D/C. Preview-first igual que normalización IB.                                                                                |
 
 ---
 
 ## 2. `estados_movimiento` — confirmado EN VIVO contra producción
 
-| id | codigo | nombre |
-|----|--------|--------|
-| 1 | APROBADO | APROBADO |
-| 2 | EN_PROGRESO | EN PROGRESO |
-| 3 | RECHAZADO | RECHAZADO |
-| 4 | BLOQUEADO | BLOQUEADO |
-| 5 | CREADO | CREADO |
-| 6 | ABIERTO | ABIERTO |
-| 7 | EXPIRADO | EXPIRADO |
-| 8 | REEMBOLSADO | REEMBOLSADO |
+| id  | codigo      | nombre      |
+| --- | ----------- | ----------- |
+| 1   | APROBADO    | APROBADO    |
+| 2   | EN_PROGRESO | EN PROGRESO |
+| 3   | RECHAZADO   | RECHAZADO   |
+| 4   | BLOQUEADO   | BLOQUEADO   |
+| 5   | CREADO      | CREADO      |
+| 6   | ABIERTO     | ABIERTO     |
+| 7   | EXPIRADO    | EXPIRADO    |
+| 8   | REEMBOLSADO | REEMBOLSADO |
 
 > ⚠️ El `codigo` es **`EN_PROGRESO` (con guion bajo)**, NO "EN PROGRESO".
 > Hubo un bug por esto: el filtro de estado y los badges deben usar `EN_PROGRESO`.
@@ -70,12 +70,12 @@ Define qué estados aplican a cada tipo de movimiento (validación de la RPC
 `cambiar_estado_movimiento`):
 
 | tipo_movimiento | estado_id aplicables |
-|-----------------|---------------------|
-| `deposito`  | 1, 2, 3, 4 |
-| `retiro`    | 1, 2, 3, 4 |
-| `tarjeta`   | 1, 2, 3, 5, 6, 7 |
-| `pago_pct`  | 1, 2, 3, 8 |
-| `cobro_pct` | 1, 2, 3, 8 |
+| --------------- | -------------------- |
+| `deposito`      | 1, 2, 3, 4           |
+| `retiro`        | 1, 2, 3, 4           |
+| `tarjeta`       | 1, 2, 3, 5, 6, 7     |
+| `pago_pct`      | 1, 2, 3, 8           |
+| `cobro_pct`     | 1, 2, 3, 8           |
 
 > Nota de implementación: la RPC normaliza el `movimientos.tipo` (display) al
 > código de `estados_por_tipo` vía un `CASE` (`Depósito`→`deposito`, etc.) y
@@ -85,10 +85,10 @@ Define qué estados aplican a cada tipo de movimiento (validación de la RPC
 
 ## 4. Dos vocabularios DISTINTOS (fuente de bugs ya ocurridos)
 
-| Campo | Tabla | Valores |
-|-------|-------|---------|
-| `movimientos.tipo` | movimientos | `deposito`, `retiro`, `tarjeta`, `pago_pct`, `cobro_pct` |
-| `comisiones_cliente.tipo` | comisiones_cliente | `Depósito`, `Retiro`, `Link de pago`, `E-commerce` |
+| Campo                     | Tabla              | Valores                                                  |
+| ------------------------- | ------------------ | -------------------------------------------------------- |
+| `movimientos.tipo`        | movimientos        | `deposito`, `retiro`, `tarjeta`, `pago_pct`, `cobro_pct` |
+| `comisiones_cliente.tipo` | comisiones_cliente | `Depósito`, `Retiro`, `Link de pago`, `E-commerce`       |
 
 - Son **campos distintos en tablas distintas** con valores distintos.
 - El filtro de "Tipo" en la UI de Movimientos mapea label visible → código real
@@ -113,9 +113,9 @@ Define qué estados aplican a cada tipo de movimiento (validación de la RPC
   ni sobre `movimientos_transiciones`. Un movimiento no se borra.
 - **DECISIÓN DE SEGURIDAD INTENCIONAL (confirmada):** `movimientos` NO tiene
   políticas de INSERT/UPDATE para `authenticated`, y así debe seguir:
-  *movimientos nunca debe tener INSERT/UPDATE abierto para authenticated —
+  _movimientos nunca debe tener INSERT/UPDATE abierto para authenticated —
   todo cambio pasa por RPC controlada (`cambiar_estado_movimiento`,
-  SECURITY DEFINER), nunca por escritura directa del cliente.* La ausencia
+  SECURITY DEFINER), nunca por escritura directa del cliente._ La ausencia
   de esas políticas NO es un gap de RLS pendiente: es el diseño correcto,
   y cualquier auditoría futura debe tratarla como tal.
 
@@ -125,7 +125,7 @@ Define qué estados aplican a cada tipo de movimiento (validación de la RPC
 
 - `admin_users.rol` **ya no existe**; es `admin_users.rol_id` (FK a `roles.id`).
 - Matriz: `permisos(rol_id, recurso_id, puede_leer, puede_crear,
-  puede_modificar, puede_borrar)`.
+puede_modificar, puede_borrar)`.
 - `recursos` tiene `codigo`/`nombre`/`modulo` (p.ej. módulos de la app).
 - API ya conectada (`src/lib/api/roles-permisos.ts`): `listRoles`,
   `upsertRol`, `deleteRol`, `listRecursos`, `getPermisosByRol`, `upsertPermiso`.
@@ -139,32 +139,33 @@ Define qué estados aplican a cada tipo de movimiento (validación de la RPC
 
 Leyenda: ✅ Conectado · ❌ No aplica (no existe el botón) · ⚠️ Equivalente conectado.
 
-| Módulo | Ver | Editar | Eliminar | Cambiar estado |
-|--------|-----|--------|----------|----------------|
-| **Clientes** | ✅ (`Ver detalle` → `$legajo`) | ❌ no existe (destino solo lectura) | ❌ no existe | ❌ no aplica (equiv.: Suspender/Reactivar ✅) |
-| **Comisiones** | ✅ | ✅ (`upsertComision`) | ❌ no existe | ❌ no aplica (equiv.: Habilitar/Deshabilitar ✅) |
-| **Movimientos** | ✅ | ❌ no existe | ❌ **no existe** (correcto: no se borra) | ✅ |
-| **admin_users** | ✅ (detalle) | ❌ no existe | ❌ no existe | ❌ no aplica |
-| **Roles/recursos/permisos** | ❌ no aplica (matriz visible) | ❌ edición de *rol* no existe (matriz de permisos ✅) | ✅ (`deleteRol`) | ❌ no aplica |
-| **Comercios (index)** | ✅ | ✅ | ✅ | ✅ (Activar/Suspender) |
-| **Comercios (transferencia)** | ✅ | ✅ | ✅ | ✅ (Activar/Suspender/Validar) |
-| **Categorías (transferencia)** | ❌ no existe | ✅ | ✅ | ✅ (Activar/Desactivar) |
-| **Resolvers** | ❌ no existe | ✅ | ✅ | ✅ (Activar/Desactivar) |
-| **APIs: Usuarios** | ✅ | ✅ | ✅ | ✅ (Validar/Homologación/Suspender/Activar) |
-| **APIs: Endpoints** | ❌ no existe | ✅ | ✅ | ✅ (Habilitar/Deshabilitar) |
-| **APIs: Restricciones** | ❌ no existe | ✅ | ✅ | ✅ (Restringir/Sacar restricción) |
-| **Integraciones (index)** | ✅ (cards semáforo) | ❌ no existe | ❌ no existe | ❌ no aplica (semáforo mock) |
-| **Integraciones (logins)** | ❌ no existe | ❌ no existe | ❌ no existe | ❌ no aplica (semáforo mock) |
-| **Impuestos: catálogo** | ✅ (detalle + alícuotas) | ✅ | ✅ | ✅ (Activar/Desactivar) |
-| **Impuestos: alícuotas (sub-tabla detalle)** | ❌ no aplica (fila de tabla) | ✅ | ✅ | ✅ (Activar/Desactivar) |
-| **Impuestos: asignaciones (usuarios)** | ✅ (cliente+impuesto embebidos en fila) | ✅ (legajo NO editable) | ✅ | ✅ (Activar/Desactivar) |
-| **Impuestos: IB padrones** | ❌ no existe | ❌ no aplica (alta = cargar archivo) | ✅ | ❌ no aplica (estado lo maneja el proceso) |
-| **Impuestos: IB normalización** | ✅ ("Ver preview" modal KPIs) | ❌ no existe | ❌ no existe | ✅ ("Aplicar" → aplicado=true, con confirmación) |
-| **Impuestos: D/C excepciones** | ❌ no aplica (todo visible en grilla) | ❌ no existe edición (solo alta) | ❌ no existe | ✅ (Activar/Desactivar) |
-| **Impuestos: D/C sync retroactivo** | ✅ ("Ver preview" modal KPIs) | ❌ no existe | ❌ no existe | ✅ ("Confirmar ejecución" → aplicado=true) |
-| **Reportes de Impuestos** | ⚠️ sigue MOCK (sección "Demo") — pendiente módulo Administración→Reportes | ❌ | ❌ | ❌ |
+| Módulo                                       | Ver                                                                       | Editar                                                | Eliminar                                 | Cambiar estado                                   |
+| -------------------------------------------- | ------------------------------------------------------------------------- | ----------------------------------------------------- | ---------------------------------------- | ------------------------------------------------ |
+| **Clientes**                                 | ✅ (`Ver detalle` → `$legajo`)                                            | ❌ no existe (destino solo lectura)                   | ❌ no existe                             | ❌ no aplica (equiv.: Suspender/Reactivar ✅)    |
+| **Comisiones**                               | ✅                                                                        | ✅ (`upsertComision`)                                 | ❌ no existe                             | ❌ no aplica (equiv.: Habilitar/Deshabilitar ✅) |
+| **Movimientos**                              | ✅                                                                        | ❌ no existe                                          | ❌ **no existe** (correcto: no se borra) | ✅                                               |
+| **admin_users**                              | ✅ (detalle)                                                              | ❌ no existe                                          | ❌ no existe                             | ❌ no aplica                                     |
+| **Roles/recursos/permisos**                  | ❌ no aplica (matriz visible)                                             | ❌ edición de _rol_ no existe (matriz de permisos ✅) | ✅ (`deleteRol`)                         | ❌ no aplica                                     |
+| **Comercios (index)**                        | ✅                                                                        | ✅                                                    | ✅                                       | ✅ (Activar/Suspender)                           |
+| **Comercios (transferencia)**                | ✅                                                                        | ✅                                                    | ✅                                       | ✅ (Activar/Suspender/Validar)                   |
+| **Categorías (transferencia)**               | ❌ no existe                                                              | ✅                                                    | ✅                                       | ✅ (Activar/Desactivar)                          |
+| **Resolvers**                                | ❌ no existe                                                              | ✅                                                    | ✅                                       | ✅ (Activar/Desactivar)                          |
+| **APIs: Usuarios**                           | ✅                                                                        | ✅                                                    | ✅                                       | ✅ (Validar/Homologación/Suspender/Activar)      |
+| **APIs: Endpoints**                          | ❌ no existe                                                              | ✅                                                    | ✅                                       | ✅ (Habilitar/Deshabilitar)                      |
+| **APIs: Restricciones**                      | ❌ no existe                                                              | ✅                                                    | ✅                                       | ✅ (Restringir/Sacar restricción)                |
+| **Integraciones (index)**                    | ✅ (cards semáforo)                                                       | ❌ no existe                                          | ❌ no existe                             | ❌ no aplica (semáforo mock)                     |
+| **Integraciones (logins)**                   | ❌ no existe                                                              | ❌ no existe                                          | ❌ no existe                             | ❌ no aplica (semáforo mock)                     |
+| **Impuestos: catálogo**                      | ✅ (detalle + alícuotas)                                                  | ✅                                                    | ✅                                       | ✅ (Activar/Desactivar)                          |
+| **Impuestos: alícuotas (sub-tabla detalle)** | ❌ no aplica (fila de tabla)                                              | ✅                                                    | ✅                                       | ✅ (Activar/Desactivar)                          |
+| **Impuestos: asignaciones (usuarios)**       | ✅ (cliente+impuesto embebidos en fila)                                   | ✅ (legajo NO editable)                               | ✅                                       | ✅ (Activar/Desactivar)                          |
+| **Impuestos: IB padrones**                   | ❌ no existe                                                              | ❌ no aplica (alta = cargar archivo)                  | ✅                                       | ❌ no aplica (estado lo maneja el proceso)       |
+| **Impuestos: IB normalización**              | ✅ ("Ver preview" modal KPIs)                                             | ❌ no existe                                          | ❌ no existe                             | ✅ ("Aplicar" → aplicado=true, con confirmación) |
+| **Impuestos: D/C excepciones**               | ❌ no aplica (todo visible en grilla)                                     | ❌ no existe edición (solo alta)                      | ❌ no existe                             | ✅ (Activar/Desactivar)                          |
+| **Impuestos: D/C sync retroactivo**          | ✅ ("Ver preview" modal KPIs)                                             | ❌ no existe                                          | ❌ no existe                             | ✅ ("Confirmar ejecución" → aplicado=true)       |
+| **Reportes de Impuestos**                    | ⚠️ sigue MOCK (sección "Demo") — pendiente módulo Administración→Reportes | ❌                                                    | ❌                                       | ❌                                               |
 
 Notas:
+
 - Clientes: el botón antes decía "Ver / Editar" (engañoso); renombrado a
   **"Ver detalle"** en este turno. No hay edición persistente de cliente
   (solo `updateClienteEstado`).
@@ -199,30 +200,30 @@ cache de sesión en `sessionStorage`) y `src/components/permission-guard.tsx`
 
 ### Mapeo ruta → recurso.codigo (ya aplicado)
 
-| Ruta (archivo) | recurso.codigo |
-|---|---|
-| `admin.general.usuarios.index` | `usuarios` |
-| `admin.general.usuarios.comisiones` | `usuarios` |
-| `admin.general.usuarios.$legajo` | `usuarios` |
-| `admin.general.movimientos.index` | `movimientos` |
+| Ruta (archivo)                                                                                        | recurso.codigo                                  |
+| ----------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| `admin.general.usuarios.index`                                                                        | `usuarios`                                      |
+| `admin.general.usuarios.comisiones`                                                                   | `usuarios`                                      |
+| `admin.general.usuarios.$legajo`                                                                      | `usuarios`                                      |
+| `admin.general.movimientos.index`                                                                     | `movimientos`                                   |
 | `admin.general.movimientos.{depositos,retiros,pagos-tarjeta,pagos-qr,cobros-qr,impuestos,comisiones}` | `movimientos` (7 sub-rutas conectadas, ver §15) |
-| `admin.administracion.usuarios.index` | `usuarios_backoffice` |
-| `admin.administracion.usuarios.roles` | `roles_permisos` |
-| `admin.comercios.index` | `comercios` |
-| `admin.comercios.apis.resolvers` | `resolvers` |
+| `admin.administracion.usuarios.index`                                                                 | `usuarios_backoffice`                           |
+| `admin.administracion.usuarios.roles`                                                                 | `roles_permisos`                                |
+| `admin.comercios.index`                                                                               | `comercios`                                     |
+| `admin.comercios.apis.resolvers`                                                                      | `resolvers`                                     |
 
 > Los `recurso.codigo` son los sembrados en `seed_recursos.sql` (producción). No
 > se inventaron ni adaptaron códigos nuevos.
 
 ### Gating por módulo (lo que quedó conectado)
 
-| Módulo | Guard ruta (`puede_leer`) | Botones deshabilitados por permiso |
-|---|---|---|
-| Clientes | `usuarios` | Suspender / Reactivar → `puede_modificar` |
-| Comisiones | `usuarios` | "Nueva comisión" → `puede_crear`; Editar / Habilitar / Deshabilitar → `puede_modificar` |
-| Movimientos | `movimientos` | "Cambiar estado" → `puede_modificar` |
-| admin_users | `usuarios_backoffice` | "Nuevo usuario" → `puede_crear` |
-| Roles y permisos | `roles_permisos` | "Nuevo rol" → `puede_crear`; checkboxes de matriz → `puede_modificar`; borrar rol → `puede_borrar` |
+| Módulo           | Guard ruta (`puede_leer`) | Botones deshabilitados por permiso                                                                 |
+| ---------------- | ------------------------- | -------------------------------------------------------------------------------------------------- |
+| Clientes         | `usuarios`                | Suspender / Reactivar → `puede_modificar`                                                          |
+| Comisiones       | `usuarios`                | "Nueva comisión" → `puede_crear`; Editar / Habilitar / Deshabilitar → `puede_modificar`            |
+| Movimientos      | `movimientos`             | "Cambiar estado" → `puede_modificar`                                                               |
+| admin_users      | `usuarios_backoffice`     | "Nuevo usuario" → `puede_crear`                                                                    |
+| Roles y permisos | `roles_permisos`          | "Nuevo rol" → `puede_crear`; checkboxes de matriz → `puede_modificar`; borrar rol → `puede_borrar` |
 
 ---
 
@@ -232,15 +233,15 @@ Implementado en este turno. Capa de datos en `src/lib/api/comercios.ts` y
 `src/lib/api/resolvers.ts`; hooks en `src/hooks/useComercios.ts` y
 `src/hooks/useResolvers.ts`.
 
-| Ruta (archivo) | Tabla(s) reales | recurso.codigo | Paginación | Filtros |
-|---|---|---|---|---|
-| `admin.comercios.index.tsx` | `comercios` (+ join `clientes`, `codigos_categoria`, `puntos_venta`) | `comercios` | server-side (react-query) | Estado y Nivel (dropdowns) + búsqueda usuario/legajo |
-| `admin.comercios.transferencia.index.tsx` | `comercios` (+ join `puntos_venta`, `codigos_categoria`, `clientes`) | `comercios` | server-side (react-query) | Estado y Nivel (dropdowns) + búsqueda usuario/legajo |
-| `admin.comercios.transferencia.categorias.tsx` | `codigos_categoria` | `comercios` | server-side (react-query) | Estado (dropdown) + búsqueda codigo/nombre/descripcion |
-| `admin.comercios.apis.resolvers.tsx` | `resolvers` | `resolvers` | server-side | Estado (dropdown) + búsqueda nombre/CUIT/URL |
-| `admin.comercios.apis.index.tsx` | `api_usuarios` | `apis_externas` | server-side (react-query) | Estado (dropdown) + búsqueda código/usuario/nombre |
-| `admin.comercios.apis.endpoints.tsx` | `api_endpoints` | `apis_externas` | server-side (react-query) | Estado/Grupo/Método (dropdowns) + búsqueda nombre/path/descripción |
-| `admin.comercios.apis.restricciones.tsx` | `api_restricciones` (+ join `api_usuarios`) | `apis_externas` | server-side (react-query) | Estado (dropdown) + búsqueda usuario/email/nombre/código |
+| Ruta (archivo)                                 | Tabla(s) reales                                                      | recurso.codigo  | Paginación                | Filtros                                                            |
+| ---------------------------------------------- | -------------------------------------------------------------------- | --------------- | ------------------------- | ------------------------------------------------------------------ |
+| `admin.comercios.index.tsx`                    | `comercios` (+ join `clientes`, `codigos_categoria`, `puntos_venta`) | `comercios`     | server-side (react-query) | Estado y Nivel (dropdowns) + búsqueda usuario/legajo               |
+| `admin.comercios.transferencia.index.tsx`      | `comercios` (+ join `puntos_venta`, `codigos_categoria`, `clientes`) | `comercios`     | server-side (react-query) | Estado y Nivel (dropdowns) + búsqueda usuario/legajo               |
+| `admin.comercios.transferencia.categorias.tsx` | `codigos_categoria`                                                  | `comercios`     | server-side (react-query) | Estado (dropdown) + búsqueda codigo/nombre/descripcion             |
+| `admin.comercios.apis.resolvers.tsx`           | `resolvers`                                                          | `resolvers`     | server-side               | Estado (dropdown) + búsqueda nombre/CUIT/URL                       |
+| `admin.comercios.apis.index.tsx`               | `api_usuarios`                                                       | `apis_externas` | server-side (react-query) | Estado (dropdown) + búsqueda código/usuario/nombre                 |
+| `admin.comercios.apis.endpoints.tsx`           | `api_endpoints`                                                      | `apis_externas` | server-side (react-query) | Estado/Grupo/Método (dropdowns) + búsqueda nombre/path/descripción |
+| `admin.comercios.apis.restricciones.tsx`       | `api_restricciones` (+ join `api_usuarios`)                          | `apis_externas` | server-side (react-query) | Estado (dropdown) + búsqueda usuario/email/nombre/código           |
 
 - Capa de `codigos_categoria` en `src/lib/api/codigos-categoria.ts` (list/CRUD +
   activar-desactivar) y hook `src/hooks/useCodigosCategoria.ts`. El alta de
@@ -302,12 +303,13 @@ que tenga una columna `legajo`:
 Se conectó el catálogo de integraciones (`integraciones` table) y se aplicó
 `PermissionGuard recurso="gestor_integraciones"` a las dos rutas existentes:
 
-| Ruta | Tabla real | recurso.codigo | Estado |
-|---|---|---|---|
-| `admin.configuracion.index` | `integraciones` (id, nombre, proveedor, created_at) | `gestor_integraciones` | ✅ Conectada (identidad + semáforo mock) |
-| `admin.configuracion.logins` | `integraciones` (mismo catálogo) | `gestor_integraciones` | ✅ Conectada (DataTable con semáforo mock) |
+| Ruta                         | Tabla real                                          | recurso.codigo         | Estado                                     |
+| ---------------------------- | --------------------------------------------------- | ---------------------- | ------------------------------------------ |
+| `admin.configuracion.index`  | `integraciones` (id, nombre, proveedor, created_at) | `gestor_integraciones` | ✅ Conectada (identidad + semáforo mock)   |
+| `admin.configuracion.logins` | `integraciones` (mismo catálogo)                    | `gestor_integraciones` | ✅ Conectada (DataTable con semáforo mock) |
 
 **Catálogo real creado (`integraciones`):**
+
 ```sql
 CREATE TABLE integraciones (
   id          TEXT PRIMARY KEY,   -- formato real: "pct:wondersoft", etc.
@@ -316,19 +318,21 @@ CREATE TABLE integraciones (
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 ```
+
 RLS activado + política mínima (authenticated). Datos: 8 integraciones reales (pct:, cpf:, bank., pds:).
 
 **Distinción importante — catálogo real vs. métricas operativas pendientes:**
 
-| Dato | Fuente actual | Estado |
-|---|---|---|
-| `id`, `nombre`, `proveedor` | **Tabla real `integraciones`** | ✅ Real |
+| Dato                                                                                                               | Fuente actual                                    | Estado                                      |
+| ------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------ | ------------------------------------------- |
+| `id`, `nombre`, `proveedor`                                                                                        | **Tabla real `integraciones`**                   | ✅ Real                                     |
 | `salud` (ok/warning/error), `ultimaEjecucion`, `proximaEjecucion`, `ejecuciones`, `tiempoRestante`, `programacion` | **Mock de referencia** (hardcoded en componente) | ⏳ Pendiente sistema de monitoreo/cron real |
-| Vista técnica (`ms-login-providers` v1.24.7, Redis/PostgreSQL IPs, versión, cron) | **Mock de referencia** (hardcoded) | ⏳ Pendiente sistema de monitoreo real |
+| Vista técnica (`ms-login-providers` v1.24.7, Redis/PostgreSQL IPs, versión, cron)                                  | **Mock de referencia** (hardcoded)               | ⏳ Pendiente sistema de monitoreo real      |
 
 > ⚠️ Las métricas operativas (semáforo, última/próxima ejecución, tiempo restante, conexiones Redis/PostgreSQL, estado del servicio) son **datos de REFERENCIA (mock)**. Provenirían de un sistema de monitoreo/cron real que **aún no existe**. No se crearon tablas para ellas porque llenarlas a mano sería "mock disfrazado de dato real" — más engañoso que el array actual. Quedan documentadas explícitamente como pendientes de un sistema de monitoreo/cron real, no solo de tabla.
 
 **Implementación:**
+
 - Capa de datos: `src/lib/api/integraciones.ts` + hook `src/hooks/useIntegraciones.ts`
 - Mapper: `toIntegracion` en `src/lib/api/mappers.ts`
 - Rutas: `admin.configuracion.index.tsx` (vista negocio + vista técnica), `admin.configuracion.logins.tsx` (DataTable)
@@ -349,12 +353,12 @@ RLS activado + política mínima (authenticated). Datos: 8 integraciones reales 
 
 **Capa de datos construida (SIN consumidor):**
 
-| Pieza | Archivo | Estado |
-|-------|---------|--------|
-| API eventos | `src/lib/api/eventos-notificacion.ts` | ✅ existe, ❌ sin uso |
-| API canales | `src/lib/api/canales-notificacion.ts` | ✅ existe, ❌ sin uso |
-| API códigos error | `src/lib/api/codigos-error.ts` | ✅ existe, ❌ sin uso |
-| Hooks | `useEventosNotificacion`, `useCanalesNotificacion`, `useCodigosError` | ✅ existen, ❌ sin uso |
+| Pieza             | Archivo                                                               | Estado                 |
+| ----------------- | --------------------------------------------------------------------- | ---------------------- |
+| API eventos       | `src/lib/api/eventos-notificacion.ts`                                 | ✅ existe, ❌ sin uso  |
+| API canales       | `src/lib/api/canales-notificacion.ts`                                 | ✅ existe, ❌ sin uso  |
+| API códigos error | `src/lib/api/codigos-error.ts`                                        | ✅ existe, ❌ sin uso  |
+| Hooks             | `useEventosNotificacion`, `useCanalesNotificacion`, `useCodigosError` | ✅ existen, ❌ sin uso |
 
 **Tablas reales (según diseño original de la conexión):**
 `codigos_error` (~10 códigos reales sembrados desde capturas legacy,
@@ -365,6 +369,7 @@ audiencia default `tecnico`), `canales_notificacion` (Email/Telegram/WhatsApp),
 hardcodeado). Layout `admin.notificaciones.tsx` = Outlet pelado, SIN guard.
 
 **Pendiente para conectar (trabajo real pendiente, NO hecho):**
+
 1. Reescribir `admin.notificaciones.index.tsx` contra `useEventosNotificacion`
    (CRUD + filtros server-side: Tipo, Estado entrega, Audiencia, Canal).
 2. Aplicar `<PermissionGuard recurso="sistema_notificaciones">`.
@@ -385,12 +390,12 @@ tablas creadas por `supabase/migrations/0004_impuestos_completo.sql`
 `PermissionGuard recurso="impuestos"` (un solo código de recurso para todo el
 módulo).
 
-| Ruta | Tabla(s) | Contenido |
-|---|---|---|
-| `admin.comercios.impuestos.index` | `impuestos` + `impuestos_alicuotas` (embebidas) | CRUD catálogo; detalle modal incluye sub-tabla de alícuotas con su propio CRUD |
-| `admin.comercios.impuestos.usuarios` | `impuestos_asignaciones` (+ joins `impuestos`, `clientes`) | CRUD asignaciones; alta exige legajo formato LPF/LPJ-CUIT existente (FK real, error 23503 se traduce a mensaje claro); legajo no editable en edición |
-| `admin.comercios.impuestos.ingresos-brutos(.index)` | `ib_padrones`, `ib_normalizacion_preview` | Alta padrón (impuesto activo + nombre + archivo), grilla con progreso/estado; normalización retroactiva preview-first; **Reportes de Impuestos sigue MOCK (badge "Demo")** |
-| `admin.comercios.impuestos.debitos-creditos` | `dc_excepciones`, `dc_sync_retroactivo` | Alta excepción (dirección Ambos/Entrantes/Salientes), toggle estado, sync retroactivo preview-first con cards explicativas |
+| Ruta                                                | Tabla(s)                                                   | Contenido                                                                                                                                                                  |
+| --------------------------------------------------- | ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `admin.comercios.impuestos.index`                   | `impuestos` + `impuestos_alicuotas` (embebidas)            | CRUD catálogo; detalle modal incluye sub-tabla de alícuotas con su propio CRUD                                                                                             |
+| `admin.comercios.impuestos.usuarios`                | `impuestos_asignaciones` (+ joins `impuestos`, `clientes`) | CRUD asignaciones; alta exige legajo formato LPF/LPJ-CUIT existente (FK real, error 23503 se traduce a mensaje claro); legajo no editable en edición                       |
+| `admin.comercios.impuestos.ingresos-brutos(.index)` | `ib_padrones`, `ib_normalizacion_preview`                  | Alta padrón (impuesto activo + nombre + archivo), grilla con progreso/estado; normalización retroactiva preview-first; **Reportes de Impuestos sigue MOCK (badge "Demo")** |
+| `admin.comercios.impuestos.debitos-creditos`        | `dc_excepciones`, `dc_sync_retroactivo`                    | Alta excepción (dirección Ambos/Entrantes/Salientes), toggle estado, sync retroactivo preview-first con cards explicativas                                                 |
 
 **Reglas de negocio implementadas:**
 
@@ -411,6 +416,7 @@ módulo).
    regla §9). El error FK 23503 se traduce: "El legajo no existe en clientes".
 
 **Implementación:**
+
 - Capa de datos: `src/lib/api/impuestos.ts` (impuestos, alícuotas,
   asignaciones, padrones, previews IB) y `src/lib/api/dc-excepciones.ts`
   (excepciones + sync retroactivo).
@@ -493,15 +499,15 @@ usuario autenticado podía verla). Ahora:
 De ~30 campos del mock (`UserData`), solo ~8 tienen fuente real. Se descartó
 reutilizar `UserModal` porque habría obligado a seguir inventando datos.
 
-| Mock | Realidad DB | Resolución |
-|---|---|---|
-| CUIT "20-12345678-9" (con guiones) | CHECK `^[0-9]{11}$` sin separadores | Se muestra el CUIT real |
-| 9 estados ("Activado", "Registrado", "Pre-activado"…) | Solo `activo/suspendido/rechazado` | Mapeo directo a los 3 reales |
-| `nombre` + `apellido` separados | Una sola columna `nombre` | Se usa `nombre` |
-| Legajo derivado vía `legajoDesdeCuit()` sobre CUIT con guiones | Legajo LPF/LPJ-CUIT11 almacenado (invariante `legajo_deriva_de_cuit`) | Se usa el legajo almacenado |
-| Subcuentas + movimientos por subcuenta | NO existe tabla `subcuentas` (verificado en migraciones) | Sección eliminada |
-| Documentos, validaciones automáticas, alertas/bloqueos/parámetros, dirección, género, PEP, entidad | Sin tablas asociadas | No se muestran (nota visible en UI lo aclara) |
-| Comisiones como cargos cobrados ("$1.250 por transferencia") | `comisiones_cliente` = configuración arancelaria | Se renderiza la config real (modalidad/%/fijo/%IVA/estado) |
+| Mock                                                                                               | Realidad DB                                                           | Resolución                                                 |
+| -------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- | ---------------------------------------------------------- |
+| CUIT "20-12345678-9" (con guiones)                                                                 | CHECK `^[0-9]{11}$` sin separadores                                   | Se muestra el CUIT real                                    |
+| 9 estados ("Activado", "Registrado", "Pre-activado"…)                                              | Solo `activo/suspendido/rechazado`                                    | Mapeo directo a los 3 reales                               |
+| `nombre` + `apellido` separados                                                                    | Una sola columna `nombre`                                             | Se usa `nombre`                                            |
+| Legajo derivado vía `legajoDesdeCuit()` sobre CUIT con guiones                                     | Legajo LPF/LPJ-CUIT11 almacenado (invariante `legajo_deriva_de_cuit`) | Se usa el legajo almacenado                                |
+| Subcuentas + movimientos por subcuenta                                                             | NO existe tabla `subcuentas` (verificado en migraciones)              | Sección eliminada                                          |
+| Documentos, validaciones automáticas, alertas/bloqueos/parámetros, dirección, género, PEP, entidad | Sin tablas asociadas                                                  | No se muestran (nota visible en UI lo aclara)              |
+| Comisiones como cargos cobrados ("$1.250 por transferencia")                                       | `comisiones_cliente` = configuración arancelaria                      | Se renderiza la config real (modalidad/%/fijo/%IVA/estado) |
 
 ### Nota
 
@@ -518,17 +524,18 @@ Las 7 sub-rutas de `/admin/general/movimientos` pasaron de mock
 reutilizando `listMovimientos` (misma lógica de query que el índice general,
 sin duplicar):
 
-| Ruta | Filtro server-side | Notas |
-|---|---|---|
-| `…movimientos.depositos` | `tipo = 'deposito'` | Mapeo directo |
-| `…movimientos.retiros` | `tipo = 'retiro'` | Mapeo directo |
-| `…movimientos.pagos-tarjeta` | `tipo = 'tarjeta'` | Campos `medioPago`/`cuotas` del mock NO existen en la tabla → descartados (documentado en la descripción de la ruta) |
-| `…movimientos.pagos-qr` | `tipo = 'pago_pct'` | `qrIdTx`→`id_txn`; `cuitMerchant`→`clientes.cuit` |
-| `…movimientos.cobros-qr` | `tipo = 'cobro_pct'` | `montoTotal`→`monto_operacion`, `montoNeto`→`monto_cobrado`; `tipoQr`/`estadoQr` sin fuente → descartados; comisión y neto visibles en el detalle |
-| `…movimientos.impuestos` | **NO es un tipo**: `conImpuesto: true` (`impuesto > 0`) sobre TODOS los tipos | Vista transversal de la columna `impuesto` (retención al cliente); banner explica que no hay desglose por nombre/tipo de impuesto |
-| `…movimientos.comisiones` | **NO es un tipo**: `conComision: true` (`comision > 0`) sobre TODOS los tipos | Vista transversal de comisiones cobradas. El mock calculaba comisión/IVA/total con tasas demo (`desgloseDemo`); la tabla real ya los tiene almacenados por fila (`comision`, `impuesto`, `monto_cobrado`). Campo `modalidad` del mock: es configuración (`comisiones_cliente.modalidad`), no existe por movimiento → descartado |
+| Ruta                         | Filtro server-side                                                            | Notas                                                                                                                                                                                                                                                                                                                           |
+| ---------------------------- | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `…movimientos.depositos`     | `tipo = 'deposito'`                                                           | Mapeo directo                                                                                                                                                                                                                                                                                                                   |
+| `…movimientos.retiros`       | `tipo = 'retiro'`                                                             | Mapeo directo                                                                                                                                                                                                                                                                                                                   |
+| `…movimientos.pagos-tarjeta` | `tipo = 'tarjeta'`                                                            | Campos `medioPago`/`cuotas` del mock NO existen en la tabla → descartados (documentado en la descripción de la ruta)                                                                                                                                                                                                            |
+| `…movimientos.pagos-qr`      | `tipo = 'pago_pct'`                                                           | `qrIdTx`→`id_txn`; `cuitMerchant`→`clientes.cuit`                                                                                                                                                                                                                                                                               |
+| `…movimientos.cobros-qr`     | `tipo = 'cobro_pct'`                                                          | `montoTotal`→`monto_operacion`, `montoNeto`→`monto_cobrado`; `tipoQr`/`estadoQr` sin fuente → descartados; comisión y neto visibles en el detalle                                                                                                                                                                               |
+| `…movimientos.impuestos`     | **NO es un tipo**: `conImpuesto: true` (`impuesto > 0`) sobre TODOS los tipos | Vista transversal de la columna `impuesto` (retención al cliente); banner explica que no hay desglose por nombre/tipo de impuesto                                                                                                                                                                                               |
+| `…movimientos.comisiones`    | **NO es un tipo**: `conComision: true` (`comision > 0`) sobre TODOS los tipos | Vista transversal de comisiones cobradas. El mock calculaba comisión/IVA/total con tasas demo (`desgloseDemo`); la tabla real ya los tiene almacenados por fila (`comision`, `impuesto`, `monto_cobrado`). Campo `modalidad` del mock: es configuración (`comisiones_cliente.modalidad`), no existe por movimiento → descartado |
 
 **Robustez de los filtros transversales (NULL / 0):**
+
 - ⚠️ **Corrección (verificado contra `information_schema` en producción):**
   `movimientos.impuesto` y `movimientos.comision` son
   `numeric NOT NULL, SIN default` — cada INSERT debe calcular el valor
@@ -543,9 +550,10 @@ sin duplicar):
   (Doble cobertura: aun si NULL existiera, `NULL > 0` evalúa NULL ≠ true.)
 
 **Implementación:**
+
 - Componente compartido nuevo: `src/components/movimientos-subroute.tsx`
   (`MovimientosSubRoute { titulo, descripcion, tipoCode?, soloConImpuesto?,
-  soloConComision? }`).
+soloConComision? }`).
 - API extendida (sin duplicar): `listMovimientos` acepta `conImpuesto?: boolean`
   → `.gt("impuesto", 0)` y `conComision?: boolean` → `.gt("comision", 0)`.
 - **Filtro de Estado por sub-ruta**: con tipo fijo se usa `estados_por_tipo`
@@ -580,19 +588,19 @@ documenta lo ya existente).
 
 ### Hallazgos de la auditoría de schema real
 
-| # | Hallazgo | Impacto | Estado |
-|---|---|---|---|
-| GAP-1 | La RPC `cambiar_estado_movimiento` nunca existió en producción — **RESUELTO**: 0006 aplicada y verificada el 2026-08-23 (ver INCIDENTE + Cierre abajo) | Botón "Cambiar estado" operativo nuevamente; verificación post-aplicación incluyó exposición vía PostgREST y rechazo de autorización a llamadas sin usuario | ✅ **RESUELTO 2026-08-23** |
-| GAP-2 | `handle_new_admin_user()` insertaba sobre `admin_users.rol` (columna eliminada; hoy `rol_id`) — **RESUELTO**: 0007 aplicada y verificada el 2026-08-23 (ver Resolución abajo) | Trigger de signup vivo y roto + conflicto descubierto con `crear-admin`; ambos caminos de alta quedaron operativos (V1/V2 verdes + Edge deployada) | ✅ **RESUELTO 2026-08-23** |
-| GAP-5 | **4 tablas consultadas por la capa API NO existían en producción** (PGRST205 verificado por sondeo REST): `integraciones`, `canales_notificacion`, `eventos_notificacion`, `codigos_error` | `admin.configuracion.index` y `admin.configuracion.logins` consumen `useIntegraciones` → **rotas** al cargar. Las 3 de Notificaciones sin consumidor activo (módulo pausado) | ✅ **RESUELTO 2026-08-24** (0009 aplicada pieza a pieza, P0-P3 verdes; V5 pendiente de sesión viva) |
-| ANOM-1 | Índice duplicado real: `movimientos_legajo_idx` ≡ `idx_movimientos_legajo` | Solo costo de escritura | 🟡 Cosmético |
-| ANOM-2 | `conciliaciones.monto_diferencia` es **nullable** en prod (migraciones decían `not null default 0`) | Corregido documental; sin acción DDL decidida | ✅ Documentado |
-| ANOM-3 | Vista `auditoria_legajos` sin `security_invoker` (reloptions = null, confirmado 2026-08-23) — **RESUELTO**: ALTER VIEW aplicado el mismo día (ver Resolución abajo) | Bypass owner-privilege cerrado; verificación discriminante: sondeo anon pasó de `200 []` a error de servidor (invoker activo) | ✅ **RESUELTO 2026-08-23** |
-| GAP-4 | Auto-recursión RLS en el patrón admin-gated — **RESUELTO**: 0008 aplicada pieza a pieza el 2026-08-23 (ver Resolución abajo) | Recursión `42P17` eliminada; `is_admin()` como único punto de verdad del predicado admin-gated; vista endurecida plenamente utilizable | ✅ **RESUELTO 2026-08-23** (verificación con admin real: pendiente primera sesión viva) |
-| CONF-1 | `movimientos.comision/impuesto`: NOT NULL **sin default** en prod | Confirmado contra `information_schema`; §15 corregido | ✅ Verificado |
-| CONF-2 | `movimientos` tiene UNA sola política (SELECT admin-gated); sin INSERT/UPDATE = diseño intencional (§5) | Confirmado contra `pg_policies` | ✅ Verificado |
-| CONF-3 | REVOKE UPDATE/DELETE sobre `movimientos_transiciones`: **VIGENTE** — sondeo REST como anon devolvió `42501 permission denied for table movimientos_transiciones` | La capa append-only por privilegios está activa además de la política RLS | ✅ Verificado |
-| PEND-2 | `admin_users.rol_id` nullable → **RESUELTO**: `ALTER COLUMN rol_id SET NOT NULL` aplicado y verificado el 2026-08-23 (`is_nullable = NO` vía information_schema) | Integridad de la FK lógica rol garantizada a nivel DDL | ✅ **RESUELTO 2026-08-23** |
+| #      | Hallazgo                                                                                                                                                                                   | Impacto                                                                                                                                                                      | Estado                                                                                              |
+| ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| GAP-1  | La RPC `cambiar_estado_movimiento` nunca existió en producción — **RESUELTO**: 0006 aplicada y verificada el 2026-08-23 (ver INCIDENTE + Cierre abajo)                                     | Botón "Cambiar estado" operativo nuevamente; verificación post-aplicación incluyó exposición vía PostgREST y rechazo de autorización a llamadas sin usuario                  | ✅ **RESUELTO 2026-08-23**                                                                          |
+| GAP-2  | `handle_new_admin_user()` insertaba sobre `admin_users.rol` (columna eliminada; hoy `rol_id`) — **RESUELTO**: 0007 aplicada y verificada el 2026-08-23 (ver Resolución abajo)              | Trigger de signup vivo y roto + conflicto descubierto con `crear-admin`; ambos caminos de alta quedaron operativos (V1/V2 verdes + Edge deployada)                           | ✅ **RESUELTO 2026-08-23**                                                                          |
+| GAP-5  | **4 tablas consultadas por la capa API NO existían en producción** (PGRST205 verificado por sondeo REST): `integraciones`, `canales_notificacion`, `eventos_notificacion`, `codigos_error` | `admin.configuracion.index` y `admin.configuracion.logins` consumen `useIntegraciones` → **rotas** al cargar. Las 3 de Notificaciones sin consumidor activo (módulo pausado) | ✅ **RESUELTO 2026-08-24** (0009 aplicada pieza a pieza, P0-P3 verdes; V5 pendiente de sesión viva) |
+| ANOM-1 | Índice duplicado real: `movimientos_legajo_idx` ≡ `idx_movimientos_legajo`                                                                                                                 | Solo costo de escritura                                                                                                                                                      | 🟡 Cosmético                                                                                        |
+| ANOM-2 | `conciliaciones.monto_diferencia` es **nullable** en prod (migraciones decían `not null default 0`)                                                                                        | Corregido documental; sin acción DDL decidida                                                                                                                                | ✅ Documentado                                                                                      |
+| ANOM-3 | Vista `auditoria_legajos` sin `security_invoker` (reloptions = null, confirmado 2026-08-23) — **RESUELTO**: ALTER VIEW aplicado el mismo día (ver Resolución abajo)                        | Bypass owner-privilege cerrado; verificación discriminante: sondeo anon pasó de `200 []` a error de servidor (invoker activo)                                                | ✅ **RESUELTO 2026-08-23**                                                                          |
+| GAP-4  | Auto-recursión RLS en el patrón admin-gated — **RESUELTO**: 0008 aplicada pieza a pieza el 2026-08-23 (ver Resolución abajo)                                                               | Recursión `42P17` eliminada; `is_admin()` como único punto de verdad del predicado admin-gated; vista endurecida plenamente utilizable                                       | ✅ **RESUELTO 2026-08-23** (verificación con admin real: pendiente primera sesión viva)             |
+| CONF-1 | `movimientos.comision/impuesto`: NOT NULL **sin default** en prod                                                                                                                          | Confirmado contra `information_schema`; §15 corregido                                                                                                                        | ✅ Verificado                                                                                       |
+| CONF-2 | `movimientos` tiene UNA sola política (SELECT admin-gated); sin INSERT/UPDATE = diseño intencional (§5)                                                                                    | Confirmado contra `pg_policies`                                                                                                                                              | ✅ Verificado                                                                                       |
+| CONF-3 | REVOKE UPDATE/DELETE sobre `movimientos_transiciones`: **VIGENTE** — sondeo REST como anon devolvió `42501 permission denied for table movimientos_transiciones`                           | La capa append-only por privilegios está activa además de la política RLS                                                                                                    | ✅ Verificado                                                                                       |
+| PEND-2 | `admin_users.rol_id` nullable → **RESUELTO**: `ALTER COLUMN rol_id SET NOT NULL` aplicado y verificado el 2026-08-23 (`is_nullable = NO` vía information_schema)                           | Integridad de la FK lógica rol garantizada a nivel DDL                                                                                                                       | ✅ **RESUELTO 2026-08-23**                                                                          |
 
 ### Incidente documentado: RPC `cambiar_estado_movimiento` nunca existió en producción (GAP-1)
 
@@ -615,8 +623,8 @@ producción**, aunque el panel y su documentación la daban por operativa.
 - **Cómo se detectó:** export completo de `pg_proc` durante la auditoría de
   schema (solo existen 6 funciones públicas; ninguna es la RPC) + sondeo
   directo a la API REST con la firma exacta `(p_comentario,
-  p_movimiento_id, p_nuevo_estado_id)` → HTTP 404 `PGRST202 "Could not find
-  the function public.cambiar_estado_movimiento(...) in the schema cache"`.
+p_movimiento_id, p_nuevo_estado_id)` → HTTP 404 `PGRST202 "Could not find
+the function public.cambiar_estado_movimiento(...) in the schema cache"`.
 - **Por qué no se había notado:** el panel aún no tiene usuarios reales ni
   uso operativo en producción; ninguna sesión anterior ejecutó el botón
   contra prod.
@@ -639,12 +647,12 @@ Supabase resolvió el incidente.
 
 **Evidencia de cierre (4 sondas independientes):**
 
-| # | Verificación | Resultado |
-|---|---|---|
-| 1 | `SELECT proname FROM pg_proc WHERE pronamespace='public'::regnamespace AND proname LIKE 'cambiar%'` (SQL Editor) | **1 fila**: `cambiar_estado_movimiento` |
-| 2 | Sondeo REST GET `/rest/v1/rpc/cambiar_estado_movimiento` | 404 PGRST202 pero con hint *"Perhaps you meant to call the function public.cambiar_estado_movimiento(p_comentario, p_movimiento_id, p_nuevo_estado_id)"* — ese hint solo existe cuando la función **está en el schema cache** de PostgREST |
-| 3 | Sondeo REST POST con JSON malformado | **HTTP 400** (parse error) — antes de existir devolvía 404 PGRST202 |
-| 4 | Sondeo REST POST con firma exacta, como anon | **HTTP 401** — la función **se ejecutó** y su guard interno rechazó al anon (`auth.uid() = null` → excepción `42501 'No autenticado'`, mapeada por PostgREST a 401): comportamiento exactamente esperado del guard admin |
+| #   | Verificación                                                                                                     | Resultado                                                                                                                                                                                                                                  |
+| --- | ---------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1   | `SELECT proname FROM pg_proc WHERE pronamespace='public'::regnamespace AND proname LIKE 'cambiar%'` (SQL Editor) | **1 fila**: `cambiar_estado_movimiento`                                                                                                                                                                                                    |
+| 2   | Sondeo REST GET `/rest/v1/rpc/cambiar_estado_movimiento`                                                         | 404 PGRST202 pero con hint _"Perhaps you meant to call the function public.cambiar_estado_movimiento(p_comentario, p_movimiento_id, p_nuevo_estado_id)"_ — ese hint solo existe cuando la función **está en el schema cache** de PostgREST |
+| 3   | Sondeo REST POST con JSON malformado                                                                             | **HTTP 400** (parse error) — antes de existir devolvía 404 PGRST202                                                                                                                                                                        |
+| 4   | Sondeo REST POST con firma exacta, como anon                                                                     | **HTTP 401** — la función **se ejecutó** y su guard interno rechazó al anon (`auth.uid() = null` → excepción `42501 'No autenticado'`, mapeada por PostgREST a 401): comportamiento exactamente esperado del guard admin                   |
 
 Control paralelo durante todo el sondeo: `GET /rest/v1/estados_movimiento` → 200 `[]`
 (canal anon sano; el `[]` es lo esperado porque su RLS es SELECT TO authenticated).
@@ -675,8 +683,8 @@ RPC). Fin-to-end real recién ahí; la prueba definitiva será el primer uso viv
 Con el trigger VIVO (`on_auth_admin_user_created`, confirmado con salida verbatim
 de `pg_trigger`), **ambos caminos de alta estaban muertos por la misma causa**:
 
-1. *Signup directo*: el insert en `auth.users` disparaba la función rota → error.
-2. *Edge `crear-admin`* (`supabase/functions/crear-admin/index.ts`): su paso 2
+1. _Signup directo_: el insert en `auth.users` disparaba la función rota → error.
+2. _Edge `crear-admin`_ (`supabase/functions/crear-admin/index.ts`): su paso 2
    (`auth.admin.createUser`, L83) dispara el mismo trigger; y aunque el trigger
    no rompiera, el insert posterior de la Edge (L101, sin manejo de conflicto)
    chocaría contra la fila fantasma del trigger → duplicate key `23505` → el
@@ -693,11 +701,12 @@ en el catálogo real); B2 `RAISE EXCEPTION` si ni el rol pedido ni Reader existe
 Edición acompañante: L87 de la Edge agrega `admin_via_edge: true` al metadata.
 
 **Verificaciones post-aplicación (todas verdes):**
-| # | Verificación | Resultado |
-|---|---|---|
-| V1 | `pg_get_functiondef('public.handle_new_admin_user()'::regprocedure)` | Contiene `rol_id` + guard `admin_via_edge`; sin rastro de la lista vieja `(id, legajo, email, nombre, rol)` |
-| V2 | Trigger query | `on_auth_admin_user_created`, `tgenabled = 'O'` |
-| V3 | Sondeo runtime `/functions/v1/crear-admin` post-deploy | OPTIONS → `200 "ok"`; POST `{}` → `400 {"error":"Faltan email, password o nombre"}` (handler vivo) |
+
+| #   | Verificación                                                         | Resultado                                                                                                   |
+| --- | -------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| V1  | `pg_get_functiondef('public.handle_new_admin_user()'::regprocedure)` | Contiene `rol_id` + guard `admin_via_edge`; sin rastro de la lista vieja `(id, legajo, email, nombre, rol)` |
+| V2  | Trigger query                                                        | `on_auth_admin_user_created`, `tgenabled = 'O'`                                                             |
+| V3  | Sondeo runtime `/functions/v1/crear-admin` post-deploy               | OPTIONS → `200 "ok"`; POST `{}` → `400 {"error":"Faltan email, password o nombre"}` (handler vivo)          |
 
 La Edge `crear-admin` recibió su **primer deploy** el 2026-08-23. Pendiente
 behavioral definitivo: primera alta real de admin.
@@ -748,13 +757,13 @@ vista endurecida heredaban el 500 por tocar `admin_users`).
 
 **Fix aplicado — `0008_fix_recursion_rls.sql`, pieza a pieza:**
 
-| Pieza | Contenido | Verificación |
-|---|---|---|
-| P0 | Helper `public.is_admin()` (`LANGUAGE sql STABLE SECURITY DEFINER SET search_path TO 'public'`) + COMMENT | V0: `prosecdef=true`, `provolatile='s'`, `search_path=public` ✓; sonda intermedia: baseline intacto (nada usaba el helper aún) |
-| P1 | admin_users: drop autotargeteado (solo políticas cuya expresión referencia `admin_users`) + recreate `manage_admins`/`select_all_admins` con `is_admin()`; **`select_own` preservada intacta** | V1 real: 3 filas exactas. Doble ejecución accidental sin daño (segunda pasada no encontró qué dropear y falló limpio en CREATE existente) |
-| P2 | clientes → `clientes_admin_all` / `clientes_admin_select` | V2 real ✓ |
-| P3 | comisiones_cliente → `comisiones_cliente_admin_all` / `_select` | V3 real: 7 filas totales, cero EXISTS inline restante |
-| P4 | Sondeo final agente | Las 4 endpoints en `200 []`; control `estados_movimiento` sano |
+| Pieza | Contenido                                                                                                                                                                                      | Verificación                                                                                                                              |
+| ----- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| P0    | Helper `public.is_admin()` (`LANGUAGE sql STABLE SECURITY DEFINER SET search_path TO 'public'`) + COMMENT                                                                                      | V0: `prosecdef=true`, `provolatile='s'`, `search_path=public` ✓; sonda intermedia: baseline intacto (nada usaba el helper aún)            |
+| P1    | admin_users: drop autotargeteado (solo políticas cuya expresión referencia `admin_users`) + recreate `manage_admins`/`select_all_admins` con `is_admin()`; **`select_own` preservada intacta** | V1 real: 3 filas exactas. Doble ejecución accidental sin daño (segunda pasada no encontró qué dropear y falló limpio en CREATE existente) |
+| P2    | clientes → `clientes_admin_all` / `clientes_admin_select`                                                                                                                                      | V2 real ✓                                                                                                                                 |
+| P3    | comisiones_cliente → `comisiones_cliente_admin_all` / `_select`                                                                                                                                | V3 real: 7 filas totales, cero EXISTS inline restante                                                                                     |
+| P4    | Sondeo final agente                                                                                                                                                                            | Las 4 endpoints en `200 []`; control `estados_movimiento` sano                                                                            |
 
 **Hallazgo durante P1 (mejor a lo previsto):** el flip fue global ya con P1 —
 defusado el nodo autorreferencial, las políticas de las otras tablas dejaron
@@ -773,16 +782,17 @@ escriben— **queda pendiente de la primera sesión viva**, igual que las altas
 de admin (0007). No dar por probado lo que solo está estructuralmente verde.
 
 ### Catálogos semilla fuera de alcance de 0005
+
 0005 documenta estructura únicamente. Para un clone fresco habrá que sembrar
 además: `roles`, `recursos`, `permisos` (matriz), `estados_movimiento`,
- `estados_por_tipo`, `codigos_categoria`. **Corrección 2026-08-24**: `codigos_error`
+`estados_por_tipo`, `codigos_categoria`. **Corrección 2026-08-24**: `codigos_error`
 e `integraciones` SÍ se crearon en producción mediante `0009` (GAP-5 resuelto);
 junto con `canales_notificacion` y `eventos_notificacion`. El sondeo PGRST205 de
 GAP-5 había probado que ninguna existía; hoy las 4 existen (con seeds reales de
 6 integraciones y 10 códigos de error). Los "8 integraciones reales" del
- párrafo original se recortaron a 6 confirmadas por el revisor (las 2 restantes
- no tenían evidencia de captura); los "10 códigos de error reales" son los de
- `CODIGOS_ERROR_SEED` (sin inventar los ~400 restantes).
+párrafo original se recortaron a 6 confirmadas por el revisor (las 2 restantes
+no tenían evidencia de captura); los "10 códigos de error reales" son los de
+`CODIGOS_ERROR_SEED` (sin inventar los ~400 restantes).
 
 ### Cierre del incidente GAP-5 (2026-08-24): 4 tablas fantasma creadas en producción
 
@@ -798,6 +808,7 @@ solo en fixtures de código (`CODIGOS_ERROR_SEED`, `CANALES_NOTIFICACION_SEED`,
 `INTEGRACIONES`).
 
 **Impacto real conocido:**
+
 - `admin.configuracion.index` y `admin.configuracion.logins` consumen
   `useIntegraciones` → **rotas al cargar** (PGRST205) hasta hoy.
 - Las 3 tablas de Notificaciones (`codigos_error`, `canales_notificacion`,
@@ -807,12 +818,12 @@ solo en fixtures de código (`CODIGOS_ERROR_SEED`, `CANALES_NOTIFICACION_SEED`,
 
 **Fix aplicado — `0009_crear_tablas_faltantes_gap5.sql`, pieza a pieza:**
 
-| Pieza | Tabla | Semilla | Verificación |
-|---|---|---|---|
-| P0 | `integraciones` | 6 integraciones reales (Wondersoft, Pago Mis Cuentas, BDC Conecta, COELSA CPF/CVU/DEBIN) | V0: `SELECT count(*) = 6` ✓ |
-| P1 | `codigos_error` | 10 códigos reales (de `CODIGOS_ERROR_SEED`) | V1: `SELECT count(*) = 10` ✓ |
-| P2 | `canales_notificacion` | sin seed (config runtime) | V2: 7 columnas exactas ✓ |
-| P3 | `eventos_notificacion` (+FK `codigos_error.id`, índices) | sin seed | V3: 12 columnas + 1 FK resuelta sin ambigüedad ✓ |
+| Pieza | Tabla                                                    | Semilla                                                                                  | Verificación                                     |
+| ----- | -------------------------------------------------------- | ---------------------------------------------------------------------------------------- | ------------------------------------------------ |
+| P0    | `integraciones`                                          | 6 integraciones reales (Wondersoft, Pago Mis Cuentas, BDC Conecta, COELSA CPF/CVU/DEBIN) | V0: `SELECT count(*) = 6` ✓                      |
+| P1    | `codigos_error`                                          | 10 códigos reales (de `CODIGOS_ERROR_SEED`)                                              | V1: `SELECT count(*) = 10` ✓                     |
+| P2    | `canales_notificacion`                                   | sin seed (config runtime)                                                                | V2: 7 columnas exactas ✓                         |
+| P3    | `eventos_notificacion` (+FK `codigos_error.id`, índices) | sin seed                                                                                 | V3: 12 columnas + 1 FK resuelta sin ambigüedad ✓ |
 
 - RLS: patrón B del proyecto (`authenticated ALL true`) en las 4.
 - Trigger `set_updated_at()` (ya existente en prod) en las 4.
@@ -840,6 +851,7 @@ probado lo que solo está estructuralmente verde — igual que GAP-4/0007.
 **Fecha:** 2026-08-24 | **Estado:** ✅ RESUELTO (código alineado a prod, tsc/lint verdes)
 
 ### Causa raíz
+
 El código que consulta y escribe `impuestos_alicuotas.estado` usaba el valor
 `"Activa"` / `"Inactiva"` (con la `a` final), pero el `CHECK` real de producción
 es `Activo` / `Inactivo` (fuente de verdad `0005_consolidacion_schema_real.sql:391-392`,
@@ -851,6 +863,7 @@ contra ese `0004` equivocado → desalineado con prod. Es el mismo patrón de
 desalineación ya documentado en §16.
 
 ### Impacto (lectura Y escritura rotas en Alícuotas)
+
 - **Escritura:** `createAlicuota` (default `estado: input.estado ?? "Activa"`) y
   `setAlicuotaEstado(estado: "Activa" | "Inactiva")` mandan `"Activa"/"Inactiva"`
   → violan el `CHECK` → error `23514` al guardar en producción.
@@ -861,6 +874,7 @@ desalineación ya documentado en §16.
   todo el código; solo `impuestos_alicuotas` tenía el typo.
 
 ### Detección
+
 Sondeo manual al sembrar `impuestos_alicuotas`: `INSERT ... estado='Activa'`
 falló por `CHECK`, y al auditar si el mismo typo existía en el código se
 encontró que **toda la capa Alícuotas** (tipos, API y UI) usaba `"Activa"/"Inactiva"`.
@@ -869,13 +883,16 @@ encontró que **toda la capa Alícuotas** (tipos, API y UI) usaba `"Activa"/"Ina
 incompatible con el tipo ya corregido de la API.
 
 ### Fix aplicado (commit posterior a este documento)
+
 Alineación `"Activa" → "Activo"` y `"Inactiva" → "Inactivo"` en los 4 archivos:
+
 - `src/lib/api/types.ts` (tipos `AlicuotaRow`, `Alicuota`, `AlicuotaInput`, `AlicuotaFilters`)
 - `src/lib/api/impuestos.ts` (filtro, default de `createAlicuota`, param de `setAlicuotaEstado`)
 - `src/data/impuestos.ts` (mock `Alicuota` + datos de ejemplo)
 - `src/routes/admin.comercios.impuestos.index.tsx` (form, badge, toggle, `<option>`)
 
 ### Verificación
+
 - `npx tsc --noEmit`: exit 0 (antes fallaba con TS2322/TS2367 en la ruta UI).
 - `npx eslint` sobre los 4 archivos: exit 0.
 - Confirmación de negocio: el seed de `impuestos_alicuotas` (bloque B) corre con
@@ -886,6 +903,7 @@ Alineación `"Activa" → "Activo"` y `"Inactiva" → "Inactivo"` en los 4 archi
 ## §18 — Restauración de tabs del detalle de cliente (persona física/jurídica)
 
 ### Reporte
+
 El usuario reportó que en el detalle de usuario ("persona física y jurídica") existía
 una "estructura tabular muy completa" en la primera versión (con tabs: datos
 personales, subcuentas, documentos, etc.) y que "ahora mismo eso no existe". Alcance
@@ -893,6 +911,7 @@ acordado: **UI + crear las tablas de respaldo que faltaban**. Regla del usuario:
 no hay datos de alguna parte, salir vacío, pero **no modificar la estructura de la v1**.
 
 ### Hallazgo de auditoría
+
 - La v1 (`src/components/user-modal.tsx`, `UserModal`) usaba **datos mock**
   (`MOCK_HISTORIAL`, `user.subcuentas`/`user.documentos` eran arrays hardcodeados).
   Por eso la ficha conectada actual decía "los datos del mock anterior no tienen
@@ -900,9 +919,10 @@ no hay datos de alguna parte, salir vacío, pero **no modificar la estructura de
   en el schema real** (no aparecen en ninguna migración previa; verificado en prod
   vía `information_schema`: 0 filas).
 - La v1 tenía 9 tabs: `identificacion, contexto, validaciones, riesgo, modulos,
-  financiero, documentos, subcuentas, historial`.
+financiero, documentos, subcuentas, historial`.
 
 ### Fix aplicado
+
 - **Migración `0010_crear_subcuentas_documentos.sql`** (aplicada en prod, sin errores):
   - `subcuentas` (hijo de `clientes.legajo` FK ON DELETE CASCADE) con columnas
     alineadas al tipo `Subcuenta` de la v1 (saldo_disponible/retenido/conciliado,
@@ -927,29 +947,32 @@ no hay datos de alguna parte, salir vacío, pero **no modificar la estructura de
     manejo de loading/error/not-found, y las tabs Movimientos/Impuestos/Comisiones.
 
 ### Verificación
+
 - `npx tsc --noEmit`: exit 0.
 - `npx eslint` sobre los 3 archivos ts/tsx: exit 0 (32 errores de formato prettier
   corregidos con `--fix`).
 - Migración `0010` ejecutada en prod sin errores (es `if not exists`, idempotente).
 
 ### Pendiente / nota
+
 - Las tabs `validaciones`, `riesgo`, `modulos`, `historial` **no tienen tabla de
   respaldo real en prod** (auditoría: la única vista parecida, `auditoria_legajos`,
   es "tabla vacía, sin PK ni lógica: no conectar" según `0003:25`/`0005:577` y sirve
   para detectar legajos inválidos, no es log de cambios). En la v1 eran 100% mock
   (`getHistorial`→`MOCK_HISTORIAL`, `user.validacionesAutomaticas`, `DEFAULT_MODULOS`
-  + random). Por eso se renderizan **estructuradas pero vacías**, fiel a la v1
-  (DataTable con columnas, sub-tabs, botones Editar/Recargar/Ir a alertas con
-  navegación real a `/admin/general/alertas`, `/admin/general/alertas/bloqueos`,
-  `/admin/general/alertas/parametros-*`, `/admin/modulos`).
+  - random). Por eso se renderizan **estructuradas pero vacías**, fiel a la v1
+    (DataTable con columnas, sub-tabs, botones Editar/Recargar/Ir a alertas con
+    navegación real a `/admin/general/alertas`, `/admin/general/alertas/bloqueos`,
+    `/admin/general/alertas/parametros-*`, `/admin/modulos`).
 - **Historial de movimientos** SÍ está cableado a datos reales: reusa
   `movimientosQuery` (tabla `movimientos` real). **Historial de cambios** queda vacío
   (no existe log de cambios de cliente en prod).
 - Si el usuario quiere datos no vacíos en `validaciones`/`riesgo`/`modulos`/`historial
-  de cambios`, hay que crear las tablas de respaldo correspondientes (fuera de
+de cambios`, hay que crear las tablas de respaldo correspondientes (fuera de
   alcance de este arreglo; requeriría nueva migración + seed).
 
 ### Segunda iteración: tablas de respaldo para ver datos (0011) — PENDIENTE APLICAR
+
 - El usuario pidió "creemos esas tablas para ver los datos" en `validaciones`/
   `riesgo`/`modulos`/`historial`. Se crearon:
   - `supabase/migrations/0011_crear_tablas_detalle_cliente.sql`: 5 tablas hijas de
@@ -973,14 +996,17 @@ no hay datos de alguna parte, salir vacío, pero **no modificar la estructura de
 ## 17. Movimientos — columnas Comisión/Impuesto/Payway y Dashboard Comisiones (PASOS 1-3)
 
 **PASO 1 — Comisión e Impuesto en todas las vistas (índice + 7 sub-rutas):**
+
 - `src/components/movimientos-subroute.tsx:354` + `src/routes/admin.general.movimientos.index.tsx:353` agregan columnas `Comisión` e `Impuesto` en **todas** las vistas (no solo en tabs filtradas). Formato `"$X (Y%)"` con `% = comision|impuesto / monto_operacion *100` calculado al vuelo, reusando `comision, impuesto, monto_operacion` ya traídos por `movimientos.ts:COLUMNS`. Tabs `Cobro de comisiones`/`Impuestos cobrados` quedan como atajos (`comision>0`/`impuesto>0`) pero ya no son el único lugar donde se ve el dato. `FilaSubRuta` extendida con `_montoOperacion/_impuesto/_comercioId/_bandera/_dbId`.
 
 **PASO 2 — Comisión Payway solo en Pagos con Tarjeta:**
+
 - `movimientos` ahora con `comercio_id (FK comercios)` + `bandera (text)` obligatorios para `tipo='tarjeta'` (`movimientos_tarjeta_requiere_comercio_bandera`). `src/lib/api/types.ts:177` `MovimientoRow` con `comercio_id/bandera`, `src/lib/api/mappers.ts:197` y `src/lib/api/movimientos.ts:29` `COLUMNS` actualizados.
 - `src/lib/api/comercio-banderas.ts:73` `listBanderasByComercioIds()` + `src/lib/api/lotes.ts:153` `getLotePaywaySnapshotForMovimientos()` (junction `lote_movimientos` → `lotes_acreditacion.tasa_payway_pct/monto`).
 - `src/components/movimientos-subroute.tsx:156` solo cuando `tipoCode==='tarjeta'`: columna `Comisión Payway` (`$ ( %)`). Lógica: si movimiento ya tiene lote (via `lote_movimientos`), usa snapshot histórico `lote.tasa_payway_pct` aplicado sobre `monto_operacion`; si no, fallback a `comercio_banderas.comision_payway` vivo. Así no cambia si la tarifa se actualiza después. Otras 6 vistas y `deposito/retiro/QR` no muestran esta columna.
 
 **PASO 3 — Dashboard Comisiones (solo Depósito+Retiro):**
+
 - `src/routes/admin.index.tsx:94` `DashboardComisionesCard` — dos `useMovimientos` (`tipo=deposito|retiro`, `pageSize 1000`) con filtros `fechaDesde/fechaHasta` (default mes en curso, dos inputs date). Cálculos: `Monto transaccionado = Σ monto_operacion`, `Comisión total = Σ comision`, `Remanente = monto - comision`. Drill-down secundario `DataTable` por comercio (`legajo → monto/comision/remanente/count`, ordenado por monto). Texto explícito: "Este cuadro refleja el flujo de transacciones del periodo seleccionado, no el saldo acumulado de la cuenta recaudadora." No incluye `tarjeta/QR` (no es dinero real hasta liquidación Payway del lote).
 
 ---
@@ -992,12 +1018,14 @@ no hay datos de alguna parte, salir vacío, pero **no modificar la estructura de
 **Causa raíz:** commit `174becc` (7 días antes) introdujo realtime en `useMovimientos` y `useClientes` con nombre de canal **fijo** (`realtime-movimientos`, `realtime-clientes`, etc.). Al agregar el Dashboard (PASO 3) que llama `useMovimientos` **dos veces en paralelo** con `tipo='deposito'` y `tipo='retiro'`, ambas instancias intentaban registrar `.on('postgres_changes')` sobre **la misma instancia de canal** ya suscrita → Supabase Realtime lanza error y rompe toda la app.
 
 **Archivos afectados (mismo patrón latente en los 4):**
+
 - `src/hooks/useMovimientos.ts:22` → canal `realtime-movimientos`
 - `src/hooks/useClientes.ts:22` → canal `realtime-clientes`
 - `src/routes/admin.comercios.link-pago.index.tsx:135` → canal `realtime-enlaces-pago`
 - `src/routes/admin.comercios.transferencia.index.tsx:134` → canal `realtime-puntos_venta`
 
 **Fix aplicado:** nombre de canal determinístico por filtro diferenciador que puede coexistir en pantalla:
+
 - `useMovimientos` → `realtime-movimientos-${filters.tipo ?? 'all'}` (ej. `realtime-movimientos-deposito`, `realtime-movimientos-retiro`, `realtime-movimientos-tarjeta`…)
 - `useClientes` → `realtime-clientes-${filters.tipoPersona ?? 'all'}` (ej. `realtime-clientes-fisica`, `realtime-clientes-juridica`)
 - `admin.comercios.link-pago.index` → `realtime-enlaces-pago-admin` (único uso, nombre explícito)
@@ -1006,4 +1034,3 @@ no hay datos de alguna parte, salir vacío, pero **no modificar la estructura de
 El cleanup `sb.removeChannel(ch)` en el `return` del useEffect sigue funcionando correctamente porque cada efecto crea su propio canal con nombre único y lo remueve al desmontar.
 
 **Verificación:** `tsc --noEmit --skipLibCheck` sin errores nuevos, `vite build` OK. Dashboard carga sin error de consola con sus 2 instancias paralelas.
-

@@ -1,7 +1,18 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { Eye, XCircle, RotateCcw, AlertTriangle, Inbox, ShieldCheck, Ban, Trash2, CheckCircle, AlertOctagon } from "lucide-react";
+import {
+  Eye,
+  XCircle,
+  RotateCcw,
+  AlertTriangle,
+  Inbox,
+  ShieldCheck,
+  Ban,
+  Trash2,
+  CheckCircle,
+  AlertOctagon,
+} from "lucide-react";
 import { PageHeader } from "@/components/page-header";
 import { DataTable, type Column, type TableServerFilters } from "@/components/data-table";
 import { ConfirmDialog } from "@/components/confirm-dialog";
@@ -27,7 +38,13 @@ import { DataAccessError } from "@/lib/api/errors";
 import { useCan } from "@/lib/permissions";
 import { PermissionGuard } from "@/components/permission-guard";
 import type { Cliente, EstadoCliente } from "@/lib/api/types";
-import { ESTADO_LABEL, ESTADO_TONE, normalizarEstado, FILTRO_ESTADOS_OPCIONES, LABEL_A_ESTADO } from "@/lib/cliente-estados";
+import {
+  ESTADO_LABEL,
+  ESTADO_TONE,
+  normalizarEstado,
+  FILTRO_ESTADOS_OPCIONES,
+  LABEL_A_ESTADO,
+} from "@/lib/cliente-estados";
 import { toast } from "sonner";
 import { Pagination } from "@/components/pagination";
 import { SHOW_PLAFT_COLUMNS } from "@/lib/feature-flags";
@@ -159,16 +176,13 @@ function KycBadge({ completo }: { completo: boolean }) {
   );
 }
 
-function PerfilConsumo({
-  pct,
-  limite,
-}: {
-  pct: number | null;
-  limite: number | null;
-}) {
+function PerfilConsumo({ pct, limite }: { pct: number | null; limite: number | null }) {
   if (pct == null) {
     return (
-      <span className="text-xs text-muted-foreground italic" title="Sin límite operativo configurado">
+      <span
+        className="text-xs text-muted-foreground italic"
+        title="Sin límite operativo configurado"
+      >
         —
       </span>
     );
@@ -191,7 +205,10 @@ function PerfilConsumo({
         {fmtLimite && <span>${fmtLimite}</span>}
       </div>
       <div className="h-1.5 rounded-full bg-muted overflow-hidden">
-        <div className={`h-full ${tone} transition-all`} style={{ width: `${Math.min(100, pct)}%` }} />
+        <div
+          className={`h-full ${tone} transition-all`}
+          style={{ width: `${Math.min(100, pct)}%` }}
+        />
       </div>
     </div>
   );
@@ -218,7 +235,9 @@ function UsuariosPage() {
     setFiltrosPanel(f);
   };
 
-  const estadoFiltroDb = filtroEstado ? (LABEL_A_ESTADO[filtroEstado] as EstadoCliente | undefined) : undefined;
+  const estadoFiltroDb = filtroEstado
+    ? (LABEL_A_ESTADO[filtroEstado] as EstadoCliente | undefined)
+    : undefined;
 
   const { rows, total, isLoading, isFetching, isError, error, isEmpty, refetch } = useClientes({
     page,
@@ -283,7 +302,10 @@ function UsuariosPage() {
     try {
       const cliente = await getClienteByLegajo(legajo);
       if (!cliente) throw new Error("Cliente no encontrado");
-      let res: { ok: boolean; motivo?: string } | { ok: true } = { ok: false, motivo: "No implementado" };
+      let res: { ok: boolean; motivo?: string } | { ok: true } = {
+        ok: false,
+        motivo: "No implementado",
+      };
       if (accion === "aprobar") res = await aprobarDocumentacionCliente(cliente);
       else if (accion === "activar") res = await activarCliente(cliente);
       else if (accion === "suspender") res = await suspenderCliente(cliente);
@@ -325,18 +347,25 @@ function UsuariosPage() {
       {
         label: "Ver / editar ficha",
         icon: Eye,
-        onClick: () => navigate({ to: "/admin/general/usuarios/$legajo", params: { legajo: row.legajo } }),
+        onClick: () =>
+          navigate({ to: "/admin/general/usuarios/$legajo", params: { legajo: row.legajo } }),
       },
       {
         label: "Asignar / gestionar CVU",
         icon: ShieldCheck,
         disabled: !puedeModificar,
-        onClick: () => navigate({ to: "/admin/general/usuarios/$legajo", params: { legajo: row.legajo }, search: { tab: "cvu" } }),
+        onClick: () =>
+          navigate({
+            to: "/admin/general/usuarios/$legajo",
+            params: { legajo: row.legajo },
+            search: { tab: "cvu" },
+          }),
       },
       {
         label: "Ver historial de movimientos",
         icon: Inbox,
-        onClick: () => navigate({ to: "/admin/general/movimientos", search: { legajo: row.legajo } }),
+        onClick: () =>
+          navigate({ to: "/admin/general/movimientos", search: { legajo: row.legajo } }),
       },
     ];
 
@@ -559,7 +588,11 @@ const columns: Column<Usuario>[] = [
     key: "estadoLabel",
     label: "Estado",
     minWidth: 120,
-    render: (row) => <Badge tone={row.estadoTone as "success" | "warn" | "danger" | "neutral"}>{row.estadoLabel}</Badge>,
+    render: (row) => (
+      <Badge tone={row.estadoTone as "success" | "warn" | "danger" | "neutral"}>
+        {row.estadoLabel}
+      </Badge>
+    ),
   },
   {
     key: "kycCompleto",

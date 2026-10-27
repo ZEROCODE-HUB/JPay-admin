@@ -51,9 +51,17 @@ Deno.serve(async (req) => {
   let targetId = userId;
 
   if (legajo && !targetEmail && !targetId) {
-    const { data: cli } = await sb.from("clientes").select("correo").eq("legajo", legajo).maybeSingle();
+    const { data: cli } = await sb
+      .from("clientes")
+      .select("correo")
+      .eq("legajo", legajo)
+      .maybeSingle();
     if (cli?.correo) targetEmail = cli.correo.toLowerCase();
-    const { data: adm } = await sb.from("admin_users").select("email").eq("legajo", legajo).maybeSingle();
+    const { data: adm } = await sb
+      .from("admin_users")
+      .select("email")
+      .eq("legajo", legajo)
+      .maybeSingle();
     if (!targetEmail && adm?.email) targetEmail = adm.email.toLowerCase();
   }
 
@@ -118,7 +126,10 @@ Deno.serve(async (req) => {
     // ya intentado arriba
   }
 
-  return new Response(JSON.stringify({ ok: true, ...results, email: targetEmail, user_id: targetId }), {
-    headers: { ...cors, "content-type": "application/json" },
-  });
+  return new Response(
+    JSON.stringify({ ok: true, ...results, email: targetEmail, user_id: targetId }),
+    {
+      headers: { ...cors, "content-type": "application/json" },
+    },
+  );
 });

@@ -78,7 +78,11 @@ export async function listEstablecimientos(): Promise<{
 export async function getParametro(clave: string): Promise<string | null> {
   const sb = requireSupabase();
   try {
-    const { data, error } = await sb.from("parametros_globales").select("valor").eq("clave", clave).maybeSingle();
+    const { data, error } = await sb
+      .from("parametros_globales")
+      .select("valor")
+      .eq("clave", clave)
+      .maybeSingle();
     if (error) return null;
     const valor = (data as { valor?: unknown } | null)?.valor;
     return valor == null ? null : String(valor);

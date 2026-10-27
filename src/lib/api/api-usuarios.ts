@@ -123,9 +123,7 @@ type ApiUsuarioEndpointRow = {
   estado: string | null;
 };
 
-export async function listApiUsuarioEndpoints(
-  apiUsuarioId: string,
-): Promise<ApiUsuarioEndpoint[]> {
+export async function listApiUsuarioEndpoints(apiUsuarioId: string): Promise<ApiUsuarioEndpoint[]> {
   const sb = requireSupabase();
   const { data, error } = await sb
     .from("api_usuario_endpoints")
@@ -205,22 +203,21 @@ export async function listApiUsuarioLogs(apiUsuarioId: string): Promise<ApiUsuar
     endpoint: r.endpoint ?? "—",
     status: r.status ?? 0,
     tiempoRespuestaMs: r.tiempo_respuesta_ms ?? 0,
-    detalle:
-      r.detalle ?? {
-        usuarioId: apiUsuarioId,
-        clientId: null,
-        ip: r.ip ?? "—",
-        metodoHttp: r.metodo ?? "GET",
-        estadoHttp: r.status ?? 0,
-        endpoint: r.endpoint ?? "—",
-        tiempoRespuesta: `${r.tiempo_respuesta_ms ?? 0}ms`,
-        userAgent: "—",
-        fecha: r.fecha_hora ?? "—",
-        requestHeaders: {},
-        requestParams: {},
-        requestQuery: {},
-        requestBody: {},
-        responseBody: {},
-      },
+    detalle: r.detalle ?? {
+      usuarioId: apiUsuarioId,
+      clientId: null,
+      ip: r.ip ?? "—",
+      metodoHttp: r.metodo ?? "GET",
+      estadoHttp: r.status ?? 0,
+      endpoint: r.endpoint ?? "—",
+      tiempoRespuesta: `${r.tiempo_respuesta_ms ?? 0}ms`,
+      userAgent: "—",
+      fecha: r.fecha_hora ?? "—",
+      requestHeaders: {},
+      requestParams: {},
+      requestQuery: {},
+      requestBody: {},
+      responseBody: {},
+    },
   }));
 }

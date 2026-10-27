@@ -6,7 +6,10 @@ export const Route = createFileRoute("/admin/general/movimientos")({
   head: () => ({
     meta: [
       { title: pageTitle("Movimientos — Admin") },
-      { name: "description", content: `Historial de movimientos de la plataforma ${brand.shortName}.` },
+      {
+        name: "description",
+        content: `Historial de movimientos de la plataforma ${brand.shortName}.`,
+      },
     ],
   }),
   component: MovimientosLayout,

@@ -2,7 +2,19 @@ import { createFileRoute } from "@tanstack/react-router";
 import { brand, pageTitle } from "@/brand/brand";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
-import { Eye, Edit3, XCircle, Ban, Trash2, AlertTriangle, Inbox, QrCode, Download, Printer, CheckCircle } from "lucide-react";
+import {
+  Eye,
+  Edit3,
+  XCircle,
+  Ban,
+  Trash2,
+  AlertTriangle,
+  Inbox,
+  QrCode,
+  Download,
+  Printer,
+  CheckCircle,
+} from "lucide-react";
 import QRCode from "qrcode";
 import { DataTable, type Column } from "@/components/data-table";
 import { ActionsDropdown, type ActionItem } from "@/components/actions-dropdown";
@@ -30,7 +42,14 @@ export const Route = createFileRoute("/admin/comercios/transferencia/")({
 });
 
 const PAGE_SIZES = [10, 20, 50];
-const ESTADOS_QR: EstadoQr[] = ["Pendiente de aprobación","Activado","Desactivado","Rechazado","Suspendido","Eliminado"];
+const ESTADOS_QR: EstadoQr[] = [
+  "Pendiente de aprobación",
+  "Activado",
+  "Desactivado",
+  "Rechazado",
+  "Suspendido",
+  "Eliminado",
+];
 
 function tone(estado: string): "success" | "neutral" | "warn" | "danger" {
   if (estado === "Activado") return "success";
@@ -46,10 +65,14 @@ function QrDetalle({ qr, onClose }: { qr: PuntoVenta; onClose: () => void }) {
 
   useEffect(() => {
     let cancelled = false;
-    QRCode.toDataURL(qrValue, { width: 260, margin: 2 }).then((url) => {
-      if (!cancelled) setQrDataUrl(url);
-    }).catch(() => setQrDataUrl(""));
-    return () => { cancelled = true; };
+    QRCode.toDataURL(qrValue, { width: 260, margin: 2 })
+      .then((url) => {
+        if (!cancelled) setQrDataUrl(url);
+      })
+      .catch(() => setQrDataUrl(""));
+    return () => {
+      cancelled = true;
+    };
   }, [qrValue]);
 
   return (
@@ -58,52 +81,148 @@ function QrDetalle({ qr, onClose }: { qr: PuntoVenta; onClose: () => void }) {
       <div className="relative bg-card rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-xl">
         <div className="sticky top-0 bg-card border-b px-6 py-4 flex justify-between items-start">
           <div>
-            <h3 className="font-display text-lg font-semibold flex items-center gap-2"><QrCode size={18}/> Detalle QR/POS</h3>
-            <p className="text-sm text-muted-foreground">QR: {qr.nombre} · POS asociado: {qr.nombre}</p>
+            <h3 className="font-display text-lg font-semibold flex items-center gap-2">
+              <QrCode size={18} /> Detalle QR/POS
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              QR: {qr.nombre} · POS asociado: {qr.nombre}
+            </p>
           </div>
-          <button onClick={onClose} className="p-1.5 hover:bg-muted rounded-md"><XCircle size={18}/></button>
+          <button onClick={onClose} className="p-1.5 hover:bg-muted rounded-md">
+            <XCircle size={18} />
+          </button>
         </div>
         <div className="p-6 space-y-4">
           <Card className="p-4">
-            <h4 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-3">QR — claramente identificado</h4>
+            <h4 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-3">
+              QR — claramente identificado
+            </h4>
             <div className="grid grid-cols-[1fr_auto] gap-6">
               <div className="grid grid-cols-2 gap-3 text-sm">
-                <div><span className="text-muted-foreground">Nombre QR/POS</span><div className="font-semibold">{qr.nombre}</div></div>
-                <div><span className="text-muted-foreground">Tipo</span><div className="font-semibold">{qr.tipo ?? "QR"}</div></div>
-                <div><span className="text-muted-foreground">Alias</span><div className="font-mono text-xs">{qr.alias ?? "—"}</div></div>
-                <div><span className="text-muted-foreground">Estado</span><div><BadgeComp tone={tone(qr.estado)}>{qr.estado}</BadgeComp></div></div>
-                <div className="col-span-2"><span className="text-muted-foreground">QR URL</span><div className="font-mono text-xs break-all">{qrValue}</div></div>
-                <div><span className="text-muted-foreground">Cajero</span><div className="font-semibold">{qr.cajero ?? "—"}</div></div>
-                <div><span className="text-muted-foreground">ID</span><div className="font-mono text-xs">{qr.id.slice(0,8)}</div></div>
+                <div>
+                  <span className="text-muted-foreground">Nombre QR/POS</span>
+                  <div className="font-semibold">{qr.nombre}</div>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Tipo</span>
+                  <div className="font-semibold">{qr.tipo ?? "QR"}</div>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Alias</span>
+                  <div className="font-mono text-xs">{qr.alias ?? "—"}</div>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Estado</span>
+                  <div>
+                    <BadgeComp tone={tone(qr.estado)}>{qr.estado}</BadgeComp>
+                  </div>
+                </div>
+                <div className="col-span-2">
+                  <span className="text-muted-foreground">QR URL</span>
+                  <div className="font-mono text-xs break-all">{qrValue}</div>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Cajero</span>
+                  <div className="font-semibold">{qr.cajero ?? "—"}</div>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">ID</span>
+                  <div className="font-mono text-xs">{qr.id.slice(0, 8)}</div>
+                </div>
               </div>
               <div className="flex flex-col items-center gap-2">
                 <div className="border-2 rounded-xl p-2 bg-white">
-                  {qrDataUrl ? <img src={qrDataUrl} alt="QR" className="w-32 h-32" /> : <div className="w-32 h-32 bg-muted animate-pulse rounded" />}
+                  {qrDataUrl ? (
+                    <img src={qrDataUrl} alt="QR" className="w-32 h-32" />
+                  ) : (
+                    <div className="w-32 h-32 bg-muted animate-pulse rounded" />
+                  )}
                 </div>
-                <span className="text-[10px] text-muted-foreground text-center">QR para cobro<br/>{qr.nombre}</span>
+                <span className="text-[10px] text-muted-foreground text-center">
+                  QR para cobro
+                  <br />
+                  {qr.nombre}
+                </span>
                 <div className="flex gap-1">
-                  <button onClick={() => { if (qrDataUrl) { const a=document.createElement("a"); a.href=qrDataUrl; a.download=`qr-${qr.id}.png`; a.click(); } }} className="h-7 px-2 rounded border text-xs flex items-center gap-1"><Download size={12}/>PNG</button>
-                  <button onClick={() => { if (qrDataUrl) { const w=window.open(); if(w) w.document.write(`<img src="${qrDataUrl}" onload="window.print()"/>`); } }} className="h-7 px-2 rounded border text-xs flex items-center gap-1"><Printer size={12}/>Imprimir</button>
+                  <button
+                    onClick={() => {
+                      if (qrDataUrl) {
+                        const a = document.createElement("a");
+                        a.href = qrDataUrl;
+                        a.download = `qr-${qr.id}.png`;
+                        a.click();
+                      }
+                    }}
+                    className="h-7 px-2 rounded border text-xs flex items-center gap-1"
+                  >
+                    <Download size={12} />
+                    PNG
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (qrDataUrl) {
+                        const w = window.open();
+                        if (w)
+                          w.document.write(`<img src="${qrDataUrl}" onload="window.print()"/>`);
+                      }
+                    }}
+                    className="h-7 px-2 rounded border text-xs flex items-center gap-1"
+                  >
+                    <Printer size={12} />
+                    Imprimir
+                  </button>
                 </div>
               </div>
             </div>
           </Card>
           <Card className="p-4">
-            <h4 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-3">POS asociado</h4>
+            <h4 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-3">
+              POS asociado
+            </h4>
             <div className="grid grid-cols-2 gap-3 text-sm">
-              <div><span className="text-muted-foreground">Nombre POS</span><div className="font-semibold">{qr.nombre}</div></div>
-              <div><span className="text-muted-foreground">Fecha creación</span><div className="font-mono text-xs">{new Date(qr.createdAt).toLocaleDateString("es-AR")}</div></div>
-              <div><span className="text-muted-foreground">Comercio</span><div className="font-semibold">{qr.comercio?.usuario ?? "—"}</div></div>
-              <div><span className="text-muted-foreground">ID POS</span><div className="font-mono text-xs">{qr.id.slice(0,8)}</div></div>
+              <div>
+                <span className="text-muted-foreground">Nombre POS</span>
+                <div className="font-semibold">{qr.nombre}</div>
+              </div>
+              <div>
+                <span className="text-muted-foreground">Fecha creación</span>
+                <div className="font-mono text-xs">
+                  {new Date(qr.createdAt).toLocaleDateString("es-AR")}
+                </div>
+              </div>
+              <div>
+                <span className="text-muted-foreground">Comercio</span>
+                <div className="font-semibold">{qr.comercio?.usuario ?? "—"}</div>
+              </div>
+              <div>
+                <span className="text-muted-foreground">ID POS</span>
+                <div className="font-mono text-xs">{qr.id.slice(0, 8)}</div>
+              </div>
             </div>
           </Card>
           <Card className="p-4">
-            <h4 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-3">Comercio / Usuario</h4>
+            <h4 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-3">
+              Comercio / Usuario
+            </h4>
             <div className="grid grid-cols-2 gap-3 text-sm">
-              <div><span className="text-muted-foreground">Comercio</span><div className="font-semibold">{qr.comercio?.usuario ?? "—"}</div></div>
-              <div><span className="text-muted-foreground">Legajo comercio</span><div className="font-mono text-xs">{qr.comercio?.legajo ?? "—"}</div></div>
-              <div><span className="text-muted-foreground">Usuario</span><div className="font-semibold">{qr.comercio?.clienteCorreo ?? qr.comercio?.usuario ?? "—"}</div></div>
-              <div><span className="text-muted-foreground">Cliente</span><div className="font-semibold">{qr.comercio?.clienteNombre ?? "—"}</div></div>
+              <div>
+                <span className="text-muted-foreground">Comercio</span>
+                <div className="font-semibold">{qr.comercio?.usuario ?? "—"}</div>
+              </div>
+              <div>
+                <span className="text-muted-foreground">Legajo comercio</span>
+                <div className="font-mono text-xs">{qr.comercio?.legajo ?? "—"}</div>
+              </div>
+              <div>
+                <span className="text-muted-foreground">Usuario</span>
+                <div className="font-semibold">
+                  {qr.comercio?.clienteCorreo ?? qr.comercio?.usuario ?? "—"}
+                </div>
+              </div>
+              <div>
+                <span className="text-muted-foreground">Cliente</span>
+                <div className="font-semibold">{qr.comercio?.clienteNombre ?? "—"}</div>
+              </div>
             </div>
           </Card>
         </div>
@@ -119,12 +238,13 @@ function Page() {
   const [search, setSearch] = useState("");
   const [estado, setEstado] = useState<EstadoQr | "">("");
   const { can } = useCan();
-  const puedeModificar = can("modificar","comercios");
-  const puedeBorrar = can("borrar","comercios");
+  const puedeModificar = can("modificar", "comercios");
+  const puedeBorrar = can("borrar", "comercios");
 
   const { data, isLoading, isError, error, refetch, isFetching } = useQuery({
     queryKey: ["qr-pos", page, pageSize, search, estado],
-    queryFn: () => listQrPos({ page, pageSize, search: search || undefined, estado: estado || undefined }),
+    queryFn: () =>
+      listQrPos({ page, pageSize, search: search || undefined, estado: estado || undefined }),
     staleTime: 15_000,
     refetchInterval: 30_000,
     refetchOnWindowFocus: true,
@@ -147,14 +267,26 @@ function Page() {
   const rows = data?.rows ?? [];
   const total = data?.total ?? 0;
   const [detail, setDetail] = useState<PuntoVenta | null>(null);
-  const [confirm, setConfirm] = useState<{ title:string; message:string; confirmLabel:string; variant:"default"|"danger"; onConfirm:()=>void }|null>(null);
+  const [confirm, setConfirm] = useState<{
+    title: string;
+    message: string;
+    confirmLabel: string;
+    variant: "default" | "danger";
+    onConfirm: () => void;
+  } | null>(null);
 
   const cambiar = async (row: PuntoVenta, nuevo: EstadoQr) => {
     try {
       await updateQrEstado(row.id, nuevo);
       qc.invalidateQueries({ queryKey: ["qr-pos"] });
     } catch (e) {
-      setConfirm({ title:"No se pudo actualizar", message:(e as Error).message, confirmLabel:"Cerrar", variant:"danger", onConfirm:()=>setConfirm(null) });
+      setConfirm({
+        title: "No se pudo actualizar",
+        message: (e as Error).message,
+        confirmLabel: "Cerrar",
+        variant: "danger",
+        onConfirm: () => setConfirm(null),
+      });
     }
   };
 
@@ -163,29 +295,167 @@ function Page() {
       await deleteQrPos(row.id);
       qc.invalidateQueries({ queryKey: ["qr-pos"] });
     } catch (e) {
-      setConfirm({ title:"No se pudo eliminar", message:(e as Error).message, confirmLabel:"Cerrar", variant:"danger", onConfirm:()=>setConfirm(null) });
+      setConfirm({
+        title: "No se pudo eliminar",
+        message: (e as Error).message,
+        confirmLabel: "Cerrar",
+        variant: "danger",
+        onConfirm: () => setConfirm(null),
+      });
     }
   };
 
   const getActions = (r: PuntoVenta): ActionItem[] => {
-    const items: ActionItem[] = [{ label:"Ver detalles", icon:Eye, onClick:()=>setDetail(r) }];
+    const items: ActionItem[] = [{ label: "Ver detalles", icon: Eye, onClick: () => setDetail(r) }];
     // Todas las transiciones siempre disponibles (si no esta ya en ese estado)
-    if (r.estado !== "Activado") items.push({ label:"Activar", icon:CheckCircle, disabled:!puedeModificar, onClick:()=>setConfirm({ title:"Activar QR", message:`¿Activar ${r.nombre}?`, confirmLabel:"Activar", variant:"default" as const, onConfirm:()=>{ setConfirm(null); void cambiar(r,"Activado"); } }) });
-    if (r.estado !== "Desactivado") items.push({ label:"Desactivar", icon:Ban, disabled:!puedeModificar, variant:"danger" as const, onClick:()=>setConfirm({ title:"Desactivar QR", message:`¿Desactivar ${r.nombre}?`, confirmLabel:"Desactivar", variant:"danger", onConfirm:()=>{ setConfirm(null); void cambiar(r,"Desactivado"); } }) });
-    if (r.estado !== "Rechazado") items.push({ label:"Rechazar", icon:XCircle, disabled:!puedeModificar, variant:"danger" as const, onClick:()=>setConfirm({ title:"Rechazar QR", message:`¿Rechazar ${r.nombre}?`, confirmLabel:"Rechazar", variant:"danger", onConfirm:()=>{ setConfirm(null); void cambiar(r,"Rechazado"); } }) });
-    if (r.estado !== "Suspendido") items.push({ label:"Suspender", icon:Ban, disabled:!puedeModificar, variant:"danger" as const, onClick:()=>setConfirm({ title:"Suspender QR", message:`¿Suspender ${r.nombre}?`, confirmLabel:"Suspender", variant:"danger", onConfirm:()=>{ setConfirm(null); void cambiar(r,"Suspendido"); } }) });
-    if (r.estado !== "Pendiente de aprobación" && (r.estado as string) !== "Pendiente de aprobacion") items.push({ label:"Pendiente", icon:Ban, disabled:!puedeModificar, onClick:()=>setConfirm({ title:"Marcar pendiente QR", message:`¿Marcar ${r.nombre} como Pendiente de aprobación?`, confirmLabel:"Pendiente", variant:"default" as const, onConfirm:()=>{ setConfirm(null); void cambiar(r,"Pendiente de aprobación"); } }) });
-    if (r.estado !== "Eliminado") items.push({ label:"Eliminar", icon:Trash2, disabled:!puedeBorrar, variant:"danger" as const, onClick:()=>setConfirm({ title:"Eliminar QR", message:`¿Eliminar ${r.nombre}?`, confirmLabel:"Eliminar", variant:"danger", onConfirm:()=>{ setConfirm(null); void eliminar(r); } }) });
+    if (r.estado !== "Activado")
+      items.push({
+        label: "Activar",
+        icon: CheckCircle,
+        disabled: !puedeModificar,
+        onClick: () =>
+          setConfirm({
+            title: "Activar QR",
+            message: `¿Activar ${r.nombre}?`,
+            confirmLabel: "Activar",
+            variant: "default" as const,
+            onConfirm: () => {
+              setConfirm(null);
+              void cambiar(r, "Activado");
+            },
+          }),
+      });
+    if (r.estado !== "Desactivado")
+      items.push({
+        label: "Desactivar",
+        icon: Ban,
+        disabled: !puedeModificar,
+        variant: "danger" as const,
+        onClick: () =>
+          setConfirm({
+            title: "Desactivar QR",
+            message: `¿Desactivar ${r.nombre}?`,
+            confirmLabel: "Desactivar",
+            variant: "danger",
+            onConfirm: () => {
+              setConfirm(null);
+              void cambiar(r, "Desactivado");
+            },
+          }),
+      });
+    if (r.estado !== "Rechazado")
+      items.push({
+        label: "Rechazar",
+        icon: XCircle,
+        disabled: !puedeModificar,
+        variant: "danger" as const,
+        onClick: () =>
+          setConfirm({
+            title: "Rechazar QR",
+            message: `¿Rechazar ${r.nombre}?`,
+            confirmLabel: "Rechazar",
+            variant: "danger",
+            onConfirm: () => {
+              setConfirm(null);
+              void cambiar(r, "Rechazado");
+            },
+          }),
+      });
+    if (r.estado !== "Suspendido")
+      items.push({
+        label: "Suspender",
+        icon: Ban,
+        disabled: !puedeModificar,
+        variant: "danger" as const,
+        onClick: () =>
+          setConfirm({
+            title: "Suspender QR",
+            message: `¿Suspender ${r.nombre}?`,
+            confirmLabel: "Suspender",
+            variant: "danger",
+            onConfirm: () => {
+              setConfirm(null);
+              void cambiar(r, "Suspendido");
+            },
+          }),
+      });
+    if (
+      r.estado !== "Pendiente de aprobación" &&
+      (r.estado as string) !== "Pendiente de aprobacion"
+    )
+      items.push({
+        label: "Pendiente",
+        icon: Ban,
+        disabled: !puedeModificar,
+        onClick: () =>
+          setConfirm({
+            title: "Marcar pendiente QR",
+            message: `¿Marcar ${r.nombre} como Pendiente de aprobación?`,
+            confirmLabel: "Pendiente",
+            variant: "default" as const,
+            onConfirm: () => {
+              setConfirm(null);
+              void cambiar(r, "Pendiente de aprobación");
+            },
+          }),
+      });
+    if (r.estado !== "Eliminado")
+      items.push({
+        label: "Eliminar",
+        icon: Trash2,
+        disabled: !puedeBorrar,
+        variant: "danger" as const,
+        onClick: () =>
+          setConfirm({
+            title: "Eliminar QR",
+            message: `¿Eliminar ${r.nombre}?`,
+            confirmLabel: "Eliminar",
+            variant: "danger",
+            onConfirm: () => {
+              setConfirm(null);
+              void eliminar(r);
+            },
+          }),
+      });
     return items;
   };
 
   const columns: import("@/components/data-table").Column<PuntoVenta>[] = [
-    { key:"nombre", label:"QR / POS", render:(r)=> <span className="font-semibold flex items-center gap-1.5"><QrCode size={14}/> {r.nombre} <span className="text-xs text-muted-foreground">({r.tipo ?? "QR"})</span></span> },
-    { key:"comercio", label:"Comercio", render:(r)=> <span>{r.comercio?.usuario ?? "—"}</span> },
-    { key:"usuario", label:"Usuario", render:(r)=> <span>{r.comercio?.clienteCorreo ?? r.comercio?.usuario ?? "—"}</span> },
-    { key:"cajero", label:"Cajero", render:(r)=> <span>{r.cajero ?? "—"}</span> },
-    { key:"estado", label:"Estado", render:(r)=><Badge tone={tone(r.estado)}>{r.estado}</Badge> },
-    { key:"createdAt", label:"Fecha", render:(r)=><span className="font-mono text-xs">{new Date(r.createdAt).toLocaleDateString("es-AR")}</span> },
+    {
+      key: "nombre",
+      label: "QR / POS",
+      render: (r) => (
+        <span className="font-semibold flex items-center gap-1.5">
+          <QrCode size={14} /> {r.nombre}{" "}
+          <span className="text-xs text-muted-foreground">({r.tipo ?? "QR"})</span>
+        </span>
+      ),
+    },
+    {
+      key: "comercio",
+      label: "Comercio",
+      render: (r) => <span>{r.comercio?.usuario ?? "—"}</span>,
+    },
+    {
+      key: "usuario",
+      label: "Usuario",
+      render: (r) => <span>{r.comercio?.clienteCorreo ?? r.comercio?.usuario ?? "—"}</span>,
+    },
+    { key: "cajero", label: "Cajero", render: (r) => <span>{r.cajero ?? "—"}</span> },
+    {
+      key: "estado",
+      label: "Estado",
+      render: (r) => <Badge tone={tone(r.estado)}>{r.estado}</Badge>,
+    },
+    {
+      key: "createdAt",
+      label: "Fecha",
+      render: (r) => (
+        <span className="font-mono text-xs">
+          {new Date(r.createdAt).toLocaleDateString("es-AR")}
+        </span>
+      ),
+    },
   ];
 
   const err = error instanceof DataAccessError ? error : null;
@@ -193,19 +463,70 @@ function Page() {
 
   return (
     <PermissionGuard recurso="comercios">
-      <PageHeader title="Pagos con QR" description="QRs/POS creados por comercios desde Enterprise. Payway activa; Admin gestiona estados." />
+      <PageHeader
+        title="Pagos con QR"
+        description="QRs/POS creados por comercios desde Enterprise. Payway activa; Admin gestiona estados."
+      />
       <div className="flex flex-wrap gap-3 mb-4">
-        <input className="h-10 px-3 rounded-md border bg-card text-sm flex-1 min-w-[200px]" placeholder="Buscar QR, comercio, cajero..." value={search} onChange={(e)=>{ setSearch(e.target.value); setPage(0); }} />
-        <select className="h-10 px-3 rounded-md border bg-card text-sm" value={estado} onChange={(e)=>{ setEstado(e.target.value as EstadoQr | ""); setPage(0); }}>
+        <input
+          className="h-10 px-3 rounded-md border bg-card text-sm flex-1 min-w-[200px]"
+          placeholder="Buscar QR, comercio, cajero..."
+          value={search}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setPage(0);
+          }}
+        />
+        <select
+          className="h-10 px-3 rounded-md border bg-card text-sm"
+          value={estado}
+          onChange={(e) => {
+            setEstado(e.target.value as EstadoQr | "");
+            setPage(0);
+          }}
+        >
           <option value="">Todos los estados</option>
-          {ESTADOS_QR.map((e)=><option key={e} value={e}>{e}</option>)}
+          {ESTADOS_QR.map((e) => (
+            <option key={e} value={e}>
+              {e}
+            </option>
+          ))}
         </select>
       </div>
-      {isLoading ? <div className="flex items-center justify-center rounded-xl border bg-card py-16 text-sm text-muted-foreground"><span className="inline-block w-4 h-4 border-2 border-muted-foreground/30 border-t-muted-foreground rounded-full animate-spin mr-2"/>Cargando QRs…</div>
-      : isError ? <div className="flex flex-col items-center gap-3 rounded-xl border border-danger-200 bg-danger-50 px-6 py-12 text-center text-sm text-danger-700"><AlertTriangle size={28}/><p>{err?.message ?? "Error"}</p><button onClick={()=>refetch()} className="h-9 px-4 rounded-md bg-primary text-primary-foreground">Reintentar</button></div>
-      : rows.length===0 ? <div className="flex flex-col items-center gap-3 rounded-xl border bg-card px-6 py-12 text-sm text-muted-foreground"><Inbox size={28}/><p>No hay QRs/POS.</p><p className="text-xs">Crea un QR en Enterprise → aparecerá aquí como Pendiente de aprobación.</p></div>
-      : <>
-          <DataTable columns={columns} data={rows} keyExtractor={(r)=>r.id} actions={(r)=> <ActionsDropdown actions={getActions(r)} />} hidePagination showGlobalFilter={false} />
+      {isLoading ? (
+        <div className="flex items-center justify-center rounded-xl border bg-card py-16 text-sm text-muted-foreground">
+          <span className="inline-block w-4 h-4 border-2 border-muted-foreground/30 border-t-muted-foreground rounded-full animate-spin mr-2" />
+          Cargando QRs…
+        </div>
+      ) : isError ? (
+        <div className="flex flex-col items-center gap-3 rounded-xl border border-danger-200 bg-danger-50 px-6 py-12 text-center text-sm text-danger-700">
+          <AlertTriangle size={28} />
+          <p>{err?.message ?? "Error"}</p>
+          <button
+            onClick={() => refetch()}
+            className="h-9 px-4 rounded-md bg-primary text-primary-foreground"
+          >
+            Reintentar
+          </button>
+        </div>
+      ) : rows.length === 0 ? (
+        <div className="flex flex-col items-center gap-3 rounded-xl border bg-card px-6 py-12 text-sm text-muted-foreground">
+          <Inbox size={28} />
+          <p>No hay QRs/POS.</p>
+          <p className="text-xs">
+            Crea un QR en Enterprise → aparecerá aquí como Pendiente de aprobación.
+          </p>
+        </div>
+      ) : (
+        <>
+          <DataTable
+            columns={columns}
+            data={rows}
+            keyExtractor={(r) => r.id}
+            actions={(r) => <ActionsDropdown actions={getActions(r)} />}
+            hidePagination
+            showGlobalFilter={false}
+          />
           <Pagination
             page={page + 1}
             totalPages={totalPages}
@@ -220,9 +541,20 @@ function Page() {
               setPage(0);
             }}
           />
-        </>}
-      {detail && <QrDetalle qr={detail} onClose={()=>setDetail(null)} />}
-      {confirm && <ConfirmDialog open={!!confirm} onClose={()=>setConfirm(null)} title={confirm.title} message={confirm.message} confirmLabel={confirm.confirmLabel} variant={confirm.variant} onConfirm={confirm.onConfirm} />}
+        </>
+      )}
+      {detail && <QrDetalle qr={detail} onClose={() => setDetail(null)} />}
+      {confirm && (
+        <ConfirmDialog
+          open={!!confirm}
+          onClose={() => setConfirm(null)}
+          title={confirm.title}
+          message={confirm.message}
+          confirmLabel={confirm.confirmLabel}
+          variant={confirm.variant}
+          onConfirm={confirm.onConfirm}
+        />
+      )}
     </PermissionGuard>
   );
 }

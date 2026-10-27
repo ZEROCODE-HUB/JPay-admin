@@ -1,6 +1,15 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Eye, FilterX, AlertTriangle, ShieldAlert, ChevronRight, ChevronDown, Layers, Search } from "lucide-react";
+import {
+  Eye,
+  FilterX,
+  AlertTriangle,
+  ShieldAlert,
+  ChevronRight,
+  ChevronDown,
+  Layers,
+  Search,
+} from "lucide-react";
 import { PageHeader } from "@/components/page-header";
 import { DataTable, type Column, type TableServerFilters } from "@/components/data-table";
 import { ActionsDropdown, type ActionItem } from "@/components/actions-dropdown";
@@ -16,7 +25,11 @@ import { calcularDesglose, fmtARS } from "@/lib/aranceles";
 import { DataAccessError } from "@/lib/api/errors";
 import { getMovimiento } from "@/lib/api/movimientos";
 import { TIPOS_LINEA, type LineaMovimiento, type TipoLinea } from "@/lib/api/lineas-movimiento";
-import { ESTADOS_MOVIMIENTO, type EstadoMovimiento, type Movimiento as MovimientoDB } from "@/lib/api/types";
+import {
+  ESTADOS_MOVIMIENTO,
+  type EstadoMovimiento,
+  type Movimiento as MovimientoDB,
+} from "@/lib/api/types";
 import { resolverEstadoMovimiento } from "@/lib/estados";
 import { useCan } from "@/lib/permissions";
 import { PermissionGuard } from "@/components/permission-guard";
@@ -29,7 +42,10 @@ export const Route = createFileRoute("/admin/general/movimientos/")({
   head: () => ({
     meta: [
       { title: pageTitle("Todos los movimientos — Movimientos — Admin") },
-      { name: "description", content: "Movimientos por concepto (ingreso, comisión, impuesto) desde el ledger." },
+      {
+        name: "description",
+        content: "Movimientos por concepto (ingreso, comisión, impuesto) desde el ledger.",
+      },
     ],
   }),
   component: TodosPage,
@@ -101,7 +117,11 @@ function TodosPage() {
 
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(20);
-  const [filtrosPanel, setFiltrosPanel] = useState<TableServerFilters>({ global: "", enums: {}, dates: {} });
+  const [filtrosPanel, setFiltrosPanel] = useState<TableServerFilters>({
+    global: "",
+    enums: {},
+    dates: {},
+  });
   const [txid, setTxid] = useState(txidUrl ?? "");
   const [cuit, setCuit] = useState("");
   const [cvu, setCvu] = useState("");
@@ -130,18 +150,36 @@ function TodosPage() {
       cuit: cuitQ || undefined,
       cvu: cvuQ || undefined,
       tipoOperacion: operacion || undefined,
-      tipoLinea: filtrosPanel.enums.tipoLinea ? TIPO_LINEA_CODE.get(filtrosPanel.enums.tipoLinea) : undefined,
+      tipoLinea: filtrosPanel.enums.tipoLinea
+        ? TIPO_LINEA_CODE.get(filtrosPanel.enums.tipoLinea)
+        : undefined,
       estadoCodigo: filtrosPanel.enums.estado || undefined,
       fechaDesde: rango?.from ? `${rango.from}T00:00:00.000` : undefined,
       fechaHasta: rango?.to ? `${rango.to}T23:59:59.999` : undefined,
     };
-  }, [page, pageSize, legajo, search, txidQ, cuitQ, cvuQ, operacion, filtrosPanel.enums, filtrosPanel.dates]);
+  }, [
+    page,
+    pageSize,
+    legajo,
+    search,
+    txidQ,
+    cuitQ,
+    cvuQ,
+    operacion,
+    filtrosPanel.enums,
+    filtrosPanel.dates,
+  ]);
 
-  const { rows, total, isLoading, isFetching, isError, error, refetch } = useLineasMovimiento(apiFilters);
+  const { rows, total, isLoading, isFetching, isError, error, refetch } =
+    useLineasMovimiento(apiFilters);
 
   const { data: estados = [] } = useEstadosMovimiento();
   const [detail, setDetail] = useState<Movimiento | null>(null);
-  const [estadoTarget, setEstadoTarget] = useState<{ dbId: string; estadoActual: string; nuevoId: number } | null>(null);
+  const [estadoTarget, setEstadoTarget] = useState<{
+    dbId: string;
+    estadoActual: string;
+    nuevoId: number;
+  } | null>(null);
   const cambiarEstado = useCambiarEstadoMovimiento();
   const { can } = useCan();
   const puedeModificar = can("modificar", "movimientos");
@@ -197,7 +235,12 @@ function TodosPage() {
       label: "Cambiar estado",
       icon: ShieldAlert,
       disabled: !puedeModificar || row.ledgerStatus === "legacy",
-      onClick: () => setEstadoTarget({ dbId: row.transactionId, estadoActual: row.estadoCodigo, nuevoId: row.estadoId }),
+      onClick: () =>
+        setEstadoTarget({
+          dbId: row.transactionId,
+          estadoActual: row.estadoCodigo,
+          nuevoId: row.estadoId,
+        }),
     },
     {
       label: "Ver movimientos del cliente",
@@ -207,7 +250,13 @@ function TodosPage() {
   ];
 
   const columns: Column<Fila>[] = [
-    { key: "legajo", label: "Legajo", hint: LEGAJO_TOOLTIP, minWidth: 130, render: (r) => <LegajoCell legajo={r.legajo} /> },
+    {
+      key: "legajo",
+      label: "Legajo",
+      hint: LEGAJO_TOOLTIP,
+      minWidth: 130,
+      render: (r) => <LegajoCell legajo={r.legajo} />,
+    },
     {
       key: "idTxn",
       label: "ID transacción",
@@ -243,29 +292,68 @@ function TodosPage() {
               {abiertos.has(r.idTxn) ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
             </button>
           ) : (
-            <span className={agrupar && !r._esCabeza ? "w-5 border-l-2 border-muted h-5 ml-2" : "w-5"} />
+            <span
+              className={agrupar && !r._esCabeza ? "w-5 border-l-2 border-muted h-5 ml-2" : "w-5"}
+            />
           )}
-          <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-semibold ${TIPO_LINEA_STYLE[r.tipoLinea]}`}>
+          <span
+            className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-semibold ${TIPO_LINEA_STYLE[r.tipoLinea]}`}
+          >
             {TIPO_LINEA_LABEL.get(r.tipoLinea) ?? r.tipoLinea}
           </span>
-          <span className="text-[11px] text-muted-foreground truncate">{OPERACION_LABEL.get(r.tipoOperacion) ?? r.tipoOperacion}</span>
+          <span className="text-[11px] text-muted-foreground truncate">
+            {OPERACION_LABEL.get(r.tipoOperacion) ?? r.tipoOperacion}
+          </span>
         </div>
       ),
     },
-    { key: "cvu", label: "CVU", minWidth: 190, maxWidth: 230, render: (r) => <span className="font-mono tabular-nums">{r.cvu || "-"}</span> },
+    {
+      key: "cvu",
+      label: "CVU",
+      minWidth: 190,
+      maxWidth: 230,
+      render: (r) => <span className="font-mono tabular-nums">{r.cvu || "-"}</span>,
+    },
     { key: "email", label: "Email", minWidth: 180, maxWidth: 260, render: (r) => r.email ?? "-" },
-    { key: "nombre", label: "Nombre", minWidth: 160, maxWidth: 260, render: (r) => r.nombre ?? "-" },
-    { key: "nombreDestino", label: "Nombre destino", minWidth: 180, maxWidth: 280, render: (r) => r.nombreDestino ?? "-" },
-    { key: "cuit", label: "CUIT", minWidth: 120, render: (r) => <span className="font-mono tabular-nums">{r.cuit || "-"}</span> },
+    {
+      key: "nombre",
+      label: "Nombre",
+      minWidth: 160,
+      maxWidth: 260,
+      render: (r) => r.nombre ?? "-",
+    },
+    {
+      key: "nombreDestino",
+      label: "Nombre destino",
+      minWidth: 180,
+      maxWidth: 280,
+      render: (r) => r.nombreDestino ?? "-",
+    },
+    {
+      key: "cuit",
+      label: "CUIT",
+      minWidth: 120,
+      render: (r) => <span className="font-mono tabular-nums">{r.cuit || "-"}</span>,
+    },
     {
       key: "monto",
       label: "Monto",
       minWidth: 150,
       render: (r) => (
-        <span className={`font-mono tabular-nums font-semibold ${r.monto >= 0 ? "text-emerald-700" : "text-danger-700"}`}>{fmtMonto(r.monto)}</span>
+        <span
+          className={`font-mono tabular-nums font-semibold ${r.monto >= 0 ? "text-emerald-700" : "text-danger-700"}`}
+        >
+          {fmtMonto(r.monto)}
+        </span>
       ),
     },
-    { key: "fecha", label: "Fecha", filterable: "date", minWidth: 170, render: (r) => <span className="font-mono tabular-nums">{fmtFecha(r.fecha)}</span> },
+    {
+      key: "fecha",
+      label: "Fecha",
+      filterable: "date",
+      minWidth: 170,
+      render: (r) => <span className="font-mono tabular-nums">{fmtFecha(r.fecha)}</span>,
+    },
     {
       key: "estado",
       label: "Estado",
@@ -284,21 +372,53 @@ function TodosPage() {
     <div className="flex flex-wrap items-end gap-3">
       <div className="space-y-1 min-w-[200px]">
         <label className="text-xs font-medium text-muted-foreground">TXID</label>
-        <input value={txid} onChange={(e) => filtrarTxid(e.target.value)} placeholder="ORD6LEN8..." className={`${inputCls} font-mono`} />
+        <input
+          value={txid}
+          onChange={(e) => filtrarTxid(e.target.value)}
+          placeholder="ORD6LEN8..."
+          className={`${inputCls} font-mono`}
+        />
       </div>
       <div className="space-y-1 min-w-[150px]">
         <label className="text-xs font-medium text-muted-foreground">CUIT</label>
-        <input value={cuit} onChange={(e) => { setCuit(e.target.value); setPage(0); }} placeholder="30719143659" className={`${inputCls} font-mono`} />
+        <input
+          value={cuit}
+          onChange={(e) => {
+            setCuit(e.target.value);
+            setPage(0);
+          }}
+          placeholder="30719143659"
+          className={`${inputCls} font-mono`}
+        />
       </div>
       <div className="space-y-1 min-w-[220px]">
         <label className="text-xs font-medium text-muted-foreground">CVU / CBU</label>
-        <input value={cvu} onChange={(e) => { setCvu(e.target.value); setPage(0); }} placeholder="0000003100..." className={`${inputCls} font-mono`} />
+        <input
+          value={cvu}
+          onChange={(e) => {
+            setCvu(e.target.value);
+            setPage(0);
+          }}
+          placeholder="0000003100..."
+          className={`${inputCls} font-mono`}
+        />
       </div>
       <div className="space-y-1 min-w-[180px]">
         <label className="text-xs font-medium text-muted-foreground">Operación</label>
-        <select value={operacion} onChange={(e) => { setOperacion(e.target.value); setPage(0); }} className={inputCls}>
+        <select
+          value={operacion}
+          onChange={(e) => {
+            setOperacion(e.target.value);
+            setPage(0);
+          }}
+          className={inputCls}
+        >
           <option value="">Todas</option>
-          {OPERACIONES.map((o) => <option key={o.code} value={o.code}>{o.label}</option>)}
+          {OPERACIONES.map((o) => (
+            <option key={o.code} value={o.code}>
+              {o.label}
+            </option>
+          ))}
         </select>
       </div>
       <label className="flex items-center gap-2 text-xs text-muted-foreground h-9">
@@ -349,10 +469,18 @@ function TodosPage() {
         <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-danger-200 bg-danger-50 px-6 py-12 text-center text-sm text-danger-700">
           <AlertTriangle size={28} />
           <div>
-            <p className="font-semibold">{err?.permission ? "No tenés permiso para ver esto" : "Ocurrió un error al cargar los movimientos"}</p>
+            <p className="font-semibold">
+              {err?.permission
+                ? "No tenés permiso para ver esto"
+                : "Ocurrió un error al cargar los movimientos"}
+            </p>
             <p className="mt-1">{err?.message ?? "Error desconocido"}</p>
           </div>
-          <button type="button" onClick={() => refetch()} className="mt-2 inline-flex h-9 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground">
+          <button
+            type="button"
+            onClick={() => refetch()}
+            className="mt-2 inline-flex h-9 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground"
+          >
             Reintentar
           </button>
         </div>
@@ -418,7 +546,9 @@ function TodosPage() {
               id="nuevo-estado"
               className="w-full h-10 px-3 rounded-md border border-input bg-card text-sm"
               value={estadoTarget.nuevoId}
-              onChange={(e) => setEstadoTarget((s) => (s ? { ...s, nuevoId: Number(e.target.value) } : s))}
+              onChange={(e) =>
+                setEstadoTarget((s) => (s ? { ...s, nuevoId: Number(e.target.value) } : s))
+              }
             >
               {estados.map((s) => (
                 <option key={s.id} value={s.id}>

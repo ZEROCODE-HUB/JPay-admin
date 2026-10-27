@@ -56,14 +56,24 @@ function DashboardComisionesCard() {
     const all = [...(depRows ?? []), ...(retRows ?? [])];
     let monto = 0;
     let comision = 0;
-    const map = new Map<string, { legajo: string; nombre: string; monto: number; comision: number; count: number }>();
+    const map = new Map<
+      string,
+      { legajo: string; nombre: string; monto: number; comision: number; count: number }
+    >();
     for (const m of all) {
       monto += Number(m.montoOperacion ?? 0);
       comision += Number(m.comision ?? 0);
       const key = m.legajo;
       const prev = map.get(key);
       const nombre = (m as any).cliente?.nombre ?? m.legajo;
-      if (!prev) map.set(key, { legajo: key, nombre, monto: Number(m.montoOperacion ?? 0), comision: Number(m.comision ?? 0), count: 1 });
+      if (!prev)
+        map.set(key, {
+          legajo: key,
+          nombre,
+          monto: Number(m.montoOperacion ?? 0),
+          comision: Number(m.comision ?? 0),
+          count: 1,
+        });
       else {
         prev.monto += Number(m.montoOperacion ?? 0);
         prev.comision += Number(m.comision ?? 0);
@@ -71,16 +81,49 @@ function DashboardComisionesCard() {
       }
     }
     const porComercio = Array.from(map.values()).sort((a, b) => b.monto - a.monto);
-    return { montoTransaccionado: monto, comisionTotal: comision, remanente: monto - comision, porComercio };
+    return {
+      montoTransaccionado: monto,
+      comisionTotal: comision,
+      remanente: monto - comision,
+      porComercio,
+    };
   }, [depRows, retRows]);
 
   const desgloseColumns: Column<(typeof porComercio)[number]>[] = [
-    { key: "legajo", label: "Legajo", render: (r) => <span className="font-mono text-xs">{r.legajo}</span> },
-    { key: "nombre", label: "Cliente", render: (r) => <span className="text-sm truncate max-w-[180px] inline-block">{r.nombre}</span> },
-    { key: "count", label: "Ops", render: (r) => <span className="font-mono text-xs">{r.count}</span> },
-    { key: "monto", label: "Monto transaccionado", render: (r) => <span className="font-mono text-xs">{fmtARS(r.monto)}</span> },
-    { key: "comision", label: "Comisión", render: (r) => <span className="font-mono text-xs">{fmtARS(r.comision)}</span> },
-    { key: "remanente", label: "Remanente", render: (r) => <span className="font-mono text-xs font-semibold">{fmtARS(r.monto - r.comision)}</span> },
+    {
+      key: "legajo",
+      label: "Legajo",
+      render: (r) => <span className="font-mono text-xs">{r.legajo}</span>,
+    },
+    {
+      key: "nombre",
+      label: "Cliente",
+      render: (r) => (
+        <span className="text-sm truncate max-w-[180px] inline-block">{r.nombre}</span>
+      ),
+    },
+    {
+      key: "count",
+      label: "Ops",
+      render: (r) => <span className="font-mono text-xs">{r.count}</span>,
+    },
+    {
+      key: "monto",
+      label: "Monto transaccionado",
+      render: (r) => <span className="font-mono text-xs">{fmtARS(r.monto)}</span>,
+    },
+    {
+      key: "comision",
+      label: "Comisión",
+      render: (r) => <span className="font-mono text-xs">{fmtARS(r.comision)}</span>,
+    },
+    {
+      key: "remanente",
+      label: "Remanente",
+      render: (r) => (
+        <span className="font-mono text-xs font-semibold">{fmtARS(r.monto - r.comision)}</span>
+      ),
+    },
   ];
 
   return (
@@ -92,11 +135,23 @@ function DashboardComisionesCard() {
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1.5">
             <Label htmlFor="com-desde">Desde</Label>
-            <Input id="com-desde" type="date" value={desde} onChange={(e) => setDesde(e.target.value)} className="h-8 text-xs w-[150px]" />
+            <Input
+              id="com-desde"
+              type="date"
+              value={desde}
+              onChange={(e) => setDesde(e.target.value)}
+              className="h-8 text-xs w-[150px]"
+            />
           </div>
           <div className="flex items-center gap-1.5">
             <Label htmlFor="com-hasta">Hasta</Label>
-            <Input id="com-hasta" type="date" value={hasta} onChange={(e) => setHasta(e.target.value)} className="h-8 text-xs w-[150px]" />
+            <Input
+              id="com-hasta"
+              type="date"
+              value={hasta}
+              onChange={(e) => setHasta(e.target.value)}
+              className="h-8 text-xs w-[150px]"
+            />
           </div>
         </div>
       </div>
@@ -115,28 +170,45 @@ function DashboardComisionesCard() {
             </div>
             <div className="rounded-lg border bg-muted/30 px-3 py-3">
               <div className="text-xs text-muted-foreground">Comisión total</div>
-              <div className="font-mono font-semibold mt-1 text-primary-ink">{fmtARS(comisionTotal)}</div>
+              <div className="font-mono font-semibold mt-1 text-primary-ink">
+                {fmtARS(comisionTotal)}
+              </div>
               <div className="text-[11px] text-muted-foreground">Suma comision</div>
             </div>
             <div className="rounded-lg border bg-primary/10 px-3 py-3">
               <div className="text-xs text-muted-foreground">Remanente</div>
-              <div className="font-mono font-semibold mt-1 text-emerald-700">{fmtARS(remanente)}</div>
+              <div className="font-mono font-semibold mt-1 text-emerald-700">
+                {fmtARS(remanente)}
+              </div>
               <div className="text-[11px] text-muted-foreground">Monto − Comisión</div>
             </div>
           </div>
           <p className="text-[11px] text-muted-foreground mt-3">
-            Este cuadro refleja el flujo de transacciones del periodo seleccionado, no el saldo acumulado de la cuenta recaudadora.
+            Este cuadro refleja el flujo de transacciones del periodo seleccionado, no el saldo
+            acumulado de la cuenta recaudadora.
           </p>
           <div className="mt-3">
-            <button type="button" onClick={() => setShowDesglose((v) => !v)} className="text-xs font-semibold text-primary-ink hover:underline">
-              {showDesglose ? "Ocultar desglose por comercio" : `Ver desglose por comercio (${porComercio.length})`}
+            <button
+              type="button"
+              onClick={() => setShowDesglose((v) => !v)}
+              className="text-xs font-semibold text-primary-ink hover:underline"
+            >
+              {showDesglose
+                ? "Ocultar desglose por comercio"
+                : `Ver desglose por comercio (${porComercio.length})`}
             </button>
             {showDesglose && (
               <div className="mt-3">
                 {porComercio.length === 0 ? (
                   <p className="text-sm text-muted-foreground">Sin movimientos en el periodo.</p>
                 ) : (
-                  <DataTable columns={desgloseColumns} data={porComercio} keyExtractor={(r) => r.legajo} showGlobalFilter={false} showDownloadButton={false} />
+                  <DataTable
+                    columns={desgloseColumns}
+                    data={porComercio}
+                    keyExtractor={(r) => r.legajo}
+                    showGlobalFilter={false}
+                    showDownloadButton={false}
+                  />
                 )}
               </div>
             )}
@@ -171,26 +243,63 @@ function Page() {
 
       {/* Acreditaciones — formato operación */}
       <div className="flex items-center justify-between mb-2">
-        <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Acreditaciones — Link de Pago</h3>
-        <Link to="/admin/comercios/link-pago/resumen" className="text-xs text-primary-ink font-semibold inline-flex items-center gap-1">Ver detalle <ArrowUpRight size={12} /></Link>
+        <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          Acreditaciones — Link de Pago
+        </h3>
+        <Link
+          to="/admin/comercios/link-pago/resumen"
+          className="text-xs text-primary-ink font-semibold inline-flex items-center gap-1"
+        >
+          Ver detalle <ArrowUpRight size={12} />
+        </Link>
       </div>
       <Card className="p-4 mb-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-1.5 text-sm">
-            <div className="flex justify-between gap-4"><span className="text-muted-foreground">Bruto</span><span className="font-mono font-semibold">—</span></div>
-            <div className="flex justify-between gap-4 text-xs"><span className="text-muted-foreground">− Impuestos</span><span className="font-mono">—</span></div>
-            <div className="flex justify-between gap-4 text-xs"><span className="text-muted-foreground">− Comisión PayWay (3%)</span><span className="font-mono">—</span></div>
-            <div className="flex justify-between gap-4 text-xs"><span className="text-muted-foreground">− Comisión {brand.name} (neto)</span><span className="font-mono">—</span></div>
+            <div className="flex justify-between gap-4">
+              <span className="text-muted-foreground">Bruto</span>
+              <span className="font-mono font-semibold">—</span>
+            </div>
+            <div className="flex justify-between gap-4 text-xs">
+              <span className="text-muted-foreground">− Impuestos</span>
+              <span className="font-mono">—</span>
+            </div>
+            <div className="flex justify-between gap-4 text-xs">
+              <span className="text-muted-foreground">− Comisión PayWay (3%)</span>
+              <span className="font-mono">—</span>
+            </div>
+            <div className="flex justify-between gap-4 text-xs">
+              <span className="text-muted-foreground">− Comisión {brand.name} (neto)</span>
+              <span className="font-mono">—</span>
+            </div>
             <div className="border-t my-1.5" />
-            <div className="flex justify-between gap-4 font-semibold"><span>Neto {brand.name}</span><span className="font-mono">—</span></div>
-            <div className="flex justify-between gap-4 text-xs text-muted-foreground"><span>Pendiente de acreditar</span><span className="font-mono">—</span></div>
+            <div className="flex justify-between gap-4 font-semibold">
+              <span>Neto {brand.name}</span>
+              <span className="font-mono">—</span>
+            </div>
+            <div className="flex justify-between gap-4 text-xs text-muted-foreground">
+              <span>Pendiente de acreditar</span>
+              <span className="font-mono">—</span>
+            </div>
           </div>
           <div className="space-y-1.5 text-sm md:border-l md:pl-6 pt-4 md:pt-0 border-t md:border-t-0">
-            <div className="flex justify-between gap-4"><span className="text-muted-foreground">Cuenta recaudadora</span><span className="font-mono font-semibold">—</span></div>
-            <div className="flex justify-between gap-4 text-xs"><span className="text-muted-foreground">Disponible</span><span className="font-mono">—</span></div>
-            <div className="flex justify-between gap-4 text-xs"><span className="text-muted-foreground">+ Pendiente</span><span className="font-mono">—</span></div>
+            <div className="flex justify-between gap-4">
+              <span className="text-muted-foreground">Cuenta recaudadora</span>
+              <span className="font-mono font-semibold">—</span>
+            </div>
+            <div className="flex justify-between gap-4 text-xs">
+              <span className="text-muted-foreground">Disponible</span>
+              <span className="font-mono">—</span>
+            </div>
+            <div className="flex justify-between gap-4 text-xs">
+              <span className="text-muted-foreground">+ Pendiente</span>
+              <span className="font-mono">—</span>
+            </div>
             <div className="border-t my-1.5" />
-            <div className="flex justify-between gap-4 font-semibold"><span>Total</span><span className="font-mono">—</span></div>
+            <div className="flex justify-between gap-4 font-semibold">
+              <span>Total</span>
+              <span className="font-mono">—</span>
+            </div>
             <div className="text-[11px] text-muted-foreground">Período hoy</div>
           </div>
         </div>
@@ -208,7 +317,9 @@ function Page() {
             </div>
           </div>
           {volumeData.length === 0 && (
-            <div className="flex items-center justify-center h-44 text-sm text-muted-foreground">Sin datos de volumen.</div>
+            <div className="flex items-center justify-center h-44 text-sm text-muted-foreground">
+              Sin datos de volumen.
+            </div>
           )}
           <div className={`flex items-end gap-1.5 h-44 ${volumeData.length === 0 ? "hidden" : ""}`}>
             {volumeData.map((v, i) => (
@@ -268,7 +379,9 @@ function Page() {
               </thead>
               <tbody className="divide-y">
                 <tr>
-                  <td colSpan={5} className="py-6 px-5 text-center text-sm text-muted-foreground">Sin registros.</td>
+                  <td colSpan={5} className="py-6 px-5 text-center text-sm text-muted-foreground">
+                    Sin registros.
+                  </td>
                 </tr>
                 {([] as string[][]).map(([n, c, seg, tone, e, v]) => (
                   <tr key={n}>
@@ -291,7 +404,10 @@ function Page() {
             <h3 className="font-display font-semibold flex items-center gap-2">
               <ShieldAlert size={16} className="text-primary-ink" /> Alertas recientes
             </h3>
-            <Link to="/admin/general/alertas/bloqueos" className="text-xs text-primary-ink font-semibold">
+            <Link
+              to="/admin/general/alertas/bloqueos"
+              className="text-xs text-primary-ink font-semibold"
+            >
               Compliance ?
             </Link>
           </div>

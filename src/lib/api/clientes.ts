@@ -19,7 +19,9 @@ const COLUMNS_LEGACY =
 
 function isMissingColumnError(error: unknown): boolean {
   const msg = (error as { message?: string })?.message ?? String(error);
-  return /column.*does not exist|PGRST204|schema cache|genero|cuit_cuil|fecha_nacimiento|origen_fondos|es_pep|tipo_sociedad|nombre_legal|fecha_inscripcion|direccion2|provincia|estado_onboarding/i.test(msg);
+  return /column.*does not exist|PGRST204|schema cache|genero|cuit_cuil|fecha_nacimiento|origen_fondos|es_pep|tipo_sociedad|nombre_legal|fecha_inscripcion|direccion2|provincia|estado_onboarding/i.test(
+    msg,
+  );
 }
 
 export async function listClientes(filters: ClienteFilters): Promise<Page<Cliente>> {
@@ -57,7 +59,9 @@ export async function listClientes(filters: ClienteFilters): Promise<Page<Client
   try {
     const { data: admins } = await sb.from("admin_users").select("email").limit(200);
     if (admins && admins.length) {
-      const adminSet = new Set((admins as { email: string }[]).map((a) => a.email.trim().toLowerCase()));
+      const adminSet = new Set(
+        (admins as { email: string }[]).map((a) => a.email.trim().toLowerCase()),
+      );
       const before = rows.length;
       rows = rows.filter((r) => !adminSet.has(r.correo.trim().toLowerCase()));
       // Ajustar total para paginación (aproximado, evita contar admins como clientes)
@@ -99,7 +103,11 @@ export async function getClienteByLegajo(legajo: string): Promise<Cliente | null
     .eq("legajo", legajo.trim().toUpperCase())
     .maybeSingle();
   if (error && isMissingColumnError(error)) {
-    const r = await sb.from("clientes").select(COLUMNS_LEGACY).eq("legajo", legajo.trim().toUpperCase()).maybeSingle();
+    const r = await sb
+      .from("clientes")
+      .select(COLUMNS_LEGACY)
+      .eq("legajo", legajo.trim().toUpperCase())
+      .maybeSingle();
     data = r.data as typeof data;
     error = r.error;
   }
@@ -115,7 +123,11 @@ export async function getClienteByCorreo(correo: string): Promise<Cliente | null
     .eq("correo", correo.trim().toLowerCase())
     .maybeSingle();
   if (error && isMissingColumnError(error)) {
-    const r = await sb.from("clientes").select(COLUMNS_LEGACY).eq("correo", correo.trim().toLowerCase()).maybeSingle();
+    const r = await sb
+      .from("clientes")
+      .select(COLUMNS_LEGACY)
+      .eq("correo", correo.trim().toLowerCase())
+      .maybeSingle();
     data = r.data as typeof data;
     error = r.error;
   }
@@ -150,7 +162,11 @@ export async function createCliente(input: ClienteInput): Promise<Cliente> {
     .select(COLUMNS)
     .single();
   if (error && isMissingColumnError(error)) {
-    const r = await sb.from("clientes").select(COLUMNS_LEGACY).eq("correo", input.correo.trim().toLowerCase()).maybeSingle();
+    const r = await sb
+      .from("clientes")
+      .select(COLUMNS_LEGACY)
+      .eq("correo", input.correo.trim().toLowerCase())
+      .maybeSingle();
     data = r.data as typeof data;
     error = r.error;
   }
@@ -167,7 +183,12 @@ export async function updateClienteEstado(id: string, estado: EstadoCliente): Pr
     .select(COLUMNS)
     .single();
   if (error && isMissingColumnError(error)) {
-    const r = await sb.from("clientes").update({ estado }).eq("id", id).select(COLUMNS_LEGACY).single();
+    const r = await sb
+      .from("clientes")
+      .update({ estado })
+      .eq("id", id)
+      .select(COLUMNS_LEGACY)
+      .single();
     data = r.data as typeof data;
     error = r.error;
   }
@@ -266,7 +287,11 @@ export async function getClientesEnrichment(
       .select("cliente_legajo,nivel,motivo")
       .in("cliente_legajo" as never, legajos as never[]);
     if (data) {
-      for (const row of data as unknown as { cliente_legajo: string; nivel: RiesgoPLD; motivo: string }[]) {
+      for (const row of data as unknown as {
+        cliente_legajo: string;
+        nivel: RiesgoPLD;
+        motivo: string;
+      }[]) {
         if (result[row.cliente_legajo]) {
           result[row.cliente_legajo].riesgo = row.nivel;
           result[row.cliente_legajo].riesgoMotivo = row.motivo;
@@ -301,10 +326,7 @@ export async function getClientesEnrichment(
 
   // 2b. Comercios por legajo (FK comercios.legajo -> clientes.legajo).
   try {
-    const { data } = await sb
-      .from("comercios")
-      .select("legajo")
-      .in("legajo", legajos);
+    const { data } = await sb.from("comercios").select("legajo").in("legajo", legajos);
     if (data) {
       const counts: Record<string, number> = {};
       for (const r of data as { legajo: string }[]) {
@@ -358,7 +380,10 @@ export async function getConsumoMensualPorLegajo(
       .eq("legajo", legajo)
       .gte("fecha", inicio.toISOString());
     if (!data) return 0;
-    const total = (data as { monto_operacion: number }[]).reduce((a, r) => a + Number(r.monto_operacion), 0);
+    const total = (data as { monto_operacion: number }[]).reduce(
+      (a, r) => a + Number(r.monto_operacion),
+      0,
+    );
     return Math.min(100, Math.round((total / limite) * 100));
   } catch {
     return null;
@@ -497,7 +522,12 @@ async function transicionarCliente(
     .select(COLUMNS)
     .single();
   if (error && isMissingColumnError(error)) {
-    const r = await sb.from("clientes").update(patch).eq("id", cliente.id).select(COLUMNS_LEGACY).single();
+    const r = await sb
+      .from("clientes")
+      .update(patch)
+      .eq("id", cliente.id)
+      .select(COLUMNS_LEGACY)
+      .single();
     data = r.data as typeof data;
     error = r.error;
   }
@@ -543,13 +573,19 @@ export async function reactivarCliente(cliente: Cliente): Promise<TransicionResu
 }
 
 export async function deshabilitarCliente(cliente: Cliente): Promise<TransicionResult> {
-  return transicionarCliente(cliente, "deshabilitado", { comentario: "Deshabilitación BCRA: CBU cancelado, historial conservado" });
+  return transicionarCliente(cliente, "deshabilitado", {
+    comentario: "Deshabilitación BCRA: CBU cancelado, historial conservado",
+  });
 }
 
 export async function eliminarCliente(cliente: Cliente): Promise<TransicionResult> {
   // Eliminado NO es estado: borrado físico (hard delete) solo si no tiene movimientos
   const hasMov = await clienteTieneMovimientos(cliente.legajo);
-  if (hasMov) return { ok: false, motivo: "No se puede eliminar: tiene movimientos. Solo puede deshabilitarse." };
+  if (hasMov)
+    return {
+      ok: false,
+      motivo: "No se puede eliminar: tiene movimientos. Solo puede deshabilitarse.",
+    };
   try {
     await hardDeleteCliente(cliente.id);
     return { ok: true, cliente };
@@ -586,18 +622,28 @@ export async function hardDeleteCliente(id: string): Promise<void> {
       // ignora tabla inexistente o RLS
     }
   }
-  try { await sb.from("impuestos_asignaciones").delete().eq("legajo", legajo); } catch {}
+  try {
+    await sb.from("impuestos_asignaciones").delete().eq("legajo", legajo);
+  } catch {}
   // cliente_transiciones tiene ambos
   try {
     await sb.from("cliente_transiciones").delete().eq("legajo", legajo);
     await sb.from("cliente_transiciones").delete().eq("cliente_id", cid);
   } catch {}
   // Tablas por cliente_id
-  try { await sb.from("comisiones_cliente").delete().eq("cliente_id", cid); } catch {}
-  try { await sb.from("cliente_links_pago").delete().eq("cliente_legajo", legajo); } catch {}
-  try { await sb.from("productos").delete().eq("cliente_legajo", legajo); } catch {}
+  try {
+    await sb.from("comisiones_cliente").delete().eq("cliente_id", cid);
+  } catch {}
+  try {
+    await sb.from("cliente_links_pago").delete().eq("cliente_legajo", legajo);
+  } catch {}
+  try {
+    await sb.from("productos").delete().eq("cliente_legajo", legajo);
+  } catch {}
   // comercios (y puntos_venta por CASCADE)
-  try { await sb.from("comercios").delete().eq("legajo", legajo); } catch {}
+  try {
+    await sb.from("comercios").delete().eq("legajo", legajo);
+  } catch {}
 
   // Finalmente cliente (dispara trigger trg_cliente_deleted_cleanup que borra auth.users)
   const { error } = await sb.from("clientes").delete().eq("id", cid);
@@ -610,9 +656,13 @@ export async function hardDeleteCliente(id: string): Promise<void> {
     // 1) Edge Function con service_role (borra auth + limpia public huérfano)
     try {
       // supabase.functions.invoke está disponible si el cliente está configurado
-      const supabaseAny = sb as unknown as { functions?: { invoke: (name: string, opts: unknown) => Promise<unknown> } };
+      const supabaseAny = sb as unknown as {
+        functions?: { invoke: (name: string, opts: unknown) => Promise<unknown> };
+      };
       if (supabaseAny.functions?.invoke) {
-        await supabaseAny.functions.invoke("eliminar-usuario", { body: { email: correoLower, legajo } });
+        await supabaseAny.functions.invoke("eliminar-usuario", {
+          body: { email: correoLower, legajo },
+        });
       }
     } catch {
       // ignorar: edge puede no estar desplegada aún
@@ -635,7 +685,12 @@ export async function generarCbuParaCliente(cliente: Cliente, cbu: string): Prom
     .select(COLUMNS)
     .single();
   if (error && isMissingColumnError(error)) {
-    const r = await sb.from("clientes").update({ cbu: cbu.trim(), cbu_cancelado: false }).eq("id", cliente.id).select(COLUMNS_LEGACY).single();
+    const r = await sb
+      .from("clientes")
+      .update({ cbu: cbu.trim(), cbu_cancelado: false })
+      .eq("id", cliente.id)
+      .select(COLUMNS_LEGACY)
+      .single();
     data = r.data as typeof data;
     error = r.error;
   }

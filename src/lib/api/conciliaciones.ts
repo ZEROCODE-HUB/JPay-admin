@@ -48,7 +48,8 @@ export type ListArchivosParams = Pagination & {
 export async function listConciliacionesArchivos(
   params: ListArchivosParams = { page: 0, pageSize: 25 },
 ): Promise<Page<ConciliacionArchivo>> {
-  if (!isSupabaseConfigured) return { rows: [], total: 0, page: params.page, pageSize: params.pageSize };
+  if (!isSupabaseConfigured)
+    return { rows: [], total: 0, page: params.page, pageSize: params.pageSize };
   const sb = requireSupabase();
   const { page, pageSize, tipo, search } = params;
   const from = page * pageSize;

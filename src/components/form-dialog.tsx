@@ -38,11 +38,19 @@ export function FormDialog({
 
   if (!open) return null;
   const w =
-    size === "2xl" ? "max-w-5xl" : size === "xl" ? "max-w-4xl" : size === "lg" ? "max-w-2xl" : "max-w-md";
+    size === "2xl"
+      ? "max-w-5xl"
+      : size === "xl"
+        ? "max-w-4xl"
+        : size === "lg"
+          ? "max-w-2xl"
+          : "max-w-md";
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
-      <div className={`relative bg-card rounded-lg w-full ${w} max-h-[90vh] overflow-y-auto shadow-xl`}>
+      <div
+        className={`relative bg-card rounded-lg w-full ${w} max-h-[90vh] overflow-y-auto shadow-xl`}
+      >
         <div className="sticky top-0 bg-card border-b px-6 py-4 flex justify-between items-start z-10">
           <div>
             <h3 className="font-display font-semibold text-lg">{title}</h3>
@@ -62,12 +70,19 @@ export function FormDialog({
           {children}
           <div className="flex gap-2 pt-2">
             {!hideCancel && (
-              <BtnOutline type="button" className="flex-1" onClick={onClose} disabled={isSubmitting}>
+              <BtnOutline
+                type="button"
+                className="flex-1"
+                onClick={onClose}
+                disabled={isSubmitting}
+              >
                 {cancelLabel}
               </BtnOutline>
             )}
             <BtnPrimary type="submit" className="flex-1" disabled={isSubmitting}>
-              {isSubmitting && <span className="inline-block w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin mr-2" />}
+              {isSubmitting && (
+                <span className="inline-block w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin mr-2" />
+              )}
               {submitLabel}
             </BtnPrimary>
           </div>

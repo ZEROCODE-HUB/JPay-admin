@@ -130,9 +130,9 @@ export function DataTable<T>({
   const [enumFilters, setEnumFilters] = useState<Record<string, string>>({});
   const [dateRanges, setDateRanges] = useState<Record<string, { from: string; to: string }>>({});
 
-  const effectiveGlobal = controlled ? serverFilterState?.global ?? "" : globalQuery;
-  const effectiveEnums = controlled ? serverFilterState?.enums ?? {} : enumFilters;
-  const effectiveDates = controlled ? serverFilterState?.dates ?? {} : dateRanges;
+  const effectiveGlobal = controlled ? (serverFilterState?.global ?? "") : globalQuery;
+  const effectiveEnums = controlled ? (serverFilterState?.enums ?? {}) : enumFilters;
+  const effectiveDates = controlled ? (serverFilterState?.dates ?? {}) : dateRanges;
 
   useEffect(() => {
     if (initialQuery === undefined) return;
@@ -167,7 +167,8 @@ export function DataTable<T>({
     return !!(range && (range.from || range.to));
   }).length;
 
-  const specificFilterCount = Object.values(effectiveEnums).filter((v) => v).length + activeDateGroups;
+  const specificFilterCount =
+    Object.values(effectiveEnums).filter((v) => v).length + activeDateGroups;
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [debouncedQuery, setDebouncedQuery] = useState("");
@@ -253,13 +254,9 @@ export function DataTable<T>({
           const raw = (row as Record<string, unknown>)[col.key];
           const rendered = col.render(row);
           const renderedText =
-            typeof rendered === "string" || typeof rendered === "number"
-              ? String(rendered)
-              : "";
+            typeof rendered === "string" || typeof rendered === "number" ? String(rendered) : "";
           const text =
-            typeof raw === "string" || typeof raw === "number"
-              ? String(raw)
-              : renderedText;
+            typeof raw === "string" || typeof raw === "number" ? String(raw) : renderedText;
           return text.toLowerCase().includes(q);
         });
         if (!matched) return false;
@@ -300,7 +297,16 @@ export function DataTable<T>({
       if (!dateFilterOk) return false;
       return true;
     });
-  }, [data, debouncedQuery, textSearchableCols, enumFilters, dateRanges, filterCols, columns, controlled]);
+  }, [
+    data,
+    debouncedQuery,
+    textSearchableCols,
+    enumFilters,
+    dateRanges,
+    filterCols,
+    columns,
+    controlled,
+  ]);
 
   const sortedData = useMemo(() => {
     if (!sortKey) return filteredData;
@@ -557,7 +563,10 @@ export function DataTable<T>({
                 </th>
               ))}
               {actions && (
-                <th className="px-2 py-2 sm:px-4 sm:py-3 w-20 text-right whitespace-nowrap" style={{ minWidth: 120 }}>
+                <th
+                  className="px-2 py-2 sm:px-4 sm:py-3 w-20 text-right whitespace-nowrap"
+                  style={{ minWidth: 120 }}
+                >
                   Acciones
                 </th>
               )}
@@ -616,7 +625,10 @@ export function DataTable<T>({
                       );
                     })}
                     {actions && (
-                      <td className="px-2 py-2 sm:px-4 sm:py-3 text-right" style={{ minWidth: 120 }}>
+                      <td
+                        className="px-2 py-2 sm:px-4 sm:py-3 text-right"
+                        style={{ minWidth: 120 }}
+                      >
                         {actions(row)}
                       </td>
                     )}

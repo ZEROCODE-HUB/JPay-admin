@@ -1,7 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { brand, pageTitle } from "@/brand/brand";
 import { useState, useEffect } from "react";
-import { Eye, Ban, XCircle, Trash2, AlertTriangle, Inbox, Link2, Copy, CheckCircle } from "lucide-react";
+import {
+  Eye,
+  Ban,
+  XCircle,
+  Trash2,
+  AlertTriangle,
+  Inbox,
+  Link2,
+  Copy,
+  CheckCircle,
+} from "lucide-react";
 import { requireSupabase } from "@/lib/supabase";
 import { DataTable, type Column, type TableServerFilters } from "@/components/data-table";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
@@ -13,7 +23,12 @@ import { PermissionGuard } from "@/components/permission-guard";
 import { Pagination } from "@/components/pagination";
 import { DataAccessError } from "@/lib/api/errors";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { listEnlaces, updateEnlaceEstado, deleteEnlace, ESTADOS_ENLACE } from "@/lib/api/enlaces-pago";
+import {
+  listEnlaces,
+  updateEnlaceEstado,
+  deleteEnlace,
+  ESTADOS_ENLACE,
+} from "@/lib/api/enlaces-pago";
 import type { EnlacePago } from "@/lib/api/enlaces-pago";
 import { toast } from "sonner";
 
@@ -54,30 +69,93 @@ function EnlaceDetalle({ enlace, onClose }: { enlace: EnlacePago; onClose: () =>
       <div className="relative bg-card rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-xl">
         <div className="sticky top-0 bg-card border-b px-6 py-4 flex justify-between items-start">
           <div className="min-w-0">
-            <h3 className="font-display text-lg font-semibold flex items-center gap-2"><Link2 size={18}/> Enlace de pago</h3>
+            <h3 className="font-display text-lg font-semibold flex items-center gap-2">
+              <Link2 size={18} /> Enlace de pago
+            </h3>
             <p className="text-sm text-muted-foreground break-all">{enlace.url ?? "—"}</p>
           </div>
-          <button onClick={onClose} className="p-1.5 hover:bg-muted rounded-md shrink-0"><XCircle size={18}/></button>
+          <button onClick={onClose} className="p-1.5 hover:bg-muted rounded-md shrink-0">
+            <XCircle size={18} />
+          </button>
         </div>
         <div className="p-6 space-y-4">
           {/* Enlace */}
           <Card className="p-4">
-            <h4 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-3">Enlace</h4>
+            <h4 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-3">
+              Enlace
+            </h4>
             <div className="grid grid-cols-2 gap-3 text-sm">
-              <div className="col-span-2"><span className="text-muted-foreground">URL</span><div className="font-mono text-xs break-all flex items-center gap-2">{enlace.url ?? "—"} {enlace.url && <button onClick={()=>{ navigator.clipboard.writeText(enlace.url!); toast.success("Copiado"); }} className="h-6 px-2 rounded border text-xs shrink-0"><Copy size={12}/></button>}</div></div>
-              <div><span className="text-muted-foreground">Comercio</span><div className="font-semibold">{enlace.comercioNombre}</div></div>
-              <div><span className="text-muted-foreground">Usuario / Legajo</span><div className="font-semibold break-all">{enlace.usuario ?? enlace.clienteLegajo}</div></div>
-              <div><span className="text-muted-foreground">Estado</span><div><Badge tone={tone(enlace.estado)}>{enlace.estado}</Badge></div></div>
-              <div><span className="text-muted-foreground">Monto</span><div className="font-mono font-semibold">{fmtMoney(enlace.monto)}</div></div>
-              <div><span className="text-muted-foreground">Referencia</span><div className="font-mono text-xs break-all">{enlace.referencia ?? "—"}</div></div>
-              <div><span className="text-muted-foreground">Expira</span><div className="font-mono text-xs">{enlace.expiraEn ? new Date(enlace.expiraEn).toLocaleDateString("es-AR") : "—"}</div></div>
-              <div><span className="text-muted-foreground">Pagos parciales</span><div>{enlace.pagosParciales ? "Sí" : "No"}</div></div>
-              <div><span className="text-muted-foreground">Métodos habilitados</span><div className="text-xs">{enlace.metodosPago?.join(", ") ?? "—"}</div></div>
-              <div className="col-span-2"><span className="text-muted-foreground">Notas</span><div className="text-xs">{enlace.notas ?? "—"}</div></div>
-              <div><span className="text-muted-foreground">Vistas</span><div className="font-mono">{enlace.vistas}</div></div>
-              <div><span className="text-muted-foreground">Pagos</span><div className="font-mono">{enlace.pagos}</div></div>
+              <div className="col-span-2">
+                <span className="text-muted-foreground">URL</span>
+                <div className="font-mono text-xs break-all flex items-center gap-2">
+                  {enlace.url ?? "—"}{" "}
+                  {enlace.url && (
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(enlace.url!);
+                        toast.success("Copiado");
+                      }}
+                      className="h-6 px-2 rounded border text-xs shrink-0"
+                    >
+                      <Copy size={12} />
+                    </button>
+                  )}
+                </div>
+              </div>
+              <div>
+                <span className="text-muted-foreground">Comercio</span>
+                <div className="font-semibold">{enlace.comercioNombre}</div>
+              </div>
+              <div>
+                <span className="text-muted-foreground">Usuario / Legajo</span>
+                <div className="font-semibold break-all">
+                  {enlace.usuario ?? enlace.clienteLegajo}
+                </div>
+              </div>
+              <div>
+                <span className="text-muted-foreground">Estado</span>
+                <div>
+                  <Badge tone={tone(enlace.estado)}>{enlace.estado}</Badge>
+                </div>
+              </div>
+              <div>
+                <span className="text-muted-foreground">Monto</span>
+                <div className="font-mono font-semibold">{fmtMoney(enlace.monto)}</div>
+              </div>
+              <div>
+                <span className="text-muted-foreground">Referencia</span>
+                <div className="font-mono text-xs break-all">{enlace.referencia ?? "—"}</div>
+              </div>
+              <div>
+                <span className="text-muted-foreground">Expira</span>
+                <div className="font-mono text-xs">
+                  {enlace.expiraEn ? new Date(enlace.expiraEn).toLocaleDateString("es-AR") : "—"}
+                </div>
+              </div>
+              <div>
+                <span className="text-muted-foreground">Pagos parciales</span>
+                <div>{enlace.pagosParciales ? "Sí" : "No"}</div>
+              </div>
+              <div>
+                <span className="text-muted-foreground">Métodos habilitados</span>
+                <div className="text-xs">{enlace.metodosPago?.join(", ") ?? "—"}</div>
+              </div>
+              <div className="col-span-2">
+                <span className="text-muted-foreground">Notas</span>
+                <div className="text-xs">{enlace.notas ?? "—"}</div>
+              </div>
+              <div>
+                <span className="text-muted-foreground">Vistas</span>
+                <div className="font-mono">{enlace.vistas}</div>
+              </div>
+              <div>
+                <span className="text-muted-foreground">Pagos</span>
+                <div className="font-mono">{enlace.pagos}</div>
+              </div>
               <div className="col-span-2 text-xs text-muted-foreground border-t pt-3 mt-1">
-                <span className="font-semibold">Ciclo:</span> PayWay crea → Pendiente de aprobación → Activado (sin cobro) → Pagado / Expirado (24h) / Desactivado (comercio) / Contracargo (comprador desconoce)
+                <span className="font-semibold">Ciclo:</span> PayWay crea → Pendiente de aprobación
+                → Activado (sin cobro) → Pagado / Expirado (24h) / Desactivado (comercio) /
+                Contracargo (comprador desconoce)
               </div>
             </div>
           </Card>
@@ -86,20 +164,56 @@ function EnlaceDetalle({ enlace, onClose }: { enlace: EnlacePago; onClose: () =>
           {(esPagado || esContracargo) && pago && (
             <Card className="p-4 border-primary/20">
               <h4 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-3 flex items-center gap-1.5">
-                <CheckCircle size={14} className="text-emerald-600"/> Información del pago {esContracargo && <Badge tone="danger" className="ml-2">Contracargo</Badge>}
+                <CheckCircle size={14} className="text-emerald-600" /> Información del pago{" "}
+                {esContracargo && (
+                  <Badge tone="danger" className="ml-2">
+                    Contracargo
+                  </Badge>
+                )}
               </h4>
               <div className="grid grid-cols-2 gap-3 text-sm">
-                <div><span className="text-muted-foreground">Método de pago</span><div className="font-semibold">{pago.metodoPago}</div></div>
-                <div><span className="text-muted-foreground">Tipo</span><div className="font-semibold">{pago.tipoTarjeta}</div></div>
-                <div><span className="text-muted-foreground">Marca / Tarjeta</span><div className="font-semibold">{pago.marcaTarjeta ?? "—"}</div></div>
-                <div><span className="text-muted-foreground">Cuotas</span><div className="font-mono font-semibold">{pago.cuotas} {pago.cuotas === 1 ? "cuota (pago único)" : "cuotas"}</div></div>
-                <div><span className="text-muted-foreground">Importe pagado</span><div className="font-mono font-semibold">{fmtMoney(pago.importePagado)}</div></div>
-                <div><span className="text-muted-foreground">Fecha de pago</span><div className="font-mono text-xs">{pago.fechaPago ? new Date(pago.fechaPago).toLocaleString("es-AR") : "—"}</div></div>
-                <div><span className="text-muted-foreground">Autorización</span><div className="font-mono text-xs">{pago.autorizacion ?? "—"}</div></div>
-                <div><span className="text-muted-foreground">Link vencimiento</span><div className="text-xs">{enlace.expiraEn ? `Expiró en 24h / Pagado antes` : "—"}</div></div>
+                <div>
+                  <span className="text-muted-foreground">Método de pago</span>
+                  <div className="font-semibold">{pago.metodoPago}</div>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Tipo</span>
+                  <div className="font-semibold">{pago.tipoTarjeta}</div>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Marca / Tarjeta</span>
+                  <div className="font-semibold">{pago.marcaTarjeta ?? "—"}</div>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Cuotas</span>
+                  <div className="font-mono font-semibold">
+                    {pago.cuotas} {pago.cuotas === 1 ? "cuota (pago único)" : "cuotas"}
+                  </div>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Importe pagado</span>
+                  <div className="font-mono font-semibold">{fmtMoney(pago.importePagado)}</div>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Fecha de pago</span>
+                  <div className="font-mono text-xs">
+                    {pago.fechaPago ? new Date(pago.fechaPago).toLocaleString("es-AR") : "—"}
+                  </div>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Autorización</span>
+                  <div className="font-mono text-xs">{pago.autorizacion ?? "—"}</div>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Link vencimiento</span>
+                  <div className="text-xs">
+                    {enlace.expiraEn ? `Expiró en 24h / Pagado antes` : "—"}
+                  </div>
+                </div>
                 {esContracargo && (
                   <div className="col-span-2 rounded-lg bg-danger-50 border border-danger-200 px-3 py-2 text-xs text-danger-800 mt-1">
-                    Este pago entró en flujo de <strong>contracargo</strong> (desconocimiento). Ver pestaña <strong>Contracargos</strong> para ticket PayWay y documentación.
+                    Este pago entró en flujo de <strong>contracargo</strong> (desconocimiento). Ver
+                    pestaña <strong>Contracargos</strong> para ticket PayWay y documentación.
                   </div>
                 )}
               </div>
@@ -108,7 +222,11 @@ function EnlaceDetalle({ enlace, onClose }: { enlace: EnlacePago; onClose: () =>
 
           {/* Leyenda estados para quien consulta un link */}
           {!pago && (
-            <p className="text-xs text-muted-foreground">El detalle de método/tarjeta/cuotas aparece cuando el link está en estado <strong>Pagado</strong> (o <strong>Contracargo</strong>). Permite entender cómo se realizó el pago.</p>
+            <p className="text-xs text-muted-foreground">
+              El detalle de método/tarjeta/cuotas aparece cuando el link está en estado{" "}
+              <strong>Pagado</strong> (o <strong>Contracargo</strong>). Permite entender cómo se
+              realizó el pago.
+            </p>
           )}
         </div>
       </div>
@@ -121,11 +239,15 @@ function Page() {
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
   const { can } = useCan();
-  const puedeModificar = can("modificar","comercios");
-  const puedeBorrar = can("borrar","comercios");
+  const puedeModificar = can("modificar", "comercios");
+  const puedeBorrar = can("borrar", "comercios");
 
   // Filtros de la card: server-side contra toda la base.
-  const [filtrosPanel, setFiltrosPanel] = useState<TableServerFilters>({ global: "", enums: {}, dates: {} });
+  const [filtrosPanel, setFiltrosPanel] = useState<TableServerFilters>({
+    global: "",
+    enums: {},
+    dates: {},
+  });
   const search = useDebouncedValue(filtrosPanel.global.trim(), 350);
   const estadoFiltro = (filtrosPanel.enums["estado"] as string | undefined) ?? "";
   const aplicarFiltros = (f: TableServerFilters) => {
@@ -135,7 +257,13 @@ function Page() {
 
   const { data, isLoading, isError, error, refetch, isFetching } = useQuery({
     queryKey: ["enlaces-pago", page, pageSize, search, estadoFiltro],
-    queryFn: () => listEnlaces({ page, pageSize, search: search || undefined, estado: estadoFiltro || undefined }),
+    queryFn: () =>
+      listEnlaces({
+        page,
+        pageSize,
+        search: search || undefined,
+        estado: estadoFiltro || undefined,
+      }),
     staleTime: 15_000,
     refetchInterval: 30_000,
     refetchOnWindowFocus: true,
@@ -158,14 +286,26 @@ function Page() {
   const rows = data?.rows ?? [];
   const total = data?.total ?? 0;
   const [detail, setDetail] = useState<EnlacePago | null>(null);
-  const [confirm, setConfirm] = useState<{ title:string; message:string; confirmLabel:string; variant:"default"|"danger"; onConfirm:()=>void }|null>(null);
+  const [confirm, setConfirm] = useState<{
+    title: string;
+    message: string;
+    confirmLabel: string;
+    variant: "default" | "danger";
+    onConfirm: () => void;
+  } | null>(null);
 
   const cambiar = async (row: EnlacePago, nuevo: string) => {
     try {
       await updateEnlaceEstado(row.id, nuevo);
       qc.invalidateQueries({ queryKey: ["enlaces-pago"] });
     } catch (e) {
-      setConfirm({ title:"No se pudo actualizar", message:(e as Error).message, confirmLabel:"Cerrar", variant:"danger", onConfirm:()=>setConfirm(null) });
+      setConfirm({
+        title: "No se pudo actualizar",
+        message: (e as Error).message,
+        confirmLabel: "Cerrar",
+        variant: "danger",
+        onConfirm: () => setConfirm(null),
+      });
     }
   };
   const eliminar = async (row: EnlacePago) => {
@@ -173,28 +313,166 @@ function Page() {
       await deleteEnlace(row.id);
       qc.invalidateQueries({ queryKey: ["enlaces-pago"] });
     } catch (e) {
-      setConfirm({ title:"No se pudo eliminar", message:(e as Error).message, confirmLabel:"Cerrar", variant:"danger", onConfirm:()=>setConfirm(null) });
+      setConfirm({
+        title: "No se pudo eliminar",
+        message: (e as Error).message,
+        confirmLabel: "Cerrar",
+        variant: "danger",
+        onConfirm: () => setConfirm(null),
+      });
     }
   };
 
   const getActions = (r: EnlacePago): ActionItem[] => {
-    const items: ActionItem[] = [{ label:"Ver detalles", icon:Eye, onClick:()=>setDetail(r) }];
-    if (r.estado !== "Activado") items.push({ label:"Activar", icon:CheckCircle, disabled:!puedeModificar, onClick:()=>setConfirm({ title:"Activar enlace", message:`¿Activar ${r.url ?? r.id}? El enlace quedará cobrable (aún no pagado).`, confirmLabel:"Activar", variant:"default" as const, onConfirm:()=>{ setConfirm(null); void cambiar(r,"Activado"); } }) });
-    if (r.estado !== "Desactivado") items.push({ label:"Desactivar", icon:Ban, disabled:!puedeModificar, variant:"default" as const, onClick:()=>setConfirm({ title:"Desactivar enlace", message:`¿Desactivar ${r.url ?? r.id}? El comercio desactiva el link.`, confirmLabel:"Desactivar", variant:"danger", onConfirm:()=>{ setConfirm(null); void cambiar(r,"Desactivado"); } }) });
-    if (r.estado !== "Pagado") items.push({ label:"Marcar pagado", icon:CheckCircle, disabled:!puedeModificar, onClick:()=>setConfirm({ title:"Marcar como pagado", message:`¿Marcar ${r.url ?? r.id} como Pagado? Se habilitará detalle de método/tarjeta/cuotas.`, confirmLabel:"Pagado", variant:"default" as const, onConfirm:()=>{ setConfirm(null); void cambiar(r,"Pagado"); } }) });
-    if (r.estado !== "Expirado" && r.estado !== "Cancelado") items.push({ label:"Marcar expirado (24h)", icon:XCircle, disabled:!puedeModificar, variant:"danger" as const, onClick:()=>setConfirm({ title:"Expirar enlace", message:`¿Marcar ${r.url ?? r.id} como Expirado? El comprador no lo abrió en 24h.`, confirmLabel:"Expirado", variant:"danger", onConfirm:()=>{ setConfirm(null); void cambiar(r,"Expirado"); } }) });
-    if (r.estado !== "Contracargo") items.push({ label:"Marcar contracargo", icon:AlertTriangle, disabled:!puedeModificar, variant:"danger" as const, onClick:()=>setConfirm({ title:"Contracargo", message:`¿Marcar ${r.url ?? r.id} como Contracargo? El comprador no acepta el gasto.`, confirmLabel:"Contracargo", variant:"danger", onConfirm:()=>{ setConfirm(null); void cambiar(r,"Contracargo"); } }) });
-    if (r.estado !== "Eliminado" && r.estado !== "Expirado" && r.estado !== "Cancelado") items.push({ label:"Eliminar", icon:Trash2, disabled:!puedeBorrar, variant:"danger" as const, onClick:()=>setConfirm({ title:"Eliminar enlace", message:`¿Eliminar ${r.url ?? r.id}?`, confirmLabel:"Eliminar", variant:"danger", onConfirm:()=>{ setConfirm(null); void eliminar(r); } }) });
+    const items: ActionItem[] = [{ label: "Ver detalles", icon: Eye, onClick: () => setDetail(r) }];
+    if (r.estado !== "Activado")
+      items.push({
+        label: "Activar",
+        icon: CheckCircle,
+        disabled: !puedeModificar,
+        onClick: () =>
+          setConfirm({
+            title: "Activar enlace",
+            message: `¿Activar ${r.url ?? r.id}? El enlace quedará cobrable (aún no pagado).`,
+            confirmLabel: "Activar",
+            variant: "default" as const,
+            onConfirm: () => {
+              setConfirm(null);
+              void cambiar(r, "Activado");
+            },
+          }),
+      });
+    if (r.estado !== "Desactivado")
+      items.push({
+        label: "Desactivar",
+        icon: Ban,
+        disabled: !puedeModificar,
+        variant: "default" as const,
+        onClick: () =>
+          setConfirm({
+            title: "Desactivar enlace",
+            message: `¿Desactivar ${r.url ?? r.id}? El comercio desactiva el link.`,
+            confirmLabel: "Desactivar",
+            variant: "danger",
+            onConfirm: () => {
+              setConfirm(null);
+              void cambiar(r, "Desactivado");
+            },
+          }),
+      });
+    if (r.estado !== "Pagado")
+      items.push({
+        label: "Marcar pagado",
+        icon: CheckCircle,
+        disabled: !puedeModificar,
+        onClick: () =>
+          setConfirm({
+            title: "Marcar como pagado",
+            message: `¿Marcar ${r.url ?? r.id} como Pagado? Se habilitará detalle de método/tarjeta/cuotas.`,
+            confirmLabel: "Pagado",
+            variant: "default" as const,
+            onConfirm: () => {
+              setConfirm(null);
+              void cambiar(r, "Pagado");
+            },
+          }),
+      });
+    if (r.estado !== "Expirado" && r.estado !== "Cancelado")
+      items.push({
+        label: "Marcar expirado (24h)",
+        icon: XCircle,
+        disabled: !puedeModificar,
+        variant: "danger" as const,
+        onClick: () =>
+          setConfirm({
+            title: "Expirar enlace",
+            message: `¿Marcar ${r.url ?? r.id} como Expirado? El comprador no lo abrió en 24h.`,
+            confirmLabel: "Expirado",
+            variant: "danger",
+            onConfirm: () => {
+              setConfirm(null);
+              void cambiar(r, "Expirado");
+            },
+          }),
+      });
+    if (r.estado !== "Contracargo")
+      items.push({
+        label: "Marcar contracargo",
+        icon: AlertTriangle,
+        disabled: !puedeModificar,
+        variant: "danger" as const,
+        onClick: () =>
+          setConfirm({
+            title: "Contracargo",
+            message: `¿Marcar ${r.url ?? r.id} como Contracargo? El comprador no acepta el gasto.`,
+            confirmLabel: "Contracargo",
+            variant: "danger",
+            onConfirm: () => {
+              setConfirm(null);
+              void cambiar(r, "Contracargo");
+            },
+          }),
+      });
+    if (r.estado !== "Eliminado" && r.estado !== "Expirado" && r.estado !== "Cancelado")
+      items.push({
+        label: "Eliminar",
+        icon: Trash2,
+        disabled: !puedeBorrar,
+        variant: "danger" as const,
+        onClick: () =>
+          setConfirm({
+            title: "Eliminar enlace",
+            message: `¿Eliminar ${r.url ?? r.id}?`,
+            confirmLabel: "Eliminar",
+            variant: "danger",
+            onConfirm: () => {
+              setConfirm(null);
+              void eliminar(r);
+            },
+          }),
+      });
     return items;
   };
 
   const columns: import("@/components/data-table").Column<EnlacePago>[] = [
-    { key:"url", label:"Enlace de pago", filterable:true, render:(r)=> <span className="font-mono text-xs break-all flex items-center gap-1"><Link2 size={12}/>{r.url ?? "—"}</span> },
-    { key:"comercioNombre", label:"Comercio", filterable:true, render:(r)=> r.comercioNombre },
-    { key:"usuario", label:"Usuario", render:(r)=> r.usuario ?? r.clienteLegajo },
-    { key:"monto", label:"Monto", render:(r)=> <span className="font-mono tabular-nums text-xs">{r.monto != null ? `$ ${Number(r.monto).toLocaleString("es-AR")}` : "—"}</span> },
-    { key:"estado", label:"Estado", filterable:"enum", filterOptions:[...ESTADOS_ENLACE], render:(r)=><Badge tone={tone(r.estado)}>{r.estado}</Badge> },
-    { key:"createdAt", label:"Fecha", render:(r)=><span className="font-mono text-xs">{new Date(r.createdAt).toLocaleDateString("es-AR")}</span> },
+    {
+      key: "url",
+      label: "Enlace de pago",
+      filterable: true,
+      render: (r) => (
+        <span className="font-mono text-xs break-all flex items-center gap-1">
+          <Link2 size={12} />
+          {r.url ?? "—"}
+        </span>
+      ),
+    },
+    { key: "comercioNombre", label: "Comercio", filterable: true, render: (r) => r.comercioNombre },
+    { key: "usuario", label: "Usuario", render: (r) => r.usuario ?? r.clienteLegajo },
+    {
+      key: "monto",
+      label: "Monto",
+      render: (r) => (
+        <span className="font-mono tabular-nums text-xs">
+          {r.monto != null ? `$ ${Number(r.monto).toLocaleString("es-AR")}` : "—"}
+        </span>
+      ),
+    },
+    {
+      key: "estado",
+      label: "Estado",
+      filterable: "enum",
+      filterOptions: [...ESTADOS_ENLACE],
+      render: (r) => <Badge tone={tone(r.estado)}>{r.estado}</Badge>,
+    },
+    {
+      key: "createdAt",
+      label: "Fecha",
+      render: (r) => (
+        <span className="font-mono text-xs">
+          {new Date(r.createdAt).toLocaleDateString("es-AR")}
+        </span>
+      ),
+    },
   ];
 
   const err = error instanceof DataAccessError ? error : null;
@@ -202,12 +480,46 @@ function Page() {
 
   return (
     <PermissionGuard recurso="comercios">
-      <PageHeader title="Links de Pago" description={`Links gestionados por ${brand.name}. PayWay crea en Pendiente; Admin gestiona ciclo completo (ver detalle para método/tarjeta/cuotas).`} />
-      {isLoading ? <div className="flex items-center justify-center rounded-xl border bg-card py-16 text-sm text-muted-foreground"><span className="inline-block w-4 h-4 border-2 border-muted-foreground/30 border-t-muted-foreground rounded-full animate-spin mr-2"/>Cargando enlaces…</div>
-      : isError ? <div className="flex flex-col items-center gap-3 rounded-xl border border-danger-200 bg-danger-50 px-6 py-12 text-center text-sm text-danger-700"><AlertTriangle size={28}/><p>{err?.message ?? "Error"}</p><button onClick={()=>refetch()} className="h-9 px-4 rounded-md bg-primary text-primary-foreground">Reintentar</button></div>
-      : rows.length===0 ? <div className="flex flex-col items-center gap-3 rounded-xl border bg-card px-6 py-12 text-sm text-muted-foreground"><Inbox size={28}/><p>No hay enlaces de pago.</p><p className="text-xs">Crea un enlace en Enterprise → aparecerá aquí como Pendiente de aprobación.</p></div>
-      : <>
-          <DataTable columns={columns} data={rows} keyExtractor={(r)=>r.id} actions={(r)=> <ActionsDropdown actions={getActions(r)} />} hidePagination serverFilterState={filtrosPanel} onServerFilterChange={aplicarFiltros} serverResultCount={total} />
+      <PageHeader
+        title="Links de Pago"
+        description={`Links gestionados por ${brand.name}. PayWay crea en Pendiente; Admin gestiona ciclo completo (ver detalle para método/tarjeta/cuotas).`}
+      />
+      {isLoading ? (
+        <div className="flex items-center justify-center rounded-xl border bg-card py-16 text-sm text-muted-foreground">
+          <span className="inline-block w-4 h-4 border-2 border-muted-foreground/30 border-t-muted-foreground rounded-full animate-spin mr-2" />
+          Cargando enlaces…
+        </div>
+      ) : isError ? (
+        <div className="flex flex-col items-center gap-3 rounded-xl border border-danger-200 bg-danger-50 px-6 py-12 text-center text-sm text-danger-700">
+          <AlertTriangle size={28} />
+          <p>{err?.message ?? "Error"}</p>
+          <button
+            onClick={() => refetch()}
+            className="h-9 px-4 rounded-md bg-primary text-primary-foreground"
+          >
+            Reintentar
+          </button>
+        </div>
+      ) : rows.length === 0 ? (
+        <div className="flex flex-col items-center gap-3 rounded-xl border bg-card px-6 py-12 text-sm text-muted-foreground">
+          <Inbox size={28} />
+          <p>No hay enlaces de pago.</p>
+          <p className="text-xs">
+            Crea un enlace en Enterprise → aparecerá aquí como Pendiente de aprobación.
+          </p>
+        </div>
+      ) : (
+        <>
+          <DataTable
+            columns={columns}
+            data={rows}
+            keyExtractor={(r) => r.id}
+            actions={(r) => <ActionsDropdown actions={getActions(r)} />}
+            hidePagination
+            serverFilterState={filtrosPanel}
+            onServerFilterChange={aplicarFiltros}
+            serverResultCount={total}
+          />
           <Pagination
             page={page + 1}
             totalPages={totalPages}
@@ -222,9 +534,20 @@ function Page() {
               setPage(0);
             }}
           />
-        </>}
-      {detail && <EnlaceDetalle enlace={detail} onClose={()=>setDetail(null)} />}
-      {confirm && <ConfirmDialog open={!!confirm} onClose={()=>setConfirm(null)} title={confirm.title} message={confirm.message} confirmLabel={confirm.confirmLabel} variant={confirm.variant} onConfirm={confirm.onConfirm} />}
+        </>
+      )}
+      {detail && <EnlaceDetalle enlace={detail} onClose={() => setDetail(null)} />}
+      {confirm && (
+        <ConfirmDialog
+          open={!!confirm}
+          onClose={() => setConfirm(null)}
+          title={confirm.title}
+          message={confirm.message}
+          confirmLabel={confirm.confirmLabel}
+          variant={confirm.variant}
+          onConfirm={confirm.onConfirm}
+        />
+      )}
     </PermissionGuard>
   );
 }

@@ -10,7 +10,10 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: pageTitle() },
-      { name: "description", content: `Panel de administración de la plataforma ${brand.shortName}.` },
+      {
+        name: "description",
+        content: `Panel de administración de la plataforma ${brand.shortName}.`,
+      },
       { name: "robots", content: "noindex, nofollow" },
     ],
   }),

@@ -40,13 +40,11 @@ export async function uploadAdjunto(
   const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
   const key = `${comercioId}/${contracargoId}/${Date.now()}_${safeName}`;
 
-  const { error } = await sb.storage
-    .from(CONTRACARGOS_BUCKET)
-    .upload(key, file, {
-      cacheControl: "3600",
-      upsert: false,
-      contentType: file.type || undefined,
-    });
+  const { error } = await sb.storage.from(CONTRACARGOS_BUCKET).upload(key, file, {
+    cacheControl: "3600",
+    upsert: false,
+    contentType: file.type || undefined,
+  });
   if (error) throw error;
 
   let uploadedBy: string | null = null;
@@ -74,9 +72,7 @@ export async function uploadAdjunto(
  */
 export async function deleteAdjunto(path: string): Promise<void> {
   const sb = requireSupabase();
-  const { error } = await sb.storage
-    .from(CONTRACARGOS_BUCKET)
-    .remove([path]);
+  const { error } = await sb.storage.from(CONTRACARGOS_BUCKET).remove([path]);
   if (error) throw error;
 }
 
@@ -85,10 +81,7 @@ export async function deleteAdjunto(path: string): Promise<void> {
  * un adjunto. Usar en lugar de `getPublicUrl` porque el bucket es
  * privado.
  */
-export async function getAdjuntoSignedUrl(
-  path: string,
-  expiresInSec = 300,
-): Promise<string> {
+export async function getAdjuntoSignedUrl(path: string, expiresInSec = 300): Promise<string> {
   const sb = requireSupabase();
   const { data, error } = await sb.storage
     .from(CONTRACARGOS_BUCKET)

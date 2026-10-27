@@ -1,6 +1,18 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Plus, Eye, Edit3, XCircle, AlertTriangle, Inbox, Search, Zap, Wallet, ShieldCheck, Coins } from "lucide-react";
+import {
+  Plus,
+  Eye,
+  Edit3,
+  XCircle,
+  AlertTriangle,
+  Inbox,
+  Search,
+  Zap,
+  Wallet,
+  ShieldCheck,
+  Coins,
+} from "lucide-react";
 import { PageHeader } from "@/components/page-header";
 import { DataTable, type Column, type TableServerFilters } from "@/components/data-table";
 import { ActionsDropdown, type ActionItem } from "@/components/actions-dropdown";
@@ -61,12 +73,17 @@ function tipoSubcuentaBadge(tipo: SubcuentaTipo) {
   const meta = TIPO_SUBCUENTA_META[tipo] ?? { label: tipo, icon: Wallet };
   const Icon = meta.icon;
   const tone =
-    tipo === "Operativa" ? "bg-emerald-100 text-emerald-800 border-emerald-200"
-      : tipo === "Recaudacion" ? "bg-blue-100 text-blue-800 border-blue-200"
-        : tipo === "Garantias" ? "bg-amber-100 text-amber-800 border-amber-200"
+    tipo === "Operativa"
+      ? "bg-emerald-100 text-emerald-800 border-emerald-200"
+      : tipo === "Recaudacion"
+        ? "bg-blue-100 text-blue-800 border-blue-200"
+        : tipo === "Garantias"
+          ? "bg-amber-100 text-amber-800 border-amber-200"
           : "bg-purple-100 text-purple-800 border-purple-200";
   return (
-    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md border text-xs font-medium ${tone}`}>
+    <span
+      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md border text-xs font-medium ${tone}`}
+    >
       <Icon size={12} />
       {meta.label}
     </span>
@@ -183,7 +200,9 @@ function CvuPage() {
   const guardarEdicion = async () => {
     if (!editTarget) return;
     try {
-      await updateSubcuenta(editTarget.clienteLegajo, editTarget.id, { cbu: editTarget.cbu ?? undefined });
+      await updateSubcuenta(editTarget.clienteLegajo, editTarget.id, {
+        cbu: editTarget.cbu ?? undefined,
+      });
       // alias not stored in subcuenta, but we keep edit for demo (no column)
       toast.success("Actualizado");
       queryClient.invalidateQueries({ queryKey: ["cvus"] });
@@ -195,78 +214,77 @@ function CvuPage() {
   };
 
   const getActions = (row: CvuRow): ActionItem[] => {
-  const items: ActionItem[] = [
-    { label: "Ver detalles", icon: Eye, onClick: () => setViewing(row) },
-  ];
+    const items: ActionItem[] = [
+      { label: "Ver detalles", icon: Eye, onClick: () => setViewing(row) },
+    ];
 
-  // Acción contextual: si la subcuenta no tiene CVU todavia, el operador
-  // puede pedir la asignacion contra BDC/COELSA. Toda la logica vive en
-  // `asignarCvuParaExistente` (centralizada en `lib/api/cvu.ts`) para que
-  // modal y menu compartan exactamente el mismo flow.
-  if (!row.cbu) {
+    // Acción contextual: si la subcuenta no tiene CVU todavia, el operador
+    // puede pedir la asignacion contra BDC/COELSA. Toda la logica vive en
+    // `asignarCvuParaExistente` (centralizada en `lib/api/cvu.ts`) para que
+    // modal y menu compartan exactamente el mismo flow.
+    if (!row.cbu) {
+      items.push({
+        label: "Generar CVU (BDC/COELSA)",
+        icon: Zap,
+        disabled: !puedeModificar,
+        onClick: async () => {
+          const cuit = (row.cliente?.cuit ?? "").replace(/\D/g, "");
+          if (!row.legajo || !cuit) {
+            toast.error("No se pudo identificar el titular (legajo o CUIT faltante).");
+            return;
+          }
+          const result = await asignarCvuParaExistente({
+            cliente: {
+              id: row.id,
+              legajo: row.legajo,
+              correo: row.cliente?.correo ?? row.email ?? "",
+              cuit,
+              nombre: `${row.nombre} ${row.apellido}`.trim() || row.nombre,
+              tipoPersona: row.cliente?.tipoPersona === "juridica" ? "juridica" : "fisica",
+            },
+            subcuentaId: row.id,
+            tipo: row.tipo,
+            origin: "admin",
+          });
+          if (result.kind === "rechazado") {
+            return;
+          }
+          queryClient.invalidateQueries({ queryKey: ["cvus"] });
+          queryClient.invalidateQueries({ queryKey: ["subcuentas", row.clienteLegajo] });
+        },
+      });
+    }
+
     items.push({
-      label: "Generar CVU (BDC/COELSA)",
-      icon: Zap,
+      label: "Editar",
+      icon: Edit3,
       disabled: !puedeModificar,
-      onClick: async () => {
-        const cuit = (row.cliente?.cuit ?? "").replace(/\D/g, "");
-        if (!row.legajo || !cuit) {
-          toast.error("No se pudo identificar el titular (legajo o CUIT faltante).");
-          return;
-        }
-        const result = await asignarCvuParaExistente({
-          cliente: {
-            id: row.id,
-            legajo: row.legajo,
-            correo: row.cliente?.correo ?? row.email ?? "",
-            cuit,
-            nombre: `${row.nombre} ${row.apellido}`.trim() || row.nombre,
-            tipoPersona:
-              row.cliente?.tipoPersona === "juridica" ? "juridica" : "fisica",
-          },
-          subcuentaId: row.id,
-          tipo: row.tipo,
-          origin: "admin",
-        });
-        if (result.kind === "rechazado") {
-          return;
-        }
-        queryClient.invalidateQueries({ queryKey: ["cvus"] });
-        queryClient.invalidateQueries({ queryKey: ["subcuentas", row.clienteLegajo] });
+      onClick: () => {
+        setEditTarget(row);
+        setEditAlias(row.cbu?.slice(-6) ?? "");
       },
     });
-  }
 
-  items.push({
-    label: "Editar",
-    icon: Edit3,
-    disabled: !puedeModificar,
-    onClick: () => {
-      setEditTarget(row);
-      setEditAlias(row.cbu?.slice(-6) ?? "");
-    },
-  });
+    items.push({
+      label: row.estado === "Activa" ? "Deshabilitar" : "Habilitar",
+      icon: XCircle,
+      variant: row.estado === "Activa" ? ("danger" as const) : undefined,
+      disabled: !puedeModificar,
+      onClick: async () => {
+        try {
+          await updateSubcuenta(row.clienteLegajo, row.id, {
+            estado: row.estado === "Activa" ? "Pausada" : "Activa",
+          });
+          queryClient.invalidateQueries({ queryKey: ["cvus"] });
+          queryClient.invalidateQueries({ queryKey: ["subcuentas", row.clienteLegajo] });
+        } catch (e) {
+          toast.error((e as Error).message);
+        }
+      },
+    });
 
-  items.push({
-    label: row.estado === "Activa" ? "Deshabilitar" : "Habilitar",
-    icon: XCircle,
-    variant: row.estado === "Activa" ? ("danger" as const) : undefined,
-    disabled: !puedeModificar,
-    onClick: async () => {
-      try {
-        await updateSubcuenta(row.clienteLegajo, row.id, {
-          estado: row.estado === "Activa" ? "Pausada" : "Activa",
-        });
-        queryClient.invalidateQueries({ queryKey: ["cvus"] });
-        queryClient.invalidateQueries({ queryKey: ["subcuentas", row.clienteLegajo] });
-      } catch (e) {
-        toast.error((e as Error).message);
-      }
-    },
-  });
-
-  return items;
-};
+    return items;
+  };
 
   const err = error instanceof DataAccessError ? error : null;
 
@@ -283,11 +301,26 @@ function CvuPage() {
       />
 
       {isLoading ? (
-        <div className="flex items-center justify-center rounded-xl border bg-card py-16 text-sm text-muted-foreground"><span className="inline-block w-4 h-4 border-2 border-muted-foreground/30 border-t-muted-foreground rounded-full animate-spin mr-2" />Cargando CVU…</div>
+        <div className="flex items-center justify-center rounded-xl border bg-card py-16 text-sm text-muted-foreground">
+          <span className="inline-block w-4 h-4 border-2 border-muted-foreground/30 border-t-muted-foreground rounded-full animate-spin mr-2" />
+          Cargando CVU…
+        </div>
       ) : isError ? (
-        <div className="flex flex-col items-center gap-3 rounded-xl border border-danger-200 bg-danger-50 px-6 py-12 text-center text-sm text-danger-700"><AlertTriangle size={28} /><p>{err?.message ?? "Error"}</p><button onClick={() => refetch()} className="h-9 px-4 rounded-md bg-primary text-primary-foreground">Reintentar</button></div>
+        <div className="flex flex-col items-center gap-3 rounded-xl border border-danger-200 bg-danger-50 px-6 py-12 text-center text-sm text-danger-700">
+          <AlertTriangle size={28} />
+          <p>{err?.message ?? "Error"}</p>
+          <button
+            onClick={() => refetch()}
+            className="h-9 px-4 rounded-md bg-primary text-primary-foreground"
+          >
+            Reintentar
+          </button>
+        </div>
       ) : rows.length === 0 ? (
-        <div className="flex flex-col items-center gap-3 rounded-xl border bg-card px-6 py-12 text-center text-sm text-muted-foreground"><Inbox size={28} /><p>No hay CVU que coincidan.</p></div>
+        <div className="flex flex-col items-center gap-3 rounded-xl border bg-card px-6 py-12 text-center text-sm text-muted-foreground">
+          <Inbox size={28} />
+          <p>No hay CVU que coincidan.</p>
+        </div>
       ) : (
         <>
           <DataTable
@@ -316,7 +349,14 @@ function CvuPage() {
             extraFilters={
               <div>
                 <label className="text-xs font-medium text-muted-foreground">Estado</label>
-                <select value={estadoFilter} onChange={(e) => { setEstadoFilter(e.target.value); setPage(0); }} className="w-full sm:min-w-[130px] h-8 px-2 rounded-md border border-input bg-background text-xs outline-none focus:ring-2 focus:ring-ring/40">
+                <select
+                  value={estadoFilter}
+                  onChange={(e) => {
+                    setEstadoFilter(e.target.value);
+                    setPage(0);
+                  }}
+                  className="w-full sm:min-w-[130px] h-8 px-2 rounded-md border border-input bg-background text-xs outline-none focus:ring-2 focus:ring-ring/40"
+                >
                   <option value="">Todos</option>
                   <option value="Activa">Habilitado</option>
                   <option value="Pausada">Deshabilitado</option>
@@ -342,33 +382,84 @@ function CvuPage() {
       )}
 
       {viewing && (
-        <FormDialog open={!!viewing} onClose={() => setViewing(null)} title="Detalle de CVU" description={`CVU de ${viewing.nombre} ${viewing.apellido}`} onSubmit={() => setViewing(null)} submitLabel="Cerrar">
+        <FormDialog
+          open={!!viewing}
+          onClose={() => setViewing(null)}
+          title="Detalle de CVU"
+          description={`CVU de ${viewing.nombre} ${viewing.apellido}`}
+          onSubmit={() => setViewing(null)}
+          submitLabel="Cerrar"
+        >
           <div className="grid grid-cols-2 gap-4 text-sm">
-            <div><span className="text-muted-foreground">Legajo:</span> <LegajoCell legajo={viewing.legajo} /></div>
-            <div><span className="text-muted-foreground">Correo:</span> <span className="font-medium">{viewing.cliente?.correo ?? viewing.email}</span></div>
-            <div><span className="text-muted-foreground">Nombre:</span> <span className="font-medium">{viewing.nombre}</span></div>
-            <div><span className="text-muted-foreground">Apellido:</span> <span className="font-medium">{viewing.apellido}</span></div>
-            <div><span className="text-muted-foreground">CVU:</span> <span className="font-mono font-medium">{viewing.cbu ?? "—"}</span></div>
-            <div><span className="text-muted-foreground">Alias:</span> <span className="font-medium">{viewing.cbu ? viewing.cbu.slice(-6) : "—"}</span></div>
+            <div>
+              <span className="text-muted-foreground">Legajo:</span>{" "}
+              <LegajoCell legajo={viewing.legajo} />
+            </div>
+            <div>
+              <span className="text-muted-foreground">Correo:</span>{" "}
+              <span className="font-medium">{viewing.cliente?.correo ?? viewing.email}</span>
+            </div>
+            <div>
+              <span className="text-muted-foreground">Nombre:</span>{" "}
+              <span className="font-medium">{viewing.nombre}</span>
+            </div>
+            <div>
+              <span className="text-muted-foreground">Apellido:</span>{" "}
+              <span className="font-medium">{viewing.apellido}</span>
+            </div>
+            <div>
+              <span className="text-muted-foreground">CVU:</span>{" "}
+              <span className="font-mono font-medium">{viewing.cbu ?? "—"}</span>
+            </div>
+            <div>
+              <span className="text-muted-foreground">Alias:</span>{" "}
+              <span className="font-medium">{viewing.cbu ? viewing.cbu.slice(-6) : "—"}</span>
+            </div>
           </div>
         </FormDialog>
       )}
 
       {editTarget && (
-        <FormDialog open={!!editTarget} onClose={() => setEditTarget(null)} title="Editar CVU" description={`Editando CVU de ${editTarget.nombre}`} onSubmit={guardarEdicion} submitLabel="Guardar">
-          <div><Label>Alias (derivado del CVU)</Label><Input value={editAlias} onChange={(e) => setEditAlias(e.target.value)} /></div>
-          <p className="text-xs text-muted-foreground">El CVU es inmutable; alias es informativo.</p>
+        <FormDialog
+          open={!!editTarget}
+          onClose={() => setEditTarget(null)}
+          title="Editar CVU"
+          description={`Editando CVU de ${editTarget.nombre}`}
+          onSubmit={guardarEdicion}
+          submitLabel="Guardar"
+        >
+          <div>
+            <Label>Alias (derivado del CVU)</Label>
+            <Input value={editAlias} onChange={(e) => setEditAlias(e.target.value)} />
+          </div>
+          <p className="text-xs text-muted-foreground">
+            El CVU es inmutable; alias es informativo.
+          </p>
         </FormDialog>
       )}
 
-      <FormDialog open={showNuevo} onClose={() => setShowNuevo(false)} title="Nuevo CVU" description="Crear CVU asociado a un usuario existente (búsqueda rápida por email, funciona con miles)." onSubmit={crear} submitLabel={saving ? "Creando..." : "Crear CVU"}>
+      <FormDialog
+        open={showNuevo}
+        onClose={() => setShowNuevo(false)}
+        title="Nuevo CVU"
+        description="Crear CVU asociado a un usuario existente (búsqueda rápida por email, funciona con miles)."
+        onSubmit={crear}
+        submitLabel={saving ? "Creando..." : "Crear CVU"}
+      >
         <div className="relative">
           <Label>Email del usuario</Label>
           <div className="relative">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+            <Search
+              size={14}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"
+            />
             <Input
               value={formSearch}
-              onChange={(e) => { setFormSearch(e.target.value); setFormOpen(true); setFormEmail(e.target.value); }}
+              onChange={(e) => {
+                setFormSearch(e.target.value);
+                setFormOpen(true);
+                setFormEmail(e.target.value);
+              }}
               onFocus={() => setFormOpen(true)}
               onBlur={() => setTimeout(() => setFormOpen(false), 150)}
               placeholder="Buscar por email, legajo o nombre..."
@@ -379,16 +470,37 @@ function CvuPage() {
           {formOpen && (clientesOpt?.length ?? 0) > 0 && (
             <div className="absolute z-20 mt-1 w-full rounded-md border bg-card shadow-lg max-h-60 overflow-auto">
               {(clientesOpt ?? []).map((c) => (
-                <button key={c.legajo} type="button" onMouseDown={(e) => { e.preventDefault(); setFormEmail(c.correo); setFormSearch(c.correo); setFormOpen(false); }} className="w-full text-left px-3 py-2 text-sm hover:bg-accent flex flex-col">
+                <button
+                  key={c.legajo}
+                  type="button"
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    setFormEmail(c.correo);
+                    setFormSearch(c.correo);
+                    setFormOpen(false);
+                  }}
+                  className="w-full text-left px-3 py-2 text-sm hover:bg-accent flex flex-col"
+                >
                   <span className="font-medium">{c.correo}</span>
-                  <span className="text-xs text-muted-foreground font-mono">{c.legajo} · {c.nombre}</span>
+                  <span className="text-xs text-muted-foreground font-mono">
+                    {c.legajo} · {c.nombre}
+                  </span>
                 </button>
               ))}
             </div>
           )}
-          <p className="text-[11px] text-muted-foreground mt-1">Seleccioná un email de la lista (20 resultados, server-side). Funciona para PF y PJ.</p>
+          <p className="text-[11px] text-muted-foreground mt-1">
+            Seleccioná un email de la lista (20 resultados, server-side). Funciona para PF y PJ.
+          </p>
         </div>
-        <div><Label>Alias (opcional)</Label><Input value={formAlias} onChange={(e) => setFormAlias(e.target.value)} placeholder="mi.alias (se genera automático si vacío)" /></div>
+        <div>
+          <Label>Alias (opcional)</Label>
+          <Input
+            value={formAlias}
+            onChange={(e) => setFormAlias(e.target.value)}
+            placeholder="mi.alias (se genera automático si vacío)"
+          />
+        </div>
         <div>
           <Label>Tipo de cuenta</Label>
           <select
@@ -403,13 +515,14 @@ function CvuPage() {
             ))}
           </select>
           <p className="mt-1 text-xs text-muted-foreground">
-            Operativa: saldo líquido para retiros y transferencias.
-            Recaudación: cobros / ventas.
-            Garantías: contracargos y retenciones.
-            Sueldos: nómina y pagos a empleados.
+            Operativa: saldo líquido para retiros y transferencias. Recaudación: cobros / ventas.
+            Garantías: contracargos y retenciones. Sueldos: nómina y pagos a empleados.
           </p>
         </div>
-        <p className="text-xs text-muted-foreground">Se generará un CVU de 22 dígitos y alias, y se guardará como subcuenta. Aparecerá en el detalle del usuario en Subcuentas y CVUs recientes.</p>
+        <p className="text-xs text-muted-foreground">
+          Se generará un CVU de 22 dígitos y alias, y se guardará como subcuenta. Aparecerá en el
+          detalle del usuario en Subcuentas y CVUs recientes.
+        </p>
       </FormDialog>
     </PermissionGuard>
   );
@@ -451,8 +564,16 @@ const columns: Column<any>[] = [
         </span>
       ),
   },
-  { key: "_cbk", label: "CBK", render: (r) => <span className="font-mono tabular-nums">{r._cbk}</span> },
+  {
+    key: "_cbk",
+    label: "CBK",
+    render: (r) => <span className="font-mono tabular-nums">{r._cbk}</span>,
+  },
   { key: "_alias", label: "Alias", render: (r) => r._alias },
   { key: "_estado", label: "Estado", render: (row) => estadoBadge(row._estado) },
-  { key: "_fechaAlta", label: "Fecha de alta", render: (r) => <span className="font-mono tabular-nums text-xs">{r._fechaAlta}</span> },
+  {
+    key: "_fechaAlta",
+    label: "Fecha de alta",
+    render: (r) => <span className="font-mono tabular-nums text-xs">{r._fechaAlta}</span>,
+  },
 ];

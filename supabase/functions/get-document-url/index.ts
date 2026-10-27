@@ -17,9 +17,7 @@ function jwtSub(token: string): string | null {
   try {
     const part = token.split(".")[1];
     const b64 = part.replace(/-/g, "+").replace(/_/g, "/");
-    const json = new TextDecoder().decode(
-      Uint8Array.from(atob(b64), (c) => c.charCodeAt(0)),
-    );
+    const json = new TextDecoder().decode(Uint8Array.from(atob(b64), (c) => c.charCodeAt(0)));
     const payload = JSON.parse(json);
     return typeof payload.sub === "string" ? payload.sub : null;
   } catch {
@@ -30,8 +28,7 @@ function jwtSub(token: string): string | null {
 Deno.serve(async (req) => {
   const cors = {
     "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Headers":
-      "authorization, x-client-info, apikey, content-type",
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
     "Access-Control-Allow-Methods": "POST, OPTIONS",
   };
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
@@ -129,11 +126,12 @@ Deno.serve(async (req) => {
     });
   }
 
-  const transform = body.transform &&
+  const transform =
+    body.transform &&
     typeof body.transform === "object" &&
     (body.transform.width || body.transform.height)
-    ? body.transform
-    : undefined;
+      ? body.transform
+      : undefined;
 
   // Cliente con service role: firma sin depender de la RLS de storage.
   const adminSb = createClient(url, serviceRole, {
@@ -145,9 +143,7 @@ Deno.serve(async (req) => {
   const exp = body.expiresIn ?? 3600;
 
   for (const p of paths) {
-    const { data, error } = await adminSb.storage
-      .from(bucket)
-      .createSignedUrl(p, exp);
+    const { data, error } = await adminSb.storage.from(bucket).createSignedUrl(p, exp);
     if (!error && data?.signedUrl) signedUrls[p] = data.signedUrl;
 
     if (transform) {
@@ -173,10 +169,10 @@ Deno.serve(async (req) => {
   // Respuesta legacy: un solo path.
   const single = body.path as string;
   if (!signedUrls[single]) {
-    return new Response(
-      JSON.stringify({ error: "No se pudo firmar el archivo" }),
-      { status: 404, headers: { ...cors, "content-type": "application/json" } },
-    );
+    return new Response(JSON.stringify({ error: "No se pudo firmar el archivo" }), {
+      status: 404,
+      headers: { ...cors, "content-type": "application/json" },
+    });
   }
   return new Response(
     JSON.stringify({ signedUrl: signedUrls[single], thumbUrl: thumbUrls[single] }),

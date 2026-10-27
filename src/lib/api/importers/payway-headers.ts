@@ -10,44 +10,15 @@
  * observadas / razonables.
  */
 export const PAYWAY_DISPUTE_HEADERS = {
-  idTransaccion: [
-    "ID_TRANSACCION",
-    "TID",
-    "ID_TX",
-    "ID_TRANSACCION_PAYWAY",
-    "SITE_TRANSACTION_ID",
-  ],
-  establecimiento: [
-    "ESTABLECIMIENTO",
-    "SITE_ID",
-    "NRO_ESTABLECIMIENTO",
-    "COMERCIO",
-  ],
-  fechaTransaccion: [
-    "FECHA_DE_TRANS",
-    "FECHA",
-    "FECHA_TRANSACCION",
-    "DATE",
-    "FECHA_OPERACION",
-  ],
+  idTransaccion: ["ID_TRANSACCION", "TID", "ID_TX", "ID_TRANSACCION_PAYWAY", "SITE_TRANSACTION_ID"],
+  establecimiento: ["ESTABLECIMIENTO", "SITE_ID", "NRO_ESTABLECIMIENTO", "COMERCIO"],
+  fechaTransaccion: ["FECHA_DE_TRANS", "FECHA", "FECHA_TRANSACCION", "DATE", "FECHA_OPERACION"],
   marca: ["MEDIO_DE_PAGO", "MARCA", "BRAND", "MEDIO_PAGO"],
   nroTarjeta: ["NRO_DE_TARJETA", "TARJETA", "CARD_NUMBER", "ULTIMOS4"],
   monto: ["MONTO_DE_TRAM", "MONTO", "TOTAL_BRUTO", "AMOUNT", "IMPORTE"],
-  autorizacion: [
-    "CODIGO_DE_AUT",
-    "AUTORIZACION",
-    "NRO_DE_CUPON",
-    "AUTH_CODE",
-    "NRO_CUPON",
-  ],
+  autorizacion: ["CODIGO_DE_AUT", "AUTORIZACION", "NRO_DE_CUPON", "AUTH_CODE", "NRO_CUPON"],
   ccoOrigen: ["CCO_ORIGEN", "ORIGEN", "ORIGIN", "CANAL_ORIGEN"],
-  ccoMotivo: [
-    "CCO_MOTIVO",
-    "MOTIVO",
-    "REASON",
-    "DESCRIPCION_MOTIVO",
-    "MOTIVO_DESCONOCIMIENTO",
-  ],
+  ccoMotivo: ["CCO_MOTIVO", "MOTIVO", "REASON", "DESCRIPCION_MOTIVO", "MOTIVO_DESCONOCIMIENTO"],
   estado: ["ESTADO", "STATUS", "ESTADO_PRESENTACION"],
 } as const;
 
@@ -82,9 +53,10 @@ export function normalizeHeader(h: string): string {
  * el campo queda sin resolver y la fila se reporta como "error de
  * parseo".
  */
-export function buildHeaderMap(
-  rawHeaders: string[],
-): { map: Map<PaywayField, string>; unresolved: string[] } {
+export function buildHeaderMap(rawHeaders: string[]): {
+  map: Map<PaywayField, string>;
+  unresolved: string[];
+} {
   const map = new Map<PaywayField, string>();
   const unresolved: string[] = [];
   const seen = new Set<string>();
@@ -97,8 +69,8 @@ export function buildHeaderMap(
     let matched: PaywayField | null = null;
     for (const [field, aliases] of Object.entries(PAYWAY_DISPUTE_HEADERS) as [
       PaywayField,
-  readonly string[],
-][]) {
+      readonly string[],
+    ][]) {
       if (aliases.some((a) => normalizeHeader(a) === norm)) {
         matched = field;
         break;

@@ -1,5 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { AlertTriangle, ChevronDown, ChevronRight, Info, ShieldCheck, ShieldOff } from "lucide-react";
+import {
+  AlertTriangle,
+  ChevronDown,
+  ChevronRight,
+  Info,
+  ShieldCheck,
+  ShieldOff,
+} from "lucide-react";
 import { FormDialog } from "@/components/form-dialog";
 import { FileDropzone } from "@/components/file-dropzone";
 import { Badge, Input, Label } from "@/components/portal-shell";
@@ -57,7 +64,10 @@ function fmtFecha(iso: string): string {
   return `${d}/${m}/${y}`;
 }
 
-const ETIQUETA_ESTADO: Record<EstadoRenglon, { texto: string; tone: "success" | "warn" | "danger" | "neutral" }> = {
+const ETIQUETA_ESTADO: Record<
+  EstadoRenglon,
+  { texto: string; tone: "success" | "warn" | "danger" | "neutral" }
+> = {
   aplicado: { texto: "Aplicar", tone: "success" },
   diferencia: { texto: "Diferencia", tone: "warn" },
   sin_establecimiento: { texto: "Sin mapear", tone: "warn" },
@@ -78,7 +88,12 @@ function CalcRow({
   tone?: "subtract" | "total";
   hint?: string;
 }) {
-  const color = tone === "total" ? "font-semibold text-foreground" : tone === "subtract" ? "text-danger-600" : "";
+  const color =
+    tone === "total"
+      ? "font-semibold text-foreground"
+      : tone === "subtract"
+        ? "text-danger-600"
+        : "";
   return (
     <div className="flex items-start justify-between gap-3 text-sm py-1">
       <span className="text-muted-foreground">
@@ -287,9 +302,7 @@ export function AcreditarLoteModal({ lote, onClose, onAcreditado }: Props) {
     const debitoCreditoMonto = retenciones
       ? retenciones.debitoCredito.monto
       : preview.totales.retencionDebitoCredito;
-    const ivaMonto = retenciones
-      ? retenciones.iva.monto
-      : preview.totales.retencionIva;
+    const ivaMonto = retenciones ? retenciones.iva.monto : preview.totales.retencionIva;
     const iibbMonto = iibbMontoFinal;
 
     const liquidacion: LiquidacionAplicada = {
@@ -463,9 +476,8 @@ export function AcreditarLoteModal({ lote, onClose, onAcreditado }: Props) {
                   </table>
 
                   <p className="text-[11px] text-muted-foreground mt-2">
-                    Delimitador{" "}
-                    <span className="font-mono">;</span>, sin salto de linea dentro del archivo.
-                    El archivo trae{" "}
+                    Delimitador <span className="font-mono">;</span>, sin salto de linea dentro del
+                    archivo. El archivo trae{" "}
                     <span className="font-mono">{parseado.columnas.length}</span> columnas; se leen
                     las {parseado.mapeo.length} que hacen falta.
                   </p>
@@ -518,11 +530,20 @@ export function AcreditarLoteModal({ lote, onClose, onAcreditado }: Props) {
                         // que lote es, asi que el control aparece deshabilitado.
                         const forcible = !m.renglon.error;
                         return (
-                          <tr key={m.renglon.nro} className={m.acreditable ? "" : "text-muted-foreground"}>
-                            <td className="px-2.5 py-1.5 font-mono tabular-nums">{fmtFecha(m.renglon.fecha)}</td>
+                          <tr
+                            key={m.renglon.nro}
+                            className={m.acreditable ? "" : "text-muted-foreground"}
+                          >
+                            <td className="px-2.5 py-1.5 font-mono tabular-nums">
+                              {fmtFecha(m.renglon.fecha)}
+                            </td>
                             <td className="px-2.5 py-1.5">{m.renglon.marca || "-"}</td>
-                            <td className="px-2.5 py-1.5 font-mono">{m.renglon.establecimiento || "-"}</td>
-                            <td className="px-2.5 py-1.5 truncate max-w-[140px]">{m.comercioNombre ?? "-"}</td>
+                            <td className="px-2.5 py-1.5 font-mono">
+                              {m.renglon.establecimiento || "-"}
+                            </td>
+                            <td className="px-2.5 py-1.5 truncate max-w-[140px]">
+                              {m.comercioNombre ?? "-"}
+                            </td>
                             <td className="px-2.5 py-1.5 text-right font-mono tabular-nums">
                               {fmt(m.renglon.totalBruto)}
                             </td>
@@ -539,11 +560,17 @@ export function AcreditarLoteModal({ lote, onClose, onAcreditado }: Props) {
                             <td className="px-2.5 py-1.5">
                               <Badge tone={et.tone}>{et.texto}</Badge>
                               {m.renglon.error && (
-                                <span className="block text-[10px] text-danger-600 mt-0.5">{m.renglon.error}</span>
+                                <span className="block text-[10px] text-danger-600 mt-0.5">
+                                  {m.renglon.error}
+                                </span>
                               )}
-                              {m.estado === "sin_establecimiento" && lote && marcaCoincide(m.renglon.marca, lote.bandera) && (
-                                <span className="block text-[10px] mt-0.5">puede ser de este lote</span>
-                              )}
+                              {m.estado === "sin_establecimiento" &&
+                                lote &&
+                                marcaCoincide(m.renglon.marca, lote.bandera) && (
+                                  <span className="block text-[10px] mt-0.5">
+                                    puede ser de este lote
+                                  </span>
+                                )}
                             </td>
                             <td className="px-2.5 py-1.5">
                               <select
@@ -553,7 +580,9 @@ export function AcreditarLoteModal({ lote, onClose, onAcreditado }: Props) {
                                   const v = e.target.value;
                                   setOverride(
                                     m.renglon.nro,
-                                    v === "aplicar" || v === "excluir" ? (v as OverrideRenglon) : null,
+                                    v === "aplicar" || v === "excluir"
+                                      ? (v as OverrideRenglon)
+                                      : null,
                                   );
                                 }}
                                 className="h-7 rounded border border-input bg-background px-1.5 text-[11px] outline-none focus:ring-2 focus:ring-ring/40 disabled:opacity-50"
@@ -575,8 +604,10 @@ export function AcreditarLoteModal({ lote, onClose, onAcreditado }: Props) {
                 <div className="mt-2 flex items-center justify-between rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-blue-800">
                   <span>
                     {Object.keys(overrides).length}{" "}
-                    {Object.keys(overrides).length === 1 ? "renglon corregido a mano" : "renglones corregidos a mano"}. El
-                    calculo de arriba ya los tiene en cuenta.
+                    {Object.keys(overrides).length === 1
+                      ? "renglon corregido a mano"
+                      : "renglones corregidos a mano"}
+                    . El calculo de arriba ya los tiene en cuenta.
                   </span>
                   <button
                     type="button"
@@ -673,11 +704,17 @@ export function AcreditarLoteModal({ lote, onClose, onAcreditado }: Props) {
                       <div className="flex items-center gap-1.5">
                         Retencion debito y credito
                         {retenciones.debitoCredito.exento ? (
-                          <Badge tone="success" className="inline-flex items-center gap-1 text-[10px]">
+                          <Badge
+                            tone="success"
+                            className="inline-flex items-center gap-1 text-[10px]"
+                          >
                             <ShieldCheck size={10} /> Exento
                           </Badge>
                         ) : retenciones.debitoCredito.asignado ? (
-                          <Badge tone="neutral" className="inline-flex items-center gap-1 text-[10px]">
+                          <Badge
+                            tone="neutral"
+                            className="inline-flex items-center gap-1 text-[10px]"
+                          >
                             <ShieldCheck size={10} /> Asignado
                           </Badge>
                         ) : (
@@ -701,7 +738,10 @@ export function AcreditarLoteModal({ lote, onClose, onAcreditado }: Props) {
                       <div className="flex items-center gap-1.5">
                         Retencion IVA
                         {retenciones.iva.asignado ? (
-                          <Badge tone="neutral" className="inline-flex items-center gap-1 text-[10px]">
+                          <Badge
+                            tone="neutral"
+                            className="inline-flex items-center gap-1 text-[10px]"
+                          >
                             <ShieldCheck size={10} /> Asignado
                           </Badge>
                         ) : (
@@ -710,9 +750,7 @@ export function AcreditarLoteModal({ lote, onClose, onAcreditado }: Props) {
                           </Badge>
                         )}
                       </div>
-                      <span className="block text-[11px] opacity-80">
-                        {retenciones.iva.motivo}
-                      </span>
+                      <span className="block text-[11px] opacity-80">{retenciones.iva.motivo}</span>
                     </span>
                     <span className="font-mono tabular-nums whitespace-nowrap text-danger-600">
                       - {fmt(retenciones.iva.monto)}
@@ -726,7 +764,10 @@ export function AcreditarLoteModal({ lote, onClose, onAcreditado }: Props) {
                       <div className="flex items-center gap-1.5">
                         Retencion Ingresos Brutos
                         {retenciones.iibb.asignado ? (
-                          <Badge tone="neutral" className="inline-flex items-center gap-1 text-[10px]">
+                          <Badge
+                            tone="neutral"
+                            className="inline-flex items-center gap-1 text-[10px]"
+                          >
                             <ShieldCheck size={10} /> Asignado
                           </Badge>
                         ) : (
@@ -759,7 +800,12 @@ export function AcreditarLoteModal({ lote, onClose, onAcreditado }: Props) {
                   <Input
                     id="p-cierre"
                     value={String(parametros.comisionCierreLotePct)}
-                    onChange={(e) => setParam("comisionCierreLotePct", Number(e.target.value.replace(",", ".")) || 0)}
+                    onChange={(e) =>
+                      setParam(
+                        "comisionCierreLotePct",
+                        Number(e.target.value.replace(",", ".")) || 0,
+                      )
+                    }
                     inputMode="decimal"
                     className="mt-1 font-mono"
                   />
@@ -779,7 +825,12 @@ export function AcreditarLoteModal({ lote, onClose, onAcreditado }: Props) {
                     <Input
                       id="p-iibb"
                       value={String(parametros.retencionIibbMonto)}
-                      onChange={(e) => setParam("retencionIibbMonto", Number(e.target.value.replace(",", ".")) || 0)}
+                      onChange={(e) =>
+                        setParam(
+                          "retencionIibbMonto",
+                          Number(e.target.value.replace(",", ".")) || 0,
+                        )
+                      }
                       inputMode="decimal"
                       className="mt-1 font-mono"
                     />
@@ -788,7 +839,7 @@ export function AcreditarLoteModal({ lote, onClose, onAcreditado }: Props) {
                 <div>
                   <Label>CUIT</Label>
                   <div className="mt-1 h-10 px-3 rounded-md border bg-muted/30 text-sm font-mono flex items-center">
-                    {retenciones?.cuit ?? (lote.comercio?.legajo ?? "—")}
+                    {retenciones?.cuit ?? lote.comercio?.legajo ?? "—"}
                   </div>
                 </div>
               </div>

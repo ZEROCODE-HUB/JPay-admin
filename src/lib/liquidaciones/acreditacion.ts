@@ -152,7 +152,13 @@ export type SitioLookup = { sitioId: string; comercioId: string; comercioNombre:
 
 /** Indice de establecimientos por `ESTABLECIMIENTO|MARCA`, por `ESTABLECIMIENTO` y por `sitioId`. */
 function indexarEstablecimientos(
-  filas: { establecimiento: string; marca: string; comercioId: string; comercioNombre: string; vigenteHasta: string | null }[],
+  filas: {
+    establecimiento: string;
+    marca: string;
+    comercioId: string;
+    comercioNombre: string;
+    vigenteHasta: string | null;
+  }[],
   sitios: SitioLookup[] = [],
 ): {
   porMarca: Map<string, EstablecimientoLookup>;
@@ -280,7 +286,11 @@ export function resolverRenglon(
       return {
         ...base,
         comercioId: sitioMatch.comercioId,
-        comercioNombre: sitioMatch.comercioNombre || lote.comercio?.nombreComercio || lote.comercio?.usuario || null,
+        comercioNombre:
+          sitioMatch.comercioNombre ||
+          lote.comercio?.nombreComercio ||
+          lote.comercio?.usuario ||
+          null,
         estado: pct > toleranciaBrutoPct ? "diferencia" : "aplicado",
         diferencia: dif,
         acreditable: true,
@@ -290,7 +300,8 @@ export function resolverRenglon(
     return { ...base, estado: "sin_establecimiento", acreditable: false };
   }
 
-  const esDeEsteLote = lookup.comercioId === lote.comercioId && marcaCoincide(renglon.marca, lote.bandera);
+  const esDeEsteLote =
+    lookup.comercioId === lote.comercioId && marcaCoincide(renglon.marca, lote.bandera);
   if (!esDeEsteLote) {
     return {
       ...base,
@@ -343,7 +354,8 @@ function aplicarOverride(
   return {
     ...m,
     comercioId: lote.comercioId,
-    comercioNombre: m.comercioNombre ?? lote.comercio?.nombreComercio ?? lote.comercio?.usuario ?? null,
+    comercioNombre:
+      m.comercioNombre ?? lote.comercio?.nombreComercio ?? lote.comercio?.usuario ?? null,
     estado: pct > toleranciaBrutoPct ? "diferencia" : "aplicado",
     diferencia: dif,
     acreditable: true,
@@ -390,7 +402,13 @@ export function calcularAcreditacion(args: {
   const overrides = args.overrides ?? {};
 
   const matches = renglones.map((r) => {
-    const auto = resolverRenglon(r, lote, idx, args.comercioManual ?? null, parametros.toleranciaBrutoPct);
+    const auto = resolverRenglon(
+      r,
+      lote,
+      idx,
+      args.comercioManual ?? null,
+      parametros.toleranciaBrutoPct,
+    );
     const ov = overrides[r.nro];
     if (!ov) return auto;
     return aplicarOverride(auto, ov, lote, parametros.toleranciaBrutoPct);
@@ -414,11 +432,14 @@ export function calcularAcreditacion(args: {
   const retencionIva = r2((comisionPropia * parametros.retencionIvaPct) / 100);
   const retencionIibb = r2(parametros.retencionIibbMonto);
 
-  const totalDescuentos = r2(comisionPropia + comisionCierre + retencionDebitoCredito + retencionIva + retencionIibb);
+  const totalDescuentos = r2(
+    comisionPropia + comisionCierre + retencionDebitoCredito + retencionIva + retencionIibb,
+  );
   const importeNeto = r2(netoCsv - totalDescuentos);
 
   const diferenciaBruto = r2(Math.abs(brutoCsv - lote.importeBruto));
-  const diferenciaBrutoPct = lote.importeBruto !== 0 ? r2((diferenciaBruto / lote.importeBruto) * 100) : 0;
+  const diferenciaBrutoPct =
+    lote.importeBruto !== 0 ? r2((diferenciaBruto / lote.importeBruto) * 100) : 0;
   const excedeTolerancia = diferenciaBrutoPct > parametros.toleranciaBrutoPct;
 
   return {

@@ -39,7 +39,11 @@ function Page() {
   const [showNew, setShowNew] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
 
-  const [filtrosPanel, setFiltrosPanel] = useState<TableServerFilters>({ global: "", enums: {}, dates: {} });
+  const [filtrosPanel, setFiltrosPanel] = useState<TableServerFilters>({
+    global: "",
+    enums: {},
+    dates: {},
+  });
   const search = useDebouncedValue(filtrosPanel.global.trim(), 350);
   const aplicarFiltros = (f: TableServerFilters) => {
     setPage(0);

@@ -80,7 +80,10 @@ function fmtFecha(iso: string | null | undefined): string {
   return `${d}/${m}/${y}`;
 }
 
-const ETIQUETA_ESTADO: Record<EstadoRenglon, { texto: string; tone: "success" | "warn" | "danger" | "neutral" }> = {
+const ETIQUETA_ESTADO: Record<
+  EstadoRenglon,
+  { texto: string; tone: "success" | "warn" | "danger" | "neutral" }
+> = {
   aplicado: { texto: "Aplicar", tone: "success" },
   diferencia: { texto: "Diferencia", tone: "warn" },
   sin_establecimiento: { texto: "Sin mapear", tone: "warn" },
@@ -324,7 +327,16 @@ export function CargarCsvModal({ open, lote, onClose, onCargado }: Props) {
       overrides,
       sitios,
     });
-  }, [modoPerLote, lote, renglones, establecimientosConNombre, parametros, comercioManual, overrides, sitios]);
+  }, [
+    modoPerLote,
+    lote,
+    renglones,
+    establecimientosConNombre,
+    parametros,
+    comercioManual,
+    overrides,
+    sitios,
+  ]);
 
   // General: calcular match contra todos los Programado y, por cada
   // uno, totales con calcularAcreditacion.
@@ -357,7 +369,16 @@ export function CargarCsvModal({ open, lote, onClose, onCargado }: Props) {
     });
 
     return { matches, sinMatch: match.sinMatch };
-  }, [modoPerLote, parseado, renglones, programados, establecimientos, establecimientosConNombre, parametros, sitios]);
+  }, [
+    modoPerLote,
+    parseado,
+    renglones,
+    programados,
+    establecimientos,
+    establecimientosConNombre,
+    parametros,
+    sitios,
+  ]);
 
   // ============================================================
   // Confirmar
@@ -371,10 +392,8 @@ export function CargarCsvModal({ open, lote, onClose, onCargado }: Props) {
       return next;
     });
 
-  const setParam = <K extends keyof ParametrosAcreditacion>(
-    k: K,
-    v: ParametrosAcreditacion[K],
-  ) => setParametros((p) => ({ ...p, [k]: v }));
+  const setParam = <K extends keyof ParametrosAcreditacion>(k: K, v: ParametrosAcreditacion[K]) =>
+    setParametros((p) => ({ ...p, [k]: v }));
 
   /**
    * Genera y descarga un CSV de ejemplo con 5 contracargos
@@ -460,7 +479,9 @@ export function CargarCsvModal({ open, lote, onClose, onCargado }: Props) {
     comisionCierreLoteMonto: p.totales.comisionCierre,
     // Si la RPC devolvio algo, lo usamos. Si no, caemos al calculo
     // local (puede no respetar exenciones).
-    debitoCreditoMonto: retenciones ? retenciones.debitoCredito.monto : p.totales.retencionDebitoCredito,
+    debitoCreditoMonto: retenciones
+      ? retenciones.debitoCredito.monto
+      : p.totales.retencionDebitoCredito,
     ivaMonto: retenciones ? retenciones.iva.monto : p.totales.retencionIva,
     iibbMonto: iibbMontoFinal,
     importeNeto: retenciones
@@ -486,7 +507,10 @@ export function CargarCsvModal({ open, lote, onClose, onCargado }: Props) {
   // la fecha del primer renglón del lote (en el orden que devolvió el
   // parser), que es la más antigua.
   const fechaCobroRealPara = (rs: RenglonLiquidacion[]): string | null => {
-    const fechas = rs.map((r) => r.fecha).filter(Boolean).sort();
+    const fechas = rs
+      .map((r) => r.fecha)
+      .filter(Boolean)
+      .sort();
     if (fechas.length === 0) return null;
     return fechas[0] ?? null;
   };
@@ -503,7 +527,11 @@ export function CargarCsvModal({ open, lote, onClose, onCargado }: Props) {
       let aplicados = 0;
       let sinMatch = 0;
       if (modoPerLote && lote && previewPerLote) {
-        const liq = liquidacionDePreview(previewPerLote, lote.tasaPropiaPct, parametros.comisionCierreLotePct);
+        const liq = liquidacionDePreview(
+          previewPerLote,
+          lote.tasaPropiaPct,
+          parametros.comisionCierreLotePct,
+        );
         const fechaCobro = fechaCobroRealPara(previewPerLote.aplicables.map((m) => m.renglon));
         await aplicarLiquidacionLote(lote.id, liq, fechaCobro);
         aplicados = 1;
@@ -534,9 +562,8 @@ export function CargarCsvModal({ open, lote, onClose, onCargado }: Props) {
   // Render
   // ============================================================
 
-  const titulo = modoPerLote && lote
-    ? `Cargar liquidación — ${lote.codigo}`
-    : "Cargar liquidación de Payway";
+  const titulo =
+    modoPerLote && lote ? `Cargar liquidación — ${lote.codigo}` : "Cargar liquidación de Payway";
   const descripcion = modoPerLote
     ? "Subí el archivo de liquidación para confirmar los importes. Quedará en Pendiente listo para acreditar."
     : "Subí el archivo de liquidación: los renglones que matcheen contra lotes Programado pasarán a Pendiente, el resto se queda donde está.";
@@ -711,8 +738,8 @@ export function CargarCsvModal({ open, lote, onClose, onCargado }: Props) {
           <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5 text-xs text-amber-800">
             <Info size={15} className="mt-0.5 shrink-0" />
             <span>
-              No se pudo leer el mapa de establecimientos de Payway. En modo por lote podés
-              resolver el comercio abajo a mano.
+              No se pudo leer el mapa de establecimientos de Payway. En modo por lote podés resolver
+              el comercio abajo a mano.
             </span>
           </div>
         )}
@@ -785,7 +812,9 @@ export function CargarCsvModal({ open, lote, onClose, onCargado }: Props) {
                             )}
                             {m.estado === "sin_establecimiento" &&
                               marcaCoincide(m.renglon.marca, lote.bandera) && (
-                                <span className="block text-[10px] mt-0.5">puede ser de este lote</span>
+                                <span className="block text-[10px] mt-0.5">
+                                  puede ser de este lote
+                                </span>
                               )}
                           </td>
                           <td className="px-2.5 py-1.5">
@@ -869,12 +898,13 @@ export function CargarCsvModal({ open, lote, onClose, onCargado }: Props) {
           <>
             <div className="rounded-lg border p-3">
               <h4 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground flex items-center gap-1.5">
-                <FileUp size={14} /> Lotes que van a pasar a Pendiente ({previewGeneral.matches.length})
+                <FileUp size={14} /> Lotes que van a pasar a Pendiente (
+                {previewGeneral.matches.length})
               </h4>
               {previewGeneral.matches.length === 0 ? (
                 <p className="text-sm text-muted-foreground">
-                  Ningún lote Programado matcheó con este archivo. Revisá que las fechas y
-                  comercios estén bien.
+                  Ningún lote Programado matcheó con este archivo. Revisá que las fechas y comercios
+                  estén bien.
                 </p>
               ) : (
                 <div className="overflow-x-auto max-h-72 overflow-y-auto -mx-3">
@@ -896,7 +926,9 @@ export function CargarCsvModal({ open, lote, onClose, onCargado }: Props) {
                         <tr key={m.lote.id}>
                           <td className="px-3 py-1.5 font-mono text-xs">{m.lote.codigo}</td>
                           <td className="px-3 py-1.5 truncate max-w-[160px]">
-                            {m.lote.comercio?.nombreComercio ?? m.lote.comercio?.usuario ?? m.lote.comercioId}
+                            {m.lote.comercio?.nombreComercio ??
+                              m.lote.comercio?.usuario ??
+                              m.lote.comercioId}
                           </td>
                           <td className="px-3 py-1.5">{m.lote.bandera}</td>
                           <td className="px-3 py-1.5 font-mono tabular-nums">
@@ -910,7 +942,9 @@ export function CargarCsvModal({ open, lote, onClose, onCargado }: Props) {
                           </td>
                           <td
                             className={`px-3 py-1.5 text-right font-mono tabular-nums ${
-                              m.preview.diferenciaBruto > 0 ? "text-amber-600" : "text-muted-foreground"
+                              m.preview.diferenciaBruto > 0
+                                ? "text-amber-600"
+                                : "text-muted-foreground"
                             }`}
                           >
                             {fmt(m.preview.diferenciaBruto)}
@@ -929,8 +963,8 @@ export function CargarCsvModal({ open, lote, onClose, onCargado }: Props) {
             {previewGeneral.sinMatch.length > 0 && (
               <details className="rounded-lg border p-3 text-xs">
                 <summary className="cursor-pointer text-muted-foreground hover:text-foreground">
-                  Renglones sin match ({previewGeneral.sinMatch.length}). El archivo los
-                  trae pero ningún lote Programado los recibió — siguen en Programado.
+                  Renglones sin match ({previewGeneral.sinMatch.length}). El archivo los trae pero
+                  ningún lote Programado los recibió — siguen en Programado.
                 </summary>
                 <div className="overflow-x-auto max-h-48 overflow-y-auto mt-2">
                   <table className="w-full text-xs">
@@ -947,7 +981,9 @@ export function CargarCsvModal({ open, lote, onClose, onCargado }: Props) {
                     <tbody className="divide-y">
                       {previewGeneral.sinMatch.map((r) => (
                         <tr key={r.nro} className="text-muted-foreground">
-                          <td className="px-2.5 py-1.5 font-mono tabular-nums">{fmtFecha(r.fecha)}</td>
+                          <td className="px-2.5 py-1.5 font-mono tabular-nums">
+                            {fmtFecha(r.fecha)}
+                          </td>
                           <td className="px-2.5 py-1.5">{r.marca || "-"}</td>
                           <td className="px-2.5 py-1.5 font-mono">{r.establecimiento || "-"}</td>
                           <td className="px-2.5 py-1.5 text-right font-mono tabular-nums">
@@ -969,13 +1005,17 @@ export function CargarCsvModal({ open, lote, onClose, onCargado }: Props) {
           </>
         )}
 
-        {!modoPerLote && parseado && !cargandoProgramados && programados && programados.length === 0 && (
-          <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5 text-xs text-amber-800">
-            <AlertTriangle size={14} className="inline mr-1.5 -mt-0.5" />
-            No hay lotes en estado Programado en la base. Generá lotes desde el módulo de
-            cobros antes de cargar liquidaciones.
-          </div>
-        )}
+        {!modoPerLote &&
+          parseado &&
+          !cargandoProgramados &&
+          programados &&
+          programados.length === 0 && (
+            <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5 text-xs text-amber-800">
+              <AlertTriangle size={14} className="inline mr-1.5 -mt-0.5" />
+              No hay lotes en estado Programado en la base. Generá lotes desde el módulo de cobros
+              antes de cargar liquidaciones.
+            </div>
+          )}
 
         {/* ========== Cálculo de descuento (per-lote) ========== */}
         {modoPerLote && previewPerLote && (
@@ -1008,11 +1048,17 @@ export function CargarCsvModal({ open, lote, onClose, onCargado }: Props) {
                     <div className="flex items-center gap-1.5">
                       Retención débito y crédito
                       {retenciones.debitoCredito.exento ? (
-                        <Badge tone="success" className="inline-flex items-center gap-1 text-[10px]">
+                        <Badge
+                          tone="success"
+                          className="inline-flex items-center gap-1 text-[10px]"
+                        >
                           <ShieldCheck size={10} /> Exento
                         </Badge>
                       ) : retenciones.debitoCredito.asignado ? (
-                        <Badge tone="neutral" className="inline-flex items-center gap-1 text-[10px]">
+                        <Badge
+                          tone="neutral"
+                          className="inline-flex items-center gap-1 text-[10px]"
+                        >
                           <ShieldCheck size={10} /> Asignado
                         </Badge>
                       ) : (
@@ -1034,7 +1080,10 @@ export function CargarCsvModal({ open, lote, onClose, onCargado }: Props) {
                     <div className="flex items-center gap-1.5">
                       Retención IVA
                       {retenciones.iva.asignado ? (
-                        <Badge tone="neutral" className="inline-flex items-center gap-1 text-[10px]">
+                        <Badge
+                          tone="neutral"
+                          className="inline-flex items-center gap-1 text-[10px]"
+                        >
                           <ShieldCheck size={10} /> Asignado
                         </Badge>
                       ) : (
@@ -1043,9 +1092,7 @@ export function CargarCsvModal({ open, lote, onClose, onCargado }: Props) {
                         </Badge>
                       )}
                     </div>
-                    <span className="block text-[11px] opacity-80">
-                      {retenciones.iva.motivo}
-                    </span>
+                    <span className="block text-[11px] opacity-80">{retenciones.iva.motivo}</span>
                   </span>
                   <span className="font-mono tabular-nums whitespace-nowrap text-danger-600">
                     - {fmt(retenciones.iva.monto)}
@@ -1056,7 +1103,10 @@ export function CargarCsvModal({ open, lote, onClose, onCargado }: Props) {
                     <div className="flex items-center gap-1.5">
                       Retención Ingresos Brutos
                       {retenciones.iibb.asignado ? (
-                        <Badge tone="neutral" className="inline-flex items-center gap-1 text-[10px]">
+                        <Badge
+                          tone="neutral"
+                          className="inline-flex items-center gap-1 text-[10px]"
+                        >
                           <ShieldCheck size={10} /> Asignado
                         </Badge>
                       ) : (
@@ -1065,9 +1115,7 @@ export function CargarCsvModal({ open, lote, onClose, onCargado }: Props) {
                         </Badge>
                       )}
                     </div>
-                    <span className="block text-[11px] opacity-80">
-                      {retenciones.iibb.motivo}
-                    </span>
+                    <span className="block text-[11px] opacity-80">{retenciones.iibb.motivo}</span>
                   </span>
                   <span className="font-mono tabular-nums whitespace-nowrap text-danger-600">
                     - {fmt(iibbMontoFinal)}
@@ -1164,8 +1212,8 @@ export function CargarCsvModal({ open, lote, onClose, onCargado }: Props) {
               </div>
             </div>
             <p className="text-[11px] text-muted-foreground mt-2">
-              Editables porque el motor de retenciones no está implementado. Lo que dejes
-              precargado es lo que se guarda.
+              Editables porque el motor de retenciones no está implementado. Lo que dejes precargado
+              es lo que se guarda.
             </p>
           </div>
         )}

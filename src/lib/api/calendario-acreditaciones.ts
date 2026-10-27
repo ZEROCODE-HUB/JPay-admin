@@ -7,11 +7,7 @@ import { DataAccessError } from "./errors";
 
 /** Estado de la acreditación que la UI muestra. */
 export type EstadoCalendario =
-  | "programado"
-  | "pendiente"
-  | "acreditado"
-  | "contracargo"
-  | "cancelado";
+  "programado" | "pendiente" | "acreditado" | "contracargo" | "cancelado";
 
 /** Fila devuelta por la RPC `calendario_acreditaciones_v2`. */
 export type CalendarioAcreditacion = {
@@ -115,9 +111,8 @@ function toCalendarioAcreditacion(r: Record<string, unknown>): CalendarioAcredit
     bandera: String(r.bandera ?? "—"),
     fechaVenta: String(r.fecha_venta ?? ""),
     fechaAcreditacion: String(r.fecha_acreditacion ?? ""),
-    diasHabilesAplicados: r.dias_habiles_aplicados != null
-      ? Number(r.dias_habiles_aplicados)
-      : null,
+    diasHabilesAplicados:
+      r.dias_habiles_aplicados != null ? Number(r.dias_habiles_aplicados) : null,
     cantidadOperaciones: parseNumber(r.cantidad_operaciones),
     importeBruto: parseNumber(r.importe_bruto),
     impuestos: parseNumber(r.impuestos),
@@ -139,14 +134,10 @@ function toAdelantoParaCalendario(r: Record<string, unknown>): AdelantoParaCalen
   return {
     id: String(r.id),
     montoSolicitado: parseNumber(r.monto_solicitado),
-    montoPorAcreditar: r.monto_por_acreditar != null
-      ? parseNumber(r.monto_por_acreditar)
-      : null,
+    montoPorAcreditar: r.monto_por_acreditar != null ? parseNumber(r.monto_por_acreditar) : null,
     plazoOriginalDias: parseNumber(r.plazo_original_dias),
     plazoAdelantadoDias: parseNumber(r.plazo_adelantado_dias),
-    tasaInteresPct: r.tasa_interes_pct != null
-      ? parseNumber(r.tasa_interes_pct)
-      : null,
+    tasaInteresPct: r.tasa_interes_pct != null ? parseNumber(r.tasa_interes_pct) : null,
     estado: r.estado as AdelantoParaCalendario["estado"],
     fechaSolicitud: String(r.fecha_solicitud ?? ""),
     fechaResolucion: (r.fecha_resolucion as string) ?? null,
@@ -221,9 +212,10 @@ export async function getResumenSaldosCalendario(
   const adelantosEnCurso = parseNumber(r.adelantos_en_curso);
   // Si la RPC devuelve `disponible_real`, lo usamos; si no, lo calculamos acá
   // para mantener compat con schemas viejos.
-  const disponibleReal = r.disponible_real != null
-    ? parseNumber(r.disponible_real)
-    : Math.max(porAcreditar - adelantosEnCurso, 0);
+  const disponibleReal =
+    r.disponible_real != null
+      ? parseNumber(r.disponible_real)
+      : Math.max(porAcreditar - adelantosEnCurso, 0);
   return { faltaCobrar, porAcreditar, adelantosEnCurso, disponibleReal };
 }
 

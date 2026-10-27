@@ -100,7 +100,8 @@ export async function updateComercio(id: string, input: ComercioUpdateInput): Pr
   if (input.usuario !== undefined) payload.usuario = input.usuario.trim();
   if (input.legajo !== undefined) payload.legajo = input.legajo.trim();
   if ((input as { nombreComercio?: string | null }).nombreComercio !== undefined)
-    payload.nombre_comercio = (input as { nombreComercio?: string | null }).nombreComercio?.trim() || null;
+    payload.nombre_comercio =
+      (input as { nombreComercio?: string | null }).nombreComercio?.trim() || null;
   if (input.categoriaId !== undefined) payload.categoria_id = input.categoriaId;
   if (input.nivel !== undefined) payload.nivel = input.nivel;
   if (input.estado !== undefined) payload.estado = input.estado;
@@ -109,7 +110,12 @@ export async function updateComercio(id: string, input: ComercioUpdateInput): Pr
   if ((input as { siteId?: string | null }).siteId !== undefined)
     payload.site_id = (input as { siteId?: string | null }).siteId?.trim() || null;
 
-  const { data, error } = await sb.from("comercios").update(payload).eq("id", id).select(COLUMNS).single();
+  const { data, error } = await sb
+    .from("comercios")
+    .update(payload)
+    .eq("id", id)
+    .select(COLUMNS)
+    .single();
   if (error) throw new DataAccessError(error);
   return toComercio(data as ComercioRow);
 }
@@ -159,7 +165,11 @@ export async function deshabilitarComercio(id: string, motivo: string): Promise<
 // existente (FK real a clientes.legajo). Selector con búsqueda server-side + limit.
 export async function listClientesForSelect(search?: string): Promise<ClienteSelect[]> {
   const sb = requireSupabase();
-  let query = sb.from("clientes").select("legajo, nombre, correo, cuit, tipo_persona").order("nombre", { ascending: true }).limit(20);
+  let query = sb
+    .from("clientes")
+    .select("legajo, nombre, correo, cuit, tipo_persona")
+    .order("nombre", { ascending: true })
+    .limit(20);
   if (search?.trim()) {
     const q = search.trim().replace(/[%_]/g, "\\$&");
     query = query.or(`legajo.ilike.%${q}%,correo.ilike.%${q}%,nombre.ilike.%${q}%`);
@@ -167,7 +177,13 @@ export async function listClientesForSelect(search?: string): Promise<ClienteSel
   const { data, error } = await query;
   if (error) throw new DataAccessError(error);
   return (data ?? []).map(
-    (r: { legajo: string; nombre: string; correo: string; cuit: string; tipo_persona: string }): ClienteSelect => ({
+    (r: {
+      legajo: string;
+      nombre: string;
+      correo: string;
+      cuit: string;
+      tipo_persona: string;
+    }): ClienteSelect => ({
       legajo: r.legajo,
       nombre: r.nombre,
       correo: r.correo,

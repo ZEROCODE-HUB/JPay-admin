@@ -448,7 +448,12 @@ function DetalleModal({ imp, onClose }: { imp: Impuesto; onClose: () => void }) 
             <Field label="Código" value={<span className="font-mono">{imp.codigo}</span>} />
             <Field label="Nombre" value={imp.nombre} />
             <Field label="Descripción" value={imp.descripcion ?? "—"} />
-            <Field label="�mbito" value={<Badge tone={imp.ambito === "Interno" ? "success" : "neutral"}>{imp.ambito}</Badge>} />
+            <Field
+              label="�mbito"
+              value={
+                <Badge tone={imp.ambito === "Interno" ? "success" : "neutral"}>{imp.ambito}</Badge>
+              }
+            />
             <Field label="Tipo" value={imp.tipo} />
             <Field
               label="Monto"
@@ -679,8 +684,14 @@ function Page() {
     return rows.filter((r) => (r.ambito ?? "Externo") === target);
   }, [rows, tab]);
 
-  const externosCount = useMemo(() => rows.filter((r) => (r.ambito ?? "Externo") === "Externo").length, [rows]);
-  const internosCount = useMemo(() => rows.filter((r) => (r.ambito ?? "Externo") === "Interno").length, [rows]);
+  const externosCount = useMemo(
+    () => rows.filter((r) => (r.ambito ?? "Externo") === "Externo").length,
+    [rows],
+  );
+  const internosCount = useMemo(
+    () => rows.filter((r) => (r.ambito ?? "Externo") === "Interno").length,
+    [rows],
+  );
 
   const err = error instanceof DataAccessError ? error : null;
   const totalPaginas = Math.max(1, Math.ceil(total / PAGE_SIZE));

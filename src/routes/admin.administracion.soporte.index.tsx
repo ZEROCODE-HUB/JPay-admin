@@ -25,7 +25,8 @@ function mockResult(id: string, tipo: QueryType): ConsultaResult {
   return {
     legajo: `LEG-${base}`,
     nombre: tipo === "deposito" ? "María Rodríguez" : "Luis Fernández",
-    email: tipo === "deposito" ? `mrodriguez@${brand.web.domain}` : `lfernandez@${brand.web.domain}`,
+    email:
+      tipo === "deposito" ? `mrodriguez@${brand.web.domain}` : `lfernandez@${brand.web.domain}`,
     monto: `$${(((base * 137) % 90000) + 1000).toLocaleString("es-AR")}`,
     estado: base % 3 === 0 ? "Pendiente" : base % 3 === 1 ? "Acreditado" : "Rechazado",
     fecha:

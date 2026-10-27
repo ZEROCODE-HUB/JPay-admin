@@ -19,8 +19,7 @@ export const KB: KbEntry[] = [
       "saldo",
       "recaudadora",
     ],
-    response:
-      `Una transacción nace EN PROGRESO: el saldo se descuenta para el cliente, pero el dinero aún no salió realmente. La plataforma espera confirmación de la cuenta recaudadora del banco. Si confirma, se genera el ID COELSA —prueba definitiva de salida— y pasa a APROBADO. Si no, pasa a RECHAZADO y el saldo se revierte. ${brand.shortName} solo disponibiliza saldos; la verdad de si el dinero se movió vive en la cuenta recaudadora, y COELSA la certifica.`,
+    response: `Una transacción nace EN PROGRESO: el saldo se descuenta para el cliente, pero el dinero aún no salió realmente. La plataforma espera confirmación de la cuenta recaudadora del banco. Si confirma, se genera el ID COELSA —prueba definitiva de salida— y pasa a APROBADO. Si no, pasa a RECHAZADO y el saldo se revierte. ${brand.shortName} solo disponibiliza saldos; la verdad de si el dinero se movió vive en la cuenta recaudadora, y COELSA la certifica.`,
   },
   {
     keywords: [
@@ -37,8 +36,7 @@ export const KB: KbEntry[] = [
   },
   {
     keywords: ["impuesto", "ganancias", "retención"],
-    response:
-      `${brand.shortName} maneja dos tipos de impuestos, totalmente separados.\n\n(1) Impuestos propios de ${brand.company.shortName}: Ganancias (anual) e Ingresos Brutos sobre su comisión — es ganancia del negocio, gestionada por su contabilidad, no afecta al cliente.\n\n(2) Impuestos retenidos al cliente: ${brand.company.shortName} es agente de retención, no pagador. Se retienen dos impuestos por operación — Débito/crédito (0,6% en ingresos, 0,6% en egresos, transferido mensualmente) e Ingresos Brutos del cliente (porcentaje variable según base del organismo fiscal, transferido cada 10 días). Ese dinero nunca es ganancia de ${brand.company.shortName}: se retiene transitoriamente y se transfiere al organismo.`,
+    response: `${brand.shortName} maneja dos tipos de impuestos, totalmente separados.\n\n(1) Impuestos propios de ${brand.company.shortName}: Ganancias (anual) e Ingresos Brutos sobre su comisión — es ganancia del negocio, gestionada por su contabilidad, no afecta al cliente.\n\n(2) Impuestos retenidos al cliente: ${brand.company.shortName} es agente de retención, no pagador. Se retienen dos impuestos por operación — Débito/crédito (0,6% en ingresos, 0,6% en egresos, transferido mensualmente) e Ingresos Brutos del cliente (porcentaje variable según base del organismo fiscal, transferido cada 10 días). Ese dinero nunca es ganancia de ${brand.company.shortName}: se retiene transitoriamente y se transfiere al organismo.`,
   },
   {
     keywords: ["alerta", "bloqueo", "compliance", "suspender", "suspensión", "cuenta bloqueada"],
@@ -156,8 +154,7 @@ export const KB: KbEntry[] = [
       "reportes ingresos brutos",
       "padrón ingresos",
     ],
-    response:
-      `Comercios → Impuestos → Ingresos brutos: gestión del impuesto de Ingresos Brutos del cliente. Incluye reportes por período (con estado de presentación y pago) y el padrón de Ingresos Brutos. Se retiene al cliente según la base del organismo fiscal y se transfiere cada 10 días; nunca es ganancia de ${brand.company.shortName}.`,
+    response: `Comercios → Impuestos → Ingresos brutos: gestión del impuesto de Ingresos Brutos del cliente. Incluye reportes por período (con estado de presentación y pago) y el padrón de Ingresos Brutos. Se retiene al cliente según la base del organismo fiscal y se transfiere cada 10 días; nunca es ganancia de ${brand.company.shortName}.`,
   },
   {
     keywords: ["reportes", "reporte", "administración reportes"],
@@ -185,7 +182,7 @@ export const KB: KbEntry[] = [
       "padrón",
     ],
     response:
-      "Reportes BCRA: permite generar el Padrón de Clientes Personas Jurídicas exigido por el Régimen Informativo de Proveedores de Servicios de Pago (Comunicación \"A\" 8207 del BCRA, presentado vía SISCEN). Se elige el período, se presiona \"Consultar padrón\" (trae los clientes Persona Jurídica activos de la base) y luego \"Descargar\" para obtener el .xlsx. El archivo se genera sin encabezado y con columnas de ancho fijo. Si algún cliente no tiene código postal cargado, se lo advierte porque el régimen exige ese dato.",
+      'Reportes BCRA: permite generar el Padrón de Clientes Personas Jurídicas exigido por el Régimen Informativo de Proveedores de Servicios de Pago (Comunicación "A" 8207 del BCRA, presentado vía SISCEN). Se elige el período, se presiona "Consultar padrón" (trae los clientes Persona Jurídica activos de la base) y luego "Descargar" para obtener el .xlsx. El archivo se genera sin encabezado y con columnas de ancho fijo. Si algún cliente no tiene código postal cargado, se lo advierte porque el régimen exige ese dato.',
   },
   {
     keywords: [
@@ -306,8 +303,7 @@ export const KB: KbEntry[] = [
       "interno de usuarios",
       "impuestos cobrados",
     ],
-    response:
-      `Administración → Registros → Total de fondos: control crítico que detecta cuándo ${brand.name} informa a los clientes un monto mayor al real en la cuenta recaudadora. Usa dos fórmulas en ARS:\n\n• Fórmula 1: Interno de usuarios + Impuestos cobrados − Banco.\n• Fórmula 2: Interno de usuarios (nuevo) − Banco.\n\nSi la diferencia da negativa se marca en rojo; el objetivo es que siempre cuadre con el banco.`,
+    response: `Administración → Registros → Total de fondos: control crítico que detecta cuándo ${brand.name} informa a los clientes un monto mayor al real en la cuenta recaudadora. Usa dos fórmulas en ARS:\n\n• Fórmula 1: Interno de usuarios + Impuestos cobrados − Banco.\n• Fórmula 2: Interno de usuarios (nuevo) − Banco.\n\nSi la diferencia da negativa se marca en rojo; el objetivo es que siempre cuadre con el banco.`,
   },
   {
     keywords: [

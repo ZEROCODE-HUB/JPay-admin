@@ -92,9 +92,7 @@ export function toCliente(r: ClienteRow): Cliente {
   };
 }
 
-export function toComision(
-  r: ComisionClienteRow,
-): ComisionCliente {
+export function toComision(r: ComisionClienteRow): ComisionCliente {
   const cli = firstOrNull(r.clientes);
   const sub = firstOrNull(r.subcuentas);
   return {
@@ -187,13 +185,19 @@ export function toPuntoVenta(r: PuntoVentaRow): PuntoVenta {
     cajero: (r as PuntoVentaRow).cajero ?? null,
     qrUrl: (r as PuntoVentaRow).qr_url ?? null,
     alias: (r as PuntoVentaRow).alias ?? null,
-    comercio: com ? { id: com.id, usuario: com.usuario, legajo: com.legajo, clienteNombre: cli?.nombre ?? undefined, clienteCorreo: cli?.correo ?? undefined } : null,
+    comercio: com
+      ? {
+          id: com.id,
+          usuario: com.usuario,
+          legajo: com.legajo,
+          clienteNombre: cli?.nombre ?? undefined,
+          clienteCorreo: cli?.correo ?? undefined,
+        }
+      : null,
   };
 }
 
-export function toComercio(
-  r: ComercioRow,
-): Comercio {
+export function toComercio(r: ComercioRow): Comercio {
   const cli = firstOrNull(r.clientes);
   const cat = firstOrNull(r.codigos_categoria);
   const pdvs = (r.puntos_venta ?? []) as PuntoVentaRow[];
@@ -226,7 +230,9 @@ export function toComercio(
       : null,
     nivel: r.nivel,
     estado: r.estado,
-    ejecutivoResponsableId: (r as unknown as { ejecutivo_responsable_id?: string | null }).ejecutivo_responsable_id ?? null,
+    ejecutivoResponsableId:
+      (r as unknown as { ejecutivo_responsable_id?: string | null }).ejecutivo_responsable_id ??
+      null,
     ejecutivo: adminUser
       ? {
           id: adminUser.id,
@@ -418,9 +424,7 @@ export function toAlicuota(r: AlicuotaRow): Alicuota {
   };
 }
 
-export function toImpuestoAsignacion(
-  r: ImpuestoAsignacionRow,
-): ImpuestoAsignacion {
+export function toImpuestoAsignacion(r: ImpuestoAsignacionRow): ImpuestoAsignacion {
   const imp = firstOrNull(r.impuestos);
   const cli = firstOrNull(r.clientes);
   return {
@@ -478,7 +482,7 @@ export function toIbNormalizacionPreview(r: IbNormalizacionPreviewRow): IbNormal
 }
 
 export function toDcExcepcion(r: DcExcepcionRow): DcExcepcion {
-  const imp = Array.isArray(r.impuestos) ? r.impuestos[0] ?? null : null;
+  const imp = Array.isArray(r.impuestos) ? (r.impuestos[0] ?? null) : null;
   return {
     id: r.id,
     email: r.usuario,

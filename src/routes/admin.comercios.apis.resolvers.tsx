@@ -156,7 +156,9 @@ function ResolverFormModal({
             placeholder="30123456780"
           />
           {form.cuit && !cuitValido && (
-            <p className="text-[11px] text-danger-600 mt-1 text-xs">El CUIT debe tener 11 dígitos.</p>
+            <p className="text-[11px] text-danger-600 mt-1 text-xs">
+              El CUIT debe tener 11 dígitos.
+            </p>
           )}
         </div>
         <div>

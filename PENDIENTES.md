@@ -10,6 +10,7 @@ la service role, sin validar el JWT ni el rol de quien la invoca. Con la clave p
 Supabase alcanza para crearse un administrador.
 
 **Qué hacer**
+
 - [ ] Exigir el JWT del llamador (`auth.getUser(token)`) y verificar que sea un administrador con
       permiso para crear usuarios antes de operar.
 - [ ] Revisar `verify_jwt` y el resto de las funciones (`eliminar-usuario`,

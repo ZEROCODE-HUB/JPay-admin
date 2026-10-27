@@ -15,15 +15,15 @@ cp .env.example .env   # completar las variables
 npm run dev
 ```
 
-| Script | Qué hace |
-|---|---|
-| `npm run dev` / `npm run build` | Desarrollo / build de producción (antes sincronizan la marca) |
-| `npm run typecheck` | Chequeo de tipos |
-| `npm run lint` | ESLint |
-| `npm run brand:sync` | Regenera los archivos derivados de `src/brand/brand.json` |
-| `npm run brand:check` | Verifica que la marca no esté escrita a mano en el código (corre en CI) |
-| `npm run brand:assets` | Regenera `hero.webp` y `og-image.png` desde la marca |
-| `npm run gen:kb` / `npm run gen:docs` | Regeneran la navegación del asistente y la doc de comportamiento |
+| Script                                | Qué hace                                                                |
+| ------------------------------------- | ----------------------------------------------------------------------- |
+| `npm run dev` / `npm run build`       | Desarrollo / build de producción (antes sincronizan la marca)           |
+| `npm run typecheck`                   | Chequeo de tipos                                                        |
+| `npm run lint`                        | ESLint                                                                  |
+| `npm run brand:sync`                  | Regenera los archivos derivados de `src/brand/brand.json`               |
+| `npm run brand:check`                 | Verifica que la marca no esté escrita a mano en el código (corre en CI) |
+| `npm run brand:assets`                | Regenera `hero.webp` y `og-image.png` desde la marca                    |
+| `npm run gen:kb` / `npm run gen:docs` | Regeneran la navegación del asistente y la doc de comportamiento        |
 
 ## Documentación
 

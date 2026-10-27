@@ -1,11 +1,7 @@
 import { requireSupabase } from "@/lib/supabase";
 import type { TablesUpdate } from "@/lib/database.types";
 import { DataAccessError } from "./errors";
-import {
-  uploadAdjunto,
-  deleteAdjunto,
-  type ArchivoAdjunto,
-} from "@/lib/storage/contracargos";
+import { uploadAdjunto, deleteAdjunto, type ArchivoAdjunto } from "@/lib/storage/contracargos";
 
 export type EstadoContra =
   | "Simulado"
@@ -19,7 +15,7 @@ export type EstadoContra =
 export const ESTADO_CONTRA_DB: Record<EstadoContra, EstadoContra> = {
   Simulado: "Simulado",
   Abierto: "Abierto",
-  "En_mediación": "En_mediacion",
+  En_mediación: "En_mediacion",
   En_mediacion: "En_mediacion",
   Cerrado_acreditado: "Cerrado_acreditado",
   Cerrado_retenido: "Cerrado_retenido",
@@ -60,7 +56,8 @@ export type ContraRow = {
   cliente_legajo: string | null;
   url_origen: string | null;
   // joins
-  comercios?: { id: string; usuario: string; legajo: string; nombre_comercio: string | null }[] | null;
+  comercios?:
+    { id: string; usuario: string; legajo: string; nombre_comercio: string | null }[] | null;
   cliente_links_pago_pagos?: { link_id: string; site_transaction_id: string }[] | null;
 };
 
@@ -197,11 +194,7 @@ export async function listContracargos(filters?: ContraFilters): Promise<Contra[
 
 export async function getContra(id: string): Promise<Contra | null> {
   const sb = requireSupabase();
-  const { data, error } = await sb
-    .from("contracargos")
-    .select(COLUMNS)
-    .eq("id", id)
-    .maybeSingle();
+  const { data, error } = await sb.from("contracargos").select(COLUMNS).eq("id", id).maybeSingle();
   if (error) throw new DataAccessError(error);
   return data ? toContra(data as ContraRow) : null;
 }
@@ -251,18 +244,12 @@ export type UpdateContraInput = {
   esSimulacion?: boolean;
 };
 
-export async function updateContracargo(
-  id: string,
-  input: UpdateContraInput,
-): Promise<Contra> {
+export async function updateContracargo(id: string, input: UpdateContraInput): Promise<Contra> {
   const sb = requireSupabase();
   const payload: TablesUpdate<"contracargos"> = {};
   if (input.estado !== undefined) {
     payload.estado = estadoUiToDb(input.estado);
-    if (
-      input.estado === "Cerrado_acreditado" ||
-      input.estado === "Cerrado_retenido"
-    ) {
+    if (input.estado === "Cerrado_acreditado" || input.estado === "Cerrado_retenido") {
       payload.fecha_cierre = new Date().toISOString();
       try {
         const { data: auth } = await sb.auth.getUser();
@@ -307,9 +294,7 @@ export async function confirmarSimulacion(id: string): Promise<Contra> {
   if (!actual) throw new DataAccessError(new Error("Contracargo no encontrado"));
   if (actual.estadoDb !== "Simulado") {
     throw new DataAccessError(
-      new Error(
-        `El contracargo no está en Simulado (estado actual: ${actual.estadoDb}).`,
-      ),
+      new Error(`El contracargo no está en Simulado (estado actual: ${actual.estadoDb}).`),
     );
   }
 
@@ -393,10 +378,7 @@ export async function agregarAdjunto(
   return { contra: toContra(data as ContraRow), adjunto };
 }
 
-export async function quitarAdjunto(
-  contra: Contra,
-  path: string,
-): Promise<Contra> {
+export async function quitarAdjunto(contra: Contra, path: string): Promise<Contra> {
   const sb = requireSupabase();
   const nuevos = contra.archivosAdjuntos.filter((a) => a.path !== path);
 
@@ -505,9 +487,7 @@ export async function listLotesParaCerrarRetenido(
   const sb = requireSupabase();
   const { data, error } = await sb
     .from("lotes_acreditacion")
-    .select(
-      "id, codigo, estado, fecha, importe_bruto, importe_neto, contracargo_monto",
-    )
+    .select("id, codigo, estado, fecha, importe_bruto, importe_neto, contracargo_monto")
     .eq("comercio_id", comercioId)
     .in("estado", ["Programado", "Pendiente", "Rechazado", "Contracargo"])
     .order("fecha", { ascending: false })

@@ -26,11 +26,7 @@ export function DemoModeProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  return (
-    <Ctx.Provider value={{ role, setRole }}>
-      {children}
-    </Ctx.Provider>
-  );
+  return <Ctx.Provider value={{ role, setRole }}>{children}</Ctx.Provider>;
 }
 
 export function useDemoMode() {

@@ -75,7 +75,7 @@ function generarUsuariosParaReporte(r: ReporteImpuesto): UsuarioIB[] {
     const cuitNum = String(20000000000 + (seed % 8999999999)).padStart(11, "0");
     const cuit = `${cuitNum.slice(0, 2)}-${cuitNum.slice(2, 10)}-${cuitNum.slice(10)}`;
     const nombre = NOMBRES_MOCK[(seed + i) % NOMBRES_MOCK.length];
-    const tasa = Number((1.5 + ((seed % 35) / 10)).toFixed(2)); // 1.5% - 4.9% variable
+    const tasa = Number((1.5 + (seed % 35) / 10).toFixed(2)); // 1.5% - 4.9% variable
     const monto = 50000 + ((seed * 13) % 450000); // 50k - 500k
     const retencion = Math.round(monto * (tasa / 100));
     return { cuit, nombre, tasa, monto, retencion };
@@ -91,7 +91,9 @@ function padronTxtContent(r: ReporteImpuesto, usuarios: UsuarioIB[]): string {
     `Detalle por usuario (CUIT;Nombre;Tasa;Monto;Retención)`,
     `------------------------------------------------------------`,
   ].join("\n");
-  const lines = usuarios.map((u) => `${u.cuit};${u.nombre};${u.tasa.toFixed(2)}%;${u.monto};${u.retencion}`);
+  const lines = usuarios.map(
+    (u) => `${u.cuit};${u.nombre};${u.tasa.toFixed(2)}%;${u.monto};${u.retencion}`,
+  );
   return `${header}\n${lines.join("\n")}\n`;
 }
 
@@ -103,7 +105,9 @@ function ReporteDetalleModal({
   onClose: () => void;
 }) {
   const usuarios = generarUsuariosParaReporte(reporte);
-  const impuestoPorMovimiento = reporte.totalMovimientos ? reporte.totalRetenciones / reporte.totalMovimientos : 0;
+  const impuestoPorMovimiento = reporte.totalMovimientos
+    ? reporte.totalRetenciones / reporte.totalMovimientos
+    : 0;
 
   const handleDownload = () => {
     const txt = padronTxtContent(reporte, usuarios);
@@ -134,7 +138,9 @@ function ReporteDetalleModal({
       key: "retencion",
       label: "Retención",
       sortable: true,
-      render: (u) => <span className="font-mono tabular-nums">$ {u.retencion.toLocaleString()}</span>,
+      render: (u) => (
+        <span className="font-mono tabular-nums">$ {u.retencion.toLocaleString()}</span>
+      ),
     },
   ];
 
@@ -148,7 +154,8 @@ function ReporteDetalleModal({
               Reporte {reporte.periodo} — {reporte.tramo}
             </h3>
             <p className="text-sm text-muted-foreground mt-0.5">
-              ID #{reporte.id} · Fecha de creación {reporte.fechaCreacion} · Lista completa de usuarios que pagan IB en este tramo
+              ID #{reporte.id} · Fecha de creación {reporte.fechaCreacion} · Lista completa de
+              usuarios que pagan IB en este tramo
             </p>
           </div>
           <button type="button" onClick={onClose} className="p-1.5 hover:bg-muted rounded-md">
@@ -161,15 +168,36 @@ function ReporteDetalleModal({
             <KpiCard label="Total movimientos" value={reporte.totalMovimientos.toLocaleString()} />
             <KpiCard label="Monto total" value={`$ ${reporte.totalMontos.toLocaleString()}`} />
             <KpiCard label="Total montos" value={`$ ${reporte.totalMontos.toLocaleString()}`} />
-            <KpiCard label="Total retenciones" value={`$ ${reporte.totalRetenciones.toLocaleString()}`} />
-            <KpiCard label="Impuesto por movimiento" value={`$ ${impuestoPorMovimiento.toFixed(2)}`} sub="Retenciones / Movimientos" />
-            <KpiCard label="Total movimientos" value={reporte.totalMovimientos.toLocaleString()} sub="Usuarios en padrón" />
-            <KpiCard label="Monto total" value={`$ ${reporte.totalMontos.toLocaleString()}`} sub="Suma de montos del período" />
-            <KpiCard label="Usuarios en tramo" value={usuarios.length} sub="Tasa variable por usuario" />
+            <KpiCard
+              label="Total retenciones"
+              value={`$ ${reporte.totalRetenciones.toLocaleString()}`}
+            />
+            <KpiCard
+              label="Impuesto por movimiento"
+              value={`$ ${impuestoPorMovimiento.toFixed(2)}`}
+              sub="Retenciones / Movimientos"
+            />
+            <KpiCard
+              label="Total movimientos"
+              value={reporte.totalMovimientos.toLocaleString()}
+              sub="Usuarios en padrón"
+            />
+            <KpiCard
+              label="Monto total"
+              value={`$ ${reporte.totalMontos.toLocaleString()}`}
+              sub="Suma de montos del período"
+            />
+            <KpiCard
+              label="Usuarios en tramo"
+              value={usuarios.length}
+              sub="Tasa variable por usuario"
+            />
           </div>
 
           <div>
-            <h4 className="font-semibold text-sm mb-2">Usuarios / Movimientos que pagan IB en este tramo</h4>
+            <h4 className="font-semibold text-sm mb-2">
+              Usuarios / Movimientos que pagan IB en este tramo
+            </h4>
             <DataTable
               columns={columnsUsuarios}
               data={usuarios}
@@ -226,25 +254,33 @@ function ReportesMock() {
       key: "totalMovimientos",
       label: "Total movimientos",
       sortable: true,
-      render: (r) => <span className="font-mono tabular-nums">{r.totalMovimientos.toLocaleString()}</span>,
+      render: (r) => (
+        <span className="font-mono tabular-nums">{r.totalMovimientos.toLocaleString()}</span>
+      ),
     },
     {
       key: "totalMontos",
       label: "Monto total",
       sortable: true,
-      render: (r) => <span className="font-mono tabular-nums">$ {r.totalMontos.toLocaleString()}</span>,
+      render: (r) => (
+        <span className="font-mono tabular-nums">$ {r.totalMontos.toLocaleString()}</span>
+      ),
     },
     {
       key: "totalMontos2",
       label: "Total montos",
       sortable: true,
-      render: (r) => <span className="font-mono tabular-nums">$ {r.totalMontos.toLocaleString()}</span>,
+      render: (r) => (
+        <span className="font-mono tabular-nums">$ {r.totalMontos.toLocaleString()}</span>
+      ),
     },
     {
       key: "totalRetenciones",
       label: "Total retenciones",
       sortable: true,
-      render: (r) => <span className="font-mono tabular-nums">$ {r.totalRetenciones.toLocaleString()}</span>,
+      render: (r) => (
+        <span className="font-mono tabular-nums">$ {r.totalRetenciones.toLocaleString()}</span>
+      ),
     },
     {
       key: "impuestoPorMovimiento",
@@ -259,25 +295,30 @@ function ReportesMock() {
       key: "presentado",
       label: "Presentado",
       sortable: true,
-      render: (r) => (r.presentado ? <Badge tone="success">Sí</Badge> : <Badge tone="neutral">No</Badge>),
+      render: (r) =>
+        r.presentado ? <Badge tone="success">Sí</Badge> : <Badge tone="neutral">No</Badge>,
     },
     {
       key: "pagado",
       label: "Pagado",
       sortable: true,
-      render: (r) => (r.pagado ? <Badge tone="success">Sí</Badge> : <Badge tone="neutral">No</Badge>),
+      render: (r) =>
+        r.pagado ? <Badge tone="success">Sí</Badge> : <Badge tone="neutral">No</Badge>,
     },
   ];
 
   return (
     <>
       <div className="flex items-center gap-2 mb-3">
-        <h3 className="font-display font-semibold text-base">Reportes de Impuestos — Ingresos Brutos</h3>
+        <h3 className="font-display font-semibold text-base">
+          Reportes de Impuestos — Ingresos Brutos
+        </h3>
         <Badge tone="neutral">Demo</Badge>
       </div>
       <p className="text-sm text-muted-foreground mb-4 -mt-2">
-        Cada registro representa un tramo/período. El archivo TXT es el padrón cargado. Ver detalle muestra la lista completa de
-        usuarios que pagan IB en ese tramo (tasa variable). Tramos: 1 (d1-10), 2 (d10-20), 3 (d20-30) y Mensual (resumen).
+        Cada registro representa un tramo/período. El archivo TXT es el padrón cargado. Ver detalle
+        muestra la lista completa de usuarios que pagan IB en ese tramo (tasa variable). Tramos: 1
+        (d1-10), 2 (d10-20), 3 (d20-30) y Mensual (resumen).
       </p>
       <DataTable
         columns={columns}
@@ -342,7 +383,7 @@ function Page() {
         title="Ingresos Brutos"
         description="Gestión de padrones TXT de Ingresos Brutos."
         action={
-          <BtnPrimary onClick={()=> setShowPadronPopup(true)} disabled={!puedeCrear}>
+          <BtnPrimary onClick={() => setShowPadronPopup(true)} disabled={!puedeCrear}>
             Cargar padrón
           </BtnPrimary>
         }
@@ -351,10 +392,16 @@ function Page() {
       {showPadronPopup && (
         <FormDialog
           open
-          onClose={()=> { setShowPadronPopup(false); setFormError(null); }}
+          onClose={() => {
+            setShowPadronPopup(false);
+            setFormError(null);
+          }}
           title="Cargar padrón TXT"
           description="Cargá un padrón TXT para un impuesto determinado."
-          onSubmit={async ()=> { await cargarPadron(); setShowPadronPopup(false); }}
+          onSubmit={async () => {
+            await cargarPadron();
+            setShowPadronPopup(false);
+          }}
           submitLabel="Cargar padrón"
         >
           <div className="space-y-4">

@@ -71,7 +71,11 @@ export async function listImpuestos(filters: ImpuestoFilters): Promise<Page<Impu
 
 export async function getImpuesto(id: string): Promise<Impuesto | null> {
   const sb = requireSupabase();
-  const { data, error } = await sb.from("impuestos").select(IMPUESTOS_COLUMNS).eq("id", id).maybeSingle();
+  const { data, error } = await sb
+    .from("impuestos")
+    .select(IMPUESTOS_COLUMNS)
+    .eq("id", id)
+    .maybeSingle();
   if (error) throw new DataAccessError(error);
   return data
     ? toImpuesto(data as ImpuestoRow & { impuestos_alicuotas?: AlicuotaRow[] | null })
@@ -117,7 +121,12 @@ export async function updateImpuesto(id: string, input: ImpuestoUpdateInput): Pr
   if (input.estado !== undefined) payload.estado = input.estado;
   if (input.ambito !== undefined) payload.ambito = input.ambito ?? undefined;
 
-  const { data, error } = await sb.from("impuestos").update(payload).eq("id", id).select("id, codigo, nombre, descripcion, tipo, monto, estado, ambito, created_at, updated_at").single();
+  const { data, error } = await sb
+    .from("impuestos")
+    .update(payload)
+    .eq("id", id)
+    .select("id, codigo, nombre, descripcion, tipo, monto, estado, ambito, created_at, updated_at")
+    .single();
   if (error) throw new DataAccessError(error);
 
   return getImpuesto((data as { id: string }).id) as Promise<Impuesto>;
@@ -318,7 +327,8 @@ export async function updateImpuestoAsignacion(
   // TODO: monto es NOT NULL en la base pero el form admite vacío (pendiente de decisión).
   if (input.monto !== undefined) payload.monto = input.monto as number;
   if (input.estado !== undefined) payload.estado = input.estado;
-  if (input.fecha_asignacion !== undefined) payload.fecha_asignacion = input.fecha_asignacion ?? undefined;
+  if (input.fecha_asignacion !== undefined)
+    payload.fecha_asignacion = input.fecha_asignacion ?? undefined;
   if (input.tipo_operacion !== undefined) payload.tipo_operacion = input.tipo_operacion;
 
   const { data, error } = await sb

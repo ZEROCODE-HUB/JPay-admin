@@ -1,15 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { pageTitle } from "@/brand/brand";
 import { useState } from "react";
-import {
-  Search,
-  AlertTriangle,
-  Inbox,
-  Calendar,
-  Store,
-  Eye,
-  Download,
-} from "lucide-react";
+import { Search, AlertTriangle, Inbox, Calendar, Store, Eye, Download } from "lucide-react";
 import { DataTable, type Column } from "@/components/data-table";
 import { PageHeader, Badge, Card, Input, Label, BtnOutline } from "@/components/portal-shell";
 import { ModalDialog } from "@/components/modal-dialog";
@@ -26,7 +18,10 @@ export const Route = createFileRoute("/admin/comercios/link-pago/lotes-venta")({
   head: () => ({
     meta: [
       { title: pageTitle("Lotes de Venta — Links de Pago — Admin") },
-      { name: "description", content: "Venta bruta acumulada del día por comercio, bandera y fecha (v_lotes_venta)." },
+      {
+        name: "description",
+        content: "Venta bruta acumulada del día por comercio, bandera y fecha (v_lotes_venta).",
+      },
     ],
   }),
 });
@@ -81,7 +76,16 @@ function Page() {
   });
 
   const { data, isLoading, isError, error, refetch, isFetching } = useQuery({
-    queryKey: ["lotes-venta", page, pageSize, search, banderaFilter, comercioFilter, fechaDesde, fechaHasta],
+    queryKey: [
+      "lotes-venta",
+      page,
+      pageSize,
+      search,
+      banderaFilter,
+      comercioFilter,
+      fechaDesde,
+      fechaHasta,
+    ],
     queryFn: () =>
       listLotesVenta({
         page,
@@ -114,7 +118,17 @@ function Page() {
         const s = v == null ? "" : String(v);
         return /[",\n;]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
       };
-      const header = ["Fecha Venta", "Comercio", "Legajo", "Bandera", "Ops", "Bruto", "Impuestos Est.", "Comisión Est.", "Neto Estimado"];
+      const header = [
+        "Fecha Venta",
+        "Comercio",
+        "Legajo",
+        "Bandera",
+        "Ops",
+        "Bruto",
+        "Impuestos Est.",
+        "Comisión Est.",
+        "Neto Estimado",
+      ];
       const lines = rows.map((r) => [
         parseDateLocal(r.fecha).toLocaleDateString("es-AR"),
         r.comercio?.nombreComercio ?? r.comercio?.usuario ?? "—",
@@ -235,7 +249,10 @@ function Page() {
           <div className="flex-1 min-w-[200px]">
             <Label>Buscar</Label>
             <div className="relative">
-              <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+              <Search
+                size={14}
+                className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"
+              />
               <Input
                 value={search}
                 onChange={(e) => {
@@ -250,7 +267,10 @@ function Page() {
           <div>
             <Label>Bandera</Label>
             <div className="relative">
-              <Store size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+              <Store
+                size={14}
+                className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"
+              />
               <select
                 value={banderaFilter}
                 onChange={(e) => {
@@ -289,7 +309,10 @@ function Page() {
           <div>
             <Label>Desde</Label>
             <div className="relative">
-              <Calendar size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+              <Calendar
+                size={14}
+                className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"
+              />
               <Input
                 type="date"
                 value={fechaDesde}
@@ -304,7 +327,10 @@ function Page() {
           <div>
             <Label>Hasta</Label>
             <div className="relative">
-              <Calendar size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+              <Calendar
+                size={14}
+                className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"
+              />
               <Input
                 type="date"
                 value={fechaHasta}
@@ -332,7 +358,10 @@ function Page() {
         <div className="flex flex-col items-center gap-3 rounded-xl border border-danger-200 bg-danger-50 px-6 py-12 text-center text-sm text-danger-700">
           <AlertTriangle size={28} />
           <p>{err?.message ?? "Error"}</p>
-          <button onClick={() => refetch()} className="h-9 px-4 rounded-md bg-primary text-primary-foreground">
+          <button
+            onClick={() => refetch()}
+            className="h-9 px-4 rounded-md bg-primary text-primary-foreground"
+          >
             Reintentar
           </button>
         </div>
@@ -431,9 +460,7 @@ function DetalleLoteModal({ lote, onClose }: { lote: LoteVenta; onClose: () => v
       minWidth: 200,
       render: (r) => (
         <div>
-          <div className="text-sm truncate max-w-[180px]">
-            {r.cliente?.nombre ?? r.legajo}
-          </div>
+          <div className="text-sm truncate max-w-[180px]">{r.cliente?.nombre ?? r.legajo}</div>
           <div className="font-mono text-xs text-muted-foreground">{r.legajo}</div>
         </div>
       ),
@@ -448,13 +475,17 @@ function DetalleLoteModal({ lote, onClose }: { lote: LoteVenta; onClose: () => v
       key: "comision",
       label: "Comisión",
       minWidth: 110,
-      render: (r) => <span className="font-mono tabular-nums text-danger-600">- {fmt(r.comision)}</span>,
+      render: (r) => (
+        <span className="font-mono tabular-nums text-danger-600">- {fmt(r.comision)}</span>
+      ),
     },
     {
       key: "impuesto",
       label: "Impuesto",
       minWidth: 110,
-      render: (r) => <span className="font-mono tabular-nums text-danger-600">- {fmt(r.impuesto)}</span>,
+      render: (r) => (
+        <span className="font-mono tabular-nums text-danger-600">- {fmt(r.impuesto)}</span>
+      ),
     },
     {
       key: "estado",
@@ -507,7 +538,10 @@ function DetalleLoteModal({ lote, onClose }: { lote: LoteVenta; onClose: () => v
         </div>
 
         <div className="relative max-w-sm">
-          <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+          <Search
+            size={14}
+            className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"
+          />
           <Input
             value={search}
             onChange={(e) => {

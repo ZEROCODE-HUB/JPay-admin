@@ -436,8 +436,22 @@ export const NIVELES_COMERCIO: NivelComercio[] = [
   "Enterprise",
 ];
 
-export type EstadoQr = "Pendiente de aprobación" | "Pendiente de aprobacion" | "Activado" | "Desactivado" | "Rechazado" | "Suspendido" | "Eliminado";
-export const ESTADOS_QR: EstadoQr[] = ["Pendiente de aprobación","Activado","Desactivado","Rechazado","Suspendido","Eliminado"];
+export type EstadoQr =
+  | "Pendiente de aprobación"
+  | "Pendiente de aprobacion"
+  | "Activado"
+  | "Desactivado"
+  | "Rechazado"
+  | "Suspendido"
+  | "Eliminado";
+export const ESTADOS_QR: EstadoQr[] = [
+  "Pendiente de aprobación",
+  "Activado",
+  "Desactivado",
+  "Rechazado",
+  "Suspendido",
+  "Eliminado",
+];
 
 export type PuntoVentaRow = {
   id: string;
@@ -467,7 +481,13 @@ export type PuntoVenta = {
   cajero?: string | null;
   qrUrl?: string | null;
   alias?: string | null;
-  comercio?: { id: string; usuario: string; legajo: string; clienteNombre?: string; clienteCorreo?: string } | null;
+  comercio?: {
+    id: string;
+    usuario: string;
+    legajo: string;
+    clienteNombre?: string;
+    clienteCorreo?: string;
+  } | null;
 };
 
 export type CodigoCategoriaRow = {
@@ -1058,8 +1078,19 @@ export type ImpuestoAsignacionRow = {
   clientes?: AsignacionClienteJoined | AsignacionClienteJoined[] | null;
 };
 
-type AsignacionImpuestoJoined = { codigo: string; nombre: string; tipo: TipoImpuesto; monto: number | null };
-type AsignacionClienteJoined = { legajo: string; nombre: string; cuit: string; tipo_persona: TipoPersona; correo: string };
+type AsignacionImpuestoJoined = {
+  codigo: string;
+  nombre: string;
+  tipo: TipoImpuesto;
+  monto: number | null;
+};
+type AsignacionClienteJoined = {
+  legajo: string;
+  nombre: string;
+  cuit: string;
+  tipo_persona: TipoPersona;
+  correo: string;
+};
 
 export type ImpuestoAsignacion = {
   id: string;
@@ -1394,7 +1425,13 @@ export type LoteVenta = {
 // --- lotes_acreditacion / lote_movimientos / adelantos (real Supabase) -----
 
 export type EstadoLote = "Programado" | "Pendiente" | "Acreditado" | "Contracargo" | "Cancelado";
-export const ESTADOS_LOTE: EstadoLote[] = ["Programado", "Pendiente", "Acreditado", "Contracargo", "Cancelado"];
+export const ESTADOS_LOTE: EstadoLote[] = [
+  "Programado",
+  "Pendiente",
+  "Acreditado",
+  "Contracargo",
+  "Cancelado",
+];
 
 export type LoteAcreditacionRow = {
   id: string;
@@ -1471,7 +1508,13 @@ export type LoteAcreditacion = {
   debitoCreditoMonto: number | null;
   /** Fecha real del cobro de Payway. null mientras el lote es Programado. */
   fechaCobroReal: string | null;
-  comercio?: { id: string; usuario: string; legajo: string; nombreComercio: string | null; siteId: string | null } | null;
+  comercio?: {
+    id: string;
+    usuario: string;
+    legajo: string;
+    nombreComercio: string | null;
+    siteId: string | null;
+  } | null;
   // compat mock
   importeFinal?: number;
 };
@@ -1482,7 +1525,13 @@ export type LoteMovimientoRow = {
 };
 
 export type EstadoAdelanto = "Pendiente" | "Aprobado" | "Rechazado" | "Acreditado" | "Cancelado";
-export const ESTADOS_ADELANTO: EstadoAdelanto[] = ["Pendiente", "Aprobado", "Rechazado", "Acreditado", "Cancelado"];
+export const ESTADOS_ADELANTO: EstadoAdelanto[] = [
+  "Pendiente",
+  "Aprobado",
+  "Rechazado",
+  "Acreditado",
+  "Cancelado",
+];
 
 export type AdelantoRow = {
   id: string;

@@ -6,7 +6,10 @@ export const Route = createFileRoute("/admin/general/movimientos/retiros")({
   head: () => ({
     meta: [
       { title: pageTitle("Retiros — Movimientos — Admin") },
-      { name: "description", content: `Retiros realizados desde la plataforma ${brand.shortName}.` },
+      {
+        name: "description",
+        content: `Retiros realizados desde la plataforma ${brand.shortName}.`,
+      },
     ],
   }),
   component: () => (

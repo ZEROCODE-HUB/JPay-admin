@@ -6,7 +6,10 @@ export const Route = createFileRoute("/admin/general/movimientos/impuestos")({
   head: () => ({
     meta: [
       { title: pageTitle("Impuestos cobrados — Movimientos — Admin") },
-      { name: "description", content: `Impuestos cobrados a través de la plataforma ${brand.shortName}.` },
+      {
+        name: "description",
+        content: `Impuestos cobrados a través de la plataforma ${brand.shortName}.`,
+      },
     ],
   }),
   component: ImpuestosPage,

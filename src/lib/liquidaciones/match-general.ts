@@ -113,7 +113,8 @@ export function calcularMatchGeneral(args: {
     const lookup =
       porMarca.get(`${r.establecimiento}|${normalizaMarca(r.marca)}`) ??
       solo.get(r.establecimiento);
-    let comercioIdDelRenglon: string | null = lookup && vigente(lookup, r.fecha) ? lookup.comercioId : null;
+    let comercioIdDelRenglon: string | null =
+      lookup && vigente(lookup, r.fecha) ? lookup.comercioId : null;
 
     // Fallback por site_id: si el mapa no lo resolvió, probamos con el
     // site_id del comercio. No valida la marca porque el CSV trae sólo

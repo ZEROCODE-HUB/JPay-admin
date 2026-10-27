@@ -1,6 +1,10 @@
 import { keepPreviousData, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
-import { listLineasMovimiento, type LineaFilters, type LineaMovimiento } from "@/lib/api/lineas-movimiento";
+import {
+  listLineasMovimiento,
+  type LineaFilters,
+  type LineaMovimiento,
+} from "@/lib/api/lineas-movimiento";
 import { requireSupabase } from "@/lib/supabase";
 import type { Page } from "@/lib/api/types";
 
