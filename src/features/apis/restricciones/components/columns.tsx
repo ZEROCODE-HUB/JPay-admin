@@ -1,4 +1,4 @@
-import { Edit3, Trash2 } from "lucide-react";
+import { Edit3, Lock, LockOpen, Trash2 } from "lucide-react";
 import { formatDate, formatDateTime } from "@/shared/format";
 import type { Column } from "@/shared/ui/data-table";
 import type { ActionItem } from "@/components/actions-dropdown";
@@ -83,7 +83,7 @@ export function restriccionAcciones(
     },
     {
       label: row.estado === "Restringiendo" ? "Sacar restricción" : "Restringir",
-      icon: Edit3,
+      icon: row.estado === "Restringiendo" ? LockOpen : Lock,
       variant: row.estado === "Restringiendo" ? "danger" : "default",
       disabled: !opts.puedeModificar,
       onClick: () => opts.onCambiarEstado(row, estadoOpuesto(row.estado)),

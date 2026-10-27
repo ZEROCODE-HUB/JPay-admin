@@ -2,6 +2,7 @@ import { FormDialog } from "@/shared/ui/form-dialog";
 import { Input, Label } from "@/components/portal-shell";
 import { LegajoCell } from "@/components/legajo-label";
 import type { CvuRow } from "@/lib/api/subcuentas";
+import { aliasDeFila } from "../utils";
 
 export function CvuDetalleDialog({
   viewing,
@@ -43,7 +44,7 @@ export function CvuDetalleDialog({
         </div>
         <div>
           <span className="text-muted-foreground">Alias:</span>{" "}
-          <span className="font-medium">{viewing.cbu ? viewing.cbu.slice(-6) : "—"}</span>
+          <span className="font-medium">{aliasDeFila(viewing)}</span>
         </div>
       </div>
     </FormDialog>

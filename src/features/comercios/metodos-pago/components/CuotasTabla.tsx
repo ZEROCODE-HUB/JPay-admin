@@ -13,8 +13,8 @@ export function CuotasTabla({
   cuotas: CuotaForm[];
   loading: boolean;
   onAdd: () => void;
-  onUpdate: (key: number, field: string, value: string) => void;
-  onRemove: (key: number) => void;
+  onUpdate: (key: string, field: string, value: string) => void;
+  onRemove: (key: string) => void;
 }) {
   return (
     <Card className="p-5">

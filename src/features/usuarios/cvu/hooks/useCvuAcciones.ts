@@ -4,8 +4,9 @@ import { Edit3, Eye, XCircle, Zap } from "lucide-react";
 import { toast } from "sonner";
 import type { ActionItem } from "@/components/actions-dropdown";
 import { asignarCvuParaExistente } from "@/lib/api/cvu";
-import { updateSubcuenta, type CvuRow } from "@/lib/api/subcuentas";
+import { updateAliasCvu, updateSubcuenta, type CvuRow } from "@/lib/api/subcuentas";
 import { useCan } from "@/lib/permissions";
+import { aliasDeFila, clienteParaCvu, validarAlias } from "../utils";
 
 /** Menú de acciones por fila + estado de los modales de detalle y edición. */
 export function useCvuAcciones() {
@@ -25,11 +26,18 @@ export function useCvuAcciones() {
 
   const guardarEdicion = async () => {
     if (!editTarget) return;
+    const clienteId = editTarget.cliente?.id;
+    if (!clienteId) {
+      toast.error("No se pudo identificar el cliente de este CVU.");
+      return;
+    }
+    const error = validarAlias(editAlias);
+    if (error) {
+      toast.error(error);
+      return;
+    }
     try {
-      await updateSubcuenta(editTarget.clienteLegajo, editTarget.id, {
-        cbu: editTarget.cbu ?? undefined,
-      });
-      // alias not stored in subcuenta, but we keep edit for demo (no column)
+      await updateAliasCvu(clienteId, editAlias);
       toast.success("Actualizado");
       invalidar(editTarget.clienteLegajo);
       setEditTarget(null);
@@ -53,20 +61,13 @@ export function useCvuAcciones() {
         icon: Zap,
         disabled: !puedeModificar,
         onClick: async () => {
-          const cuit = (row.cliente?.cuit ?? "").replace(/\D/g, "");
-          if (!row.legajo || !cuit) {
+          const cliente = clienteParaCvu(row);
+          if (!cliente) {
             toast.error("No se pudo identificar el titular (legajo o CUIT faltante).");
             return;
           }
           const result = await asignarCvuParaExistente({
-            cliente: {
-              id: row.id,
-              legajo: row.legajo,
-              correo: row.cliente?.correo ?? row.email ?? "",
-              cuit,
-              nombre: `${row.nombre} ${row.apellido}`.trim() || row.nombre,
-              tipoPersona: row.cliente?.tipoPersona === "juridica" ? "juridica" : "fisica",
-            },
+            cliente,
             subcuentaId: row.id,
             tipo: row.tipo,
             origin: "admin",
@@ -85,7 +86,7 @@ export function useCvuAcciones() {
       disabled: !puedeModificar,
       onClick: () => {
         setEditTarget(row);
-        setEditAlias(row.cbu?.slice(-6) ?? "");
+        setEditAlias(row.cliente?.alias ?? (row.cbu ? aliasDeFila(row) : ""));
       },
     });
 

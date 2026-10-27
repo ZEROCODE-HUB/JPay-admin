@@ -33,7 +33,7 @@ function buildColumns(rolNombre: Map<string, string>): Column<AdminUser>[] {
       render: (r) => <Badge tone={estadoAdminTone(r.activo)}>{estadoAdminLabel(r.activo)}</Badge>,
     },
     {
-      key: "created_at",
+      key: "createdAt",
       label: "Creado",
       sortable: true,
       filterable: false,

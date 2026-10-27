@@ -1,3 +1,5 @@
+import { formatDateTime } from "@/shared/format";
+
 export const PAGE_SIZES = [10, 20, 50];
 
 /** Monto del enlace/pago como número (o null si no vino). */
@@ -20,4 +22,15 @@ export function accionesDisponibles(estado: string) {
     contracargo: estado !== "Contracargo",
     eliminar: estado !== "Eliminado" && estado !== "Expirado" && estado !== "Cancelado",
   };
+}
+
+/** Vencimiento del link: fecha real de expiración y si ya pasó. null si no tiene. */
+export function vencimientoEnlace(
+  expiraEn: string | null | undefined,
+  ahora: Date = new Date(),
+): { fecha: string; vencido: boolean } | null {
+  if (!expiraEn) return null;
+  const t = new Date(expiraEn).getTime();
+  if (Number.isNaN(t)) return null;
+  return { fecha: formatDateTime(expiraEn), vencido: t <= ahora.getTime() };
 }

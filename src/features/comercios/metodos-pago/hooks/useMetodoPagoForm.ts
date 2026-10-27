@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { listCuotasByBandera, type Bandera } from "@/lib/api/banderas";
 import { agregarCuota, cuotasAForm, TIPOS_METODO, type MetodoPagoForm } from "../utils";
@@ -11,7 +11,6 @@ export function useMetodoPagoForm(metodo: Bandera | null, onSave: (m: MetodoPago
   const [estado, setEstado] = useState(metodo?.estado ?? "Activo");
   const [cuotas, setCuotas] = useState<MetodoPagoForm["cuotas"]>([]);
   const [loadingCuotas, setLoadingCuotas] = useState(false);
-  const keyRef = useRef(1);
 
   useEffect(() => {
     if (metodo) {
@@ -25,13 +24,13 @@ export function useMetodoPagoForm(metodo: Bandera | null, onSave: (m: MetodoPago
   }, [metodo]);
 
   const addCuota = () => {
-    setCuotas((prev) => agregarCuota(prev, keyRef.current++));
+    setCuotas((prev) => agregarCuota(prev, crypto.randomUUID()));
   };
 
-  const updateCuota = (key: number, field: string, value: string) =>
+  const updateCuota = (key: string, field: string, value: string) =>
     setCuotas((prev) => prev.map((c) => (c.key === key ? { ...c, [field]: value } : c)));
 
-  const removeCuota = (key: number) => setCuotas((prev) => prev.filter((c) => c.key !== key));
+  const removeCuota = (key: string) => setCuotas((prev) => prev.filter((c) => c.key !== key));
 
   const guardar = () => {
     if (nombre.trim() === "") {

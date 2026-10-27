@@ -161,12 +161,20 @@ export type CvuFilters = {
 };
 
 export type CvuRow = Subcuenta & {
-  cliente?: { correo: string; nombre: string; cuit: string; tipoPersona: string } | null;
+  cliente?: {
+    id: string;
+    correo: string;
+    nombre: string;
+    cuit: string;
+    tipoPersona: string;
+    /** `clientes.alias`: subaccounts no tiene columna de alias. */
+    alias: string | null;
+  } | null;
   legajo: string;
 };
 
 const COLUMNS_WITH_CLIENTE =
-  `${COLUMNS}, clientes(legajo, correo, nombre, cuit, tipo_persona)` as const;
+  `${COLUMNS}, clientes(id, legajo, correo, nombre, cuit, tipo_persona, alias)` as const;
 
 export async function listAllCvus(
   filters: CvuFilters,
@@ -191,27 +199,38 @@ export async function listAllCvus(
   const rows = (
     (data ?? []) as (SubcuentaRow & {
       clientes?: {
+        id: string;
         legajo: string;
         correo: string;
         nombre: string;
         cuit: string;
         tipo_persona: string;
+        alias: string | null;
       } | null;
     })[]
   ).map((r) => {
     const base = toSubcuenta(r as SubcuentaRow);
     const cli = r.clientes as unknown as {
+      id: string;
       legajo: string;
       correo: string;
       nombre: string;
       cuit: string;
       tipo_persona: string;
+      alias: string | null;
     } | null;
     return {
       ...base,
       legajo: r.cliente_legajo,
       cliente: cli
-        ? { correo: cli.correo, nombre: cli.nombre, cuit: cli.cuit, tipoPersona: cli.tipo_persona }
+        ? {
+            id: cli.id,
+            correo: cli.correo,
+            nombre: cli.nombre,
+            cuit: cli.cuit,
+            tipoPersona: cli.tipo_persona,
+            alias: cli.alias ?? null,
+          }
         : null,
     } as CvuRow;
   });
@@ -327,6 +346,19 @@ export async function updateSubcuenta(
     .single();
   if (error) throw new DataAccessError(error);
   return toSubcuenta(data as SubcuentaRow);
+}
+
+/**
+ * Guarda el alias del CVU. `subaccounts` no tiene columna de alias: el alias vive en
+ * `clientes.alias` (junto al CVU principal del cliente), así que se actualiza ahí.
+ */
+export async function updateAliasCvu(clienteId: string, alias: string): Promise<void> {
+  const sb = requireSupabase();
+  const { error } = await sb
+    .from("clientes")
+    .update({ alias: alias.trim() || null })
+    .eq("id", clienteId);
+  if (error) throw new DataAccessError(error);
 }
 
 export async function deleteSubcuenta(clienteLegajo: string, id: string): Promise<void> {

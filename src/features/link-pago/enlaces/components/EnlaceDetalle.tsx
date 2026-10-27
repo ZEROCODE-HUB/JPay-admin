@@ -4,12 +4,13 @@ import { formatDate, formatDateTime, formatMoney } from "@/shared/format";
 import { Badge, Card } from "@/components/portal-shell";
 import type { EnlacePago } from "@/lib/api/enlaces-pago";
 import { toneEnlace } from "../estados";
-import { montoNumero } from "../utils";
+import { montoNumero, vencimientoEnlace } from "../utils";
 
 /** Modal con el detalle del enlace y, si se pagó, la información del pago. */
 export function EnlaceDetalle({ enlace, onClose }: { enlace: EnlacePago; onClose: () => void }) {
   const pago = enlace.pago;
   const esPagado = enlace.estado === "Pagado";
+  const vencimiento = vencimientoEnlace(enlace.expiraEn);
   const esContracargo = enlace.estado === "Contracargo";
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center p-4">
@@ -159,7 +160,18 @@ export function EnlaceDetalle({ enlace, onClose }: { enlace: EnlacePago; onClose
                 <div>
                   <span className="text-muted-foreground">Link vencimiento</span>
                   <div className="text-xs">
-                    {enlace.expiraEn ? `Expiró en 24h / Pagado antes` : "—"}
+                    {vencimiento ? (
+                      <>
+                        <span className="font-mono">{vencimiento.fecha}</span>
+                        {vencimiento.vencido && (
+                          <Badge tone="danger" className="ml-2">
+                            Vencido
+                          </Badge>
+                        )}
+                      </>
+                    ) : (
+                      "—"
+                    )}
                   </div>
                 </div>
                 {esContracargo && (
