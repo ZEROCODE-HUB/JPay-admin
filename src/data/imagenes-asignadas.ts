@@ -11,20 +11,8 @@ export type ImagenAsignada = {
   url: string;
 };
 
-export const IMAGENES_ASIGNADAS: Record<string, ImagenAsignada[]> = {
-  // Persona natural: Valentina Fernandez
-  "LPF-20000009179": [
-    { label: "Documento frente", url: "/imagenes/natural-frente.svg" },
-    { label: "Documento dorso", url: "/imagenes/natural-dorso.svg" },
-    { label: "Selfie verificatoria", url: "/imagenes/natural-selfie.svg" },
-  ],
-  // Persona jurídica: Constructora Alpha SA
-  "LPJ-30112233445": [
-    { label: "Documento constitutivo", url: "/imagenes/juridica-1.svg" },
-    { label: "Estatuto social", url: "/imagenes/juridica-2.svg" },
-    { label: "Inscripción AFIP", url: "/imagenes/juridica-3.svg" },
-  ],
-};
+// Vacío a propósito: eran legajos de ejemplo. Pendiente de conectar a la base.
+export const IMAGENES_ASIGNADAS: Record<string, ImagenAsignada[]> = {};
 
 export function imagenesParaLegajo(legajo: string): ImagenAsignada[] {
   return IMAGENES_ASIGNADAS[legajo.trim().toUpperCase()] ?? [];

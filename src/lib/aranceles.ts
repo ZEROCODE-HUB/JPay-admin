@@ -1,4 +1,25 @@
-import type { ConfigComision, ModalidadComision } from "@/data/clientes";
+import type { EstadoComision, ModalidadComision, TipoOperacion } from "@/lib/api/types";
+
+/**
+ * Parametrización de arancel por cliente y tipo de operación.
+ * Modelo 1:1 con la tabla `comisiones_cliente`:
+ * - `operacion`: código único de referencia (ej. "DEP-2024-001").
+ * - `tipo`: categoría de la operación (4 valores fijos).
+ * - `modalidad`: Porcentaje | Fijo.
+ * - `porcentaje` / `montoFijo`: según modalidad.
+ * - `porcentajeImpuesto`: IVA sobre la comisión que la plataforma retiene y paga (hoy 21%).
+ *   Es independiente de las retenciones al cliente (IIBB, débito/crédito).
+ */
+export type ConfigComision = {
+  operacion: string;
+  tipo: TipoOperacion;
+  modalidad: ModalidadComision;
+  porcentaje: number | null;
+  montoFijo: number | null;
+  porcentajeImpuesto: number;
+  estado?: EstadoComision;
+  descripcion?: string;
+};
 
 export type ParametrosCobro = {
   modalidad: ModalidadComision;

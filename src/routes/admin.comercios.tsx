@@ -1,6 +1,5 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { brand, pageTitle } from "@/brand/brand";
-import { ComerciosProvider } from "@/contexts/comercios";
 
 export const Route = createFileRoute("/admin/comercios")({
   component: ComerciosLayout,
@@ -13,9 +12,5 @@ export const Route = createFileRoute("/admin/comercios")({
 });
 
 function ComerciosLayout() {
-  return (
-    <ComerciosProvider>
-      <Outlet />
-    </ComerciosProvider>
-  );
+  return <Outlet />;
 }
