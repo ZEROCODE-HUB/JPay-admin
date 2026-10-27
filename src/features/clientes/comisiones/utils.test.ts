@@ -8,7 +8,6 @@ import {
   desgloseDe,
   draftDesdeComision,
   draftVacio,
-  otraActivaMismoAlcance,
 } from "./utils";
 
 function api(over: Partial<ComisionCliente> = {}): ComisionCliente {
@@ -70,16 +69,5 @@ describe("carga de comisiones: utils", () => {
   it("código de operación nuevo", () => {
     expect(codigoOperacionNuevo({ tipo: "Retiro", subcuentaId: "s" }, 5)).toBe("RET-CVU-5");
     expect(codigoOperacionNuevo({ tipo: "Depósito", subcuentaId: null }, 7)).toBe("DEP-CTA-7");
-  });
-
-  it("encuentra otra activa del mismo alcance, sin contar la propia", () => {
-    const activas = [
-      { id: "a", subcuentaId: null },
-      { id: "b", subcuentaId: "s1" },
-    ];
-    expect(otraActivaMismoAlcance(activas, "a", null)).toBeUndefined();
-    expect(otraActivaMismoAlcance(activas, undefined, null)?.id).toBe("a");
-    expect(otraActivaMismoAlcance(activas, "x", "s1")?.id).toBe("b");
-    expect(otraActivaMismoAlcance(activas, "x", "s2")).toBeUndefined();
   });
 });

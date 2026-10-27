@@ -3,7 +3,11 @@ import { useQueryClient } from "@tanstack/react-query";
 import type { TableServerFilters } from "@/shared/ui/data-table";
 import { useComisiones } from "@/hooks/useComisiones";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
-import { listComisiones, setComisionEstado, upsertComision } from "@/lib/api/comisiones";
+import {
+  contarOtrasComisionesHabilitadas,
+  setComisionEstado,
+  upsertComision,
+} from "@/lib/api/comisiones";
 import { getClienteByCorreo } from "@/lib/api/clientes";
 import { useCan } from "@/lib/permissions";
 import type { EstadoComision, ModalidadComision, TipoOperacion } from "@/lib/api/types";
@@ -14,7 +18,6 @@ import {
   desgloseDe,
   draftDesdeComision,
   draftVacio,
-  otraActivaMismoAlcance,
   type Comision,
   type ComisionDraft,
 } from "../utils";
@@ -28,10 +31,6 @@ export type ConfirmActionState = {
 };
 
 export type Alcance = "" | "cvu" | "cuenta";
-
-/** Busca las comisiones habilitadas del cliente para ese tipo (primeras 20). */
-const activasDelCliente = (clienteId: string, tipo: TipoOperacion) =>
-  listComisiones({ clienteId, tipo, estado: "Habilitado", page: 0, pageSize: 20 });
 
 /** Filtros, datos, formulario y acciones de la carga de comisiones de usuarios. */
 export function useCargaComisiones() {
@@ -118,8 +117,13 @@ export function useCargaComisiones() {
       if (nuevo === "Habilitado") {
         const cliente = await getClienteByCorreo(row.correo.toLowerCase());
         if (cliente) {
-          const activas = await activasDelCliente(cliente.id, row.tipo);
-          if (otraActivaMismoAlcance(activas.rows, row.id, row.subcuentaId)) {
+          const otras = await contarOtrasComisionesHabilitadas({
+            clienteId: cliente.id,
+            tipo: row.tipo,
+            subcuentaId: row.subcuentaId,
+            excluirId: row.id,
+          });
+          if (otras > 0) {
             const alcanceTxt = row.cvu ? `el CVU ${row.cvu}` : "toda la cuenta";
             errorDialogo(
               "Ya hay una comisión activa de ese tipo",
@@ -175,8 +179,13 @@ export function useCargaComisiones() {
       // hay CVU) y tipo: se pueden guardar deshabilitadas, pero no dos activas del
       // mismo alcance a la vez.
       if (draft.estado === "Habilitado") {
-        const activas = await activasDelCliente(cliente.id, draft.tipo);
-        if (otraActivaMismoAlcance(activas.rows, draft.id, draft.subcuentaId)) {
+        const otras = await contarOtrasComisionesHabilitadas({
+          clienteId: cliente.id,
+          tipo: draft.tipo,
+          subcuentaId: draft.subcuentaId,
+          excluirId: draft.id,
+        });
+        if (otras > 0) {
           const alcanceTxt = draft.subcuentaId
             ? `el CVU elegido`
             : `toda la cuenta de ${cliente.correo}`;

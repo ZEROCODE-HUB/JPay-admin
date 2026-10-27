@@ -15,7 +15,7 @@ import { dialogoError } from "../../utils";
 import {
   PAGE_SIZE,
   altaBase,
-  blankAlta,
+  altaVacia,
   esAltaValida,
   esErrorCheck,
   mensajeAltaCreada,
@@ -43,7 +43,7 @@ export function useDebitosCreditos() {
 
   // Alta manual
   const [showAlta, setShowAlta] = useState(false);
-  const [alta, setAlta] = useState<AltaForm>(blankAlta);
+  const [alta, setAlta] = useState<AltaForm>(() => altaVacia(new Date()));
   const [altaGuardando, setAltaGuardando] = useState(false);
   const { rows: impuestos } = useImpuestos({ page: 0, pageSize: 100, estado: "Activo" });
 
@@ -89,7 +89,7 @@ export function useDebitosCreditos() {
       }
       invalidarExcepciones();
       setShowAlta(false);
-      setAlta(blankAlta);
+      setAlta(altaVacia(new Date()));
       setBanner(mensajeAltaCreada(cantidad));
     } catch (e) {
       const mensaje = esErrorCheck(e)

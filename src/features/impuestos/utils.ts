@@ -25,6 +25,12 @@ export function contarPaginas(total: number, pageSize: number): number {
   return Math.max(1, Math.ceil(total / pageSize));
 }
 
+/** Fecha local (no UTC) en formato AAAA-MM-DD, como la usan los inputs type="date". */
+export function fechaLocalISO(d: Date): string {
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
 /** Diálogo de error que se cierra con "Cerrar". */
 export function dialogoError(
   title: string,

@@ -105,6 +105,22 @@ export function asignacionUpdatePayload(form: AsignacionForm): Partial<ImpuestoA
   };
 }
 
+const FECHA_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+/**
+ * Filtro de fechas de asignación para el servidor: solo se envían las fechas
+ * completas (AAAA-MM-DD, tal como las da el input type="date" en hora local).
+ */
+export function filtroFechasAsignacion(
+  desde: string,
+  hasta: string,
+): { fecha_desde?: string; fecha_hasta?: string } {
+  return {
+    fecha_desde: FECHA_RE.test(desde) ? desde : undefined,
+    fecha_hasta: FECHA_RE.test(hasta) ? hasta : undefined,
+  };
+}
+
 /** El error de guardar es porque el legajo no existe (foreign key). */
 export function esErrorFk(e: { code?: string | null; message: string }): boolean {
   return e.code === "23503" || /foreign key/i.test(e.message);

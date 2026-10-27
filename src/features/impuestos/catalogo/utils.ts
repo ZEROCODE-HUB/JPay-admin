@@ -16,26 +16,9 @@ export type ImpuestoForm = {
   ambito: AmbitoImpuesto;
 };
 
-/** Ámbito de una fila; las que no tienen se consideran Externas. */
-export function ambitoDe(row: Pick<Impuesto, "ambito">): AmbitoImpuesto {
-  return row.ambito ?? "Externo";
-}
-
-/** Filas de la pestaña elegida (se filtra sobre la página ya cargada). */
-export function filtrarPorAmbito<T extends Pick<Impuesto, "ambito">>(
-  rows: T[],
-  tab: TabAmbito,
-): T[] {
-  const target: AmbitoImpuesto = tab === "internos" ? "Interno" : "Externo";
-  return rows.filter((r) => ambitoDe(r) === target);
-}
-
-/** Cantidad de filas externas e internas de la página cargada. */
-export function contarPorAmbito(rows: Pick<Impuesto, "ambito">[]) {
-  return {
-    externos: rows.filter((r) => ambitoDe(r) === "Externo").length,
-    internos: rows.filter((r) => ambitoDe(r) === "Interno").length,
-  };
+/** Ámbito que se filtra en el servidor para la pestaña elegida. */
+export function ambitoDeTab(tab: TabAmbito): AmbitoImpuesto {
+  return tab === "internos" ? "Interno" : "Externo";
 }
 
 /** Valores iniciales del formulario (vacío o a partir del impuesto a editar). */

@@ -1,4 +1,4 @@
-import { Edit3, Eye, XCircle } from "lucide-react";
+import { CheckCircle, Edit3, Eye, XCircle } from "lucide-react";
 import { formatMoney, formatPercent } from "@/shared/format";
 import type { Column } from "@/shared/ui/data-table";
 import type { ActionItem } from "@/components/actions-dropdown";
@@ -117,7 +117,7 @@ export function accionesComision(s: CargaComisionesState, row: Comision): Action
         }
       : {
           label: "Habilitar",
-          icon: Eye,
+          icon: CheckCircle,
           disabled: !s.puedeModificar,
           onClick: () => s.pedirCambioEstado(row),
         },

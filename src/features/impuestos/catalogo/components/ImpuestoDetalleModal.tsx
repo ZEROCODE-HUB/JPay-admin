@@ -37,7 +37,7 @@ export function ImpuestoDetalleModal({ imp, onClose }: { imp: Impuesto; onClose:
             <Field label="Nombre" value={imp.nombre} />
             <Field label="Descripción" value={imp.descripcion ?? "—"} />
             <Field
-              label="�mbito"
+              label="Ámbito"
               value={<Badge tone={ambitoTone(imp.ambito)}>{imp.ambito}</Badge>}
             />
             <Field label="Tipo" value={imp.tipo} />

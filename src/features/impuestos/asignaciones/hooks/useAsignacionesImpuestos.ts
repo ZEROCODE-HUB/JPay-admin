@@ -18,6 +18,7 @@ import {
   asignacionCreatePayload,
   asignacionUpdatePayload,
   esErrorFk,
+  filtroFechasAsignacion,
   type AsignacionForm,
 } from "../utils";
 
@@ -31,7 +32,7 @@ export function useAsignacionesImpuestos() {
   const [searchInput, setSearchInput] = useState("");
   const search = useDebouncedValue(searchInput, 350);
   const [estadoFilter, setEstadoFilter] = useState<EstadoFiltro>("");
-  // Fechas desde/hasta: se muestran en la card de filtros pero el listado no las usa.
+  // Fechas desde/hasta: se filtran en el servidor sobre fecha_asignacion.
   const [searchDesde, setSearchDesde] = useState("");
   const [searchHasta, setSearchHasta] = useState("");
 
@@ -45,6 +46,7 @@ export function useAsignacionesImpuestos() {
     pageSize: PAGE_SIZE,
     search,
     estado: estadoFilter || undefined,
+    ...filtroFechasAsignacion(searchDesde, searchHasta),
   });
 
   const [editTarget, setEditTarget] = useState<ImpuestoAsignacion | null>(null);

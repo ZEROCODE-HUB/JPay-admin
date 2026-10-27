@@ -1,4 +1,5 @@
 import type { DcExcepcionCreateInput } from "@/lib/api/dc-excepciones";
+import { fechaLocalISO } from "../utils";
 
 export const PAGE_SIZE = 10;
 
@@ -17,23 +18,20 @@ export type AltaForm = {
   archivo_certificado: string;
 };
 
-/** Formulario vacío con vigencia desde la fecha dada (YYYY-MM-DD en UTC). */
+/** Formulario vacío con vigencia desde la fecha dada (AAAA-MM-DD, fecha local). */
 export function altaVacia(hoy: Date): AltaForm {
   return {
     email: "",
     cuit: "",
     direccion: "Ambos",
     motivo: "",
-    desde: hoy.toISOString().slice(0, 10),
+    desde: fechaLocalISO(hoy),
     hasta: "",
     autorizacion: "",
     impuesto_id: "",
     archivo_certificado: "",
   };
 }
-
-/** Formulario vacío; la fecha se fija al cargar el módulo. */
-export const blankAlta: AltaForm = altaVacia(new Date());
 
 /** Email con formato, CUIT de 11 dígitos (se ignoran guiones), motivo y fecha desde. */
 export function esAltaValida(alta: AltaForm): boolean {

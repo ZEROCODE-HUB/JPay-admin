@@ -23,6 +23,12 @@ describe("débitos y créditos: utils", () => {
     expect(v.desde).toBe("2026-10-27");
   });
 
+  it("la vigencia desde es la fecha local (no UTC) del momento en que se arma", () => {
+    // 23:30 local: en UTC puede ser el día siguiente, pero el default es el día local.
+    expect(altaVacia(new Date(2026, 9, 27, 23, 30)).desde).toBe("2026-10-27");
+    expect(altaVacia(new Date(2026, 9, 28, 0, 15)).desde).toBe("2026-10-28");
+  });
+
   it("validación de email, CUIT de 11 dígitos, motivo y fecha", () => {
     expect(esAltaValida(alta())).toBe(true);
     expect(esAltaValida(alta({ email: "sin-arroba" }))).toBe(false);

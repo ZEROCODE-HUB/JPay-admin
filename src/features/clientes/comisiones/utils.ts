@@ -143,15 +143,3 @@ export function codigoOperacionNuevo(
 ): string {
   return `${draft.tipo === "Retiro" ? "RET" : "DEP"}-${draft.subcuentaId ? "CVU" : "CTA"}-${ahora}`;
 }
-
-/**
- * Otra comisión habilitada del mismo alcance (mismo CVU, o ambas sin CVU),
- * excluyendo la propia.
- */
-export function otraActivaMismoAlcance<T extends { id: string; subcuentaId: string | null }>(
-  activas: T[],
-  id: string | undefined,
-  subcuentaId: string | null,
-): T | undefined {
-  return activas.find((c) => c.id !== id && (c.subcuentaId ?? null) === (subcuentaId ?? null));
-}

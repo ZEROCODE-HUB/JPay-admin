@@ -1,10 +1,9 @@
 import { describe, expect, it } from "vitest";
 import type { Impuesto } from "@/lib/api/types";
 import {
-  contarPorAmbito,
+  ambitoDeTab,
   esErrorDuplicado,
   esImpuestoFormValido,
-  filtrarPorAmbito,
   formInicial,
   impuestoPayload,
   montoNegativo,
@@ -37,15 +36,9 @@ const form = (over: Partial<ImpuestoForm> = {}): ImpuestoForm => ({
 });
 
 describe("catálogo de impuestos: utils", () => {
-  it("filtra y cuenta por ámbito (sin ámbito = Externo)", () => {
-    const rows = [
-      impuesto({ id: "a" }),
-      impuesto({ id: "b", ambito: "Interno" }),
-      impuesto({ id: "c", ambito: null as unknown as Impuesto["ambito"] }),
-    ];
-    expect(filtrarPorAmbito(rows, "externos").map((r) => r.id)).toEqual(["a", "c"]);
-    expect(filtrarPorAmbito(rows, "internos").map((r) => r.id)).toEqual(["b"]);
-    expect(contarPorAmbito(rows)).toEqual({ externos: 2, internos: 1 });
+  it("cada pestaña pide su ámbito al servidor", () => {
+    expect(ambitoDeTab("externos")).toBe("Externo");
+    expect(ambitoDeTab("internos")).toBe("Interno");
   });
 
   it("formInicial vacío y desde un impuesto", () => {

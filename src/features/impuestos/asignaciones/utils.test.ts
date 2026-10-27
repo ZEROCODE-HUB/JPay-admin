@@ -7,6 +7,7 @@ import {
   esAsignacionValida,
   esErrorFk,
   esMontoValido,
+  filtroFechasAsignacion,
   formInicial,
   legajoDesdeBusqueda,
   type AsignacionForm,
@@ -66,6 +67,25 @@ describe("asignaciones de impuestos: utils", () => {
     expect(asignacionUpdatePayload(form({ tipoOperacion: "Retiro", monto: "3" }))).toMatchObject({
       monto: 3,
       tipo_operacion: "Retiro",
+    });
+  });
+
+  it("la edición manda el cambio de impuesto", () => {
+    expect(asignacionUpdatePayload(form({ impuestoId: "imp-2" })).impuesto_id).toBe("imp-2");
+  });
+
+  it("filtro de fechas: solo fechas AAAA-MM-DD completas", () => {
+    expect(filtroFechasAsignacion("2026-10-01", "2026-10-27")).toEqual({
+      fecha_desde: "2026-10-01",
+      fecha_hasta: "2026-10-27",
+    });
+    expect(filtroFechasAsignacion("", "")).toEqual({
+      fecha_desde: undefined,
+      fecha_hasta: undefined,
+    });
+    expect(filtroFechasAsignacion("2026-10", "")).toEqual({
+      fecha_desde: undefined,
+      fecha_hasta: undefined,
     });
   });
 

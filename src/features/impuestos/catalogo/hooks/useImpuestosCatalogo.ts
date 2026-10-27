@@ -1,6 +1,6 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { useImpuestos } from "@/hooks/useImpuestos";
+import { useImpuestos, useImpuestosConteoPorAmbito } from "@/hooks/useImpuestos";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import {
   createImpuesto,
@@ -15,9 +15,8 @@ import type { ConfirmActionState, EstadoFiltro } from "../../types";
 import { dialogoError } from "../../utils";
 import {
   PAGE_SIZE,
-  contarPorAmbito,
+  ambitoDeTab,
   esErrorDuplicado,
-  filtrarPorAmbito,
   impuestoPayload,
   type ImpuestoForm,
   type TabAmbito,
@@ -37,16 +36,15 @@ export function useImpuestosCatalogo() {
   const puedeModificar = can("modificar", "impuestos");
   const puedeBorrar = can("borrar", "impuestos");
 
+  // El ámbito de la pestaña se filtra en el servidor: total y páginas coinciden.
   const listado = useImpuestos({
     page,
     pageSize: PAGE_SIZE,
     search,
     estado: estadoFilter || undefined,
+    ambito: ambitoDeTab(tab),
   });
-  const { rows } = listado;
-
-  const filteredRows = useMemo(() => filtrarPorAmbito(rows, tab), [rows, tab]);
-  const conteo = useMemo(() => contarPorAmbito(rows), [rows]);
+  const conteo = useImpuestosConteoPorAmbito({ search, estado: estadoFilter || undefined });
 
   const [detail, setDetail] = useState<Impuesto | null>(null);
   const [editTarget, setEditTarget] = useState<Impuesto | null>(null);
@@ -124,7 +122,6 @@ export function useImpuestosCatalogo() {
     cambiarEstado,
     tab,
     cambiarTab,
-    filteredRows,
     conteo,
     puedeCrear,
     puedeModificar,

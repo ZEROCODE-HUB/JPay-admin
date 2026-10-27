@@ -178,3 +178,33 @@ export async function setComisionEstado(
   if (error) throw new DataAccessError(error);
   return toComision(data as ComisionClienteRow);
 }
+
+export type AlcanceComision = {
+  clienteId: string;
+  tipo: TipoOperacion;
+  /** CVU de la comisión; null = comisión de toda la cuenta del cliente. */
+  subcuentaId: string | null;
+  /** Comisión que se está guardando o habilitando (no cuenta como "otra"). */
+  excluirId?: string;
+};
+
+/**
+ * Cantidad de OTRAS comisiones habilitadas del mismo cliente, tipo de operación y
+ * alcance (mismo CVU, o toda la cuenta). Consulta con count, sin traer filas.
+ */
+export async function contarOtrasComisionesHabilitadas(alcance: AlcanceComision): Promise<number> {
+  const sb = requireSupabase();
+  let query = sb
+    .from("comisiones_cliente")
+    .select("id", { count: "exact", head: true })
+    .eq("cliente_id", alcance.clienteId)
+    .eq("tipo", alcance.tipo)
+    .eq("estado", "Habilitado");
+  query = alcance.subcuentaId
+    ? query.eq("subcuenta_id", alcance.subcuentaId)
+    : query.is("subcuenta_id", null);
+  if (alcance.excluirId) query = query.neq("id", alcance.excluirId);
+  const { count, error } = await query;
+  if (error) throw new DataAccessError(error);
+  return count ?? 0;
+}

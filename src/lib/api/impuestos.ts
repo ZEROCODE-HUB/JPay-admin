@@ -37,20 +37,26 @@ export type ImpuestoFilters = Pagination & {
 const IMPUESTOS_COLUMNS =
   "id, codigo, nombre, descripcion, tipo, monto, estado, ambito, created_at, updated_at, impuestos_alicuotas(id, impuesto_id, codigo, tasa, descripcion, estado, created_at)";
 
+/** Condición `.or()` de la búsqueda de texto del catálogo, o null si no hay búsqueda. */
+function busquedaImpuestos(search?: string): string | null {
+  if (!search || !search.trim()) return null;
+  const q = search.trim().replace(/[%_]/g, "\\$&");
+  return `codigo.ilike.%${q}%,nombre.ilike.%${q}%,descripcion.ilike.%${q}%`;
+}
+
 export async function listImpuestos(filters: ImpuestoFilters): Promise<Page<Impuesto>> {
   const sb = requireSupabase();
-  const { page, pageSize, search, estado, tipo } = filters;
+  const { page, pageSize, search, estado, tipo, ambito } = filters;
   const from = page * pageSize;
   const to = from + pageSize - 1;
 
   let query = sb.from("impuestos").select(IMPUESTOS_COLUMNS, { count: "exact" });
 
-  if (search && search.trim()) {
-    const q = search.trim().replace(/[%_]/g, "\\$&");
-    query = query.or(`codigo.ilike.%${q}%,nombre.ilike.%${q}%,descripcion.ilike.%${q}%`);
-  }
+  const busqueda = busquedaImpuestos(search);
+  if (busqueda) query = query.or(busqueda);
   if (estado) query = query.eq("estado", estado);
   if (tipo) query = query.eq("tipo", tipo);
+  if (ambito) query = query.eq("ambito", ambito);
 
   query = query.order("codigo", { ascending: true }).range(from, to);
 
@@ -67,6 +73,27 @@ export async function listImpuestos(filters: ImpuestoFilters): Promise<Page<Impu
     page,
     pageSize,
   };
+}
+
+export type ImpuestoConteoFilters = Pick<ImpuestoFilters, "search" | "estado" | "tipo">;
+
+/** Cantidad real de impuestos de cada ámbito con los mismos filtros (sin traer filas). */
+export async function countImpuestosPorAmbito(
+  filters: ImpuestoConteoFilters,
+): Promise<{ externos: number; internos: number }> {
+  const sb = requireSupabase();
+  const contar = async (ambito: AmbitoImpuesto) => {
+    let query = sb.from("impuestos").select("id", { count: "exact", head: true });
+    const busqueda = busquedaImpuestos(filters.search);
+    if (busqueda) query = query.or(busqueda);
+    if (filters.estado) query = query.eq("estado", filters.estado);
+    if (filters.tipo) query = query.eq("tipo", filters.tipo);
+    const { count, error } = await query.eq("ambito", ambito);
+    if (error) throw new DataAccessError(error);
+    return count ?? 0;
+  };
+  const [externos, internos] = await Promise.all([contar("Externo"), contar("Interno")]);
+  return { externos, internos };
 }
 
 export async function getImpuesto(id: string): Promise<Impuesto | null> {
@@ -251,6 +278,10 @@ export type ImpuestoAsignacionFilters = Pagination & {
   estado?: "Activo" | "Inactivo";
   impuesto_id?: string;
   cliente_legajo?: string;
+  /** Fecha de asignación mínima (AAAA-MM-DD, fecha local, inclusive). */
+  fecha_desde?: string;
+  /** Fecha de asignación máxima (AAAA-MM-DD, fecha local, inclusive). */
+  fecha_hasta?: string;
 };
 
 const ASIGNACIONES_COLUMNS =
@@ -262,7 +293,8 @@ export async function listImpuestosAsignaciones(
   filters: ImpuestoAsignacionFilters,
 ): Promise<Page<ImpuestoAsignacion>> {
   const sb = requireSupabase();
-  const { page, pageSize, search, estado, impuesto_id, cliente_legajo } = filters;
+  const { page, pageSize, search, estado, impuesto_id, cliente_legajo, fecha_desde, fecha_hasta } =
+    filters;
   const from = page * pageSize;
   const to = from + pageSize - 1;
 
@@ -271,6 +303,8 @@ export async function listImpuestosAsignaciones(
   if (impuesto_id) query = query.eq("impuesto_id", impuesto_id);
   if (cliente_legajo) query = query.eq("legajo", cliente_legajo);
   if (estado) query = query.eq("estado", estado);
+  if (fecha_desde) query = query.gte("fecha_asignacion", fecha_desde);
+  if (fecha_hasta) query = query.lte("fecha_asignacion", fecha_hasta);
   if (search && search.trim()) {
     const q = search.trim().replace(/[%_]/g, "\\$&");
     query = query.or(
@@ -322,6 +356,7 @@ export async function updateImpuestoAsignacion(
 ): Promise<ImpuestoAsignacion> {
   const sb = requireSupabase();
   const payload: TablesUpdate<"impuestos_asignaciones"> = {};
+  if (input.impuesto_id !== undefined) payload.impuesto_id = input.impuesto_id;
   if (input.tipo !== undefined) payload.tipo = input.tipo;
   if (input.monto !== undefined) payload.monto = input.monto;
   if (input.estado !== undefined) payload.estado = input.estado;

@@ -1,6 +1,7 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import {
   listImpuestos,
+  countImpuestosPorAmbito,
   listAlicuotas,
   listImpuestosAsignaciones,
   listImpuestosForAsignacion,
@@ -8,6 +9,7 @@ import {
   listIbNormalizacionPreviews,
   getLatestNormalizacionPreviewByPadron,
   type ImpuestoFilters,
+  type ImpuestoConteoFilters,
   type AlicuotaFilters,
   type ImpuestoAsignacionFilters,
   type IbPadronFilters,
@@ -43,6 +45,17 @@ export function useImpuestos(filters: ImpuestoFilters) {
     isEmpty: !query.isLoading && rows.length === 0,
     refetch: query.refetch,
   };
+}
+
+/** Contadores reales de impuestos Externos e Internos (consulta count, sin filas). */
+export function useImpuestosConteoPorAmbito(filters: ImpuestoConteoFilters) {
+  const query = useQuery({
+    queryKey: ["impuestos", "conteo-ambito", filters],
+    queryFn: () => countImpuestosPorAmbito(filters),
+    placeholderData: keepPreviousData,
+    staleTime: 30_000,
+  });
+  return query.data ?? { externos: 0, internos: 0 };
 }
 
 export function useAlicuotas(filters: AlicuotaFilters) {

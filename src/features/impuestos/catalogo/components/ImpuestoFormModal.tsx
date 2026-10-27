@@ -109,7 +109,7 @@ export function ImpuestoFormModal({
           </select>
         </div>
         <div>
-          <Label htmlFor="im-ambito">�mbito</Label>
+          <Label htmlFor="im-ambito">Ámbito</Label>
           <select
             id="im-ambito"
             className={SELECT_CLS}

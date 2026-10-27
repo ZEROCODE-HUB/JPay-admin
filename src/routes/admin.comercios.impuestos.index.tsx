@@ -64,7 +64,7 @@ function Page() {
       >
         <DataTable
           columns={columnasImpuestos}
-          data={s.filteredRows}
+          data={listado.rows}
           keyExtractor={(r) => r.id}
           pageSize={PAGE_SIZE}
           showDownloadButton={false}
