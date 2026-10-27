@@ -14,7 +14,10 @@ import {
   type SubcuentaComision,
   updateSubcuenta,
 } from "@/lib/api/subcuentas";
-import { DEFAULT_PARAMS_ALERTAS, DEFAULT_PARAMS_BLOQUEO } from "@/components/user-modal";
+import {
+  DEFAULT_PARAMS_ALERTAS,
+  DEFAULT_PARAMS_BLOQUEO,
+} from "@/features/usuarios/parametros-riesgo";
 
 export function TablaSubcuentas({
   rows,
