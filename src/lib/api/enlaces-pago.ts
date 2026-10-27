@@ -53,11 +53,11 @@ export type EnlacePagoRow = {
   metodos_pago: string[] | null;
   vistas: number | null;
   pagos: number | null;
-  cajero: string | null;
+  cajero?: string | null;
   created_at: string;
   updated_at?: string;
-  // joins
-  clientes?: { correo: string; nombre: string }[] | null;
+  // joins (to-one: PostgREST devuelve object)
+  clientes?: { correo: string; nombre: string } | { correo: string; nombre: string }[] | null;
   // pago (solo si Pagado / Contracargo)
   metodo_pago?: string | null;
   tipo_tarjeta?: string | null;
@@ -97,7 +97,7 @@ export type EnlacePago = {
 };
 
 function toEnlace(r: EnlacePagoRow): EnlacePago {
-  const cli = Array.isArray(r.clientes) ? r.clientes[0] : null;
+  const cli = Array.isArray(r.clientes) ? r.clientes[0] : (r.clientes ?? null);
   const estado = normalizeEstado(r.estado);
   // Mock pago info para Pagado/Contracargo (v1: derivado en UI, no persiste en DB)
   const pago: PagoInfo | null =
@@ -126,7 +126,7 @@ function toEnlace(r: EnlacePagoRow): EnlacePago {
     metodosPago: r.metodos_pago,
     vistas: Number(r.vistas ?? 0),
     pagos: Number(r.pagos ?? 0),
-    cajero: r.cajero,
+    cajero: r.cajero ?? null,
     createdAt: r.created_at,
     usuario: cli?.correo ?? undefined,
     clienteNombre: cli?.nombre ?? undefined,
@@ -152,7 +152,7 @@ export type EnlaceFilters = Pagination & {
   estado?: string;
 };
 
-const COLUMNS = "id, cliente_legajo, comercio_nombre, url, monto, estado, referencia, notas, expira_en, pagos_parciales, metodos_pago, vistas, pagos, cajero, created_at, updated_at, clientes(correo, nombre)";
+const COLUMNS = "id, cliente_legajo, comercio_nombre, url, monto, estado, referencia, notas, expira_en, pagos_parciales, metodos_pago, vistas, pagos, created_at, clientes(correo, nombre)";
 const COLUMNS_LEGACY = "id, cliente_legajo, comercio_nombre, url, monto, estado, created_at, clientes(correo, nombre)";
 
 function isMissingColumnError(error: unknown): boolean {
@@ -166,7 +166,7 @@ export async function listEnlaces(filters: EnlaceFilters): Promise<Page<EnlacePa
   const from = page * pageSize;
   const to = from + pageSize - 1;
 
-  const build = (cols: string, withRefSearch: boolean) => {
+  const build = <C extends string>(cols: C, withRefSearch: boolean) => {
     let query = sb.from("cliente_links_pago").select(cols, { count: "exact" });
     if (search?.trim()) {
       const q = search.trim().replace(/[%_]/g, "\\$&");

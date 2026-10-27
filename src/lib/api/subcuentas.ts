@@ -1,4 +1,5 @@
 import { requireSupabase } from "@/lib/supabase";
+import type { TablesUpdate } from "@/lib/database.types";
 import { DataAccessError } from "./errors";
 
 // Modelo de saldos — referencia rápida:
@@ -164,7 +165,7 @@ export type CvuRow = Subcuenta & {
   legajo: string;
 };
 
-const COLUMNS_WITH_CLIENTE = COLUMNS + ", clientes(legajo, correo, nombre, cuit, tipo_persona)";
+const COLUMNS_WITH_CLIENTE = `${COLUMNS}, clientes(legajo, correo, nombre, cuit, tipo_persona)` as const;
 
 export async function listAllCvus(filters: CvuFilters): Promise<{ rows: CvuRow[]; total: number; page: number; pageSize: number }> {
   const sb = requireSupabase();
@@ -287,7 +288,7 @@ export async function updateSubcuenta(
 ): Promise<Subcuenta> {
   const sb = requireSupabase();
   const { retirosHabilitados, ...rest } = input;
-  const datos: Record<string, unknown> = { ...rest };
+  const datos: TablesUpdate<"subaccounts"> = { ...rest };
   if (retirosHabilitados !== undefined) datos.retiros_habilitados = retirosHabilitados;
 
   const { data, error } = await sb

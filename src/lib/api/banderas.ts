@@ -1,4 +1,5 @@
 import { requireSupabase } from "@/lib/supabase";
+import type { TablesUpdate } from "@/lib/database.types";
 import { DataAccessError } from "./errors";
 
 export type BanderaRow = {
@@ -104,7 +105,7 @@ export async function updateBandera(
   input: Partial<{ nombre: string; tipo: string; diasHabilesAcreditacion: number; estado: string }>,
 ): Promise<Bandera> {
   const sb = requireSupabase();
-  const payload: Record<string, unknown> = {};
+  const payload: TablesUpdate<"banderas"> = {};
   if (input.nombre !== undefined) payload.nombre = input.nombre.trim();
   if (input.tipo !== undefined) payload.tipo = input.tipo;
   if (input.diasHabilesAcreditacion !== undefined) payload.dias_habiles_acreditacion = input.diasHabilesAcreditacion;
@@ -152,7 +153,7 @@ export async function updateBanderaCuota(
   input: Partial<{ cuotas: number; ten: number; coeficiente: number; estado: string }>,
 ): Promise<BanderaCuota> {
   const sb = requireSupabase();
-  const payload: Record<string, unknown> = {};
+  const payload: TablesUpdate<"banderas_cuotas"> = {};
   if (input.cuotas !== undefined) payload.cuotas = input.cuotas;
   if (input.ten !== undefined) payload.ten = input.ten;
   if (input.coeficiente !== undefined) payload.coeficiente = input.coeficiente;

@@ -118,11 +118,12 @@ import type {
   ImpuestoAsignacion,
   Movimiento,
 } from "@/lib/api/types";
+import { type EstadoMovimiento } from "@/lib/api/types";
 import {
-  type EstadoMovimiento,
+  MovimientoDetail,
+  DetailModal,
   type Movimiento as DetailMovimiento,
-} from "@/lib/api/types";
-import { MovimientoDetail, DetailModal } from "@/components/movimiento-detail";
+} from "@/components/movimiento-detail";
 import { resolverEstadoMovimiento } from "@/lib/estados";
 import { useEstadosMovimiento } from "@/hooks/useEstados";
 import { useCambiarEstadoMovimiento } from "@/hooks/useMovimientoActions";
@@ -794,7 +795,7 @@ function camposIdentificacion(c: Cliente) {
     { label: "Cant. cuentas virtuales", valor: "—" },
     { label: "Nombre", valor: nombreDerivado },
     { label: "Apellido", valor: apellidoDerivado },
-    { label: "CUIT", valor: c.cuit_cuil ?? c.cuit ?? "—" },
+    { label: "CUIT", valor: c.cuitCuil ?? c.cuit ?? "—" },
     { label: "Género", valor: c.genero ?? "—" },
     { label: "Dirección", valor: c.direccion ?? "—" },
     { label: "Número de dirección", valor: c.direccion2 ?? "—" },
@@ -1521,7 +1522,7 @@ function ApiUsuariosModal({
         <DataTable
           columns={apiUsuariosColumns as never}
           data={query.data! as never}
-          keyExtractor={(u: { id: string }) => u.id}
+          keyExtractor={(u) => u.id}
           emptyMessage="Sin usuarios API"
           actions={(u: { id: string; codigoUsuarioApi: string; usuario: string; nombreCompleto: string; estado: string }) => (
             <button

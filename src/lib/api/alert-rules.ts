@@ -1,4 +1,5 @@
 import { requireSupabase } from "@/lib/supabase";
+import type { Json } from "@/lib/database.types";
 import { DataAccessError } from "./errors";
 import type { Page, Pagination } from "./types";
 
@@ -21,6 +22,7 @@ export type AlertRuleCode =
 
 export type ScheduleDay = { day: number; enabled: boolean; start: string; end: string };
 export type MinorsPolicy = "allow" | "alert" | "block";
+export type AlertRuleParameters = { [key: string]: Json | undefined };
 
 export type AlertRule = {
   id: string;
@@ -71,7 +73,7 @@ export async function listAlertRules(): Promise<AlertRule[]> {
 
 /** Guarda varias reglas en una sola transaccion (la base valida cada una). */
 export async function saveAlertRules(
-  rules: { code: AlertRuleCode; isEnabled: boolean; parameters: Record<string, unknown> }[],
+  rules: { code: AlertRuleCode; isEnabled: boolean; parameters: AlertRuleParameters }[],
 ): Promise<void> {
   const sb = requireSupabase();
   const { error } = await sb.rpc("guardar_alert_rules", {
@@ -160,11 +162,12 @@ export async function saveClientBlockParameter(input: {
   companyMinWages: number | null;
 }): Promise<void> {
   const sb = requireSupabase();
+  // Los tipos generados no admiten args nullable; la función acepta NULL (= sin umbral propio).
   const { error } = await sb.rpc("guardar_parametros_bloqueo_cliente", {
     p_legajo: input.legajo,
-    p_individual_min_wages: input.individualMinWages,
-    p_company_min_wages: input.companyMinWages,
-    p_id: input.id ?? null,
+    p_individual_min_wages: input.individualMinWages as number,
+    p_company_min_wages: input.companyMinWages as number,
+    p_id: input.id ?? undefined,
   });
   if (error) throw new DataAccessError(error);
 }

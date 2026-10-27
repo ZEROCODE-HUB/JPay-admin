@@ -1,4 +1,5 @@
 import { requireSupabase } from "@/lib/supabase";
+import type { TablesUpdate } from "@/lib/database.types";
 import { DataAccessError } from "./errors";
 import { toCodigoCategoria } from "./mappers";
 import type {
@@ -85,7 +86,7 @@ export async function updateCodigoCategoria(
   input: CodigoCategoriaUpdateInput,
 ): Promise<CodigoCategoria> {
   const sb = requireSupabase();
-  const payload: Record<string, unknown> = {};
+  const payload: TablesUpdate<"codigos_categoria"> = {};
   if (input.codigo !== undefined) payload.codigo = input.codigo.trim();
   if (input.nombre !== undefined) payload.nombre = input.nombre.trim();
   if (input.descripcion !== undefined) payload.descripcion = input.descripcion.trim();

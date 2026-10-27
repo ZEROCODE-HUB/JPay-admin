@@ -1,4 +1,5 @@
 import { requireSupabase } from "@/lib/supabase";
+import type { TablesUpdate } from "@/lib/database.types";
 import { DataAccessError } from "./errors";
 import { toCodigoError } from "./mappers";
 import type {
@@ -79,7 +80,7 @@ export async function updateCodigoError(
   input: CodigoErrorUpdateInput,
 ): Promise<CodigoError> {
   const sb = requireSupabase();
-  const payload: Record<string, unknown> = {};
+  const payload: TablesUpdate<"codigos_error"> = {};
   if (input.codigo !== undefined) payload.codigo = input.codigo.trim();
   if (input.mensaje !== undefined) payload.mensaje = input.mensaje.trim();
   if (input.audiencia !== undefined) payload.audiencia = input.audiencia;

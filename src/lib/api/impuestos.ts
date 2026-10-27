@@ -1,5 +1,6 @@
 ﻿import { requireSupabase } from "@/lib/supabase";
 import { DataAccessError } from "./errors";
+import type { Json, TablesInsert, TablesUpdate } from "@/lib/database.types";
 import {
   toImpuesto,
   toAlicuota,
@@ -20,7 +21,6 @@ import type {
   IbPadronRow,
   IbNormalizacionPreview,
   IbNormalizacionPreviewRow,
-  TipoPersona,
   Page,
   Pagination,
   AlicuotaInput,
@@ -85,7 +85,7 @@ export async function createImpuesto(input: ImpuestoCreateInput): Promise<Impues
   const ambito = (input.ambito as AmbitoImpuesto | undefined) ?? "Externo";
   const descripcionClean = input.descripcion?.trim() ?? null;
 
-  const payload: Record<string, unknown> = {
+  const payload: TablesInsert<"impuestos"> = {
     codigo: input.codigo.trim(),
     nombre: input.nombre.trim(),
     descripcion: descripcionClean,
@@ -108,14 +108,14 @@ export type ImpuestoUpdateInput = Partial<ImpuestoInput>;
 
 export async function updateImpuesto(id: string, input: ImpuestoUpdateInput): Promise<Impuesto> {
   const sb = requireSupabase();
-  const payload: Record<string, unknown> = {};
+  const payload: TablesUpdate<"impuestos"> = {};
   if (input.codigo !== undefined) payload.codigo = input.codigo.trim();
   if (input.nombre !== undefined) payload.nombre = input.nombre.trim();
   if (input.descripcion !== undefined) payload.descripcion = input.descripcion?.trim() ?? null;
   if (input.tipo !== undefined) payload.tipo = input.tipo;
   if (input.monto !== undefined) payload.monto = input.monto;
   if (input.estado !== undefined) payload.estado = input.estado;
-  if (input.ambito !== undefined) payload.ambito = input.ambito;
+  if (input.ambito !== undefined) payload.ambito = input.ambito ?? undefined;
 
   const { data, error } = await sb.from("impuestos").update(payload).eq("id", id).select("id, codigo, nombre, descripcion, tipo, monto, estado, ambito, created_at, updated_at").single();
   if (error) throw new DataAccessError(error);
@@ -196,7 +196,7 @@ export async function createAlicuota(impuesto_id: string, input: AlicuotaInput):
 
 export async function updateAlicuota(id: string, input: Partial<AlicuotaInput>): Promise<Alicuota> {
   const sb = requireSupabase();
-  const payload: Record<string, unknown> = {};
+  const payload: TablesUpdate<"impuestos_alicuotas"> = {};
   if (input.codigo !== undefined) payload.codigo = input.codigo.trim();
   if (input.tasa !== undefined) payload.tasa = input.tasa;
   if (input.descripcion !== undefined) payload.descripcion = input.descripcion?.trim() ?? null;
@@ -247,19 +247,7 @@ export type ImpuestoAsignacionFilters = Pagination & {
 const ASIGNACIONES_COLUMNS =
   "id, legajo, impuesto_id, tipo, monto, estado, fecha_asignacion, tipo_operacion, impuestos(codigo, nombre, tipo, monto), clientes!impuestos_asignaciones_legajo_fkey(legajo, nombre, cuit, tipo_persona, correo)";
 
-type AsignacionRowConEmbed = ImpuestoAsignacionRow & {
-  impuestos?:
-    | {
-        codigo: string;
-        nombre: string;
-        tipo: "Porcentaje" | "Fijo" | "Otro";
-        monto: number | null;
-      }[]
-    | null;
-  clientes?:
-    | { legajo: string; nombre: string; cuit: string; tipo_persona: TipoPersona; correo: string }[]
-    | null;
-};
+type AsignacionRowConEmbed = ImpuestoAsignacionRow;
 
 export async function listImpuestosAsignaciones(
   filters: ImpuestoAsignacionFilters,
@@ -306,7 +294,8 @@ export async function createImpuestoAsignacion(
       legajo: input.cliente_legajo.trim(),
       impuesto_id: input.impuesto_id,
       tipo: input.tipo,
-      monto: input.monto,
+      // TODO: monto es NOT NULL en la base pero el form admite vacío (pendiente de decisión).
+      monto: input.monto as number,
       estado: input.estado ?? "Activo",
       fecha_asignacion: input.fecha_asignacion ?? new Date().toISOString().slice(0, 10),
       tipo_operacion: input.tipo_operacion ?? null,
@@ -324,11 +313,12 @@ export async function updateImpuestoAsignacion(
   input: Partial<ImpuestoAsignacionInput>,
 ): Promise<ImpuestoAsignacion> {
   const sb = requireSupabase();
-  const payload: Record<string, unknown> = {};
+  const payload: TablesUpdate<"impuestos_asignaciones"> = {};
   if (input.tipo !== undefined) payload.tipo = input.tipo;
-  if (input.monto !== undefined) payload.monto = input.monto;
+  // TODO: monto es NOT NULL en la base pero el form admite vacío (pendiente de decisión).
+  if (input.monto !== undefined) payload.monto = input.monto as number;
   if (input.estado !== undefined) payload.estado = input.estado;
-  if (input.fecha_asignacion !== undefined) payload.fecha_asignacion = input.fecha_asignacion;
+  if (input.fecha_asignacion !== undefined) payload.fecha_asignacion = input.fecha_asignacion ?? undefined;
   if (input.tipo_operacion !== undefined) payload.tipo_operacion = input.tipo_operacion;
 
   const { data, error } = await sb
@@ -441,7 +431,7 @@ export async function updateIbPadron(
   input: Partial<{ estado: string; progreso: number }>,
 ): Promise<IbPadron> {
   const sb = requireSupabase();
-  const payload: Record<string, unknown> = {};
+  const payload: TablesUpdate<"ib_padrones"> = {};
   if (input.estado !== undefined) payload.estado = input.estado;
   if (input.progreso !== undefined) payload.progreso = input.progreso;
 
@@ -502,10 +492,10 @@ export async function listIbNormalizacionPreviews(
 
 export async function createIbNormalizacionPreview(input: {
   padron_id: string;
-  kpis_json: object;
-  creados_json: object;
-  desactivados_json: object;
-  omitidos_json: object;
+  kpis_json: Json;
+  creados_json: Json;
+  desactivados_json: Json;
+  omitidos_json: Json;
 }): Promise<IbNormalizacionPreview> {
   const sb = requireSupabase();
   const { data, error } = await sb

@@ -1,4 +1,5 @@
 import { requireSupabase } from "@/lib/supabase";
+import type { TablesInsert, TablesUpdate } from "@/lib/database.types";
 import { DataAccessError } from "./errors";
 import type { ComercioBandera, ComercioBanderaEstado, ComercioBanderaRow } from "./types";
 
@@ -36,7 +37,7 @@ export async function createBandera(
   input: { bandera: string; comisionPropia: number; comisionPayway: number; estado?: ComercioBanderaEstado; banderaId?: string; metodoKey?: string },
 ): Promise<ComercioBandera> {
   const sb = requireSupabase();
-  const payload: Record<string, unknown> = {
+  const payload: TablesInsert<"comercio_banderas"> = {
     comercio_id: comercioId,
     bandera: input.bandera.trim(),
     comision_molipay: input.comisionPropia,
@@ -55,7 +56,7 @@ export async function updateBandera(
   input: Partial<{ bandera: string; comisionPropia: number; comisionPayway: number; estado: ComercioBanderaEstado; banderaId?: string; metodoKey?: string }>,
 ): Promise<ComercioBandera> {
   const sb = requireSupabase();
-  const payload: Record<string, unknown> = {};
+  const payload: TablesUpdate<"comercio_banderas"> = {};
   if (input.bandera !== undefined) payload.bandera = input.bandera.trim();
   if (input.comisionPropia !== undefined) payload.comision_molipay = input.comisionPropia;
   if (input.comisionPayway !== undefined) payload.comision_payway = input.comisionPayway;

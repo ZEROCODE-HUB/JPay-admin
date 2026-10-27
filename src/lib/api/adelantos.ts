@@ -1,4 +1,5 @@
 import { requireSupabase } from "@/lib/supabase";
+import type { TablesUpdate } from "@/lib/database.types";
 import { DataAccessError } from "./errors";
 import type { Adelanto, AdelantoRow, EstadoAdelanto } from "./types";
 
@@ -185,7 +186,7 @@ export async function createAdelanto(input: {
         .select("importe_neto")
         .eq("comercio_id", input.comercioId);
       const totalVendido = (ventasData ?? []).reduce(
-        (sum: number, v: { importe_neto: number }) => sum + Number(v.importe_neto ?? 0),
+        (sum: number, v: { importe_neto: number | null }) => sum + Number(v.importe_neto ?? 0),
         0,
       );
       const { data: adelantosData } = await sb
@@ -255,7 +256,7 @@ export async function aprobarAdelanto(
   const { data, error } = await sb.rpc("fn_aprobar_adelanto", {
     p_adelanto_id: id,
     p_tasa_pct: tasaPct,
-    p_notas: notas ?? null,
+    p_notas: notas ?? undefined,
   });
   if (error) throw new DataAccessError(error);
   const r = (data ?? {}) as Record<string, unknown>;
@@ -289,7 +290,7 @@ export async function acreditarAdelanto(
   const sb = requireSupabase();
   const { data, error } = await sb.rpc("fn_acreditar_adelanto", {
     p_adelanto_id: id,
-    p_notas: notas ?? null,
+    p_notas: notas ?? undefined,
   });
   if (error) throw new DataAccessError(error);
   const r = (data ?? {}) as Record<string, unknown>;
@@ -317,7 +318,7 @@ export async function acreditarAdelanto(
  */
 export async function rechazarAdelanto(id: string, notas?: string): Promise<Adelanto> {
   const sb = requireSupabase();
-  const payload: Record<string, unknown> = {
+  const payload: TablesUpdate<"adelantos"> = {
     estado: "Rechazado",
     fecha_resolucion: new Date().toISOString(),
   };
@@ -382,7 +383,7 @@ export async function updateAdelanto(
     );
   }
 
-  const payload: Record<string, unknown> = {};
+  const payload: TablesUpdate<"adelantos"> = {};
   if (input.montoSolicitado !== undefined) payload.monto_solicitado = input.montoSolicitado;
   if (input.plazoAdelantadoDias !== undefined) payload.plazo_adelantado_dias = input.plazoAdelantadoDias;
   if (input.tasaInteresPct !== undefined) payload.tasa_interes_pct = input.tasaInteresPct;

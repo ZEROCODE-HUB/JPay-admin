@@ -1,3 +1,4 @@
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { requireSupabase } from "@/lib/supabase";
 import { DataAccessError } from "./errors";
 
@@ -379,7 +380,8 @@ export async function crearExencion(
   input: ExencionInput,
 ): Promise<void> {
   const sb = requireSupabase();
-  const { error } = await sb.from("exenciones_debito_credito").insert({
+  // TODO: la tabla exenciones_debito_credito no existe en la base (pendiente de decisión)
+  const { error } = await (sb as unknown as SupabaseClient).from("exenciones_debito_credito").insert({
     cliente_legajo: clienteLegajo,
     cuit: input.cuit,
     direccion: input.direccion,
@@ -398,29 +400,27 @@ export type ComisionCliente = {
   estado: string;
 };
 
-type ComisionClienteRow = {
-  id: string;
-  concepto: string | null;
-  monto: number | null;
-  fecha: string | null;
-  estado: string | null;
-};
-
 export async function listComisionesCliente(clienteLegajo: string): Promise<ComisionCliente[]> {
   const sb = requireSupabase();
+  const { data: cli, error: errCli } = await sb
+    .from("clientes")
+    .select("id")
+    .eq("legajo", clienteLegajo)
+    .maybeSingle();
+  if (errCli) throw new DataAccessError(errCli);
+  if (!cli) return [];
   const { data, error } = await sb
     .from("comisiones_cliente")
-    .select("id, concepto, monto, fecha, estado")
-    .eq("cliente_legajo", clienteLegajo)
-    .order("fecha", { ascending: false })
+    .select("id, operacion, descripcion, monto_fijo, created_at, estado")
+    .eq("cliente_id", cli.id)
+    .order("created_at", { ascending: false })
     .limit(10);
   if (error) throw new DataAccessError(error);
-  const rows = (data as ComisionClienteRow[] | null) ?? [];
-  return rows.map((r) => ({
+  return (data ?? []).map((r) => ({
     id: r.id,
-    concepto: r.concepto ?? "Comisión",
-    monto: r.monto === null ? 0 : Number(r.monto),
-    fecha: r.fecha ?? "—",
+    concepto: r.descripcion ?? r.operacion ?? "Comisión",
+    monto: r.monto_fijo === null ? 0 : Number(r.monto_fijo),
+    fecha: r.created_at ?? "—",
     estado: r.estado ?? "—",
   }));
 }

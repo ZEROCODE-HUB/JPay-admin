@@ -1,4 +1,5 @@
 import { requireSupabase } from "@/lib/supabase";
+import type { TablesInsert, TablesUpdate } from "@/lib/database.types";
 import { DataAccessError } from "./errors";
 import { toCliente } from "./mappers";
 import type { Cliente, ClienteRow, EstadoCliente, Page, Pagination, TipoPersona } from "./types";
@@ -27,7 +28,7 @@ export async function listClientes(filters: ClienteFilters): Promise<Page<Client
   const from = page * pageSize;
   const to = from + pageSize - 1;
 
-  const build = (cols: string) => {
+  const build = <C extends string>(cols: C) => {
     let q = sb.from("clientes").select(cols, { count: "exact" });
     if (search && search.trim()) {
       const qq = search.trim().replace(/[%_]/g, "\\$&");
@@ -134,16 +135,18 @@ export type ClienteInput = {
 /** El legajo se deriva del CUIT vía trigger `handle_new_cliente` (la DB es la fuente de verdad). */
 export async function createCliente(input: ClienteInput): Promise<Cliente> {
   const sb = requireSupabase();
+  const nuevo: Omit<TablesInsert<"clientes">, "legajo"> = {
+    tipo_persona: input.tipoPersona,
+    correo: input.correo,
+    nombre: input.nombre,
+    cuit: input.cuit,
+    estado: input.estado ?? "pendiente_verificacion",
+    fecha_alta: input.fechaAlta ?? new Date().toISOString().slice(0, 10),
+  };
   let { data, error } = await sb
     .from("clientes")
-    .insert({
-      tipo_persona: input.tipoPersona,
-      correo: input.correo,
-      nombre: input.nombre,
-      cuit: input.cuit,
-      estado: input.estado ?? "pendiente_verificacion",
-      fecha_alta: input.fechaAlta ?? new Date().toISOString().slice(0, 10),
-    })
+    // legajo es NOT NULL pero lo completa el trigger handle_new_cliente.
+    .insert(nuevo as TablesInsert<"clientes">)
     .select(COLUMNS)
     .single();
   if (error && isMissingColumnError(error)) {
@@ -478,7 +481,7 @@ async function transicionarCliente(
   if (!check.ok) return { ok: false, motivo: check.motivo! };
 
   // Deshabilitar cancela CBU (idempotente)
-  const patch: Record<string, unknown> = { estado: nuevoEstado };
+  const patch: TablesUpdate<"clientes"> = { estado: nuevoEstado };
   if (nuevoEstado === "deshabilitado") {
     patch.cbu_cancelado = true;
   }
@@ -571,29 +574,24 @@ export async function hardDeleteCliente(id: string): Promise<void> {
     "documentos",
     "historial_cambios",
     "validaciones",
-    "alertas",
-    "bloqueos",
     "cliente_modulos",
     "cliente_parametros_alertas",
     "cliente_parametros_bloqueos",
     "cliente_comercios_pst",
-    "impuestos_asignaciones",
-    "cliente_transiciones",
-  ];
+  ] as const;
   for (const t of tablasLegajo) {
     try {
-      const col = t === "impuestos_asignaciones" ? "legajo" : "cliente_legajo";
-      // cliente_transiciones tiene ambos; intentamos legajo
-      if (t === "cliente_transiciones") {
-        await sb.from(t).delete().eq("legajo", legajo);
-        await sb.from(t).delete().eq("cliente_id", cid);
-      } else {
-        await sb.from(t).delete().eq(col, legajo);
-      }
+      await sb.from(t).delete().eq("cliente_legajo", legajo);
     } catch {
       // ignora tabla inexistente o RLS
     }
   }
+  try { await sb.from("impuestos_asignaciones").delete().eq("legajo", legajo); } catch {}
+  // cliente_transiciones tiene ambos
+  try {
+    await sb.from("cliente_transiciones").delete().eq("legajo", legajo);
+    await sb.from("cliente_transiciones").delete().eq("cliente_id", cid);
+  } catch {}
   // Tablas por cliente_id
   try { await sb.from("comisiones_cliente").delete().eq("cliente_id", cid); } catch {}
   try { await sb.from("cliente_links_pago").delete().eq("cliente_legajo", legajo); } catch {}

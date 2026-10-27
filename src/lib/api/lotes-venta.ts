@@ -110,20 +110,8 @@ export type OperacionesLoteFilters = Pagination & {
   search?: string;
 };
 
-const OPS_COLUMNS = [
-  "id",
-  "id_txn",
-  "fecha",
-  "monto_operacion",
-  "comision",
-  "impuesto",
-  "monto_cobrado",
-  "estado_id",
-  "legajo",
-  "bandera",
-  "estados_movimiento(codigo, nombre, es_final)",
-  "clientes!transactions_cliente_id_fkey(correo, nombre, cuit)",
-].join(", ");
+const OPS_COLUMNS =
+  "id, id_txn, fecha, monto_operacion, comision, impuesto, monto_cobrado, estado_id, legajo, bandera, estados_movimiento(codigo, nombre, es_final), clientes!transactions_cliente_id_fkey(correo, nombre, cuit)";
 
 export async function listOperacionesLote(
   f: OperacionesLoteFilters,
@@ -157,9 +145,7 @@ export async function listOperacionesLote(
   const { data, error, count } = await q;
   if (error) throw new DataAccessError(error);
 
-  const rows = ((data ?? []) as (MovimientoRow & {
-    clientes?: { correo: string; nombre: string; cuit: string }[] | null;
-  })[]).map(toMovimiento);
+  const rows = ((data ?? []) as MovimientoRow[]).map(toMovimiento);
 
   return { rows, total: count ?? rows.length, page, pageSize };
 }

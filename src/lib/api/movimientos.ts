@@ -116,9 +116,7 @@ export async function listMovimientos(filters: MovimientoFilters): Promise<Page<
   const { data, error, count } = await query;
   if (error) throw new DataAccessError(error);
 
-  const rows = (data ?? []) as (MovimientoRow & {
-    clientes?: { correo: string; nombre: string; cuit: string }[] | null;
-  })[];
+  const rows = (data ?? []) as MovimientoRow[];
 
   return {
     rows: rows.map(toMovimiento),
@@ -133,10 +131,6 @@ export async function getMovimiento(id: string): Promise<Movimiento | null> {
   const { data, error } = await sb.from("transactions").select(COLUMNS).eq("id", id).maybeSingle();
   if (error) throw new DataAccessError(error);
   return data
-    ? toMovimiento(
-        data as MovimientoRow & {
-          clientes?: { correo: string; nombre: string; cuit: string }[] | null;
-        },
-      )
+    ? toMovimiento(data as MovimientoRow)
     : null;
 }

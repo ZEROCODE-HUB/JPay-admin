@@ -1,7 +1,9 @@
 import { requireSupabase } from "@/lib/supabase";
+import type { TablesUpdate } from "@/lib/database.types";
 import { DataAccessError } from "./errors";
 import { toDcExcepcion, toDcSyncRetroactivo } from "./mappers";
 import type {
+  JsonObject,
   DcExcepcion,
   DcExcepcionRow,
   DcSyncRetroactivo,
@@ -118,7 +120,7 @@ export async function updateDcExcepcion(
   input: DcExcepcionUpdateInput,
 ): Promise<DcExcepcion> {
   const sb = requireSupabase();
-  const payload: Record<string, unknown> = {};
+  const payload: TablesUpdate<"dc_excepciones"> = {};
   if (input.tipo !== undefined) payload.tipo = input.tipo;
   if (input.direccion !== undefined) payload.direccion = input.direccion;
   if (input.motivo !== undefined) payload.motivo = input.motivo.trim();
@@ -227,7 +229,7 @@ export type DcSyncRetroactivoCreateInput = {
   cuit: string;
   desde: string; // YYYY-MM-DD
   hasta?: string | null; // YYYY-MM-DD
-  preview_json: Record<string, unknown>; // Requerido: el backend o caller debe calcularlo
+  preview_json: JsonObject; // Requerido: el backend o caller debe calcularlo
 };
 
 export async function createDcSyncRetroactivo(

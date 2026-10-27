@@ -43,7 +43,7 @@ export const EMPTY_TABLE_FILTERS: TableServerFilters = { global: "", enums: {}, 
 type DataTableProps<T> = {
   columns: Column<T>[];
   data: T[];
-  keyExtractor: (row: T) => string | number;
+  keyExtractor: (row: T, index?: number) => string | number;
   actions?: (row: T) => ReactNode;
   loading?: boolean;
   emptyMessage?: string;

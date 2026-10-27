@@ -1,4 +1,5 @@
 import { requireSupabase } from "@/lib/supabase";
+import type { TablesUpdate } from "@/lib/database.types";
 import { DataAccessError } from "./errors";
 import {
   uploadAdjunto,
@@ -255,7 +256,7 @@ export async function updateContracargo(
   input: UpdateContraInput,
 ): Promise<Contra> {
   const sb = requireSupabase();
-  const payload: Record<string, unknown> = {};
+  const payload: TablesUpdate<"contracargos"> = {};
   if (input.estado !== undefined) {
     payload.estado = estadoUiToDb(input.estado);
     if (

@@ -1,4 +1,5 @@
 import { requireSupabase } from "@/lib/supabase";
+import type { TablesUpdate } from "@/lib/database.types";
 import { DataAccessError } from "./errors";
 import { toIntegracion } from "./mappers";
 import type { Integracion, IntegracionInput, IntegracionRow, Page, Pagination } from "./types";
@@ -64,7 +65,7 @@ export async function updateIntegracion(
   input: IntegracionUpdateInput,
 ): Promise<Integracion> {
   const sb = requireSupabase();
-  const payload: Record<string, unknown> = {};
+  const payload: TablesUpdate<"integraciones"> = {};
   if (input.nombre !== undefined) payload.nombre = input.nombre.trim();
   if (input.proveedor !== undefined) payload.proveedor = input.proveedor.trim();
 

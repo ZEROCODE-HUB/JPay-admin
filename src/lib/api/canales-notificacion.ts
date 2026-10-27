@@ -1,4 +1,5 @@
 import { requireSupabase } from "@/lib/supabase";
+import type { TablesUpdate } from "@/lib/database.types";
 import { DataAccessError } from "./errors";
 import { toCanalNotificacion } from "./mappers";
 import type {
@@ -83,7 +84,7 @@ export async function updateCanalNotificacion(
   input: CanalNotificacionUpdateInput,
 ): Promise<CanalNotificacion> {
   const sb = requireSupabase();
-  const payload: Record<string, unknown> = {};
+  const payload: TablesUpdate<"canales_notificacion"> = {};
   if (input.nombre !== undefined) payload.nombre = input.nombre.trim();
   if (input.tipo !== undefined) payload.tipo = input.tipo;
   if (input.configuracion !== undefined) payload.configuracion = input.configuracion;

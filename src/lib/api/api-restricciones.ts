@@ -1,4 +1,5 @@
 import { requireSupabase } from "@/lib/supabase";
+import type { TablesUpdate } from "@/lib/database.types";
 import { DataAccessError } from "./errors";
 import { toApiRestriccion } from "./mappers";
 import type {
@@ -48,17 +49,7 @@ export async function listApiRestricciones(
   const { data, error, count } = await query;
   if (error) throw new DataAccessError(error);
 
-  const rows = (data ?? []) as (ApiRestriccionRow & {
-    api_usuarios?:
-      | {
-          id: string;
-          codigo_usuario_api: string;
-          usuario: string;
-          nombre_completo: string;
-          estado: string;
-        }[]
-      | null;
-  })[];
+  const rows = (data ?? []) as ApiRestriccionRow[];
   return { rows: rows.map(toApiRestriccion), total: count ?? rows.length, page, pageSize };
 }
 
@@ -95,7 +86,7 @@ export async function updateApiRestriccion(
   input: ApiRestriccionUpdateInput,
 ): Promise<ApiRestriccion> {
   const sb = requireSupabase();
-  const payload: Record<string, unknown> = {};
+  const payload: TablesUpdate<"api_restricciones"> = {};
   if (input.apiUsuarioId !== undefined) payload.api_usuario_id = input.apiUsuarioId;
   if (input.estado !== undefined) payload.estado = input.estado;
   if (input.fechaExpiracion !== undefined) payload.fecha_expiracion = input.fechaExpiracion;

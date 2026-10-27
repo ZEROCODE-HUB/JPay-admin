@@ -272,7 +272,9 @@ function Page() {
         message="¿Estás seguro de eliminar este rol? Esta acción no se puede deshacer."
         confirmLabel="Eliminar"
         variant="danger"
-        onConfirm={() => confirmDelete && deleteMut.mutate(confirmDelete)}
+        onConfirm={() => {
+          if (confirmDelete) deleteMut.mutate(confirmDelete);
+        }}
       />
     </PermissionGuard>
   );

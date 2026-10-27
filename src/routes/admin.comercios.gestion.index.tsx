@@ -181,7 +181,7 @@ function BanderasSection({ comercioId }: { comercioId: string }) {
 
   const openEdit = (b: import("@/lib/api/types").ComercioBandera) => {
     setEditing(b);
-    setFormBanderaId(b.bandera_id || "");
+    setFormBanderaId(b.banderaId || "");
     setFormBanderaCustom("");
     setFormComisionPropia(String(b.comisionPropia));
     setFormPayway(String(b.comisionPayway));

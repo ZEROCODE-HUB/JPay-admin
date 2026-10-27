@@ -50,7 +50,6 @@ export const TIPO_SOCIEDAD: Record<string, string> = {
   "s.e": "16",
   se: "16",
   sociedad: "17",
-  "cooperativa": "18",
   cooperativa: "18",
   consortorio: "19",
   "sin fines de lucro": "19",

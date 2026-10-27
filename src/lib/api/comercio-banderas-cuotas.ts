@@ -1,4 +1,5 @@
 import { requireSupabase } from "@/lib/supabase";
+import type { TablesUpdate } from "@/lib/database.types";
 import { DataAccessError } from "./errors";
 import type { ComercioBanderaCuota, ComercioBanderaCuotaRow } from "./types";
 
@@ -51,7 +52,7 @@ export async function updateComercioBanderaCuota(
   input: Partial<{ cuotas: number; tasaMensual: number; estado: "Activo" | "Inactivo" }>,
 ): Promise<ComercioBanderaCuota> {
   const sb = requireSupabase();
-  const payload: Record<string, unknown> = {};
+  const payload: TablesUpdate<"comercio_banderas_cuotas"> = {};
   if (input.cuotas !== undefined) payload.cuotas = input.cuotas;
   if (input.tasaMensual !== undefined) payload.tasa_mensual = input.tasaMensual;
   if (input.estado !== undefined) payload.estado = input.estado;

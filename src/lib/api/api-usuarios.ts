@@ -1,4 +1,5 @@
 import { requireSupabase } from "@/lib/supabase";
+import type { TablesUpdate } from "@/lib/database.types";
 import { DataAccessError } from "./errors";
 import { toApiUsuario } from "./mappers";
 import type {
@@ -76,7 +77,7 @@ export async function updateApiUsuario(
   input: ApiUsuarioUpdateInput,
 ): Promise<ApiUsuario> {
   const sb = requireSupabase();
-  const payload: Record<string, unknown> = {};
+  const payload: TablesUpdate<"api_usuarios"> = {};
   if (input.codigoUsuarioApi !== undefined)
     payload.codigo_usuario_api = input.codigoUsuarioApi.trim();
   if (input.usuario !== undefined) payload.usuario = input.usuario.trim();

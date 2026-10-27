@@ -1,4 +1,5 @@
 import { requireSupabase } from "@/lib/supabase";
+import type { TablesUpdate } from "@/lib/database.types";
 import { DataAccessError } from "./errors";
 import { toEventoNotificacion } from "./mappers";
 import type {
@@ -108,7 +109,7 @@ export async function updateEventoNotificacion(
   input: EventoNotificacionUpdateInput,
 ): Promise<EventoNotificacion> {
   const sb = requireSupabase();
-  const payload: Record<string, unknown> = {};
+  const payload: TablesUpdate<"eventos_notificacion"> = {};
   if (input.tipo !== undefined) payload.tipo = input.tipo;
   if (input.codigoErrorId !== undefined) payload.codigo_error_id = input.codigoErrorId;
   if (input.titulo !== undefined) payload.titulo = input.titulo.trim();

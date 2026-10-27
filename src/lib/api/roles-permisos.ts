@@ -1,4 +1,5 @@
 import { requireSupabase } from "@/lib/supabase";
+import type { TablesInsert } from "@/lib/database.types";
 import { DataAccessError } from "./errors";
 import type {
   EstadoMovimiento,
@@ -38,7 +39,7 @@ export async function upsertRol(input: {
   descripcion?: string | null;
 }): Promise<Rol> {
   const sb = requireSupabase();
-  const payload: Record<string, unknown> = {
+  const payload: TablesInsert<"roles"> = {
     nombre: input.nombre,
     descripcion: input.descripcion ?? null,
   };
@@ -113,7 +114,7 @@ export type PermisoInput = {
 
 export async function upsertPermiso(input: PermisoInput): Promise<Permiso> {
   const sb = requireSupabase();
-  const payload: Record<string, unknown> = {
+  const payload: TablesInsert<"permisos"> = {
     rol_id: input.rolId,
     recurso_id: input.recursoId,
     puede_leer: input.puedeLeer ?? false,

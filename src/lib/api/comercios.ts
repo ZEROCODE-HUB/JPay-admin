@@ -1,4 +1,5 @@
 import { requireSupabase } from "@/lib/supabase";
+import type { TablesInsert, TablesUpdate } from "@/lib/database.types";
 import { DataAccessError } from "./errors";
 import { toComercio, toPuntoVenta } from "./mappers";
 import type {
@@ -12,7 +13,6 @@ import type {
   Pagination,
   PuntoVenta,
   PuntoVentaRow,
-  TipoPersona,
 } from "./types";
 
 export type ComercioFilters = Pagination & {
@@ -55,19 +55,7 @@ export async function listComercios(filters: ComercioFilters): Promise<Page<Come
   const { data, error, count } = await q;
   if (error) throw new DataAccessError(error);
 
-  const rows = (data ?? []) as (ComercioRow & {
-    clientes?:
-      | {
-          legajo: string;
-          nombre: string;
-          cuit: string;
-          tipo_persona: TipoPersona;
-          correo: string;
-        }[]
-      | null;
-    codigos_categoria?: { id: number; descripcion: string }[] | null;
-    puntos_venta?: PuntoVentaRow[] | null;
-  })[];
+  const rows = (data ?? []) as ComercioRow[];
 
   return {
     rows: rows.map(toComercio),
@@ -82,28 +70,14 @@ export async function getComercio(id: string): Promise<Comercio | null> {
   const { data, error } = await sb.from("comercios").select(COLUMNS).eq("id", id).maybeSingle();
   if (error) throw new DataAccessError(error);
   if (!data) return null;
-  return toComercio(
-    data as ComercioRow & {
-      clientes?:
-        | {
-            legajo: string;
-            nombre: string;
-            cuit: string;
-            tipo_persona: TipoPersona;
-            correo: string;
-          }[]
-        | null;
-      codigos_categoria?: { id: number; descripcion: string }[] | null;
-      puntos_venta?: PuntoVentaRow[] | null;
-    },
-  );
+  return toComercio(data as ComercioRow);
 }
 
 export type ComercioCreateInput = ComercioInput;
 
 export async function createComercio(input: ComercioCreateInput): Promise<Comercio> {
   const sb = requireSupabase();
-  const payload: Record<string, unknown> = {
+  const payload: TablesInsert<"comercios"> = {
     usuario: input.usuario.trim(),
     legajo: input.legajo.trim(),
     nombre_comercio: (input as { nombreComercio?: string | null }).nombreComercio?.trim() || null,
@@ -115,28 +89,14 @@ export async function createComercio(input: ComercioCreateInput): Promise<Comerc
   };
   const { data, error } = await sb.from("comercios").insert(payload).select(COLUMNS).single();
   if (error) throw new DataAccessError(error);
-  return toComercio(
-    data as ComercioRow & {
-      clientes?:
-        | {
-            legajo: string;
-            nombre: string;
-            cuit: string;
-            tipo_persona: TipoPersona;
-            correo: string;
-          }[]
-        | null;
-      codigos_categoria?: { id: number; descripcion: string }[] | null;
-      puntos_venta?: PuntoVentaRow[] | null;
-    },
-  );
+  return toComercio(data as ComercioRow);
 }
 
 export type ComercioUpdateInput = Partial<ComercioInput>;
 
 export async function updateComercio(id: string, input: ComercioUpdateInput): Promise<Comercio> {
   const sb = requireSupabase();
-  const payload: Record<string, unknown> = {};
+  const payload: TablesUpdate<"comercios"> = {};
   if (input.usuario !== undefined) payload.usuario = input.usuario.trim();
   if (input.legajo !== undefined) payload.legajo = input.legajo.trim();
   if ((input as { nombreComercio?: string | null }).nombreComercio !== undefined)
@@ -151,21 +111,7 @@ export async function updateComercio(id: string, input: ComercioUpdateInput): Pr
 
   const { data, error } = await sb.from("comercios").update(payload).eq("id", id).select(COLUMNS).single();
   if (error) throw new DataAccessError(error);
-  return toComercio(
-    data as ComercioRow & {
-      clientes?:
-        | {
-            legajo: string;
-            nombre: string;
-            cuit: string;
-            tipo_persona: TipoPersona;
-            correo: string;
-          }[]
-        | null;
-      codigos_categoria?: { id: number; descripcion: string }[] | null;
-      puntos_venta?: PuntoVentaRow[] | null;
-    },
-  );
+  return toComercio(data as ComercioRow);
 }
 
 export async function setComercioEstado(id: string, estado: EstadoComercio): Promise<Comercio> {
@@ -191,27 +137,20 @@ export async function deshabilitarComercio(id: string, motivo: string): Promise<
   // 2. Registrar en historial_cambios
   try {
     const { data: auth } = await sb.auth.getUser();
-    const uid = auth?.user?.id ?? null;
+    const ahora = new Date();
     await sb.from("historial_cambios").insert({
-      tabla: "comercios",
-      registro_id: id,
-      cambio: "Deshabilitación",
-      motivo: motivo.trim(),
-      usuario_id: uid,
+      cliente_legajo: data.legajo,
+      campo: `Comercio deshabilitado (${data.nombre_comercio ?? data.usuario})`,
+      valor_anterior: null,
+      valor_nuevo: motivo.trim(),
+      hora: ahora.toTimeString().slice(0, 5),
+      usuario: auth?.user?.email ?? auth?.user?.id ?? null,
     });
   } catch {
     // No falla la operación principal si el historial falla
   }
 
-  return toComercio(
-    data as ComercioRow & {
-      clientes?:
-        | { legajo: string; nombre: string; cuit: string; tipo_persona: TipoPersona; correo: string }[]
-        | null;
-      codigos_categoria?: { id: number; descripcion: string }[] | null;
-      puntos_venta?: PuntoVentaRow[] | null;
-    },
-  );
+  return toComercio(data as ComercioRow);
 }
 
 // --- catálogos auxiliares ---------------------------------------------------
@@ -246,5 +185,5 @@ export async function listPuntosVenta(comercioId: string): Promise<PuntoVenta[]>
     .eq("comercio_id", comercioId)
     .order("created_at", { ascending: true });
   if (error) throw new DataAccessError(error);
-  return (data ?? []).map((r: PuntoVentaRow) => toPuntoVenta(r));
+  return ((data ?? []) as PuntoVentaRow[]).map((r) => toPuntoVenta(r));
 }

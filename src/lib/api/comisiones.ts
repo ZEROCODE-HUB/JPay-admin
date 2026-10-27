@@ -1,4 +1,5 @@
 import { requireSupabase } from "@/lib/supabase";
+import type { TablesInsert } from "@/lib/database.types";
 import { DataAccessError } from "./errors";
 import { toComision } from "./mappers";
 import type {
@@ -9,7 +10,6 @@ import type {
   Page,
   Pagination,
   TipoOperacion,
-  TipoPersona,
 } from "./types";
 
 export type ComisionFilters = Pagination & {
@@ -98,18 +98,7 @@ export async function listComisiones(filters: ComisionFilters): Promise<Page<Com
   const { data, error, count } = await query;
   if (error) throw new DataAccessError(error);
 
-  const rows = (data ?? []) as (ComisionClienteRow & {
-    clientes?:
-      | {
-          legajo: string;
-          correo: string;
-          cuit: string;
-          nombre: string;
-          tipo_persona: TipoPersona;
-        }[]
-      | null;
-    subcuentas?: { cbu: string | null; nombre: string | null }[] | null;
-  })[];
+  const rows = (data ?? []) as ComisionClienteRow[];
 
   return {
     rows: rows.map(toComision),
@@ -137,7 +126,7 @@ export async function upsertComision(
   input: ComisionInput & { id?: string },
 ): Promise<ComisionCliente> {
   const sb = requireSupabase();
-  const payload: Record<string, unknown> = {
+  const payload: TablesInsert<"comisiones_cliente"> = {
     cliente_id: input.clienteId,
     subcuenta_id: input.subcuentaId ?? null,
     operacion: input.operacion,
@@ -157,20 +146,7 @@ export async function upsertComision(
     .select(COLUMNS)
     .single();
   if (error) throw new DataAccessError(error);
-  return toComision(
-    data as ComisionClienteRow & {
-      clientes?:
-        | {
-            legajo: string;
-            correo: string;
-            cuit: string;
-            nombre: string;
-            tipo_persona: TipoPersona;
-          }[]
-        | null;
-      subcuentas?: { cbu: string | null; nombre: string | null }[] | null;
-    },
-  );
+  return toComision(data as ComisionClienteRow);
 }
 
 export async function setComisionEstado(
@@ -185,18 +161,5 @@ export async function setComisionEstado(
     .select(COLUMNS)
     .single();
   if (error) throw new DataAccessError(error);
-  return toComision(
-    data as ComisionClienteRow & {
-      clientes?:
-        | {
-            legajo: string;
-            correo: string;
-            cuit: string;
-            nombre: string;
-            tipo_persona: TipoPersona;
-          }[]
-        | null;
-      subcuentas?: { cbu: string | null; nombre: string | null }[] | null;
-    },
-  );
+  return toComision(data as ComisionClienteRow);
 }

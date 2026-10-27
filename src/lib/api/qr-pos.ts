@@ -9,7 +9,8 @@ export type QrFilters = Pagination & {
   comercioId?: string;
 };
 
-const COLUMNS = "id, comercio_id, nombre, estado, created_at, tipo, cajero, qr_url, alias, comercios(id, usuario, legajo, clientes(nombre, correo))";
+// puntos_venta no tiene tipo/cajero/qr_url/alias en la base: se piden solo las columnas reales.
+const COLUMNS = "id, comercio_id, nombre, estado, created_at, comercios(id, usuario, legajo, clientes(nombre, correo))";
 const COLUMNS_LEGACY = "id, comercio_id, nombre, estado, created_at, comercios(id, usuario, legajo, clientes(nombre, correo))";
 
 function isMissingColumnError(error: unknown): boolean {
@@ -23,7 +24,7 @@ export async function listQrPos(filters: QrFilters): Promise<Page<PuntoVenta>> {
   const from = page * pageSize;
   const to = from + pageSize - 1;
 
-  const build = async (cols: string, includeExtraSearch: boolean) => {
+  const build = async <C extends string>(cols: C, includeExtraSearch: boolean) => {
     let query = sb.from("puntos_venta").select(cols, { count: "exact" });
     if (search?.trim()) {
       const q = search.trim().replace(/[%_]/g, "\\$&");
@@ -49,7 +50,7 @@ export async function listQrPos(filters: QrFilters): Promise<Page<PuntoVenta>> {
     count = res.count;
   }
   if (error) throw new DataAccessError(error);
-  const rows = (data ?? []) as (PuntoVentaRow & { comercios?: { id: string; usuario: string; legajo: string; clientes?: { nombre: string; correo: string }[] | null } | null })[];
+  const rows = (data ?? []) as PuntoVentaRow[];
   return { rows: rows.map((r) => toPuntoVenta(r as never)), total: count ?? rows.length, page, pageSize };
 }
 

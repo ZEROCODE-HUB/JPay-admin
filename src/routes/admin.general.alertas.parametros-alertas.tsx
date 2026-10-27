@@ -9,6 +9,7 @@ import {
   saveAlertRules,
   type AlertRule,
   type AlertRuleCode,
+  type AlertRuleParameters,
   type MinorsPolicy,
   type ScheduleDay,
 } from "@/lib/api/alert-rules";
@@ -172,14 +173,14 @@ function toDraft(rules: AlertRule[]): Draft {
 }
 
 /** Valida y arma los parametros a guardar; devuelve errores por campo. */
-function construir(draft: Draft): { rules: { code: AlertRuleCode; isEnabled: boolean; parameters: Record<string, unknown> }[]; errores: Record<string, string> } {
+function construir(draft: Draft): { rules: { code: AlertRuleCode; isEnabled: boolean; parameters: AlertRuleParameters }[]; errores: Record<string, string> } {
   const errores: Record<string, string> = {};
-  const rules: { code: AlertRuleCode; isEnabled: boolean; parameters: Record<string, unknown> }[] = [];
+  const rules: { code: AlertRuleCode; isEnabled: boolean; parameters: AlertRuleParameters }[] = [];
   for (const g of GROUPS) {
     for (const rv of g.rules) {
       const d = draft[rv.code];
       if (!d) continue;
-      const parameters: Record<string, unknown> = {};
+      const parameters: AlertRuleParameters = {};
       for (const f of rv.numbers ?? []) {
         const raw = (d.values[f.key] ?? "").trim();
         const n = Number(raw);

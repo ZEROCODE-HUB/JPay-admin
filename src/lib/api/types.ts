@@ -5,6 +5,10 @@
 //  - admin_users.rol_id     -> uuid FK a roles.id (NO columna "rol" texto).
 //  - comisiones_cliente.operacion = código único (text); tipo = categoría (text, 4 valores).
 
+import type { Json } from "@/lib/database.types";
+
+export type JsonObject = { [key: string]: Json | undefined };
+
 export type TipoPersona = "fisica" | "juridica";
 export const TIPOS_PERSONA: TipoPersona[] = ["fisica", "juridica"];
 
@@ -156,7 +160,19 @@ export type ComisionClienteRow = {
   descripcion: string | null;
   created_at: string;
   updated_at: string;
+  clientes?: ComisionClienteJoined | ComisionClienteJoined[] | null;
+  subcuentas?: ComisionSubcuentaJoined | ComisionSubcuentaJoined[] | null;
 };
+
+type ComisionClienteJoined = {
+  legajo: string;
+  correo: string;
+  cuit: string;
+  nombre: string;
+  tipo_persona: TipoPersona;
+};
+
+type ComisionSubcuentaJoined = { cbu: string | null; nombre: string | null };
 
 export type ComisionCliente = {
   id: string;
@@ -206,21 +222,13 @@ export type MovimientoRow = {
   destinatario_nombre?: string | null;
   destinatario_cuit?: string | null;
   destinatario_banco?: string | null;
-  estados_movimiento?:
-    | {
-        codigo: string;
-        nombre: string;
-        es_final: boolean;
-      }[]
-    | null;
-  clientes?:
-    | {
-        correo: string;
-        nombre: string;
-        cuit: string;
-      }[]
-    | null;
+  // to-one: PostgREST devuelve object (se acepta array por compat).
+  estados_movimiento?: MovimientoEstadoJoined | MovimientoEstadoJoined[] | null;
+  clientes?: MovimientoClienteJoined | MovimientoClienteJoined[] | null;
 };
+
+type MovimientoEstadoJoined = { codigo: string; nombre: string; es_final: boolean };
+type MovimientoClienteJoined = { correo: string; nombre: string; cuit: string };
 
 export type Movimiento = {
   id: string;
@@ -441,7 +449,12 @@ export type PuntoVentaRow = {
   cajero?: string | null;
   qr_url?: string | null;
   alias?: string | null;
-  comercios?: { id: string; usuario: string; legajo: string; clientes?: { nombre: string; correo: string }[] | null } | null;
+  comercios?: {
+    id: string;
+    usuario: string;
+    legajo: string;
+    clientes?: { nombre: string; correo: string } | { nombre: string; correo: string }[] | null;
+  } | null;
 };
 
 export type PuntoVenta = {
@@ -541,18 +554,22 @@ export type ComercioRow = {
   site_id?: string | null;
   created_at: string;
   updated_at: string;
-  clientes?:
-    | {
-        legajo: string;
-        nombre: string;
-        cuit: string;
-        tipo_persona: TipoPersona;
-        correo: string;
-      }[]
-    | null;
-  codigos_categoria?: CodigoCategoriaRow[] | null;
+  // PostgREST devuelve object en to-one y array en one-to-many: se aceptan ambas.
+  clientes?: ComercioClienteJoined | ComercioClienteJoined[] | null;
+  codigos_categoria?: CodigoCategoriaRow | CodigoCategoriaRow[] | null;
   puntos_venta?: PuntoVentaRow[] | null;
+  admin_users?: ComercioAdminJoined | ComercioAdminJoined[] | null;
 };
+
+type ComercioClienteJoined = {
+  legajo: string;
+  nombre: string;
+  cuit: string;
+  tipo_persona: TipoPersona;
+  correo: string;
+};
+
+type ComercioAdminJoined = { id: string; nombre: string; email: string };
 
 export type Comercio = {
   id: string;
@@ -765,15 +782,15 @@ export type ApiRestriccionRow = {
   fecha_creacion: string;
   fecha_expiracion: string | null;
   created_at: string;
-  api_usuarios?:
-    | {
-        id: string;
-        codigo_usuario_api: string;
-        usuario: string;
-        nombre_completo: string;
-        estado: EstadoApiUsuario;
-      }[]
-    | null;
+  api_usuarios?: ApiUsuarioJoined | ApiUsuarioJoined[] | null;
+};
+
+type ApiUsuarioJoined = {
+  id: string;
+  codigo_usuario_api: string;
+  usuario: string;
+  nombre_completo: string;
+  estado: EstadoApiUsuario;
 };
 
 export type ApiRestriccion = {
@@ -881,7 +898,7 @@ export type CanalNotificacion = {
 export type CanalNotificacionInput = {
   nombre: string;
   tipo: "Email" | "Telegram" | "WhatsApp";
-  configuracion?: Record<string, unknown> | null;
+  configuracion?: JsonObject | null;
   activo?: boolean;
 };
 
@@ -927,7 +944,7 @@ export type EventoNotificacionInput = {
   mensaje: string;
   audiencia: "Admin" | "Cliente" | "Ambos";
   canal: "Email" | "Telegram" | "WhatsApp";
-  metadata?: Record<string, unknown> | null;
+  metadata?: JsonObject | null;
 };
 
 export type EventoNotificacionFiltros = {
@@ -1037,11 +1054,12 @@ export type ImpuestoAsignacionRow = {
   estado: EstadoImpuesto;
   fecha_asignacion: string | null;
   tipo_operacion: TipoOperacion | null;
-  impuestos?: { codigo: string; nombre: string; tipo: TipoImpuesto; monto: number | null }[] | null;
-  clientes?:
-    | { legajo: string; nombre: string; cuit: string; tipo_persona: TipoPersona; correo: string }[]
-    | null;
+  impuestos?: AsignacionImpuestoJoined | AsignacionImpuestoJoined[] | null;
+  clientes?: AsignacionClienteJoined | AsignacionClienteJoined[] | null;
 };
+
+type AsignacionImpuestoJoined = { codigo: string; nombre: string; tipo: TipoImpuesto; monto: number | null };
+type AsignacionClienteJoined = { legajo: string; nombre: string; cuit: string; tipo_persona: TipoPersona; correo: string };
 
 export type ImpuestoAsignacion = {
   id: string;

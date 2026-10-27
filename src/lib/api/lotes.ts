@@ -1,4 +1,5 @@
 import { requireSupabase } from "@/lib/supabase";
+import type { TablesUpdate } from "@/lib/database.types";
 import { DataAccessError } from "./errors";
 import type { EstadoLote, LoteAcreditacion, LoteAcreditacionRow, Movimiento, MovimientoRow, Page, Pagination } from "./types";
 import { toMovimiento } from "./mappers";
@@ -178,7 +179,7 @@ export async function listLoteMovimientos(loteId: string): Promise<Movimiento[]>
     .in("id", movimientoIds);
   if (movError) throw new DataAccessError(movError);
   return (movimientos ?? []).map((r) =>
-    toMovimiento(r as MovimientoRow & { clientes?: { correo: string; nombre: string; cuit: string }[] | null }),
+    toMovimiento(r as MovimientoRow),
   );
 }
 
@@ -254,7 +255,7 @@ export async function updateLote(id: string, input: UpdateLoteInput): Promise<Lo
   const current = await getLote(id);
   if (!current) throw new DataAccessError(new Error("Lote no encontrado"));
 
-  const payload: Record<string, unknown> = {};
+  const payload: TablesUpdate<"lotes_acreditacion"> = {};
 
   if (input.estado !== undefined) payload.estado = input.estado;
   if (input.contracargoMonto !== undefined) payload.contracargo_monto = input.contracargoMonto;
@@ -352,8 +353,8 @@ export async function resumenLotes(
 ): Promise<ResumenLotesAdmin> {
   const sb = requireSupabase();
   const { data, error } = await sb.rpc("resumen_lotes_admin", {
-    p_desde: filtros.fechaDesde || null,
-    p_hasta: filtros.fechaHasta || null,
+    p_desde: filtros.fechaDesde || undefined,
+    p_hasta: filtros.fechaHasta || undefined,
   });
   if (error) throw new DataAccessError(error);
 
@@ -397,7 +398,7 @@ export async function aplicarLiquidacionLote(
   const { data, error } = await sb.rpc("aplicar_liquidacion_lote", {
     p_lote_id: id,
     p_liquidacion: liquidacion,
-    p_fecha_cobro_real: fechaCobroReal || null,
+    p_fecha_cobro_real: fechaCobroReal || undefined,
   });
   if (error) throw new DataAccessError(error);
 
@@ -436,7 +437,7 @@ export async function acreditarLote(
   const sb = requireSupabase();
   const { data, error } = await sb.rpc("acreditar_lote", {
     p_lote_id: id,
-    p_notas: notas?.trim() || null,
+    p_notas: notas?.trim() || undefined,
     p_adelantos_monto: adelantosMonto,
   });
   if (error) throw new DataAccessError(error);

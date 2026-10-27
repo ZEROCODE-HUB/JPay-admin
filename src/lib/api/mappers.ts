@@ -49,10 +49,8 @@ import type {
   PuntoVentaRow,
   Resolver,
   ResolverRow,
-  TipoPersona,
   CodigoCategoria,
   CodigoCategoriaRow,
-  EstadoApiUsuario,
   TipoImpuesto,
 } from "./types";
 
@@ -95,21 +93,10 @@ export function toCliente(r: ClienteRow): Cliente {
 }
 
 export function toComision(
-  r: ComisionClienteRow & {
-    clientes?:
-      | {
-          legajo: string;
-          correo: string;
-          cuit: string;
-          nombre: string;
-          tipo_persona: TipoPersona;
-        }[]
-      | null;
-    subcuentas?: { cbu: string | null; nombre: string | null }[] | null;
-  },
+  r: ComisionClienteRow,
 ): ComisionCliente {
-  const cli = Array.isArray(r.clientes) ? (r.clientes[0] ?? null) : (r.clientes ?? null);
-  const sub = Array.isArray(r.subcuentas) ? (r.subcuentas[0] ?? null) : (r.subcuentas ?? null);
+  const cli = firstOrNull(r.clientes);
+  const sub = firstOrNull(r.subcuentas);
   return {
     id: r.id,
     clienteId: r.cliente_id,
@@ -137,14 +124,9 @@ export function toComision(
   };
 }
 
-export function toMovimiento(
-  r: MovimientoRow & {
-    clientes?: { correo: string; nombre: string; cuit: string }[] | null;
-  },
-): Movimiento {
-  const cli = Array.isArray(r.clientes) ? (r.clientes[0] ?? null) : (r.clientes ?? null);
-  const estadoArr = Array.isArray(r.estados_movimiento) ? r.estados_movimiento : null;
-  const estado = estadoArr && estadoArr.length ? estadoArr[0] : null;
+export function toMovimiento(r: MovimientoRow): Movimiento {
+  const cli = firstOrNull(r.clientes);
+  const estado = firstOrNull(r.estados_movimiento);
   return {
     id: r.id,
     clienteId: r.cliente_id,
@@ -187,14 +169,14 @@ export function toAdminUser(r: AdminUserRow): AdminUser {
   };
 }
 
-function firstOrNull<T>(v: T[] | null | undefined): T | null {
+function firstOrNull<T>(v: T | T[] | null | undefined): T | null {
   if (Array.isArray(v)) return v[0] ?? null;
-  return (v as T | null) ?? null;
+  return v ?? null;
 }
 
-export function toPuntoVenta(r: PuntoVentaRow & { comercios?: { id: string; usuario: string; legajo: string; clientes?: { nombre: string; correo: string }[] | null } | null }): PuntoVenta {
-  const com = r.comercios as { id: string; usuario: string; legajo: string; clientes?: { nombre: string; correo: string }[] | null } | null;
-  const cli = Array.isArray(com?.clientes) ? com?.clientes[0] : com?.clientes ?? null;
+export function toPuntoVenta(r: PuntoVentaRow): PuntoVenta {
+  const com = r.comercios ?? null;
+  const cli = firstOrNull(com?.clientes);
   return {
     id: r.id,
     comercioId: r.comercio_id,
@@ -210,24 +192,7 @@ export function toPuntoVenta(r: PuntoVentaRow & { comercios?: { id: string; usua
 }
 
 export function toComercio(
-  r: ComercioRow & {
-    clientes?:
-      | {
-          legajo: string;
-          nombre: string;
-          cuit: string;
-          tipo_persona: TipoPersona;
-          correo: string;
-        }[]
-      | null;
-    codigos_categoria?: CodigoCategoriaRow[] | null;
-    puntos_venta?: PuntoVentaRow[] | null;
-    admin_users?: {
-      id: string;
-      nombre: string;
-      email: string;
-    }[] | null;
-  },
+  r: ComercioRow,
 ): Comercio {
   const cli = firstOrNull(r.clientes);
   const cat = firstOrNull(r.codigos_categoria);
@@ -334,20 +299,8 @@ export function toApiEndpoint(r: ApiEndpointRow): ApiEndpoint {
   };
 }
 
-export function toApiRestriccion(
-  r: ApiRestriccionRow & {
-    api_usuarios?:
-      | {
-          id: string;
-          codigo_usuario_api: string;
-          usuario: string;
-          nombre_completo: string;
-          estado: EstadoApiUsuario;
-        }[]
-      | null;
-  },
-): ApiRestriccion {
-  const u = Array.isArray(r.api_usuarios) ? r.api_usuarios[0] : null;
+export function toApiRestriccion(r: ApiRestriccionRow): ApiRestriccion {
+  const u = firstOrNull(r.api_usuarios);
   return {
     id: r.id,
     apiUsuarioId: r.api_usuario_id,
@@ -466,19 +419,7 @@ export function toAlicuota(r: AlicuotaRow): Alicuota {
 }
 
 export function toImpuestoAsignacion(
-  r: ImpuestoAsignacionRow & {
-    impuestos?:
-      { codigo: string; nombre: string; tipo: TipoImpuesto; monto: number | null }[] | null;
-    clientes?:
-      | {
-          legajo: string;
-          nombre: string;
-          cuit: string;
-          tipo_persona: TipoPersona;
-          correo: string;
-        }[]
-      | null;
-  },
+  r: ImpuestoAsignacionRow,
 ): ImpuestoAsignacion {
   const imp = firstOrNull(r.impuestos);
   const cli = firstOrNull(r.clientes);

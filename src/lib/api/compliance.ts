@@ -1,4 +1,6 @@
+import type { PostgrestError, SupabaseClient } from "@supabase/supabase-js";
 import { requireSupabase } from "@/lib/supabase";
+import type { Database } from "@/lib/database.types";
 import { DataAccessError } from "./errors";
 import type { Page, Pagination } from "./types";
 
@@ -163,23 +165,24 @@ export async function listAllAlerts(f: AlertFilters): Promise<AlertItem[]> {
   return ((data ?? []) as AlertRow[]).map(toAlert);
 }
 
-async function rpc<T = unknown>(fn: string, args: Record<string, unknown>): Promise<T> {
+async function rpc<T = unknown>(
+  llamar: (sb: SupabaseClient<Database>) => PromiseLike<{ data: unknown; error: PostgrestError | null }>,
+): Promise<T> {
   const sb = requireSupabase();
-  const { data, error } = await sb.rpc(fn, args);
+  const { data, error } = await llamar(sb);
   if (error) throw new DataAccessError(error);
   return data as T;
 }
 
-export const acceptAlert = (id: string) => rpc("aceptar_alerta", { p_id: id });
+export const acceptAlert = (id: string) => rpc((sb) => sb.rpc("aceptar_alerta", { p_id: id }));
 
 export const resolveAlert = (id: string, resolution: AlertResolution, notes: string) =>
-  rpc("resolver_alerta", { p_id: id, p_resolution: resolution, p_notes: notes });
+  rpc((sb) => sb.rpc("resolver_alerta", { p_id: id, p_resolution: resolution, p_notes: notes }));
 
 /** Barrido manual (reemplaza al cron mientras no exista): consume coincidencias PLAFT pendientes. */
 export const runComplianceSweep = () =>
   rpc<{ coincidencias_revisadas: number; alertas_nuevas: number; ultima_corrida_plaft: string | null }>(
-    "ejecutar_barrido_compliance",
-    {},
+    (sb) => sb.rpc("ejecutar_barrido_compliance"),
   );
 
 export type SimulatedDeposit = {
@@ -194,13 +197,15 @@ export type SimulatedDeposit = {
 
 /** Depósito entrante simulado (solo desarrollo) para probar las reglas de depósitos. */
 export const simulateDeposit = (input: { cbuDestino: string; importe: number; cuitOrigen?: string; titularOrigen?: string; cbuOrigen?: string }) =>
-  rpc<SimulatedDeposit>("simular_deposito_entrante", {
-    p_cbu_destino: input.cbuDestino,
-    p_importe: input.importe,
-    p_cuit_origen: input.cuitOrigen || null,
-    p_titular_origen: input.titularOrigen || null,
-    p_cbu_origen: input.cbuOrigen || null,
-  });
+  rpc<SimulatedDeposit>((sb) =>
+    sb.rpc("simular_deposito_entrante", {
+      p_cbu_destino: input.cbuDestino,
+      p_importe: input.importe,
+      p_cuit_origen: input.cuitOrigen || undefined,
+      p_titular_origen: input.titularOrigen || undefined,
+      p_cbu_origen: input.cbuOrigen || undefined,
+    }),
+  );
 
 // ============================================================================
 // Bloqueos
@@ -346,16 +351,23 @@ export async function listAllBlocks(f: BlockFilters): Promise<AccountBlock[]> {
 }
 
 export const createManualBlock = (input: { legajo: string; subaccountId: string | null; reason: string }) =>
-  rpc<string>("crear_bloqueo_manual", { p_legajo: input.legajo, p_subaccount_id: input.subaccountId, p_reason: input.reason });
+  rpc<string>((sb) =>
+    sb.rpc("crear_bloqueo_manual", {
+      p_legajo: input.legajo,
+      // Los tipos generados no admiten args nullable; NULL = bloqueo de toda la cuenta.
+      p_subaccount_id: input.subaccountId as string,
+      p_reason: input.reason,
+    }),
+  );
 
-export const acceptBlock = (id: string) => rpc("aceptar_bloqueo", { p_id: id });
+export const acceptBlock = (id: string) => rpc((sb) => sb.rpc("aceptar_bloqueo", { p_id: id }));
 
 export const releaseBlock = (id: string, notes: string) =>
-  rpc<{ ok: boolean; depositos_liberados: number; monto_liberado: number }>("liberar_bloqueo", { p_id: id, p_notes: notes });
+  rpc<{ ok: boolean; depositos_liberados: number; monto_liberado: number }>((sb) => sb.rpc("liberar_bloqueo", { p_id: id, p_notes: notes }));
 
 // ============================================================================
 // SMVM (valor de referencia de las reglas en salarios mínimos)
 // ============================================================================
 
-export const readSmvm = () => rpc<number>("leer_smvm", {}).then((v) => Number(v ?? 0));
-export const saveSmvm = (monto: number) => rpc("guardar_smvm", { p_monto: monto });
+export const readSmvm = () => rpc<number>((sb) => sb.rpc("leer_smvm")).then((v) => Number(v ?? 0));
+export const saveSmvm = (monto: number) => rpc((sb) => sb.rpc("guardar_smvm", { p_monto: monto }));

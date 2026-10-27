@@ -194,9 +194,9 @@ export async function listCalendarioAcreditaciones(
   const { data, error } = await sb.rpc("calendario_acreditaciones_v2", {
     p_mes: filters.mes,
     p_anio: filters.anio,
-    p_comercio_id: filters.comercioId ?? null,
-    p_bandera: filters.bandera ?? null,
-    p_estado: filters.estado ?? null,
+    p_comercio_id: filters.comercioId ?? undefined,
+    p_bandera: filters.bandera ?? undefined,
+    p_estado: filters.estado ?? undefined,
   });
   if (error) throw new DataAccessError(error);
   const arr = Array.isArray(data) ? data : [];
@@ -212,7 +212,7 @@ export async function getResumenSaldosCalendario(
 ): Promise<ResumenSaldos> {
   const sb = requireSupabase();
   const { data, error } = await sb.rpc("calendario_resumen_saldos", {
-    p_comercio_id: comercioId,
+    p_comercio_id: comercioId ?? undefined,
   });
   if (error) throw new DataAccessError(error);
   const r = (data ?? {}) as Record<string, unknown>;
@@ -238,7 +238,7 @@ export async function getAdelantosPorDia(
   const sb = requireSupabase();
   const { data, error } = await sb.rpc("calendario_adelantos_por_dia", {
     p_comercio_id: comercioId,
-    p_fecha: fecha,
+    p_fecha: fecha ?? undefined,
   });
   if (error) throw new DataAccessError(error);
   const arr = Array.isArray(data) ? data : [];
@@ -256,7 +256,7 @@ export async function getExportDia(
   const sb = requireSupabase();
   const { data, error } = await sb.rpc("calendario_exportar_dia", {
     p_fecha: fecha,
-    p_comercio_id: comercioId,
+    p_comercio_id: comercioId ?? undefined,
   });
   if (error) throw new DataAccessError(error);
   const arr = Array.isArray(data) ? data : [];

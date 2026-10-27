@@ -1,4 +1,5 @@
 import { requireSupabase } from "@/lib/supabase";
+import type { TablesUpdate } from "@/lib/database.types";
 import { DataAccessError } from "./errors";
 import { toResolver } from "./mappers";
 import type {
@@ -87,7 +88,7 @@ export type ResolverUpdateInput = Partial<ResolverInput>;
 
 export async function updateResolver(id: string, input: ResolverUpdateInput): Promise<Resolver> {
   const sb = requireSupabase();
-  const payload: Record<string, unknown> = {};
+  const payload: TablesUpdate<"resolvers"> = {};
   if (input.nombre !== undefined) payload.nombre = input.nombre.trim();
   if (input.cuit !== undefined) payload.cuit = input.cuit.trim();
   if (input.url !== undefined) payload.url = input.url.trim();
