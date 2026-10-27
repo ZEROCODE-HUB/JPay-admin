@@ -20,7 +20,6 @@ import { ConfirmDialog } from "@/components/confirm-dialog";
 import { useDeveloperMode } from "@/hooks/use-developer-mode";
 import { toast } from "sonner";
 import { useIntegraciones } from "@/hooks/useIntegraciones";
-import { useCan } from "@/lib/permissions";
 import { PermissionGuard } from "@/components/permission-guard";
 import type { Integracion } from "@/lib/api/types";
 import { pageTitle } from "@/brand/brand";
@@ -99,7 +98,6 @@ const mockEjecuciones: Record<string, number> = {
 
 function Page() {
   const { devMode } = useDeveloperMode();
-  const { can } = useCan();
   const {
     rows: integraciones,
     isLoading,

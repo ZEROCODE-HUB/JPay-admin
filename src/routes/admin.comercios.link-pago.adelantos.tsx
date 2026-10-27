@@ -544,7 +544,7 @@ function Page() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [page, setPage] = useState(0);
-  const [pageSize, setPageSize] = useState(20);
+  const [pageSize] = useState(20);
   const [estadoFilter, setEstadoFilter] = useState<EstadoAdelanto | "">("");
   const [detail, setDetail] = useState<AdelantoUI | null>(null);
   const [confirm, setConfirm] = useState<{ title: string; message: string } | null>(null);

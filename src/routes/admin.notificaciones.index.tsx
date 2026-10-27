@@ -138,7 +138,7 @@ const canalTone: Record<Canal, "neutral" | "success" | "warn"> = {
 function Page() {
   const [eventos] = useState(eventosIniciales);
 
-  const getActions = (r: Evento): ActionItem[] => [
+  const getActions = (_r: Evento): ActionItem[] => [
     {
       label: "Ver detalle",
       icon: Eye,

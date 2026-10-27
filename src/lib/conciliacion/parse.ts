@@ -32,32 +32,6 @@ export type BankRow = {
   raw: Record<string, string>;
 };
 
-const HEADER_EXPECTED = [
-  "FECHA_NEGOCIO",
-  "ID_DEBIN",
-  "TIPO_MOV_COELSA",
-  "CBU",
-  "CTA_BT_DEL_CBU",
-  "BT_SBO",
-  "BT_TOP",
-  "DENOMINACION",
-  "CUIT",
-  "IMPORTE_COELSA",
-  "ESTADO_COELSA",
-  "ASTO_ESTADO",
-  "CVU",
-  "CUIT_VIRTUAL",
-  "CVU_2",
-  "CUIT_VIRTUAL_2",
-  "CBU_2",
-  "CUIT_2",
-  "CONCEPTO",
-  "MISMO_TIT",
-  "DETALLE",
-  "CVU_CREDITO",
-  "FECHA_HORA_COELSA",
-] as const;
-
 export function parseImporte(raw: string): number {
   if (!raw) return 0;
   // "-14,355.00" -> remove commas (thousands) keep dot decimal, keep sign

@@ -16,7 +16,6 @@ import {
 import { PageHeader } from "@/components/page-header";
 import { DataTable, type Column, type TableServerFilters } from "@/components/data-table";
 import { ActionsDropdown, type ActionItem } from "@/components/actions-dropdown";
-import { ConfirmDialog } from "@/components/confirm-dialog";
 import { BtnPrimary, Badge, Input, Label } from "@/components/portal-shell";
 import { FormDialog } from "@/components/form-dialog";
 import { LegajoCell, LEGAJO_TOOLTIP } from "@/components/legajo-label";

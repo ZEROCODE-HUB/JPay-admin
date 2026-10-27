@@ -31,7 +31,7 @@ function phaseLabel(p: Phase): string {
 export function ImportarContracargosModal({ onClose }: { onClose: () => void }) {
   const qc = useQueryClient();
   const [phase, setPhase] = useState<Phase>("idle");
-  const [file, setFile] = useState<File | null>(null);
+  const [, setFile] = useState<File | null>(null);
   const [parsed, setParsed] = useState<ParsedPaywayFile | null>(null);
   const [parseError, setParseError] = useState<string | null>(null);
   const [results, setResults] = useState<ImportRowResult[] | null>(null);

@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { pageTitle } from "@/brand/brand";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState, useMemo } from "react";
-import { Eye, Power, PowerOff, Edit3, Trash2, Plus, AlertTriangle, Inbox } from "lucide-react";
+import { Power, PowerOff, Edit3, Trash2, Plus, AlertTriangle, Inbox } from "lucide-react";
 import { DataTable, type Column } from "@/components/data-table";
 import { ActionsDropdown, type ActionItem } from "@/components/actions-dropdown";
 import { PageHeader, Badge, BtnPrimary, Input, Label, Card } from "@/components/portal-shell";
@@ -35,8 +35,6 @@ export const Route = createFileRoute("/admin/comercios/impuestos/usuarios")({
 });
 
 const PAGE_SIZE = 10;
-
-const TIPOS_IMPUESTO: TipoImpuesto[] = ["Porcentaje", "Fijo", "Otro"];
 
 function formatTasa(tasa: number) {
   return Number.isInteger(tasa) ? String(tasa) : tasa.toFixed(2);

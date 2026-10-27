@@ -17,11 +17,8 @@ import {
   Settings,
   Cable,
   BellRing,
-  Bot,
-  ChevronDown,
   UserCog,
   Store,
-  type LucideIcon,
 } from "lucide-react";
 import { PortalShell, type NavItem } from "@/components/portal-shell";
 import { useDemoMode } from "@/contexts/demo-mode";

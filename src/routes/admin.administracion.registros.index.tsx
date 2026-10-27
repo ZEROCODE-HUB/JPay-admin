@@ -8,7 +8,6 @@ import { DataTable, type Column } from "@/components/data-table";
 import { FormDialog } from "@/components/form-dialog";
 import { ActionsDropdown, type ActionItem } from "@/components/actions-dropdown";
 import { Badge } from "@/components/portal-shell";
-import { brand } from "@/brand/brand";
 
 type Fondo = {
   legajo: string;

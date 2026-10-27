@@ -523,7 +523,7 @@ export async function exportLotesAcreditacion(
 
 export async function resolverContracargo(
   id: string,
-  accion: "Acreditar",
+  _accion: "Acreditar",
   args: { contracargoMonto?: number; notas?: string },
 ): Promise<LoteAcreditacion> {
   return updateLote(id, {

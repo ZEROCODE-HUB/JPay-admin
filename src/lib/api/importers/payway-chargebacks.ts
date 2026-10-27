@@ -40,44 +40,12 @@ function detectFormat(file: File): "csv" | "xlsx" | null {
 }
 
 /**
- * Lee el archivo y devuelve un array de objetos (uno por fila) donde
- * las claves son los headers crudos (primera fila).
- */
-async function readRows(file: File, format: "csv" | "xlsx"): Promise<Record<string, string>[]> {
-  const buf = await file.arrayBuffer();
-
-  if (format === "xlsx") {
-    const wb = XLSX.read(buf, { type: "array", raw: false });
-    const sheetName = wb.SheetNames[0];
-    if (!sheetName) return [];
-    const sheet = wb.Sheets[sheetName];
-    // defval: '' para que no aparezcan celdas como undefined
-    return XLSX.utils.sheet_to_json<Record<string, string>>(sheet, {
-      defval: "",
-      raw: false, // nos importa el string formateado (montos con coma, etc)
-    });
-  }
-
-  // CSV: usamos SheetJS también (soporta CSV) para no agregar papaparse.
-  // Para CSVs muy grandes (>50MB) SheetJS puede ser más lento que
-  // papaparse, pero el reporte de PayWay no suele pasar los 5MB.
-  const wb = XLSX.read(buf, { type: "array", raw: false });
-  const sheetName = wb.SheetNames[0];
-  if (!sheetName) return [];
-  const sheet = wb.Sheets[sheetName];
-  return XLSX.utils.sheet_to_json<Record<string, string>>(sheet, {
-    defval: "",
-    raw: false,
-  });
-}
-
-/**
- * Lee el archivo y devuelve una matriz de celdas (string[][]). A
- * diferencia de `readRows`, no intenta adivinar cuál es la fila
+ * Lee el archivo y devuelve una matriz de celdas (string[][]). No
+ * intenta adivinar cuál es la fila
  * de headers: devuelve TODO en orden. Lo usamos para encontrar la
  * fila de headers aunque haya un título arriba.
  */
-async function readMatrix(file: File, format: "csv" | "xlsx"): Promise<string[][]> {
+async function readMatrix(file: File, _format: "csv" | "xlsx"): Promise<string[][]> {
   const buf = await file.arrayBuffer();
   const wb = XLSX.read(buf, { type: "array", raw: false });
   const sheetName = wb.SheetNames[0];

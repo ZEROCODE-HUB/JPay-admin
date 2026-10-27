@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
-import { useState, useRef, useEffect, type ReactNode } from "react";
+import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import {
   ChevronLeft,
@@ -20,7 +20,6 @@ import {
   Eye,
   FileUp,
   Ban,
-  ShieldCheck,
   Info,
 } from "lucide-react";
 import { PageHeader } from "@/components/page-header";
@@ -42,9 +41,6 @@ import {
   reactivarCliente,
   deshabilitarCliente,
   eliminarCliente,
-  clienteTieneMovimientos,
-  clienteTieneComision,
-  generarCbuParaCliente,
   listEvaluacionesRiesgo,
   registrarEvaluacionRiesgo,
   updatePerfilTransaccional,
@@ -64,12 +60,7 @@ import {
   type SubcuentaUpdate,
 } from "@/lib/api/subcuentas";
 import { TablaSubcuentas, SubcuentaDetalleModal } from "@/components/subcuentas-tab";
-import {
-  listDocumentos,
-  DOCUMENTO_LABELS,
-  type Documento,
-  type DocumentoTipo,
-} from "@/lib/api/documentos";
+import { listDocumentos, DOCUMENTO_LABELS, type Documento } from "@/lib/api/documentos";
 import { useDocumentosUrls } from "@/lib/api/use-documento-url";
 import {
   listHistorialCambios,
@@ -93,9 +84,6 @@ import {
   type Alerta,
   type Bloqueo,
   type ParametroConfig,
-  type ComercioPst,
-  type LinkPago,
-  type ComisionCliente as ComisionClienteLegacy,
 } from "@/lib/api/detalle-cliente";
 import { listComisiones } from "@/lib/api/comisiones";
 import type { ComisionCliente } from "@/lib/api/types";
@@ -104,7 +92,6 @@ import {
   listApiUsuarioEndpoints,
   listApiUsuarioLogs,
   setApiUsuarioEstado,
-  type ApiUsuarioEndpoint,
   type ApiUsuarioLog,
 } from "@/lib/api/api-usuarios";
 import { DataAccessError } from "@/lib/api/errors";
@@ -565,23 +552,6 @@ const bloqueosColumns: Column<BloqueoView>[] = [
     key: "fechaAceptacion",
     label: "Fecha de aceptación",
     render: (r) => r.fechaAceptacion ?? "—",
-  },
-];
-
-const apiUsuariosColumns = [
-  {
-    key: "codigo",
-    label: "Código",
-    render: (u: { codigoUsuarioApi: string }) => u.codigoUsuarioApi,
-  },
-  { key: "usuario", label: "Usuario", render: (u: { usuario: string }) => u.usuario },
-  { key: "nombre", label: "Nombre", render: (u: { nombreCompleto: string }) => u.nombreCompleto },
-  {
-    key: "estado",
-    label: "Estado",
-    render: (u: { estado: string }) => (
-      <Badge tone={u.estado === "Activo" ? "success" : "neutral"}>{u.estado}</Badge>
-    ),
   },
 ];
 
@@ -1078,7 +1048,6 @@ function esUrlImagen(url: string | null): boolean {
 
 function DocumentoCard({
   doc,
-  legajo,
   resolvedUrl,
   thumbUrl,
 }: {
@@ -1491,81 +1460,6 @@ function ApiUsuariosInline({
   );
 }
 
-function ApiUsuariosModal({
-  open,
-  onClose,
-  cantidad,
-  legajo,
-}: {
-  open: boolean;
-  onClose: () => void;
-  cantidad: number;
-  legajo: string;
-}) {
-  const query = useQuery({
-    queryKey: ["cliente_api_usuarios", legajo, "popup"],
-    queryFn: () => listClienteApiUsuarios(legajo),
-    enabled: open && !!legajo,
-  });
-  const [detalle, setDetalle] = useState<{
-    id: string;
-    codigoUsuarioApi: string;
-    usuario: string;
-    nombreCompleto: string;
-    estado: string;
-  } | null>(null);
-
-  return (
-    <ModalDialog
-      open={open}
-      onClose={onClose}
-      title="Usuarios API asociados"
-      description={`${cantidad} usuario(s) asociado(s) a la API externa`}
-      size="xl"
-    >
-      {query.isLoading ? (
-        <p className="text-sm text-muted-foreground">Cargando…</p>
-      ) : query.isError ? (
-        <p className="text-sm text-danger-600">{(query.error as Error).message}</p>
-      ) : (query.data?.length ?? 0) === 0 ? (
-        <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-border bg-card px-6 py-8 text-sm text-muted-foreground">
-          <Inbox size={22} />
-          <p>Sin usuarios API asociados.</p>
-        </div>
-      ) : (
-        <DataTable
-          columns={apiUsuariosColumns as never}
-          data={query.data! as never}
-          keyExtractor={(u) => u.id}
-          emptyMessage="Sin usuarios API"
-          actions={(u: {
-            id: string;
-            codigoUsuarioApi: string;
-            usuario: string;
-            nombreCompleto: string;
-            estado: string;
-          }) => (
-            <button
-              type="button"
-              onClick={() => setDetalle(u)}
-              className="inline-flex items-center gap-1 h-8 rounded-md border border-input px-2 text-xs font-medium text-foreground hover:bg-accent"
-            >
-              Ver detalle
-            </button>
-          )}
-        />
-      )}
-
-      <ApiDetalleModal
-        open={!!detalle}
-        onClose={() => setDetalle(null)}
-        apiUsuarioId={detalle?.id ?? null}
-        cantidad={cantidad}
-      />
-    </ModalDialog>
-  );
-}
-
 function CargaMasivaSubcuentas({
   open,
   legajo,
@@ -1578,7 +1472,7 @@ function CargaMasivaSubcuentas({
   onDone: () => void;
 }) {
   const queryClient = useQueryClient();
-  const [archivo, setArchivo] = useState<File | null>(null);
+  const [, setArchivo] = useState<File | null>(null);
   const [vista, setVista] = useState<SubcuentaInput[]>([]);
   const [err, setErr] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -2842,9 +2736,6 @@ function ClienteDetailPage() {
   const apiCantidadReal = clienteApiUsuariosQuery.isSuccess
     ? apiUsuariosVinculados.length
     : (apiModulo?.cantidad ?? 0);
-
-  const alertasHabilitadas = (paramAlertasQuery.data ?? []).filter((p) => p.habilitado).length;
-  const bloqueosHabilitados = (paramBloqueosQuery.data ?? []).filter((p) => p.habilitado).length;
 
   const alertasVisibles: AlertaView[] = (alertasQuery.data ?? []).map((a) => {
     const g = gestiones[a.id];

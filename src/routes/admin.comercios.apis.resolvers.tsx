@@ -3,7 +3,7 @@ import { pageTitle } from "@/brand/brand";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { CheckCircle, XCircle, Edit3, Plus, AlertTriangle, Inbox } from "lucide-react";
-import { PageHeader, Badge, Input, Label, BtnPrimary, BtnOutline } from "@/components/portal-shell";
+import { PageHeader, Badge, Input, Label, BtnPrimary } from "@/components/portal-shell";
 import { DataTable, type Column } from "@/components/data-table";
 import { ActionsDropdown, type ActionItem } from "@/components/actions-dropdown";
 import { ConfirmDialog } from "@/components/confirm-dialog";

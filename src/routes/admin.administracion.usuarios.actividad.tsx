@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Eye, X, Download } from "lucide-react";
+import { Eye, Download } from "lucide-react";
 import * as XLSX from "xlsx";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/page-header";

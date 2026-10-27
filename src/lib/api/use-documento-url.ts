@@ -150,7 +150,6 @@ export function useDocumentosUrls(docs: DocumentoParaResolver[], legajo: string)
       const file = d.url ? d.url.replace(/^\/+/, "") : "";
       return { id: d.id, paths: file ? [`${legajo}/${file}`, file] : [] };
     });
-    const allPaths = Array.from(new Set(plan.flatMap((p) => p.paths)));
 
     (async () => {
       const urls: Record<string, string | null> = {};

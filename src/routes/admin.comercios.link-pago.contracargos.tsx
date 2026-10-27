@@ -4,12 +4,10 @@ import { useState, useEffect, useMemo, useRef, type ReactElement } from "react";
 import {
   Eye,
   AlertTriangle,
-  Inbox,
   Ticket,
   FileText,
   ArrowRight,
   Clock,
-  ShieldCheck,
   Plus,
   X,
   Upload,
@@ -25,7 +23,7 @@ import {
   Banknote,
 } from "lucide-react";
 import { DataTable, type Column } from "@/components/data-table";
-import { PageHeader, Badge, Card, Input, Label, BtnOutline } from "@/components/portal-shell";
+import { PageHeader, Badge, Card, Input, Label } from "@/components/portal-shell";
 import { ActionsDropdown, type ActionItem } from "@/components/actions-dropdown";
 import { PermissionGuard } from "@/components/permission-guard";
 import { ConfirmDialog } from "@/components/confirm-dialog";
@@ -284,7 +282,7 @@ function Detalle({ c, onClose }: { c: Contra; onClose: () => void }) {
 
   const onEnviarPayway = async () => {
     try {
-      const r = await enviarAPayway(c.id);
+      await enviarAPayway(c.id);
       toast.success("Marcado como enviado a PayWay");
       qc.invalidateQueries({ queryKey: ["contracargos"] });
       // refrescar el modal: re-leemos del server

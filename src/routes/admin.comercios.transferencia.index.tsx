@@ -4,7 +4,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import {
   Eye,
-  Edit3,
   XCircle,
   Ban,
   Trash2,
@@ -16,7 +15,7 @@ import {
   CheckCircle,
 } from "lucide-react";
 import QRCode from "qrcode";
-import { DataTable, type Column } from "@/components/data-table";
+import { DataTable } from "@/components/data-table";
 import { ActionsDropdown, type ActionItem } from "@/components/actions-dropdown";
 import { PageHeader, Badge, Card } from "@/components/portal-shell";
 import { ConfirmDialog } from "@/components/confirm-dialog";
@@ -24,7 +23,6 @@ import { useCan } from "@/lib/permissions";
 import { PermissionGuard } from "@/components/permission-guard";
 import { DataAccessError } from "@/lib/api/errors";
 import { Badge as BadgeComp } from "@/components/portal-shell";
-import { LegajoCell } from "@/components/legajo-label";
 import { Pagination } from "@/components/pagination";
 import { useQuery } from "@tanstack/react-query";
 import { requireSupabase } from "@/lib/supabase";

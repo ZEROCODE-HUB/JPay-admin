@@ -196,7 +196,6 @@ function LoteDetalle({
   onClose: () => void;
   onSubirCsv: (l: LoteAcreditacion) => void;
 }) {
-  const queryClient = useQueryClient();
   const { data: movimientos } = useQuery({
     queryKey: ["lote-movimientos", lote.id],
     queryFn: () => listLoteMovimientos(lote.id),
@@ -211,23 +210,11 @@ function LoteDetalle({
   const comisionCierrePct =
     (lote.comisionCierreLotePct ?? 0) > 0 ? (lote.comisionCierreLotePct as number) : 0.45;
   const loteEstimado = esLoteEstimado(lote);
-  // En Programado la 0,45% no se debita; mostrar $ 0,00 con leyenda
-  // "Pendiente de cierre" para que el operador no la confunda con un
-  // cargo firme.
-  const comisionCierreMostrar = loteEstimado ? 0 : comisionCierre;
   // Tasas (en pesos) recalculadas desde el bruto × porcentaje. Los
   // campos de la DB están mal acumulados; usar el cálculo en pantalla
   // para que el desglose siempre cuadre con la regla de negocio.
   const { paywayMonto: tasaPaywayMostrar, propiaMonto: tasaPropiaMostrar } = tasasCalculadas(lote);
   const totalDesc = totalDescuentos(lote);
-  // "Menos impuestos": usa los snapshots reales (iva + dc + iibb) y
-  // cae al legacy solo si los 3 están en 0 (lotes viejos).
-  const totalImpuestosReal =
-    (lote.ivaMonto ?? 0) + (lote.debitoCreditoMonto ?? 0) + (lote.iibbMonto ?? 0);
-  const menosImpuestos =
-    totalImpuestosReal > 0
-      ? lote.importeBruto - totalImpuestosReal
-      : lote.importeBruto - (lote.impuestos ?? 0);
   const esCuotas = (lote.cuotas ?? 1) > 1;
   const esContracargo = lote.estado === "Contracargo" || contracargo > 0;
   const movs = movimientos ?? [];

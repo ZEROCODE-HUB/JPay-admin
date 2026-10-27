@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus, X, Trash2, Loader2 } from "lucide-react";
 import { PageHeader } from "@/components/page-header";
-import { BtnPrimary, BtnOutline } from "@/components/portal-shell";
+import { BtnPrimary } from "@/components/portal-shell";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { DataAccessError } from "@/lib/api/errors";
 import {

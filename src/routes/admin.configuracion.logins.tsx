@@ -2,7 +2,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import { DataTable, type Column } from "@/components/data-table";
 import { PageHeader, Badge } from "@/components/portal-shell";
 import { useIntegraciones } from "@/hooks/useIntegraciones";
-import { useCan } from "@/lib/permissions";
 import { PermissionGuard } from "@/components/permission-guard";
 import type { Integracion } from "@/lib/api/types";
 import { CheckCircle2, AlertTriangle, XCircle } from "lucide-react";
@@ -19,15 +18,6 @@ export const Route = createFileRoute("/admin/configuracion/logins")({
 });
 
 type Salud = "ok" | "warning" | "error";
-
-const saludMeta: Record<
-  Salud,
-  { label: string; tone: "success" | "warn" | "danger"; icon: typeof CheckCircle2 }
-> = {
-  ok: { label: "Funcionando correctamente", tone: "success", icon: CheckCircle2 },
-  warning: { label: "Ejecución reciente con demoras", tone: "warn", icon: AlertTriangle },
-  error: { label: "Última ejecución fallida", tone: "danger", icon: XCircle },
-};
 
 // Mock data for operational metrics — ⚠️ datos de REFERENCIA (mock)
 // Provenientes de un sistema de monitoreo/cron real que aún no existe.
@@ -97,12 +87,7 @@ type LoginConfig = {
 };
 
 function Page() {
-  const {
-    rows: integraciones,
-    isLoading,
-    isError,
-    isEmpty,
-  } = useIntegraciones({
+  const { rows: integraciones } = useIntegraciones({
     page: 0,
     pageSize: 100,
   });

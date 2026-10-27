@@ -9,8 +9,6 @@ import {
   Clock,
   ArrowUpRight,
   Wallet,
-  Landmark,
-  Percent,
 } from "lucide-react";
 import { PageHeader, Card, Stat, Badge } from "@/components/portal-shell";
 import { Input, Label } from "@/components/portal-shell";

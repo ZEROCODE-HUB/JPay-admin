@@ -87,10 +87,6 @@ function isTextFilterable<T>(col: Column<T>): boolean {
   return col.filterable === true || col.filterable === "text";
 }
 
-function isBoolOrText(val: Column<unknown>["filterable"]): val is boolean | "text" {
-  return val === true || val === "text";
-}
-
 export function DataTable<T>({
   columns,
   data,

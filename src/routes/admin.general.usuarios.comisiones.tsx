@@ -18,12 +18,7 @@ import { listSubcuentas } from "@/lib/api/subcuentas";
 import { getClienteByCorreo } from "@/lib/api/clientes";
 import { DataAccessError } from "@/lib/api/errors";
 import { useQuery } from "@tanstack/react-query";
-import {
-  TIPOS_OPERACION,
-  type TipoOperacion,
-  type ModalidadComision,
-  type EstadoComision,
-} from "@/lib/api/types";
+import { type TipoOperacion, type ModalidadComision, type EstadoComision } from "@/lib/api/types";
 import { useCan } from "@/lib/permissions";
 import { PermissionGuard } from "@/components/permission-guard";
 import { useClientesForSelect } from "@/hooks/useComercios";

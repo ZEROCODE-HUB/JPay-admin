@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, type ComponentType, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import {
   ChevronLeft,
   Banknote,
@@ -138,19 +138,6 @@ function downloadExcel(filename: string, rows: Record<string, unknown>[]) {
   URL.revokeObjectURL(url);
 }
 
-function downloadCSV(filename: string, rows: Record<string, unknown>[]) {
-  const cols = Object.keys(rows[0] ?? {});
-  const escape = (v: unknown) => {
-    const s = v == null ? "" : String(v);
-    return /[",\n;]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
-  };
-  const lines = [
-    cols.map(escape).join(","),
-    ...rows.map((r) => cols.map((c) => escape(r[c])).join(",")),
-  ];
-  downloadFile(filename, lines.join("\n"));
-}
-
 type Archivo = {
   archivo: string;
   fecha: string;
@@ -160,32 +147,6 @@ type Archivo = {
   rawFile?: File | null;
   storagePath?: string | null;
 };
-
-const CONCILIACION_COLS = [
-  "FECHA_NEGOCIO",
-  "ID_DEBIN",
-  "TIPO_MOV_COELSA",
-  "CBU",
-  "CTA_BT_DEL_CBU",
-  "BT_SBO",
-  "BT_TOP",
-  "DENOMINACION",
-  "CUIT",
-  "IMPORTE_COELSA",
-  "ESTADO_COELSA",
-  "ASTO_ESTADO",
-  "CVU",
-  "CUIT_VIRTUAL",
-  "CVU_2",
-  "CUIT_VIRTUAL_2",
-  "CBU_2",
-  "CUIT_2",
-  "CONCEPTO",
-  "MISMO_TIT",
-  "DETALLE",
-  "CVU_CREDITO",
-  "FECHA_HORA_COELSA",
-];
 
 const ARCHIVOS_INICIALES: Archivo[] = [];
 

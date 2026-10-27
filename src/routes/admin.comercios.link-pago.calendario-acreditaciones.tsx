@@ -6,22 +6,16 @@ import {
   ChevronRight,
   X,
   Loader2,
-  Wallet,
-  Eye,
   AlertTriangle,
   FileSpreadsheet,
   FileText,
   Banknote,
   TrendingUp,
   MinusCircle,
-  CheckCircle2,
   Clock,
-  ArrowDownCircle,
   Zap,
   CalendarDays,
-  Filter,
   Building2,
-  Download,
 } from "lucide-react";
 import { PageHeader, Badge, Card, Label } from "@/components/portal-shell";
 import { PermissionGuard } from "@/components/permission-guard";

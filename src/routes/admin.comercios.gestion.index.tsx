@@ -848,15 +848,6 @@ function Field({ label, value }: { label: string; value: React.ReactNode }) {
   );
 }
 
-type ComercioForm = {
-  clienteLegajo: string;
-  usuario: string;
-  categoriaId: string;
-  nivel: NivelComercio;
-  estado: EstadoComercio;
-  ejecutivoResponsableId: string;
-};
-
 /**
  * Label con un icono "?" a la derecha. Al pasar el mouse muestra la ayuda
  * en lenguaje simple, pensada para usuarios no técnicos.
@@ -1201,7 +1192,6 @@ function Page() {
   const { can } = useCan();
   const puedeCrear = can("crear", "comercios");
   const puedeModificar = can("modificar", "comercios");
-  const puedeBorrar = can("borrar", "comercios");
 
   const { rows, total, isLoading, isFetching, isError, error, isEmpty, refetch } = useComercios({
     page,

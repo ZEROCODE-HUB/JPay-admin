@@ -13,7 +13,7 @@ import {
   CheckCircle,
 } from "lucide-react";
 import { requireSupabase } from "@/lib/supabase";
-import { DataTable, type Column, type TableServerFilters } from "@/components/data-table";
+import { DataTable, type TableServerFilters } from "@/components/data-table";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { ActionsDropdown, type ActionItem } from "@/components/actions-dropdown";
 import { PageHeader, Badge, Card } from "@/components/portal-shell";
