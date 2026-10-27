@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { pageTitle } from "@/brand/brand";
-import { CategoriaComercioPage } from "@/components/categoria-comercio-page";
+import { CategoriaComercioPage } from "@/features/comercios/categoria/components/CategoriaComercioPage";
 
 export const Route = createFileRoute("/admin/comercios/gestion/categoria")({
   component: CategoriaComercioPage,

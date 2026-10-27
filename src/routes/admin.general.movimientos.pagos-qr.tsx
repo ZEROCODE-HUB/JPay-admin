@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { MovimientosSubRoute } from "@/components/movimientos-subroute";
+import { MovimientosSubRoute } from "@/features/movimientos/subruta/components/MovimientosSubRoute";
 import { Card, Input, Label } from "@/components/portal-shell";
 import { toast } from "sonner";
 import { brand, pageTitle } from "@/brand/brand";

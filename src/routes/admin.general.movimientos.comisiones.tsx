@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Info } from "lucide-react";
-import { MovimientosSubRoute } from "@/components/movimientos-subroute";
+import { MovimientosSubRoute } from "@/features/movimientos/subruta/components/MovimientosSubRoute";
 import { brand, pageTitle } from "@/brand/brand";
 
 export const Route = createFileRoute("/admin/general/movimientos/comisiones")({
