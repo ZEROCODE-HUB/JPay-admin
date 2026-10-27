@@ -5,32 +5,23 @@
 // Usado por hardDeleteCliente para garantizar que "Eliminar" bloquee el login.
 
 import { createClient } from "jsr:@supabase/supabase-js@2";
+import { json, preflight } from "../_shared/http.ts";
 
 Deno.serve(async (req) => {
-  const cors = {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
-  };
-  if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
+  const pre = preflight(req);
+  if (pre) return pre;
 
   const url = Deno.env.get("SUPABASE_URL");
   const service = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   if (!url || !service) {
-    return new Response(JSON.stringify({ error: "Falta configuración del servidor" }), {
-      status: 500,
-      headers: { ...cors, "content-type": "application/json" },
-    });
+    return json({ error: "Falta configuración del servidor" }, 500);
   }
 
   let body: { email?: string; user_id?: string; legajo?: string };
   try {
     body = await req.json();
   } catch {
-    return new Response(JSON.stringify({ error: "Body inválido" }), {
-      status: 400,
-      headers: { ...cors, "content-type": "application/json" },
-    });
+    return json({ error: "Body inválido" }, 400);
   }
 
   const email = body.email?.trim().toLowerCase() ?? null;
@@ -38,10 +29,7 @@ Deno.serve(async (req) => {
   const legajo = body.legajo?.trim().toUpperCase() ?? null;
 
   if (!email && !userId && !legajo) {
-    return new Response(JSON.stringify({ error: "Debe indicar email, user_id o legajo" }), {
-      status: 400,
-      headers: { ...cors, "content-type": "application/json" },
-    });
+    return json({ error: "Debe indicar email, user_id o legajo" }, 400);
   }
 
   const sb = createClient(url, service, { auth: { autoRefreshToken: false } });
@@ -126,10 +114,5 @@ Deno.serve(async (req) => {
     // ya intentado arriba
   }
 
-  return new Response(
-    JSON.stringify({ ok: true, ...results, email: targetEmail, user_id: targetId }),
-    {
-      headers: { ...cors, "content-type": "application/json" },
-    },
-  );
+  return json({ ok: true, ...results, email: targetEmail, user_id: targetId });
 });

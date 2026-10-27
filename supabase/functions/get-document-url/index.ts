@@ -12,6 +12,7 @@
 //   supabase functions deploy get-document-url
 
 import { createClient } from "jsr:@supabase/supabase-js@2";
+import { CORS, json, preflight } from "../_shared/http.ts";
 
 function jwtSub(token: string): string | null {
   try {
@@ -26,30 +27,20 @@ function jwtSub(token: string): string | null {
 }
 
 Deno.serve(async (req) => {
-  const cors = {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
-  };
-  if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
+  const pre = preflight(req);
+  if (pre) return pre;
 
   const authHeader = req.headers.get("Authorization") ?? "";
   const token = authHeader.replace(/^Bearer\s+/i, "");
   if (!token) {
-    return new Response(JSON.stringify({ error: "Falta el token de sesión" }), {
-      status: 401,
-      headers: { ...cors, "content-type": "application/json" },
-    });
+    return json({ error: "Falta el token de sesión" }, 401);
   }
 
   const url = Deno.env.get("SUPABASE_URL");
   const anon = Deno.env.get("SUPABASE_ANON_KEY");
   const serviceRole = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   if (!url || !anon || !serviceRole) {
-    return new Response(JSON.stringify({ error: "Falta configuración del servidor" }), {
-      status: 500,
-      headers: { ...cors, "content-type": "application/json" },
-    });
+    return json({ error: "Falta configuración del servidor" }, 500);
   }
 
   // Cliente con el JWT del usuario: la RLS de `admin_users` ya exige rol admin.
@@ -59,10 +50,7 @@ Deno.serve(async (req) => {
 
   const uid = jwtSub(token);
   if (!uid) {
-    return new Response(JSON.stringify({ error: "Sesión inválida" }), {
-      status: 401,
-      headers: { ...cors, "content-type": "application/json" },
-    });
+    return json({ error: "Sesión inválida" }, 401);
   }
 
   const { data: admin, error: adminErr } = await userSb
@@ -72,10 +60,7 @@ Deno.serve(async (req) => {
     .maybeSingle();
 
   if (adminErr || !admin || !admin.activo) {
-    return new Response(JSON.stringify({ error: "No autorizado" }), {
-      status: 403,
-      headers: { ...cors, "content-type": "application/json" },
-    });
+    return json({ error: "No autorizado" }, 403);
   }
 
   const { data: rol } = await userSb
@@ -85,10 +70,7 @@ Deno.serve(async (req) => {
     .maybeSingle();
 
   if (!rol?.nombre || rol.nombre.toLowerCase() !== "admin") {
-    return new Response(JSON.stringify({ error: "Se requiere rol admin" }), {
-      status: 403,
-      headers: { ...cors, "content-type": "application/json" },
-    });
+    return json({ error: "Se requiere rol admin" }, 403);
   }
 
   let body: {
@@ -106,10 +88,7 @@ Deno.serve(async (req) => {
   try {
     body = await req.json();
   } catch {
-    return new Response(JSON.stringify({ error: "Body inválido" }), {
-      status: 400,
-      headers: { ...cors, "content-type": "application/json" },
-    });
+    return json({ error: "Body inválido" }, 400);
   }
 
   const bucket = body.bucket ?? "kyc";
@@ -120,10 +99,7 @@ Deno.serve(async (req) => {
       : [];
 
   if (paths.length === 0) {
-    return new Response(JSON.stringify({ error: "Falta el path del documento" }), {
-      status: 400,
-      headers: { ...cors, "content-type": "application/json" },
-    });
+    return json({ error: "Falta el path del documento" }, 400);
   }
 
   const transform =
@@ -161,21 +137,16 @@ Deno.serve(async (req) => {
 
   // Respuesta única (lotes): mapa path -> signedUrl (+ thumbnails si aplica).
   if (Array.isArray(body.paths)) {
-    return new Response(JSON.stringify({ signedUrls, thumbUrls }), {
-      headers: { ...cors, "content-type": "application/json" },
-    });
+    return json({ signedUrls, thumbUrls });
   }
 
   // Respuesta legacy: un solo path.
   const single = body.path as string;
   if (!signedUrls[single]) {
-    return new Response(JSON.stringify({ error: "No se pudo firmar el archivo" }), {
-      status: 404,
-      headers: { ...cors, "content-type": "application/json" },
-    });
+    return json({ error: "No se pudo firmar el archivo" }, 404);
   }
   return new Response(
     JSON.stringify({ signedUrl: signedUrls[single], thumbUrl: thumbUrls[single] }),
-    { headers: { ...cors, "content-type": "application/json" } },
+    { headers: { ...CORS, "content-type": "application/json" } },
   );
 });
