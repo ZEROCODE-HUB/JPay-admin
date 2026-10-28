@@ -1,5 +1,5 @@
 ﻿import { createFileRoute, Outlet, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import {
   LayoutDashboard,
   Users,
@@ -22,6 +22,8 @@ import {
 } from "lucide-react";
 import { PortalShell, type NavItem } from "@/components/portal-shell";
 import { useDemoMode } from "@/contexts/demo-mode";
+import { usePaisConModulos } from "@/shared/modulos-pais";
+import { filtrarPorModulo } from "@/shared/pais";
 import { RouteSkeleton } from "@/shared/ui/route-skeleton";
 import { AdminChatbot } from "@/components/admin-chatbot";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
@@ -32,7 +34,8 @@ export const Route = createFileRoute("/admin")({
   pendingComponent: RouteSkeleton,
 });
 
-const nav: NavItem[] = [
+// Cada ítem con `modulo` aparece solo si el país lo tiene prendido (`paises.modulos`).
+const NAV: NavItem[] = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard },
   {
     label: "General",
@@ -50,7 +53,7 @@ const nav: NavItem[] = [
       { to: "/admin/comercios/gestion", label: "Gestión de comercios", icon: Store },
       { to: "/admin/comercios/transferencia", label: "Pagos con QR", icon: CreditCard },
       { to: "/admin/comercios/link-pago", label: "Enlaces de pago", icon: Link2 },
-      { to: "/admin/comercios/impuestos", label: "Impuestos", icon: Receipt },
+      { to: "/admin/comercios/impuestos", label: "Impuestos", icon: Receipt, modulo: "iibb" },
       { to: "/admin/comercios/apis", label: "APIs externas", icon: Code2 },
     ],
   },
@@ -77,6 +80,8 @@ const nav: NavItem[] = [
 ];
 
 function AdminLayout() {
+  const pais = usePaisConModulos();
+  const nav = useMemo(() => filtrarPorModulo(NAV, pais), [pais]);
   const { role, setRole } = useDemoMode();
   const navigate = useNavigate();
   const [authChecked, setAuthChecked] = useState(!isSupabaseConfigured);

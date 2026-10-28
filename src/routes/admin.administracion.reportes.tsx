@@ -1,8 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { ChevronLeft } from "lucide-react";
 import { PageHeader } from "@/components/portal-shell";
-import { reports, views } from "@/features/reportes/catalogo";
+import { reports as todos, views } from "@/features/reportes/catalogo";
+import { usePaisConModulos } from "@/shared/modulos-pais";
 
 export const Route = createFileRoute("/admin/administracion/reportes")({
   head: () => ({ meta: [{ title: "Reportes — Admin Panel" }] }),
@@ -10,6 +11,8 @@ export const Route = createFileRoute("/admin/administracion/reportes")({
 });
 
 function Page() {
+  const pais = usePaisConModulos();
+  const reports = useMemo(() => todos.filter((r) => !r.modulo || pais.modulos[r.modulo]), [pais]);
   const [selected, setSelected] = useState<string | null>(null);
   const current = reports.find((r) => r.key === selected);
   const View = current ? views[current.key] : undefined;

@@ -1,8 +1,9 @@
 import { toast } from "sonner";
 import type { CobroComision, ConfiguracionPagos, ModeloFondos } from "@/lib/api/paises";
+import type { Modulo } from "@/shared/pais";
 
-/** Nombre visible de cada módulo de `paises.modulos`. */
-export const MODULOS: Record<string, string> = {
+/** Nombre visible de cada módulo de `paises.modulos`; también arman los menús del admin y del portal. */
+export const MODULOS: Record<Modulo, string> = {
   spei: "Transferencias SPEI",
   oxxo: "Efectivo OXXO",
   msi: "Meses sin intereses",
@@ -14,6 +15,10 @@ export const MODULOS: Record<string, string> = {
   bcra: "Reportes BCRA",
   afip: "AFIP",
   repet: "REPET",
+  pagos_proveedor: "Cobros con Ecart Pay",
+  retiros_proveedor: "Retiros desde Ecart Pay",
+  payway: "Tarjetas con Payway",
+  transferencias_salientes: "Transferencias BDC / Coelsa",
 };
 
 export const MODELOS_FONDOS: Record<ModeloFondos, { label: string; detalle: string }> = {

@@ -4,6 +4,7 @@ import {
   desconectarComercioEcartPay,
   listConciliacionesProveedor,
   listContracargosProveedor,
+  getReporteCobrosProveedor,
   listDiferenciasAbiertas,
   resolverDiferencia,
   getTareaProgramada,
@@ -121,4 +122,11 @@ export function usePaisesMutaciones() {
       onSuccess,
     }),
   };
+}
+
+export function useReporteCobrosProveedor(rango: { desde: string; hasta: string }) {
+  return useQuery({
+    queryKey: [...KEY, "reporte-cobros", rango.desde, rango.hasta],
+    queryFn: () => getReporteCobrosProveedor(rango.desde, rango.hasta),
+  });
 }

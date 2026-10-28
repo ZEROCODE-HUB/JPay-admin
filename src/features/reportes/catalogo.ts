@@ -7,6 +7,7 @@ import {
   Landmark,
   Receipt,
   Users,
+  Wallet,
   type LucideIcon,
 } from "lucide-react";
 import { ReporteConciliaciones } from "@/features/reportes/components/ReporteConciliaciones";
@@ -18,6 +19,8 @@ import { ReporteActividad } from "@/features/reportes/components/ReporteActivida
 import { ReporteImpuestos } from "@/features/reportes/components/ReporteImpuestos";
 import { ReporteConciliacionesBLP } from "@/features/reportes/components/ReporteConciliacionesBLP";
 import { ReporteUnidadNegocio } from "@/features/reportes/components/ReporteUnidadNegocio";
+import { ReporteCobrosProveedor } from "@/features/reportes/components/ReporteCobrosProveedor";
+import type { Modulo } from "@/shared/pais";
 
 export type ReportDef = {
   key: string;
@@ -25,9 +28,19 @@ export type ReportDef = {
   icon: LucideIcon;
   color: string;
   description: string;
+  /** Solo se muestra si el país tiene el módulo prendido. */
+  modulo?: Modulo;
 };
 
 export const reports: ReportDef[] = [
+  {
+    key: "cobros-proveedor",
+    name: "Cobros con Ecart Pay",
+    icon: Wallet,
+    color: "text-emerald-600",
+    description: "Por día, medio de pago, sucursal y comercio, con comisiones y reembolsos.",
+    modulo: "pagos_proveedor",
+  },
   {
     key: "conciliaciones",
     name: "Conciliaciones Bancarias",
@@ -41,6 +54,7 @@ export const reports: ReportDef[] = [
     icon: Receipt,
     color: "text-emerald-500",
     description: 'Padrón de Personas Jurídicas — Com. "A" 8207 (SISCEN).',
+    modulo: "bcra",
   },
   {
     key: "afip",
@@ -48,6 +62,7 @@ export const reports: ReportDef[] = [
     icon: FileText,
     color: "text-orange-500",
     description: "Regímenes informativos (ARCA / ex AFIP).",
+    modulo: "afip",
   },
   {
     key: "comisiones",
@@ -76,6 +91,7 @@ export const reports: ReportDef[] = [
     icon: FileSpreadsheet,
     color: "text-primary-ink",
     description: "Retenciones presentadas y pagadas por período.",
+    modulo: "iibb",
   },
   {
     key: "conciliaciones-blp",
@@ -83,6 +99,7 @@ export const reports: ReportDef[] = [
     icon: Landmark,
     color: "text-cyan-500",
     description: "Conciliación de archivos Payway (pagos y liquidaciones).",
+    modulo: "payway",
   },
   {
     key: "unidad-negocio",
@@ -103,4 +120,5 @@ export const views: Record<string, ComponentType> = {
   impuestos: ReporteImpuestos,
   "conciliaciones-blp": ReporteConciliacionesBLP,
   "unidad-negocio": ReporteUnidadNegocio,
+  "cobros-proveedor": ReporteCobrosProveedor,
 };

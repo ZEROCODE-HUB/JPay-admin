@@ -1,6 +1,7 @@
 import { requireSupabase } from "@/lib/supabase";
 import type { Json } from "@/lib/database.types";
 import type { Tables, TablesUpdate } from "@/lib/database.types";
+import { toReporteCobros, type ReporteCobros } from "@/shared/reporte-cobros";
 import { DataAccessError } from "./errors";
 
 /**
@@ -539,4 +540,20 @@ export async function listFeriados(pais: string, desde: string): Promise<Feriado
     .order("fecha");
   if (error) throw new DataAccessError(error);
   return data ?? [];
+}
+
+/** Reporte de cobros con Ecart Pay de todos los comercios (o de uno) en un período. */
+export async function getReporteCobrosProveedor(
+  desde: string,
+  hasta: string,
+  comercioId?: string,
+): Promise<ReporteCobros> {
+  const sb = requireSupabase();
+  const { data, error } = await sb.rpc("reporte_cobros_proveedor", {
+    p_desde: desde,
+    p_hasta: hasta,
+    p_comercio_id: comercioId,
+  });
+  if (error) throw new DataAccessError(error);
+  return toReporteCobros(data);
 }
