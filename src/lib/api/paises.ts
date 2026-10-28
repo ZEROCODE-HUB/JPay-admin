@@ -44,6 +44,8 @@ export type ConexionProveedor = {
   estado: EstadoConexion;
   verificadaAt: string | null;
   entorno: string | null;
+  /** Cobre: `simulado`, `prueba` o `produccion`. */
+  modo: string | null;
   baseUrl: string | null;
   latenciaMs: number | null;
   pasos: PasoConexion[];
@@ -113,6 +115,7 @@ export function toConexion(
     estado: (["ok", "error"].includes(estado) ? estado : "sin_probar") as EstadoConexion,
     verificadaAt,
     entorno: typeof d.entorno === "string" ? d.entorno : null,
+    modo: typeof d.modo === "string" ? d.modo : null,
     baseUrl: typeof d.baseUrl === "string" ? d.baseUrl : null,
     latenciaMs: typeof d.latenciaMs === "number" ? d.latenciaMs : null,
     pasos,
@@ -190,15 +193,18 @@ export async function updateProveedorPago(
   if (error) throw new DataAccessError(error);
 }
 
+/** Edge Function que prueba la conexión de cada proveedor (solo admins). */
+const FUNCION_SALUD: Record<string, string> = { ecartpay: "ecartpay-salud", cobre: "cobre-salud" };
+
 /**
- * Prueba la conexión de la plataforma con Ecart Pay (Edge Function `ecartpay-salud`, solo
- * admins). La función guarda el resultado en `proveedores_pago`, así que alcanza con refrescar.
+ * Prueba la conexión de la plataforma con un proveedor. La función guarda el resultado en
+ * `proveedores_pago`, así que alcanza con refrescar.
  */
-export async function probarConexionEcartPay(): Promise<{ ok: boolean }> {
+export async function probarConexionProveedor(codigo: string): Promise<{ ok: boolean }> {
+  const funcion = FUNCION_SALUD[codigo];
+  if (!funcion) throw new DataAccessError(new Error(`Sin prueba de conexión para ${codigo}`));
   const sb = requireSupabase();
-  const { data, error } = await sb.functions.invoke<{ ok: boolean }>("ecartpay-salud", {
-    body: {},
-  });
+  const { data, error } = await sb.functions.invoke<{ ok: boolean }>(funcion, { body: {} });
   if (error) {
     // En errores HTTP el mensaje útil viene en el cuerpo ({ error }) de la respuesta.
     const ctx = (error as { context?: Response }).context;

@@ -1,7 +1,7 @@
 import { usePaisesConfig } from "@/hooks/usePaises";
 import { AlertasEcartPayCard } from "./AlertasEcartPayCard";
 import { ConciliacionCard } from "./ConciliacionCard";
-import { ConexionEcartPayCard } from "./ConexionEcartPayCard";
+import { ConexionProveedorCard } from "./ConexionProveedorCard";
 import { ContracargosCard } from "./ContracargosCard";
 import { ConexionesComerciosCard } from "./ConexionesComerciosCard";
 import { ConfiguracionPagosCard } from "./ConfiguracionPagosCard";
@@ -25,16 +25,23 @@ export function PaisesPage() {
   }
   const instalacion = paises.find((p) => p.predeterminado);
   const ecartpay = proveedores.find((p) => p.codigo === "ecartpay");
+  const cobre = proveedores.find((p) => p.codigo === "cobre");
   return (
     <div className="space-y-4">
       {ecartpay && <AlertasEcartPayCard />}
-      {ecartpay && <ConexionEcartPayCard proveedor={ecartpay} />}
+      {ecartpay && <ConexionProveedorCard proveedor={ecartpay} />}
       {ecartpay && <ConexionesComerciosCard />}
       {ecartpay && <ConciliacionCard />}
       {ecartpay && <ContracargosCard />}
       {ecartpay && <EventosWebhookCard />}
       {ecartpay && <MsiCard />}
       {ecartpay && <PuntosFisicosCard />}
+      {cobre && (
+        <ConexionProveedorCard
+          proveedor={cobre}
+          descripcion="Cuentas y transferencias SPEI. Mientras Cobre no entregue la instancia de prueba funciona con el simulador (COBRE_MODO)."
+        />
+      )}
       {configuracion.map((c) => (
         <ConfiguracionPagosCard key={`${c.pais}-${c.proveedor}`} config={c} />
       ))}

@@ -12,6 +12,12 @@ const ESTADO: Record<EstadoConexion, { label: string; tone: "success" | "danger"
   sin_probar: { label: "Sin probar", tone: "neutral" },
 };
 
+const MODO: Record<string, string> = {
+  simulado: "simulador",
+  prueba: "instancia de prueba",
+  produccion: "producción",
+};
+
 const PASOS: Record<string, string> = {
   claves: "Claves de la cuenta",
   token: "Token de acceso",
@@ -20,18 +26,28 @@ const PASOS: Record<string, string> = {
   webhook: "Secreto de webhooks",
 };
 
-/** Conexión de la plataforma con Ecart Pay: estado de la última prueba y botón para repetirla. */
-export function ConexionEcartPayCard({ proveedor }: { proveedor: ProveedorPago }) {
-  const { probarEcartPay } = usePaisesMutaciones();
+/** Conexión de la plataforma con un proveedor: estado de la última prueba y botón para repetirla. */
+export function ConexionProveedorCard({
+  proveedor,
+  descripcion,
+}: {
+  proveedor: ProveedorPago;
+  descripcion?: string;
+}) {
+  const { probarProveedor } = usePaisesMutaciones();
   const c = proveedor.conexion;
   const estado = ESTADO[c.estado];
-  const entorno = c.entorno ?? (proveedor.sandbox ? "sandbox" : "produccion");
+  const entorno = c.modo
+    ? (MODO[c.modo] ?? c.modo)
+    : (c.entorno ?? (proveedor.sandbox ? "sandbox" : "produccion")) === "sandbox"
+      ? "sandbox"
+      : "producción";
 
   const probar = () =>
-    probarEcartPay.mutate(undefined, {
+    probarProveedor.mutate(proveedor.codigo, {
       onSuccess: (r) =>
         r.ok
-          ? toast.success("Conexión con Ecart Pay OK")
+          ? toast.success(`Conexión con ${proveedor.nombre} OK`)
           : toast.error("La prueba encontró errores"),
       onError: avisarError,
     });
@@ -44,9 +60,10 @@ export function ConexionEcartPayCard({ proveedor }: { proveedor: ProveedorPago }
             {proveedor.nombre}
             <Badge tone={estado.tone}>
               {estado.label}
-              {c.estado === "ok" && ` (${entorno === "sandbox" ? "sandbox" : "producción"})`}
+              {c.estado === "ok" && ` (${entorno})`}
             </Badge>
           </h3>
+          {descripcion && <p className="text-xs text-muted-foreground mt-1">{descripcion}</p>}
           <p className="text-xs text-muted-foreground mt-1">
             {c.verificadaAt
               ? `Última prueba ${formatDateTime(c.verificadaAt)}${c.latenciaMs != null ? ` · ${c.latenciaMs} ms` : ""}`
@@ -54,8 +71,8 @@ export function ConexionEcartPayCard({ proveedor }: { proveedor: ProveedorPago }
             {c.baseUrl && <span className="font-mono"> · {c.baseUrl}</span>}
           </p>
         </div>
-        <BtnOutline onClick={probar} disabled={probarEcartPay.isPending}>
-          {probarEcartPay.isPending ? "Probando…" : "Probar conexión"}
+        <BtnOutline onClick={probar} disabled={probarProveedor.isPending}>
+          {probarProveedor.isPending ? "Probando…" : "Probar conexión"}
         </BtnOutline>
       </div>
       {c.pasos.length > 0 && (
