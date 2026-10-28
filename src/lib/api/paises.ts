@@ -288,6 +288,81 @@ export async function desconectarComercioEcartPay(comercioId: string): Promise<v
   }
 }
 
+export type EventoWebhook = {
+  id: string;
+  origen: string;
+  evento: string | null;
+  idExterno: string | null;
+  estadoExterno: string | null;
+  firmaValida: boolean | null;
+  resultado: string | null;
+  error: string | null;
+  intentos: number;
+  recibidoAt: string;
+  procesadoAt: string | null;
+};
+
+/** Últimos avisos de proveedores (webhooks y notify_url) registrados por `ecartpay-webhook`. */
+export async function listEventosWebhook(limite = 50): Promise<EventoWebhook[]> {
+  const sb = requireSupabase();
+  const { data, error } = await sb
+    .from("webhook_eventos")
+    .select(
+      "id, origen, evento, id_externo, estado_externo, firma_valida, resultado, error, intentos, recibido_at, procesado_at",
+    )
+    .order("recibido_at", { ascending: false })
+    .limit(limite);
+  if (error) throw new DataAccessError(error);
+  return (data ?? []).map((r) => ({
+    id: r.id,
+    origen: r.origen,
+    evento: r.evento,
+    idExterno: r.id_externo,
+    estadoExterno: r.estado_externo,
+    firmaValida: r.firma_valida,
+    resultado: r.resultado,
+    error: r.error,
+    intentos: r.intentos,
+    recibidoAt: r.recibido_at,
+    procesadoAt: r.procesado_at,
+  }));
+}
+
+export type TareaProgramada = {
+  ultimaCorridaAt: string | null;
+  resultado: Record<string, unknown>;
+};
+
+export async function getTareaProgramada(nombre: string): Promise<TareaProgramada | null> {
+  const sb = requireSupabase();
+  const { data, error } = await sb
+    .from("tareas_programadas")
+    .select("ultima_corrida_at, resultado")
+    .eq("nombre", nombre)
+    .maybeSingle();
+  if (error) throw new DataAccessError(error);
+  if (!data) return null;
+  const r = data.resultado;
+  return {
+    ultimaCorridaAt: data.ultima_corrida_at,
+    resultado:
+      r && typeof r === "object" && !Array.isArray(r) ? (r as Record<string, unknown>) : {},
+  };
+}
+
+/** Reprocesa un aviso: vuelve a consultar la orden en Ecart Pay (solo admins). */
+export async function reprocesarEventoWebhook(eventoId: string): Promise<void> {
+  const sb = requireSupabase();
+  const { error } = await sb.functions.invoke("ecartpay-pendientes", {
+    body: { evento_id: eventoId },
+  });
+  if (error) {
+    const ctx = (error as { context?: Response }).context;
+    const cuerpo = ctx ? await ctx.json().catch(() => null) : null;
+    throw new DataAccessError(cuerpo?.error ? new Error(cuerpo.error) : error);
+  }
+}
+
 /** Feriados del país desde `desde` (fecha ISO), ordenados. */
 export async function listFeriados(pais: string, desde: string): Promise<Feriado[]> {
   const sb = requireSupabase();

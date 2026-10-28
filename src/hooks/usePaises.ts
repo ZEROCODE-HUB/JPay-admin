@@ -1,6 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   desconectarComercioEcartPay,
+  getTareaProgramada,
+  listEventosWebhook,
+  reprocesarEventoWebhook,
   listConexionesComercios,
   listConfiguracionPagos,
   listFeriados,
@@ -38,6 +41,21 @@ export function useConexionesComercios() {
   return useQuery({ queryKey: [...KEY, "conexiones"], queryFn: listConexionesComercios });
 }
 
+/** Avisos de Ecart Pay y última corrida de la tarea de pendientes (se refresca cada 30 s). */
+export function useEventosWebhook() {
+  const eventos = useQuery({
+    queryKey: [...KEY, "webhooks"],
+    queryFn: () => listEventosWebhook(),
+    refetchInterval: 30_000,
+  });
+  const tarea = useQuery({
+    queryKey: [...KEY, "tarea", "ecartpay-pendientes"],
+    queryFn: () => getTareaProgramada("ecartpay-pendientes"),
+    refetchInterval: 30_000,
+  });
+  return { eventos, tarea };
+}
+
 export function useFeriados(pais: string | null, desde: string) {
   return useQuery({
     queryKey: [...KEY, "feriados", pais, desde],
@@ -66,6 +84,7 @@ export function usePaisesMutaciones() {
     }),
     probarEcartPay: useMutation({ mutationFn: probarConexionEcartPay, onSuccess }),
     desconectarComercio: useMutation({ mutationFn: desconectarComercioEcartPay, onSuccess }),
+    reprocesarEvento: useMutation({ mutationFn: reprocesarEventoWebhook, onSuccess }),
     guardarConfiguracion: useMutation({
       mutationFn: (c: ConfiguracionPagos) => updateConfiguracionPagos(c.pais, c.proveedor, c),
       onSuccess,

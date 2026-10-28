@@ -2,6 +2,7 @@ import { usePaisesConfig } from "@/hooks/usePaises";
 import { ConexionEcartPayCard } from "./ConexionEcartPayCard";
 import { ConexionesComerciosCard } from "./ConexionesComerciosCard";
 import { ConfiguracionPagosCard } from "./ConfiguracionPagosCard";
+import { EventosWebhookCard } from "./EventosWebhookCard";
 import { FeriadosCard } from "./FeriadosCard";
 import { PaisesCard } from "./PaisesCard";
 import { ProveedoresCard } from "./ProveedoresCard";
@@ -23,6 +24,7 @@ export function PaisesPage() {
     <div className="space-y-4">
       {ecartpay && <ConexionEcartPayCard proveedor={ecartpay} />}
       {ecartpay && <ConexionesComerciosCard />}
+      {ecartpay && <EventosWebhookCard />}
       {configuracion.map((c) => (
         <ConfiguracionPagosCard key={`${c.pais}-${c.proveedor}`} config={c} />
       ))}
