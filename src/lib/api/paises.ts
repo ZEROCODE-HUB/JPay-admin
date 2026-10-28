@@ -400,6 +400,134 @@ export async function listPuntosFisicos(): Promise<PuntoFisico[]> {
   });
 }
 
+export type CorridaConciliacion = {
+  id: string;
+  origen: string;
+  ejecutadaAt: string;
+  resumen: Record<string, unknown>;
+  error: string | null;
+};
+
+export type DiferenciaConciliacion = {
+  id: string;
+  tipo: string;
+  ordenId: string | null;
+  transaccionId: string | null;
+  pagoId: string | null;
+  detalle: Record<string, unknown>;
+  createdAt: string;
+};
+
+const objeto = (v: unknown): Record<string, unknown> =>
+  v && typeof v === "object" && !Array.isArray(v) ? (v as Record<string, unknown>) : {};
+
+/** Últimas corridas de conciliación con Ecart Pay. */
+export async function listConciliacionesProveedor(limite = 5): Promise<CorridaConciliacion[]> {
+  const sb = requireSupabase();
+  const { data, error } = await sb
+    .from("conciliaciones_proveedor")
+    .select("id, origen, ejecutada_at, resumen, error")
+    .order("ejecutada_at", { ascending: false })
+    .limit(limite);
+  if (error) throw new DataAccessError(error);
+  return (data ?? []).map((c) => ({
+    id: c.id,
+    origen: c.origen,
+    ejecutadaAt: c.ejecutada_at,
+    resumen: objeto(c.resumen),
+    error: c.error,
+  }));
+}
+
+/** Diferencias de conciliación sin resolver. */
+export async function listDiferenciasAbiertas(): Promise<DiferenciaConciliacion[]> {
+  const sb = requireSupabase();
+  const { data, error } = await sb
+    .from("conciliacion_proveedor_diferencias")
+    .select("id, tipo, orden_id, transaccion_id, pago_id, detalle, created_at")
+    .eq("resuelta", false)
+    .order("created_at", { ascending: false });
+  if (error) throw new DataAccessError(error);
+  return (data ?? []).map((d) => ({
+    id: d.id,
+    tipo: d.tipo,
+    ordenId: d.orden_id,
+    transaccionId: d.transaccion_id,
+    pagoId: d.pago_id,
+    detalle: objeto(d.detalle),
+    createdAt: d.created_at,
+  }));
+}
+
+/** Marca una diferencia como resuelta (RLS: `movimientos: modificar`). */
+export async function resolverDiferencia(id: string, nota: string): Promise<void> {
+  const sb = requireSupabase();
+  const { data: auth } = await sb.auth.getUser();
+  const { error } = await sb
+    .from("conciliacion_proveedor_diferencias")
+    .update({
+      resuelta: true,
+      resuelta_at: new Date().toISOString(),
+      resuelta_por: auth.user?.id ?? null,
+      nota: nota.trim() || null,
+    })
+    .eq("id", id);
+  if (error) throw new DataAccessError(error);
+}
+
+/** Corre la conciliación ahora (Edge Function `ecartpay-conciliacion`, solo admins). */
+export async function conciliarAhora(): Promise<Record<string, unknown>> {
+  const sb = requireSupabase();
+  const { data, error } = await sb.functions.invoke<Record<string, unknown>>(
+    "ecartpay-conciliacion",
+    { body: { manual: true } },
+  );
+  if (error) {
+    const ctx = (error as { context?: Response }).context;
+    const cuerpo = ctx ? await ctx.json().catch(() => null) : null;
+    throw new DataAccessError(cuerpo?.error ? new Error(cuerpo.error) : error);
+  }
+  return data ?? {};
+}
+
+export type ContracargoProveedor = {
+  id: string;
+  idExterno: string;
+  legajo: string | null;
+  ordenId: string | null;
+  monto: number | null;
+  moneda: string | null;
+  motivo: string | null;
+  estado: string;
+  venceAt: string | null;
+  updatedAt: string;
+};
+
+/** Contracargos avisados por Ecart Pay (webhooks firmados), los más recientes primero. */
+export async function listContracargosProveedor(): Promise<ContracargoProveedor[]> {
+  const sb = requireSupabase();
+  const { data, error } = await sb
+    .from("contracargos_proveedor")
+    .select(
+      "id, id_externo, cliente_legajo, orden_id, monto, moneda, motivo, estado, vence_at, updated_at",
+    )
+    .order("updated_at", { ascending: false })
+    .limit(50);
+  if (error) throw new DataAccessError(error);
+  return (data ?? []).map((c) => ({
+    id: c.id,
+    idExterno: c.id_externo,
+    legajo: c.cliente_legajo,
+    ordenId: c.orden_id,
+    monto: c.monto != null ? Number(c.monto) : null,
+    moneda: c.moneda,
+    motivo: c.motivo,
+    estado: c.estado,
+    venceAt: c.vence_at,
+    updatedAt: c.updated_at,
+  }));
+}
+
 /** Feriados del país desde `desde` (fecha ISO), ordenados. */
 export async function listFeriados(pais: string, desde: string): Promise<Feriado[]> {
   const sb = requireSupabase();

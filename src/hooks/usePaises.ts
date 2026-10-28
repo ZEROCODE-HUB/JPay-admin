@@ -1,6 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+  conciliarAhora,
   desconectarComercioEcartPay,
+  listConciliacionesProveedor,
+  listContracargosProveedor,
+  listDiferenciasAbiertas,
+  resolverDiferencia,
   getTareaProgramada,
   listEventosWebhook,
   listPuntosFisicos,
@@ -61,6 +66,22 @@ export function usePuntosFisicos() {
   return useQuery({ queryKey: [...KEY, "puntos-fisicos"], queryFn: listPuntosFisicos });
 }
 
+export function useConciliacion() {
+  const corridas = useQuery({
+    queryKey: [...KEY, "conciliacion", "corridas"],
+    queryFn: () => listConciliacionesProveedor(),
+  });
+  const diferencias = useQuery({
+    queryKey: [...KEY, "conciliacion", "diferencias"],
+    queryFn: listDiferenciasAbiertas,
+  });
+  return { corridas, diferencias };
+}
+
+export function useContracargosProveedor() {
+  return useQuery({ queryKey: [...KEY, "contracargos"], queryFn: listContracargosProveedor });
+}
+
 export function useFeriados(pais: string | null, desde: string) {
   return useQuery({
     queryKey: [...KEY, "feriados", pais, desde],
@@ -90,6 +111,11 @@ export function usePaisesMutaciones() {
     probarEcartPay: useMutation({ mutationFn: probarConexionEcartPay, onSuccess }),
     desconectarComercio: useMutation({ mutationFn: desconectarComercioEcartPay, onSuccess }),
     reprocesarEvento: useMutation({ mutationFn: reprocesarEventoWebhook, onSuccess }),
+    conciliar: useMutation({ mutationFn: conciliarAhora, onSuccess }),
+    resolverDiferencia: useMutation({
+      mutationFn: (v: { id: string; nota: string }) => resolverDiferencia(v.id, v.nota),
+      onSuccess,
+    }),
     guardarConfiguracion: useMutation({
       mutationFn: (c: ConfiguracionPagos) => updateConfiguracionPagos(c.pais, c.proveedor, c),
       onSuccess,
