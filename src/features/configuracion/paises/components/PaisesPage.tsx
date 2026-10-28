@@ -5,6 +5,7 @@ import { ContracargosCard } from "./ContracargosCard";
 import { ConexionesComerciosCard } from "./ConexionesComerciosCard";
 import { ConfiguracionPagosCard } from "./ConfiguracionPagosCard";
 import { EventosWebhookCard } from "./EventosWebhookCard";
+import { MsiCard } from "./MsiCard";
 import { PuntosFisicosCard } from "./PuntosFisicosCard";
 import { FeriadosCard } from "./FeriadosCard";
 import { PaisesCard } from "./PaisesCard";
@@ -30,6 +31,7 @@ export function PaisesPage() {
       {ecartpay && <ConciliacionCard />}
       {ecartpay && <ContracargosCard />}
       {ecartpay && <EventosWebhookCard />}
+      {ecartpay && <MsiCard />}
       {ecartpay && <PuntosFisicosCard />}
       {configuracion.map((c) => (
         <ConfiguracionPagosCard key={`${c.pais}-${c.proveedor}`} config={c} />

@@ -5,6 +5,9 @@ import {
   listConciliacionesProveedor,
   listContracargosProveedor,
   getReporteCobrosProveedor,
+  getMsiComercio,
+  guardarMsiComercio,
+  type ConfigMsi,
   listDiferenciasAbiertas,
   resolverDiferencia,
   getTareaProgramada,
@@ -129,4 +132,20 @@ export function useReporteCobrosProveedor(rango: { desde: string; hasta: string 
     queryKey: [...KEY, "reporte-cobros", rango.desde, rango.hasta],
     queryFn: () => getReporteCobrosProveedor(rango.desde, rango.hasta),
   });
+}
+
+export function useMsiComercio(comercioId: string | null) {
+  const qc = useQueryClient();
+  const key = [...KEY, "msi", comercioId];
+  return {
+    config: useQuery({
+      queryKey: key,
+      queryFn: () => getMsiComercio(comercioId as string),
+      enabled: !!comercioId,
+    }),
+    guardar: useMutation({
+      mutationFn: (c: ConfigMsi) => guardarMsiComercio(comercioId as string, c),
+      onSuccess: (c) => qc.setQueryData(key, c),
+    }),
+  };
 }

@@ -557,3 +557,46 @@ export async function getReporteCobrosProveedor(
   if (error) throw new DataAccessError(error);
   return toReporteCobros(data);
 }
+
+export type PlanMsi = {
+  meses: number;
+  activo: boolean;
+  /** true = cuotas con interés que paga el cliente; false = sin intereses (las absorbe el comercio). */
+  cuotasFijas: boolean;
+  minimo: number | null;
+  maximo: number | null;
+  /** Comisión de Ecart Pay por el plazo (%), si la informa. */
+  tasa: number | null;
+};
+
+export type ConfigMsi = { habilitado: boolean; planes: PlanMsi[]; amexCuotasFijas: boolean };
+
+async function invocarMsi(body: Record<string, unknown>): Promise<ConfigMsi> {
+  const sb = requireSupabase();
+  const { data, error } = await sb.functions.invoke<ConfigMsi>("ecartpay-msi", { body });
+  if (error) {
+    const ctx = (error as { context?: Response }).context;
+    const cuerpo = ctx ? await ctx.json().catch(() => null) : null;
+    throw new DataAccessError(cuerpo?.error ? new Error(cuerpo.error) : error);
+  }
+  if (!data) throw new DataAccessError(new Error("Respuesta vacía de Ecart Pay"));
+  return data;
+}
+
+/** Meses sin intereses del comercio en su cuenta Ecart Pay (Edge Function `ecartpay-msi`). */
+export const getMsiComercio = (comercioId: string) =>
+  invocarMsi({ accion: "leer", comercio_id: comercioId });
+
+export const guardarMsiComercio = (comercioId: string, c: ConfigMsi) =>
+  invocarMsi({
+    accion: "guardar",
+    comercio_id: comercioId,
+    amex_cuotas_fijas: c.amexCuotasFijas,
+    planes: c.planes.map((p) => ({
+      meses: p.meses,
+      activo: p.activo,
+      cuotas_fijas: p.cuotasFijas,
+      minimo: p.minimo,
+      maximo: p.maximo,
+    })),
+  });
