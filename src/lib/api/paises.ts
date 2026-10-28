@@ -1,4 +1,5 @@
 import { requireSupabase } from "@/lib/supabase";
+import type { Json } from "@/lib/database.types";
 import type { Tables, TablesUpdate } from "@/lib/database.types";
 import { DataAccessError } from "./errors";
 
@@ -31,6 +32,20 @@ export type ProveedorPago = {
   tipos: string[];
   activo: boolean;
   sandbox: boolean;
+  conexion: ConexionProveedor;
+};
+
+export type EstadoConexion = "sin_probar" | "ok" | "error";
+export type PasoConexion = { paso: string; ok: boolean; detalle: string; ms?: number };
+
+/** Última prueba de conexión del proveedor (la escribe la Edge Function `ecartpay-salud`). */
+export type ConexionProveedor = {
+  estado: EstadoConexion;
+  verificadaAt: string | null;
+  entorno: string | null;
+  baseUrl: string | null;
+  latenciaMs: number | null;
+  pasos: PasoConexion[];
 };
 
 export type ConfiguracionPagos = {
@@ -74,6 +89,32 @@ function toProveedor(r: Tables<"proveedores_pago">): ProveedorPago {
     tipos: r.tipos ?? [],
     activo: r.activo,
     sandbox: r.sandbox,
+    conexion: toConexion(r.conexion_estado, r.conexion_verificada_at, r.conexion_detalle),
+  };
+}
+
+export function toConexion(
+  estado: string,
+  verificadaAt: string | null,
+  detalle: Json,
+): ConexionProveedor {
+  const d =
+    detalle && typeof detalle === "object" && !Array.isArray(detalle)
+      ? (detalle as Record<string, unknown>)
+      : {};
+  const pasos = Array.isArray(d.pasos)
+    ? d.pasos.filter(
+        (p): p is PasoConexion =>
+          !!p && typeof p === "object" && typeof (p as PasoConexion).paso === "string",
+      )
+    : [];
+  return {
+    estado: (["ok", "error"].includes(estado) ? estado : "sin_probar") as EstadoConexion,
+    verificadaAt,
+    entorno: typeof d.entorno === "string" ? d.entorno : null,
+    baseUrl: typeof d.baseUrl === "string" ? d.baseUrl : null,
+    latenciaMs: typeof d.latenciaMs === "number" ? d.latenciaMs : null,
+    pasos,
   };
 }
 
@@ -146,6 +187,24 @@ export async function updateProveedorPago(
   const sb = requireSupabase();
   const { error } = await sb.from("proveedores_pago").update(input).eq("codigo", codigo);
   if (error) throw new DataAccessError(error);
+}
+
+/**
+ * Prueba la conexión de la plataforma con Ecart Pay (Edge Function `ecartpay-salud`, solo
+ * admins). La función guarda el resultado en `proveedores_pago`, así que alcanza con refrescar.
+ */
+export async function probarConexionEcartPay(): Promise<{ ok: boolean }> {
+  const sb = requireSupabase();
+  const { data, error } = await sb.functions.invoke<{ ok: boolean }>("ecartpay-salud", {
+    body: {},
+  });
+  if (error) {
+    // En errores HTTP el mensaje útil viene en el cuerpo ({ error }) de la respuesta.
+    const ctx = (error as { context?: Response }).context;
+    const cuerpo = ctx ? await ctx.json().catch(() => null) : null;
+    throw new DataAccessError(cuerpo?.error ? new Error(cuerpo.error) : error);
+  }
+  return { ok: data?.ok === true };
 }
 
 export async function listConfiguracionPagos(): Promise<ConfiguracionPagos[]> {

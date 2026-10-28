@@ -4,6 +4,7 @@ import {
   listFeriados,
   listPaises,
   listProveedoresPago,
+  probarConexionEcartPay,
   setPaisPredeterminado,
   updateConfiguracionPagos,
   updatePais,
@@ -57,6 +58,7 @@ export function usePaisesMutaciones() {
       }) => updateProveedorPago(v.codigo, v.cambios),
       onSuccess,
     }),
+    probarEcartPay: useMutation({ mutationFn: probarConexionEcartPay, onSuccess }),
     guardarConfiguracion: useMutation({
       mutationFn: (c: ConfiguracionPagos) => updateConfiguracionPagos(c.pais, c.proveedor, c),
       onSuccess,

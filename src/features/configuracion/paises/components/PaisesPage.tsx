@@ -1,4 +1,5 @@
 import { usePaisesConfig } from "@/hooks/usePaises";
+import { ConexionEcartPayCard } from "./ConexionEcartPayCard";
 import { ConfiguracionPagosCard } from "./ConfiguracionPagosCard";
 import { FeriadosCard } from "./FeriadosCard";
 import { PaisesCard } from "./PaisesCard";
@@ -16,8 +17,10 @@ export function PaisesPage() {
     );
   }
   const instalacion = paises.find((p) => p.predeterminado);
+  const ecartpay = proveedores.find((p) => p.codigo === "ecartpay");
   return (
     <div className="space-y-4">
+      {ecartpay && <ConexionEcartPayCard proveedor={ecartpay} />}
       {configuracion.map((c) => (
         <ConfiguracionPagosCard key={`${c.pais}-${c.proveedor}`} config={c} />
       ))}
