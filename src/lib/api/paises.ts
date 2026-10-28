@@ -234,6 +234,60 @@ export async function updateConfiguracionPagos(
   if (error) throw new DataAccessError(error);
 }
 
+export type ConexionComercio = {
+  id: string;
+  comercioId: string;
+  comercio: string;
+  legajo: string;
+  proveedor: string;
+  estado: string;
+  entorno: string;
+  cuentaExternaId: string | null;
+  scopes: number;
+  conectadoAt: string | null;
+  revocadoAt: string | null;
+  ultimoError: string | null;
+};
+
+/** Conexiones de comercios con proveedores (OAuth), las más recientes primero. */
+export async function listConexionesComercios(): Promise<ConexionComercio[]> {
+  const sb = requireSupabase();
+  const { data, error } = await sb
+    .from("comercio_proveedores")
+    .select(
+      "id, comercio_id, proveedor, estado, entorno, cuenta_externa_id, scopes, conectado_at, revocado_at, ultimo_error, comercios(nombre_comercio, legajo)",
+    )
+    .order("updated_at", { ascending: false });
+  if (error) throw new DataAccessError(error);
+  return (data ?? []).map((r) => ({
+    id: r.id,
+    comercioId: r.comercio_id,
+    comercio: r.comercios?.nombre_comercio ?? "—",
+    legajo: r.comercios?.legajo ?? "—",
+    proveedor: r.proveedor,
+    estado: r.estado,
+    entorno: r.entorno,
+    cuentaExternaId: r.cuenta_externa_id,
+    scopes: r.scopes?.length ?? 0,
+    conectadoAt: r.conectado_at,
+    revocadoAt: r.revocado_at,
+    ultimoError: r.ultimo_error,
+  }));
+}
+
+/** Desconecta la cuenta Ecart Pay de un comercio (Edge Function `ecartpay-oauth-desconectar`). */
+export async function desconectarComercioEcartPay(comercioId: string): Promise<void> {
+  const sb = requireSupabase();
+  const { error } = await sb.functions.invoke("ecartpay-oauth-desconectar", {
+    body: { comercio_id: comercioId },
+  });
+  if (error) {
+    const ctx = (error as { context?: Response }).context;
+    const cuerpo = ctx ? await ctx.json().catch(() => null) : null;
+    throw new DataAccessError(cuerpo?.error ? new Error(cuerpo.error) : error);
+  }
+}
+
 /** Feriados del país desde `desde` (fecha ISO), ordenados. */
 export async function listFeriados(pais: string, desde: string): Promise<Feriado[]> {
   const sb = requireSupabase();

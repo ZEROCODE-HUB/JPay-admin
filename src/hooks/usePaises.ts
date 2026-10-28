@@ -1,5 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+  desconectarComercioEcartPay,
+  listConexionesComercios,
   listConfiguracionPagos,
   listFeriados,
   listPaises,
@@ -32,6 +34,10 @@ export function usePaisesConfig() {
   };
 }
 
+export function useConexionesComercios() {
+  return useQuery({ queryKey: [...KEY, "conexiones"], queryFn: listConexionesComercios });
+}
+
 export function useFeriados(pais: string | null, desde: string) {
   return useQuery({
     queryKey: [...KEY, "feriados", pais, desde],
@@ -59,6 +65,7 @@ export function usePaisesMutaciones() {
       onSuccess,
     }),
     probarEcartPay: useMutation({ mutationFn: probarConexionEcartPay, onSuccess }),
+    desconectarComercio: useMutation({ mutationFn: desconectarComercioEcartPay, onSuccess }),
     guardarConfiguracion: useMutation({
       mutationFn: (c: ConfiguracionPagos) => updateConfiguracionPagos(c.pais, c.proveedor, c),
       onSuccess,
