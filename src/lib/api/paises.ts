@@ -600,3 +600,19 @@ export const guardarMsiComercio = (comercioId: string, c: ConfigMsi) =>
       maximo: p.maximo,
     })),
   });
+
+export type AlertaProveedor = {
+  codigo: string;
+  nivel: "critica" | "aviso";
+  cantidad: number;
+  detalle: string;
+};
+
+/** Alertas operativas de Ecart Pay calculadas en el momento (RPC solo para backoffice). */
+export async function listAlertasEcartPay(): Promise<AlertaProveedor[]> {
+  const sb = requireSupabase();
+  const { data, error } = await sb.rpc("alertas_proveedor_pagos", { p_proveedor: "ecartpay" });
+  if (error) throw new DataAccessError(error);
+  const alertas = (data as { alertas?: unknown } | null)?.alertas;
+  return Array.isArray(alertas) ? (alertas as AlertaProveedor[]) : [];
+}

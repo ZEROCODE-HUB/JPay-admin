@@ -1,4 +1,5 @@
 import { usePaisesConfig } from "@/hooks/usePaises";
+import { AlertasEcartPayCard } from "./AlertasEcartPayCard";
 import { ConciliacionCard } from "./ConciliacionCard";
 import { ConexionEcartPayCard } from "./ConexionEcartPayCard";
 import { ContracargosCard } from "./ContracargosCard";
@@ -26,6 +27,7 @@ export function PaisesPage() {
   const ecartpay = proveedores.find((p) => p.codigo === "ecartpay");
   return (
     <div className="space-y-4">
+      {ecartpay && <AlertasEcartPayCard />}
       {ecartpay && <ConexionEcartPayCard proveedor={ecartpay} />}
       {ecartpay && <ConexionesComerciosCard />}
       {ecartpay && <ConciliacionCard />}

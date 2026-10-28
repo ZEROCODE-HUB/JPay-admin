@@ -6,6 +6,7 @@ import {
   listContracargosProveedor,
   getReporteCobrosProveedor,
   getMsiComercio,
+  listAlertasEcartPay,
   guardarMsiComercio,
   type ConfigMsi,
   listDiferenciasAbiertas,
@@ -148,4 +149,12 @@ export function useMsiComercio(comercioId: string | null) {
       onSuccess: (c) => qc.setQueryData(key, c),
     }),
   };
+}
+
+export function useAlertasEcartPay() {
+  return useQuery({
+    queryKey: [...KEY, "alertas"],
+    queryFn: listAlertasEcartPay,
+    refetchInterval: 60_000,
+  });
 }
