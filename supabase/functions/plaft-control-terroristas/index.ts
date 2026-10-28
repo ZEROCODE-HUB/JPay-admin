@@ -3,6 +3,7 @@
 // Las alertas en public.alertas las crea el trigger trg_plaft_coincidencia_alerta
 // cada vez que se inserta una coincidencia nueva en plaft_coincidencias.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { esServiceRole, exigirPermiso, HttpError } from "../_shared/http.ts";
 
 const REPET_URL = "https://repet.jus.gob.ar/xml/personas.json";
 const UMBRAL = Number(Deno.env.get("PLAFT_UMBRAL") ?? "0.75"); // 75% por defecto
@@ -181,7 +182,16 @@ async function notificar(nuevas: Record<string, unknown>[]) {
 }
 
 // ---------- Handler ----------
+// Lo dispara una tarea programada (service role key) o un usuario con `compliance: modificar`.
 Deno.serve(async (req) => {
+  if (!esServiceRole(req)) {
+    try {
+      await exigirPermiso(req, "compliance", "modificar");
+    } catch (e) {
+      const status = e instanceof HttpError ? e.status : 403;
+      return Response.json({ estado: "error", error: (e as Error).message }, { status });
+    }
+  }
   const inicio = Date.now();
   let offset = 0;
   let limit = 500; // clientes por invocación (evita WORKER_RESOURCE_LIMIT)
