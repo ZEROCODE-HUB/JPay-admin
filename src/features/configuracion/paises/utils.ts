@@ -19,6 +19,7 @@ export const MODULOS: Record<Modulo, string> = {
   retiros_proveedor: "Retiros desde Ecart Pay",
   payway: "Tarjetas con Payway",
   transferencias_salientes: "Transferencias BDC / Coelsa",
+  transferencias_cobre: "CLABE y transferencias SPEI (Cobre)",
 };
 
 export const MODELOS_FONDOS: Record<ModeloFondos, { label: string; detalle: string }> = {

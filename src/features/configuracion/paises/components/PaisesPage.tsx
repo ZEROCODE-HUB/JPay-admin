@@ -1,5 +1,6 @@
 import { usePaisesConfig } from "@/hooks/usePaises";
 import { AlertasEcartPayCard } from "./AlertasEcartPayCard";
+import { CobreCard } from "./CobreCard";
 import { ConciliacionCard } from "./ConciliacionCard";
 import { ConexionProveedorCard } from "./ConexionProveedorCard";
 import { ContracargosCard } from "./ContracargosCard";
@@ -42,6 +43,7 @@ export function PaisesPage() {
           descripcion="Cuentas y transferencias SPEI. Mientras Cobre no entregue la instancia de prueba funciona con el simulador (COBRE_MODO)."
         />
       )}
+      {cobre && <CobreCard simulado={cobre.conexion.modo === "simulado"} />}
       {configuracion.map((c) => (
         <ConfiguracionPagosCard key={`${c.pais}-${c.proveedor}`} config={c} />
       ))}
