@@ -1,17 +1,18 @@
 import { AlertTriangle, CheckCircle2, XCircle } from "lucide-react";
 import { Card } from "@/components/portal-shell";
-import { useAlertasEcartPay } from "@/hooks/usePaises";
+import { useAlertasProveedor } from "@/hooks/usePaises";
 
 /**
- * Monitoreo de Ecart Pay: avisos fallidos, tareas atrasadas, conciliación, pagos pendientes
- * viejos, contracargos por vencer y conexiones en error. Se recalcula cada minuto.
+ * Monitoreo de un proveedor: avisos fallidos, tareas atrasadas, conciliación y lo propio de cada
+ * uno (pagos y contracargos en Ecart Pay; transferencias, aprobaciones y depósitos en Cobre).
+ * Se recalcula cada minuto.
  */
-export function AlertasEcartPayCard() {
-  const { data, isLoading, error } = useAlertasEcartPay();
+export function AlertasProveedorCard({ proveedor, nombre }: { proveedor: string; nombre: string }) {
+  const { data, isLoading, error } = useAlertasProveedor(proveedor);
   const alertas = data ?? [];
   return (
     <Card>
-      <h3 className="font-semibold">Alertas de Ecart Pay</h3>
+      <h3 className="font-semibold">Alertas de {nombre}</h3>
       {isLoading ? (
         <p className="mt-2 text-sm text-muted-foreground">Revisando…</p>
       ) : error ? (
@@ -20,8 +21,7 @@ export function AlertasEcartPayCard() {
         </p>
       ) : alertas.length === 0 ? (
         <p className="mt-2 flex items-center gap-2 text-sm">
-          <CheckCircle2 size={16} className="text-primary-ink" /> Todo en orden: avisos, tareas,
-          conciliación, pagos pendientes y contracargos.
+          <CheckCircle2 size={16} className="text-primary-ink" /> Todo en orden.
         </p>
       ) : (
         <ul className="mt-2 space-y-1.5 text-sm">

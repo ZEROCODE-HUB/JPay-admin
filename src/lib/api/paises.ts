@@ -428,12 +428,16 @@ export type DiferenciaConciliacion = {
 const objeto = (v: unknown): Record<string, unknown> =>
   v && typeof v === "object" && !Array.isArray(v) ? (v as Record<string, unknown>) : {};
 
-/** Últimas corridas de conciliación con Ecart Pay. */
-export async function listConciliacionesProveedor(limite = 5): Promise<CorridaConciliacion[]> {
+/** Últimas corridas de conciliación con un proveedor. */
+export async function listConciliacionesProveedor(
+  proveedor: string,
+  limite = 5,
+): Promise<CorridaConciliacion[]> {
   const sb = requireSupabase();
   const { data, error } = await sb
     .from("conciliaciones_proveedor")
     .select("id, origen, ejecutada_at, resumen, error")
+    .eq("proveedor", proveedor)
     .order("ejecutada_at", { ascending: false })
     .limit(limite);
   if (error) throw new DataAccessError(error);
@@ -446,12 +450,17 @@ export async function listConciliacionesProveedor(limite = 5): Promise<CorridaCo
   }));
 }
 
-/** Diferencias de conciliación sin resolver. */
-export async function listDiferenciasAbiertas(): Promise<DiferenciaConciliacion[]> {
+/** Diferencias de conciliación sin resolver de un proveedor. */
+export async function listDiferenciasAbiertas(
+  proveedor: string,
+): Promise<DiferenciaConciliacion[]> {
   const sb = requireSupabase();
   const { data, error } = await sb
     .from("conciliacion_proveedor_diferencias")
-    .select("id, tipo, orden_id, transaccion_id, pago_id, detalle, created_at")
+    .select(
+      "id, tipo, orden_id, transaccion_id, pago_id, detalle, created_at, conciliaciones_proveedor!inner(proveedor)",
+    )
+    .eq("conciliaciones_proveedor.proveedor", proveedor)
     .eq("resuelta", false)
     .order("created_at", { ascending: false });
   if (error) throw new DataAccessError(error);
@@ -482,11 +491,11 @@ export async function resolverDiferencia(id: string, nota: string): Promise<void
   if (error) throw new DataAccessError(error);
 }
 
-/** Corre la conciliación ahora (Edge Function `ecartpay-conciliacion`, solo admins). */
-export async function conciliarAhora(): Promise<Record<string, unknown>> {
+/** Corre la conciliación ahora (Edge Function `<proveedor>-conciliacion`, solo admins). */
+export async function conciliarAhora(proveedor: string): Promise<Record<string, unknown>> {
   const sb = requireSupabase();
   const { data, error } = await sb.functions.invoke<Record<string, unknown>>(
-    "ecartpay-conciliacion",
+    `${proveedor}-conciliacion`,
     { body: { manual: true } },
   );
   if (error) {
@@ -614,10 +623,10 @@ export type AlertaProveedor = {
   detalle: string;
 };
 
-/** Alertas operativas de Ecart Pay calculadas en el momento (RPC solo para backoffice). */
-export async function listAlertasEcartPay(): Promise<AlertaProveedor[]> {
+/** Alertas operativas de un proveedor calculadas en el momento (RPC solo para backoffice). */
+export async function listAlertasProveedor(proveedor: string): Promise<AlertaProveedor[]> {
   const sb = requireSupabase();
-  const { data, error } = await sb.rpc("alertas_proveedor_pagos", { p_proveedor: "ecartpay" });
+  const { data, error } = await sb.rpc("alertas_proveedor_pagos", { p_proveedor: proveedor });
   if (error) throw new DataAccessError(error);
   const alertas = (data as { alertas?: unknown } | null)?.alertas;
   return Array.isArray(alertas) ? (alertas as AlertaProveedor[]) : [];

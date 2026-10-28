@@ -1,7 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type { ModeloFondosCobre } from "@/lib/api/cobre";
 import {
   crearCuentaPlataformaCobre,
   decidirTransferenciaCobre,
+  devolverDepositoCobre,
+  guardarModeloCliente,
+  listModelosClientes,
   getConfiguracionCobre,
   guardarConfiguracionCobre,
   listDepositosSinAsignar,
@@ -22,6 +26,7 @@ export function useCobreAdmin() {
       queryFn: () => listTransferenciasCobre(["pendiente_aprobacion"]),
       refetchInterval: 30_000,
     }),
+    modelos: useQuery({ queryKey: [...KEY, "modelos"], queryFn: listModelosClientes }),
     sinAsignar: useQuery({
       queryKey: [...KEY, "sin-asignar"],
       queryFn: listDepositosSinAsignar,
@@ -38,5 +43,11 @@ export function useCobreAdminMutaciones() {
     crearCuenta: useMutation({ mutationFn: crearCuentaPlataformaCobre, onSuccess }),
     decidir: useMutation({ mutationFn: decidirTransferenciaCobre, onSuccess }),
     simularDeposito: useMutation({ mutationFn: simularDepositoCobre, onSuccess }),
+    devolver: useMutation({ mutationFn: devolverDepositoCobre, onSuccess }),
+    guardarModelo: useMutation({
+      mutationFn: (v: { legajo: string; modelo: ModeloFondosCobre | null }) =>
+        guardarModeloCliente(v.legajo, v.modelo),
+      onSuccess,
+    }),
   };
 }

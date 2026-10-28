@@ -26,6 +26,9 @@ export type TransferenciaCobre = {
 
 export type DepositoCobre = {
   id: string;
+  /** Estado de la devolución al remitente (null = no se pidió). */
+  devolucion: string | null;
+  devolucionMotivo: string | null;
   monto: number;
   clabe: string | null;
   remitente: string | null;
@@ -123,13 +126,17 @@ export async function listDepositosSinAsignar(): Promise<DepositoCobre[]> {
   const sb = requireSupabase();
   const { data, error } = await sb
     .from("cobre_depositos")
-    .select("id, monto, clabe, remitente, clave_rastreo, recibido_at")
+    .select(
+      "id, monto, clabe, remitente, clave_rastreo, recibido_at, devolucion_estado, devolucion_motivo",
+    )
     .eq("estado", "sin_asignar")
     .order("recibido_at", { ascending: false })
     .limit(50);
   if (error) throw new DataAccessError(error);
   return (data ?? []).map((r) => ({
     id: r.id,
+    devolucion: r.devolucion_estado,
+    devolucionMotivo: r.devolucion_motivo,
     monto: Number(r.monto),
     clabe: r.clabe,
     remitente: r.remitente,
@@ -141,3 +148,43 @@ export async function listDepositosSinAsignar(): Promise<DepositoCobre[]> {
 /** Solo en modo simulado: transferencia SPEI entrante a una CLABE. */
 export const simularDepositoCobre = (v: { clabe: string; monto: number; remitente?: string }) =>
   invocar("cobre-simulador", { accion: "deposito", ...v });
+
+/** Devuelve al remitente un depósito sin asignar (Edge Function `cobre-cuentas`). */
+export const devolverDepositoCobre = (depositoId: string) =>
+  invocar("cobre-cuentas", { accion: "devolver_deposito", deposito_id: depositoId });
+
+export type ModeloCliente = { legajo: string; nombre: string | null; modelo: ModeloFondosCobre };
+
+/** Clientes con un modelo de fondos distinto del default. */
+export async function listModelosClientes(): Promise<ModeloCliente[]> {
+  const sb = requireSupabase();
+  const { data, error } = await sb
+    .from("cobre_clientes")
+    .select("cliente_legajo, modelo_fondos, clientes(nombre, nombre_fantasia)")
+    .order("cliente_legajo");
+  if (error) throw new DataAccessError(error);
+  return (data ?? []).map((r) => {
+    const c = r.clientes as unknown as {
+      nombre: string | null;
+      nombre_fantasia: string | null;
+    } | null;
+    return {
+      legajo: r.cliente_legajo,
+      nombre: c?.nombre_fantasia || c?.nombre || null,
+      modelo: r.modelo_fondos as ModeloFondosCobre,
+    };
+  });
+}
+
+/** Fija el modelo de un cliente; `null` lo vuelve al default. */
+export async function guardarModeloCliente(legajo: string, modelo: ModeloFondosCobre | null) {
+  const sb = requireSupabase();
+  const { error } = modelo
+    ? await sb.from("cobre_clientes").upsert({
+        cliente_legajo: legajo,
+        modelo_fondos: modelo,
+        updated_at: new Date().toISOString(),
+      })
+    : await sb.from("cobre_clientes").delete().eq("cliente_legajo", legajo);
+  if (error) throw new DataAccessError(error);
+}

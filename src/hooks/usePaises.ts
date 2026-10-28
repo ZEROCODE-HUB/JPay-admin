@@ -6,7 +6,7 @@ import {
   listContracargosProveedor,
   getReporteCobrosProveedor,
   getMsiComercio,
-  listAlertasEcartPay,
+  listAlertasProveedor,
   guardarMsiComercio,
   type ConfigMsi,
   listDiferenciasAbiertas,
@@ -71,14 +71,14 @@ export function usePuntosFisicos() {
   return useQuery({ queryKey: [...KEY, "puntos-fisicos"], queryFn: listPuntosFisicos });
 }
 
-export function useConciliacion() {
+export function useConciliacion(proveedor: string) {
   const corridas = useQuery({
-    queryKey: [...KEY, "conciliacion", "corridas"],
-    queryFn: () => listConciliacionesProveedor(),
+    queryKey: [...KEY, "conciliacion", proveedor, "corridas"],
+    queryFn: () => listConciliacionesProveedor(proveedor),
   });
   const diferencias = useQuery({
-    queryKey: [...KEY, "conciliacion", "diferencias"],
-    queryFn: listDiferenciasAbiertas,
+    queryKey: [...KEY, "conciliacion", proveedor, "diferencias"],
+    queryFn: () => listDiferenciasAbiertas(proveedor),
   });
   return { corridas, diferencias };
 }
@@ -151,10 +151,10 @@ export function useMsiComercio(comercioId: string | null) {
   };
 }
 
-export function useAlertasEcartPay() {
+export function useAlertasProveedor(proveedor: string) {
   return useQuery({
-    queryKey: [...KEY, "alertas"],
-    queryFn: listAlertasEcartPay,
+    queryKey: [...KEY, "alertas", proveedor],
+    queryFn: () => listAlertasProveedor(proveedor),
     refetchInterval: 60_000,
   });
 }

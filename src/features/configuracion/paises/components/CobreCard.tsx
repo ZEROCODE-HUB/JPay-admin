@@ -18,18 +18,34 @@ const MODELOS: Record<ModeloFondosCobre, { label: string; detalle: string }> = {
   },
 };
 
+const DEVOLUCION: Record<
+  string,
+  { label: string; tone: "success" | "warn" | "danger" | "neutral" }
+> = {
+  pendiente: { label: "Devolviendo", tone: "warn" },
+  pendiente_aprobacion: { label: "Devolución por aprobar", tone: "warn" },
+  completada: { label: "Devuelto", tone: "success" },
+  rechazada: { label: "Devolución rechazada", tone: "danger" },
+  fallida: { label: "Devolución fallida", tone: "danger" },
+  cancelada: { label: "Devolución cancelada", tone: "neutral" },
+};
+
 /**
  * Cobre (México): modelo de fondos, monto de aprobación y OTP, cuenta de JPay, transferencias
  * pendientes de aprobación, depósitos sin asignar y, en modo simulado, depósitos de prueba.
  */
 export function CobreCard({ simulado }: { simulado: boolean }) {
-  const { configuracion, aprobaciones, sinAsignar } = useCobreAdmin();
+  const { configuracion, aprobaciones, sinAsignar, modelos } = useCobreAdmin();
   const m = useCobreAdminMutaciones();
   const c = configuracion.data;
   const [modelo, setModelo] = useState<ModeloFondosCobre>("centralizado");
   const [monto, setMonto] = useState("");
   const [otp, setOtp] = useState(false);
   const [dep, setDep] = useState({ clabe: "", monto: "" });
+  const [cli, setCli] = useState<{ legajo: string; modelo: ModeloFondosCobre }>({
+    legajo: "",
+    modelo: "por_comercio",
+  });
 
   useEffect(() => {
     if (!c) return;
@@ -189,7 +205,27 @@ export function CobreCard({ simulado }: { simulado: boolean }) {
                       {d.remitente ?? "Sin remitente"} · CLABE{" "}
                       <span className="font-mono">{d.clabe ?? "—"}</span>
                     </span>
-                    <span className="tabular-nums">
+                    <span className="flex items-center gap-3 tabular-nums">
+                      {d.devolucion &&
+                      !["rechazada", "fallida", "cancelada"].includes(d.devolucion) ? (
+                        <Badge tone={DEVOLUCION[d.devolucion]?.tone ?? "warn"}>
+                          {DEVOLUCION[d.devolucion]?.label ?? d.devolucion}
+                        </Badge>
+                      ) : (
+                        <button
+                          type="button"
+                          className="text-xs font-semibold text-danger-600 hover:underline disabled:opacity-50"
+                          disabled={m.devolver.isPending}
+                          onClick={() =>
+                            m.devolver.mutate(d.id, {
+                              onSuccess: () => toast.success("Devolución enviada a Cobre"),
+                              onError: avisarError,
+                            })
+                          }
+                        >
+                          Devolver
+                        </button>
+                      )}
                       {formatMoney(d.monto)}{" "}
                       <span className="text-xs text-muted-foreground">
                         {formatDateTime(d.recibidoAt)}
@@ -200,7 +236,79 @@ export function CobreCard({ simulado }: { simulado: boolean }) {
               </ul>
             )}
             <p className="mt-1 text-[11px] text-muted-foreground">
-              Llegaron a una CLABE que no es de ninguna subcuenta: no se acreditaron a nadie.
+              Llegaron a una CLABE que no es de ninguna subcuenta: no se acreditaron a nadie. Se
+              pueden devolver al remitente (el monto completo, una sola vez).
+            </p>
+          </section>
+
+          <section>
+            <p className="text-xs font-medium">Modelo de fondos por cliente</p>
+            {(modelos.data ?? []).length === 0 ? (
+              <p className="mt-1 text-muted-foreground">
+                Todos los clientes usan el modelo por defecto.
+              </p>
+            ) : (
+              <ul className="mt-1 divide-y divide-border">
+                {modelos.data!.map((x) => (
+                  <li key={x.legajo} className="py-1.5 flex items-center justify-between gap-3">
+                    <span>
+                      {x.nombre ?? x.legajo}{" "}
+                      <span className="text-xs text-muted-foreground">{x.legajo}</span>
+                    </span>
+                    <span className="flex items-center gap-3">
+                      <Badge tone="neutral">{MODELOS[x.modelo].label}</Badge>
+                      <button
+                        type="button"
+                        className="text-xs text-muted-foreground hover:underline"
+                        onClick={() =>
+                          m.guardarModelo.mutate(
+                            { legajo: x.legajo, modelo: null },
+                            { onError: avisarError },
+                          )
+                        }
+                      >
+                        Quitar
+                      </button>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <div className="mt-2 flex flex-wrap items-end gap-2">
+              <input
+                className="h-9 w-48 rounded-md border border-input bg-card px-2 text-sm"
+                placeholder="Legajo del cliente"
+                value={cli.legajo}
+                onChange={(e) => setCli({ ...cli, legajo: e.target.value.trim().toUpperCase() })}
+              />
+              <select
+                className="h-9 rounded-md border border-input bg-card px-2 text-sm"
+                value={cli.modelo}
+                onChange={(e) => setCli({ ...cli, modelo: e.target.value as ModeloFondosCobre })}
+              >
+                {Object.entries(MODELOS).map(([k, v]) => (
+                  <option key={k} value={k}>
+                    {v.label}
+                  </option>
+                ))}
+              </select>
+              <BtnOutline
+                disabled={!cli.legajo || m.guardarModelo.isPending}
+                onClick={() =>
+                  m.guardarModelo.mutate(cli, {
+                    onSuccess: () => {
+                      toast.success("Modelo del cliente guardado");
+                      setCli({ ...cli, legajo: "" });
+                    },
+                    onError: avisarError,
+                  })
+                }
+              >
+                Asignar
+              </BtnOutline>
+            </div>
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              Aplica a las CLABEs nuevas del cliente; las que ya tiene siguen en su cuenta actual.
             </p>
           </section>
 
