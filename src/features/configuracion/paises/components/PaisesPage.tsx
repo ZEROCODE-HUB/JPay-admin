@@ -3,6 +3,7 @@ import { ConexionEcartPayCard } from "./ConexionEcartPayCard";
 import { ConexionesComerciosCard } from "./ConexionesComerciosCard";
 import { ConfiguracionPagosCard } from "./ConfiguracionPagosCard";
 import { EventosWebhookCard } from "./EventosWebhookCard";
+import { PuntosFisicosCard } from "./PuntosFisicosCard";
 import { FeriadosCard } from "./FeriadosCard";
 import { PaisesCard } from "./PaisesCard";
 import { ProveedoresCard } from "./ProveedoresCard";
@@ -25,6 +26,7 @@ export function PaisesPage() {
       {ecartpay && <ConexionEcartPayCard proveedor={ecartpay} />}
       {ecartpay && <ConexionesComerciosCard />}
       {ecartpay && <EventosWebhookCard />}
+      {ecartpay && <PuntosFisicosCard />}
       {configuracion.map((c) => (
         <ConfiguracionPagosCard key={`${c.pais}-${c.proveedor}`} config={c} />
       ))}

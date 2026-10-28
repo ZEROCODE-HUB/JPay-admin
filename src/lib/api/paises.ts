@@ -363,6 +363,43 @@ export async function reprocesarEventoWebhook(eventoId: string): Promise<void> {
   }
 }
 
+export type PuntoFisico = {
+  id: string;
+  comercio: string;
+  legajo: string;
+  nombre: string;
+  ciudad: string | null;
+  estado: string;
+  cajas: number;
+  conTerminal: number;
+};
+
+/** Sucursales (no eliminadas) de todos los comercios con el conteo de cajas y terminales. */
+export async function listPuntosFisicos(): Promise<PuntoFisico[]> {
+  const sb = requireSupabase();
+  const { data, error } = await sb
+    .from("sucursales")
+    .select(
+      "id, nombre, ciudad, estado, comercios(nombre_comercio, legajo), cajas(terminal_id, eliminado_at)",
+    )
+    .is("eliminado_at", null)
+    .order("nombre");
+  if (error) throw new DataAccessError(error);
+  return (data ?? []).map((s) => {
+    const cajas = (s.cajas ?? []).filter((c) => !c.eliminado_at);
+    return {
+      id: s.id,
+      comercio: s.comercios?.nombre_comercio ?? "—",
+      legajo: s.comercios?.legajo ?? "—",
+      nombre: s.nombre,
+      ciudad: s.ciudad,
+      estado: s.estado,
+      cajas: cajas.length,
+      conTerminal: cajas.filter((c) => c.terminal_id).length,
+    };
+  });
+}
+
 /** Feriados del país desde `desde` (fecha ISO), ordenados. */
 export async function listFeriados(pais: string, desde: string): Promise<Feriado[]> {
   const sb = requireSupabase();

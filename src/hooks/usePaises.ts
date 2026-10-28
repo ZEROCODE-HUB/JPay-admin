@@ -3,6 +3,7 @@ import {
   desconectarComercioEcartPay,
   getTareaProgramada,
   listEventosWebhook,
+  listPuntosFisicos,
   reprocesarEventoWebhook,
   listConexionesComercios,
   listConfiguracionPagos,
@@ -54,6 +55,10 @@ export function useEventosWebhook() {
     refetchInterval: 30_000,
   });
   return { eventos, tarea };
+}
+
+export function usePuntosFisicos() {
+  return useQuery({ queryKey: [...KEY, "puntos-fisicos"], queryFn: listPuntosFisicos });
 }
 
 export function useFeriados(pais: string | null, desde: string) {
