@@ -12,6 +12,9 @@ export const PAGE_SIZES = [10, 20, 50];
 /** En esta pantalla se cargan comisiones de Depósito, Retiro y Conversión (pesos a dólares, México). */
 export const TIPOS_COMISION_USUARIOS: TipoOperacion[] = ["Depósito", "Retiro", "Conversión"];
 
+/** IVA por defecto sobre la comisión según el país del cliente (México 16 %, Argentina 21 %). */
+export const ivaPorDefecto = (pais?: string | null) => (pais === "MX" ? 16 : 21);
+
 /** Monto de operación de referencia para el desglose de ejemplo. */
 export const MONTO_OPERACION_REF = 100000;
 

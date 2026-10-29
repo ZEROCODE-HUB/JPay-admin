@@ -658,6 +658,8 @@ export type ClienteSelect = {
   correo: string;
   cuit?: string;
   tipoPersona?: TipoPersona;
+  /** País del cliente (AR, MX): define el IVA por defecto de sus comisiones. */
+  pais?: string | null;
 };
 
 // --- resolvers (tabla real: resolvers) -------------------------------------

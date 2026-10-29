@@ -6,7 +6,7 @@ import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { useClientesForSelect } from "@/hooks/useComercios";
 import { listSubcuentas } from "@/lib/api/subcuentas";
 import type { EstadoComision, ModalidadComision, TipoOperacion } from "@/lib/api/types";
-import { TIPOS_COMISION_USUARIOS, type ComisionDraft } from "../utils";
+import { ivaPorDefecto, TIPOS_COMISION_USUARIOS, type ComisionDraft } from "../utils";
 
 const SELECT_CLS =
   "w-full h-10 px-3 rounded-md border border-input bg-card text-sm outline-none focus:ring-2 focus:ring-ring/40 focus:border-ring";
@@ -78,6 +78,7 @@ export function ComisionFormFields({
                     cuit: (c.cuit as string) ?? draft.cuit,
                     tipoPersona:
                       (c.tipoPersona as ComisionDraft["tipoPersona"]) ?? draft.tipoPersona,
+                    porcentajeImpuesto: ivaPorDefecto(c.pais),
                   } as ComisionDraft);
                   setOpen(false);
                 }}

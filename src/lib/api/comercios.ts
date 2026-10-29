@@ -167,7 +167,7 @@ export async function listClientesForSelect(search?: string): Promise<ClienteSel
   const sb = requireSupabase();
   let query = sb
     .from("clientes")
-    .select("legajo, nombre, correo, cuit, tipo_persona")
+    .select("legajo, nombre, correo, cuit, tipo_persona, pais")
     .order("nombre", { ascending: true })
     .limit(20);
   if (search?.trim()) {
@@ -183,12 +183,14 @@ export async function listClientesForSelect(search?: string): Promise<ClienteSel
       correo: string;
       cuit: string;
       tipo_persona: string;
+      pais: string | null;
     }): ClienteSelect => ({
       legajo: r.legajo,
       nombre: r.nombre,
       correo: r.correo,
       cuit: r.cuit,
       tipoPersona: r.tipo_persona as ClienteSelect["tipoPersona"],
+      pais: r.pais,
     }),
   );
 }
