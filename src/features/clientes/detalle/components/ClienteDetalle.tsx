@@ -7,6 +7,7 @@ import { useClienteAcciones } from "../hooks/useClienteAcciones";
 import { TABS, type TabKey } from "../utils";
 import { ClienteAcciones } from "./ClienteAcciones";
 import { ClienteModales } from "./ClienteModales";
+import { CobreTab } from "./CobreTab";
 import { ContextoTab } from "./ContextoTab";
 import { DocumentosTab } from "./DocumentosTab";
 import { HistorialTab } from "./HistorialTab";
@@ -86,7 +87,7 @@ export function ClienteDetalle({
 
       {/* --- Tabs --- */}
       <div className="mt-6 flex flex-wrap gap-1 border-b border-border">
-        {TABS.map((t) => (
+        {TABS.filter((t) => t.key !== "cobre" || cliente.pais === "MX").map((t) => (
           <button
             key={t.key}
             type="button"
@@ -123,6 +124,7 @@ export function ClienteDetalle({
         {activeTab === "contexto" && <ContextoTab data={data} ui={ui} />}
         {activeTab === "riesgo" && <RiesgoTab cliente={cliente} data={data} ui={ui} />}
         {activeTab === "modulos" && <ModulosTab legajo={legajo} data={data} ui={ui} />}
+        {activeTab === "cobre" && cliente.pais === "MX" && <CobreTab legajo={cliente.legajo} />}
         {activeTab === "historial" && <HistorialTab data={data} />}
       </div>
 

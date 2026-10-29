@@ -3,20 +3,8 @@ import { toast } from "sonner";
 import { Badge, BtnOutline, BtnPrimary, Card } from "@/components/portal-shell";
 import { Toggle } from "@/features/alertas/parametros-alertas/components/Toggle";
 import { useCobreAdmin, useCobreAdminMutaciones } from "@/hooks/useCobre";
-import type { ModeloFondosCobre } from "@/lib/api/cobre";
 import { formatDateTime, formatMoney, parseMonto } from "@/shared/format";
 import { avisarError } from "../utils";
-
-const MODELOS: Record<ModeloFondosCobre, { label: string; detalle: string }> = {
-  centralizado: {
-    label: "Centralizado",
-    detalle: "Cada subcuenta tiene una CLABE virtual sobre la cuenta de JPay en Cobre.",
-  },
-  por_comercio: {
-    label: "Por comercio",
-    detalle: "Cada cliente tiene su propia cuenta en Cobre; sus CLABEs cuelgan de esa cuenta.",
-  },
-};
 
 const DEVOLUCION: Record<
   string,
@@ -30,56 +18,72 @@ const DEVOLUCION: Record<
   cancelada: { label: "Devolución cancelada", tone: "neutral" },
 };
 
+const input = "mt-1 block w-full h-9 rounded-md border border-input bg-card px-2 text-sm";
+
 /**
- * Cobre (México): modelo de fondos, monto de aprobación y OTP, cuenta de JPay, transferencias
- * pendientes de aprobación, depósitos sin asignar y, en modo simulado, depósitos de prueba.
+ * Cobre (México), según el Solution Design de JPAY: cada comercio tiene su Cobre Balance (se da
+ * de alta desde el detalle del cliente). Acá: Balances Global y USA de JPay (dólares), suscripción
+ * de avisos, montos de aprobación y OTP, aprobaciones, depósitos sin asignar y el simulador.
  */
 export function CobreCard({ simulado }: { simulado: boolean }) {
-  const { configuracion, aprobaciones, sinAsignar, modelos } = useCobreAdmin();
+  const { configuracion, balances, suscripcion, aprobaciones, lotes, sinAsignar } = useCobreAdmin();
   const m = useCobreAdminMutaciones();
   const c = configuracion.data;
-  const [modelo, setModelo] = useState<ModeloFondosCobre>("centralizado");
   const [monto, setMonto] = useState("");
+  const [montoUsd, setMontoUsd] = useState("");
   const [otp, setOtp] = useState(false);
   const [dep, setDep] = useState({ clabe: "", monto: "" });
-  const [cli, setCli] = useState<{ legajo: string; modelo: ModeloFondosCobre }>({
-    legajo: "",
-    modelo: "por_comercio",
-  });
+  const [r2p, setR2p] = useState("");
+  const [saldos, setSaldos] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (!c) return;
-    setModelo(c.modeloDefault);
     setMonto(c.montoAprobacion != null ? String(c.montoAprobacion) : "");
+    setMontoUsd(c.montoAprobacionUsd != null ? String(c.montoAprobacionUsd) : "");
     setOtp(c.exigirOtp);
   }, [c]);
 
   const guardar = () => {
-    const importe = monto.trim() ? parseMonto(monto) : null;
-    if (importe !== null && !(importe > 0)) return toast.error("Monto de aprobación inválido");
+    const mxn = monto.trim() ? parseMonto(monto) : null;
+    const usd = montoUsd.trim() ? parseMonto(montoUsd) : null;
+    if ((mxn !== null && !(mxn > 0)) || (usd !== null && !(usd > 0))) {
+      return toast.error("Monto de aprobación inválido");
+    }
     m.guardar.mutate(
-      { modeloDefault: modelo, montoAprobacion: importe, exigirOtp: otp },
+      { montoAprobacion: mxn, montoAprobacionUsd: usd, exigirOtp: otp },
       { onSuccess: () => toast.success("Configuración de Cobre guardada"), onError: avisarError },
     );
   };
 
-  const decidir = (id: string, aprobar: boolean) =>
+  const decidir = (id: string, aprobar: boolean, lote = false) =>
     m.decidir.mutate(
       {
         id,
         aprobar,
+        lote,
         nota: aprobar ? "Aprobada desde el backoffice" : "Rechazada desde el backoffice",
       },
       {
         onSuccess: () =>
-          toast.success(aprobar ? "Transferencia aprobada" : "Transferencia rechazada"),
+          toast.success(aprobar ? "Aprobado: sale a Cobre" : "Rechazado: se liberó el saldo"),
         onError: avisarError,
       },
     );
 
+  const verSaldo = (id: string) =>
+    m.consultarBalance.mutate(id, {
+      onSuccess: (r) =>
+        setSaldos((s) => ({ ...s, [id]: formatMoney(r.saldo, { moneda: r.moneda ?? "USD" }) })),
+      onError: avisarError,
+    });
+
   return (
     <Card>
-      <h3 className="font-semibold">Cobre: cuentas y transferencias SPEI</h3>
+      <h3 className="font-semibold">Cobre: cuentas, SPEI y dólares</h3>
+      <p className="text-xs text-muted-foreground mt-1">
+        Cada comercio tiene su propia cuenta en Cobre: se da de alta desde el detalle del cliente
+        (pestaña Cobre).
+      </p>
       {configuracion.isLoading ? (
         <p className="mt-2 text-sm text-muted-foreground">Cargando…</p>
       ) : configuracion.error ? (
@@ -87,59 +91,117 @@ export function CobreCard({ simulado }: { simulado: boolean }) {
       ) : (
         <div className="mt-3 space-y-5 text-sm">
           <section>
-            <p className="text-xs font-medium">Cuenta de JPay en Cobre (modelo centralizado)</p>
-            {c?.cuentaPlataforma ? (
-              <p className="mt-1">
-                CLABE <span className="font-mono">{c.cuentaPlataforma.clabe ?? "—"}</span>{" "}
-                <Badge tone="neutral">{c.cuentaPlataforma.modo}</Badge>
-              </p>
-            ) : (
-              <div className="mt-1 flex items-center gap-3">
-                <span className="text-muted-foreground">Todavía no se creó.</span>
+            <p className="text-xs font-medium">Balances de JPay en dólares (Global y USA)</p>
+            {(balances.data ?? []).length < 2 ? (
+              <div className="mt-1 flex flex-wrap items-center gap-3">
+                <span className="text-muted-foreground">
+                  Hacen falta para convertir a dólares y pagar por Fedwire o SWIFT.
+                </span>
                 <BtnOutline
-                  disabled={m.crearCuenta.isPending}
+                  disabled={m.crearBalances.isPending}
                   onClick={() =>
-                    m.crearCuenta.mutate(undefined, {
-                      onSuccess: () => toast.success("Cuenta de JPay creada en Cobre"),
+                    m.crearBalances.mutate(undefined, {
+                      onSuccess: () => toast.success("Balances creados en Cobre"),
                       onError: avisarError,
                     })
                   }
                 >
-                  {m.crearCuenta.isPending ? "Creando…" : "Crear cuenta"}
+                  {m.crearBalances.isPending ? "Creando…" : "Crear balances"}
                 </BtnOutline>
               </div>
+            ) : (
+              <ul className="mt-1 divide-y divide-border">
+                {balances.data!.map((b) => (
+                  <li
+                    key={b.id}
+                    className="py-1.5 flex flex-wrap items-center justify-between gap-3"
+                  >
+                    <span>
+                      {b.tipo === "global"
+                        ? "Global USD (recibe las conversiones)"
+                        : "USA (paga Fedwire y SWIFT)"}{" "}
+                      <span className="font-mono text-xs text-muted-foreground">
+                        {b.cuentaExterna}
+                      </span>
+                    </span>
+                    <span className="flex items-center gap-3">
+                      {b.conectividad && b.conectividad !== "connected" && (
+                        <Badge tone="warn">{b.conectividad}</Badge>
+                      )}
+                      {saldos[b.id] ? (
+                        <span className="tabular-nums">{saldos[b.id]}</span>
+                      ) : (
+                        <button
+                          type="button"
+                          className="text-xs text-secondary hover:underline"
+                          onClick={() => verSaldo(b.id)}
+                        >
+                          Ver saldo
+                        </button>
+                      )}
+                    </span>
+                  </li>
+                ))}
+              </ul>
             )}
+          </section>
+
+          <section>
+            <p className="text-xs font-medium">Avisos de Cobre (webhooks)</p>
+            <div className="mt-1 flex flex-wrap items-center justify-between gap-3">
+              <span className="text-muted-foreground">
+                {suscripcion.data
+                  ? `Suscripción ${suscripcion.data.id} · ${suscripcion.data.eventos} eventos · ${formatDateTime(suscripcion.data.creadaAt)}`
+                  : "Sin suscripción registrada por API."}
+              </span>
+              <BtnOutline
+                disabled={m.suscribir.isPending}
+                onClick={() =>
+                  m.suscribir.mutate(undefined, {
+                    onSuccess: (r) =>
+                      toast.success(
+                        r.faltan.length
+                          ? `Suscripción ${r.suscripcion}: faltan ${r.faltan.length} eventos`
+                          : `Suscripción ${r.suscripcion} con todos los eventos`,
+                      ),
+                    onError: avisarError,
+                  })
+                }
+              >
+                {m.suscribir.isPending
+                  ? "Registrando…"
+                  : suscripcion.data
+                    ? "Revisar suscripción"
+                    : "Suscribir"}
+              </BtnOutline>
+            </div>
           </section>
 
           <section className="grid gap-3 md:grid-cols-3">
             <label className="text-xs">
-              Modelo de fondos por defecto
-              <select
-                className="mt-1 block w-full h-9 rounded-md border border-input bg-card px-2 text-sm"
-                value={modelo}
-                onChange={(e) => setModelo(e.target.value as ModeloFondosCobre)}
-              >
-                {Object.entries(MODELOS).map(([k, v]) => (
-                  <option key={k} value={k}>
-                    {v.label}
-                  </option>
-                ))}
-              </select>
-              <span className="mt-1 block text-[11px] text-muted-foreground">
-                {MODELOS[modelo].detalle}
-              </span>
-            </label>
-            <label className="text-xs">
-              Aprobación desde (monto)
+              Aprobación desde (pesos)
               <input
-                className="mt-1 block w-full h-9 rounded-md border border-input bg-card px-2 text-sm"
+                className={input}
                 inputMode="decimal"
                 placeholder="Sin aprobación"
                 value={monto}
                 onChange={(e) => setMonto(e.target.value)}
               />
               <span className="mt-1 block text-[11px] text-muted-foreground">
-                Desde este monto la transferencia espera la aprobación de un admin.
+                Transferencias SPEI y lotes (por el total) desde este monto esperan a un admin.
+              </span>
+            </label>
+            <label className="text-xs">
+              Aprobación desde (dólares)
+              <input
+                className={input}
+                inputMode="decimal"
+                placeholder="Sin aprobación"
+                value={montoUsd}
+                onChange={(e) => setMontoUsd(e.target.value)}
+              />
+              <span className="mt-1 block text-[11px] text-muted-foreground">
+                Envíos Fedwire y SWIFT desde este monto esperan a un admin.
               </span>
             </label>
             <div className="text-xs">
@@ -157,16 +219,17 @@ export function CobreCard({ simulado }: { simulado: boolean }) {
           </section>
 
           <section>
-            <p className="text-xs font-medium">Transferencias esperando aprobación</p>
-            {(aprobaciones.data ?? []).length === 0 ? (
-              <p className="mt-1 text-muted-foreground">No hay transferencias pendientes.</p>
+            <p className="text-xs font-medium">Esperando aprobación</p>
+            {(aprobaciones.data ?? []).length === 0 && (lotes.data ?? []).length === 0 ? (
+              <p className="mt-1 text-muted-foreground">No hay envíos pendientes.</p>
             ) : (
               <ul className="mt-1 divide-y divide-border">
-                {aprobaciones.data!.map((t) => (
+                {(aprobaciones.data ?? []).map((t) => (
                   <li key={t.id} className="py-2 flex flex-wrap items-center justify-between gap-3">
                     <div>
                       <div className="font-medium tabular-nums">
-                        {formatMoney(t.monto)} · {t.legajo}
+                        {formatMoney(t.monto, { moneda: t.moneda })} · {t.legajo}{" "}
+                        <Badge tone="neutral">{t.tipo.toUpperCase()}</Badge>
                       </div>
                       <div className="text-xs text-muted-foreground">
                         A {t.destinatario ?? "—"} · {t.concepto ?? ""} ·{" "}
@@ -183,6 +246,32 @@ export function CobreCard({ simulado }: { simulado: boolean }) {
                       <BtnPrimary
                         disabled={m.decidir.isPending}
                         onClick={() => decidir(t.id, true)}
+                      >
+                        Aprobar
+                      </BtnPrimary>
+                    </div>
+                  </li>
+                ))}
+                {(lotes.data ?? []).map((l) => (
+                  <li key={l.id} className="py-2 flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                      <div className="font-medium tabular-nums">
+                        Lote de {l.cantidad} pagos · {formatMoney(l.total)} · {l.legajo}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {formatDateTime(l.creadoAt)}
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <BtnOutline
+                        disabled={m.decidir.isPending}
+                        onClick={() => decidir(l.id, false, true)}
+                      >
+                        Rechazar
+                      </BtnOutline>
+                      <BtnPrimary
+                        disabled={m.decidir.isPending}
+                        onClick={() => decidir(l.id, true, true)}
                       >
                         Aprobar
                       </BtnPrimary>
@@ -236,113 +325,70 @@ export function CobreCard({ simulado }: { simulado: boolean }) {
               </ul>
             )}
             <p className="mt-1 text-[11px] text-muted-foreground">
-              Llegaron a una CLABE que no es de ninguna subcuenta: no se acreditaron a nadie. Se
-              pueden devolver al remitente (el monto completo, una sola vez).
-            </p>
-          </section>
-
-          <section>
-            <p className="text-xs font-medium">Modelo de fondos por cliente</p>
-            {(modelos.data ?? []).length === 0 ? (
-              <p className="mt-1 text-muted-foreground">
-                Todos los clientes usan el modelo por defecto.
-              </p>
-            ) : (
-              <ul className="mt-1 divide-y divide-border">
-                {modelos.data!.map((x) => (
-                  <li key={x.legajo} className="py-1.5 flex items-center justify-between gap-3">
-                    <span>
-                      {x.nombre ?? x.legajo}{" "}
-                      <span className="text-xs text-muted-foreground">{x.legajo}</span>
-                    </span>
-                    <span className="flex items-center gap-3">
-                      <Badge tone="neutral">{MODELOS[x.modelo].label}</Badge>
-                      <button
-                        type="button"
-                        className="text-xs text-muted-foreground hover:underline"
-                        onClick={() =>
-                          m.guardarModelo.mutate(
-                            { legajo: x.legajo, modelo: null },
-                            { onError: avisarError },
-                          )
-                        }
-                      >
-                        Quitar
-                      </button>
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            )}
-            <div className="mt-2 flex flex-wrap items-end gap-2">
-              <input
-                className="h-9 w-48 rounded-md border border-input bg-card px-2 text-sm"
-                placeholder="Legajo del cliente"
-                value={cli.legajo}
-                onChange={(e) => setCli({ ...cli, legajo: e.target.value.trim().toUpperCase() })}
-              />
-              <select
-                className="h-9 rounded-md border border-input bg-card px-2 text-sm"
-                value={cli.modelo}
-                onChange={(e) => setCli({ ...cli, modelo: e.target.value as ModeloFondosCobre })}
-              >
-                {Object.entries(MODELOS).map(([k, v]) => (
-                  <option key={k} value={k}>
-                    {v.label}
-                  </option>
-                ))}
-              </select>
-              <BtnOutline
-                disabled={!cli.legajo || m.guardarModelo.isPending}
-                onClick={() =>
-                  m.guardarModelo.mutate(cli, {
-                    onSuccess: () => {
-                      toast.success("Modelo del cliente guardado");
-                      setCli({ ...cli, legajo: "" });
-                    },
-                    onError: avisarError,
-                  })
-                }
-              >
-                Asignar
-              </BtnOutline>
-            </div>
-            <p className="mt-1 text-[11px] text-muted-foreground">
-              Aplica a las CLABEs nuevas del cliente; las que ya tiene siguen en su cuenta actual.
+              Llegaron a un Balance o CLABE que no es de ningún comercio: no se acreditaron a nadie.
+              Se pueden devolver al remitente (el monto completo, una sola vez).
             </p>
           </section>
 
           {simulado && (
-            <section className="rounded-md border border-dashed border-border p-3">
-              <p className="text-xs font-medium">Simulador: depósito SPEI de prueba</p>
-              <div className="mt-2 flex flex-wrap items-end gap-2">
-                <input
-                  className="h-9 w-56 rounded-md border border-input bg-card px-2 text-sm font-mono"
-                  placeholder="CLABE de la subcuenta"
-                  value={dep.clabe}
-                  onChange={(e) => setDep({ ...dep, clabe: e.target.value.replace(/\D/g, "") })}
-                />
-                <input
-                  className="h-9 w-32 rounded-md border border-input bg-card px-2 text-sm"
-                  placeholder="Monto"
-                  inputMode="decimal"
-                  value={dep.monto}
-                  onChange={(e) => setDep({ ...dep, monto: e.target.value })}
-                />
-                <BtnOutline
-                  disabled={m.simularDeposito.isPending}
-                  onClick={() =>
-                    m.simularDeposito.mutate(
-                      { clabe: dep.clabe, monto: parseMonto(dep.monto) },
-                      {
-                        onSuccess: () => toast.success("Depósito simulado enviado"),
+            <section className="rounded-md border border-dashed border-border p-3 space-y-3">
+              <div>
+                <p className="text-xs font-medium">
+                  Simulador: depósito SPEI a la CLABE de un comercio
+                </p>
+                <div className="mt-2 flex flex-wrap items-end gap-2">
+                  <input
+                    className="h-9 w-56 rounded-md border border-input bg-card px-2 text-sm font-mono"
+                    placeholder="CLABE del comercio"
+                    value={dep.clabe}
+                    onChange={(e) => setDep({ ...dep, clabe: e.target.value.replace(/\D/g, "") })}
+                  />
+                  <input
+                    className="h-9 w-32 rounded-md border border-input bg-card px-2 text-sm"
+                    placeholder="Monto"
+                    inputMode="decimal"
+                    value={dep.monto}
+                    onChange={(e) => setDep({ ...dep, monto: e.target.value })}
+                  />
+                  <BtnOutline
+                    disabled={m.simularDeposito.isPending}
+                    onClick={() =>
+                      m.simularDeposito.mutate(
+                        { clabe: dep.clabe, monto: parseMonto(dep.monto) },
+                        {
+                          onSuccess: () => toast.success("Depósito simulado enviado"),
+                          onError: avisarError,
+                        },
+                      )
+                    }
+                  >
+                    {m.simularDeposito.isPending ? "Enviando…" : "Simular depósito"}
+                  </BtnOutline>
+                </div>
+              </div>
+              <div>
+                <p className="text-xs font-medium">
+                  Simulador: pagar un cobro por SPEI (CLABE dinámica)
+                </p>
+                <div className="mt-2 flex flex-wrap items-end gap-2">
+                  <input
+                    className="h-9 w-56 rounded-md border border-input bg-card px-2 text-sm font-mono"
+                    placeholder="CLABE del cobro"
+                    value={r2p}
+                    onChange={(e) => setR2p(e.target.value.replace(/\D/g, ""))}
+                  />
+                  <BtnOutline
+                    disabled={m.simularPagoR2p.isPending}
+                    onClick={() =>
+                      m.simularPagoR2p.mutate(r2p, {
+                        onSuccess: () => toast.success("Pago simulado enviado"),
                         onError: avisarError,
-                      },
-                    )
-                  }
-                >
-                  {m.simularDeposito.isPending ? "Enviando…" : "Simular depósito"}
-                </BtnOutline>
+                      })
+                    }
+                  >
+                    {m.simularPagoR2p.isPending ? "Pagando…" : "Simular pago"}
+                  </BtnOutline>
+                </div>
               </div>
             </section>
           )}

@@ -39,6 +39,7 @@ export type TabKey =
   | "riesgo"
   | "contexto"
   | "modulos"
+  | "cobre"
   | "historial";
 
 export const TABS: { key: TabKey; label: string }[] = [
@@ -51,6 +52,7 @@ export const TABS: { key: TabKey; label: string }[] = [
   { key: "riesgo", label: "Riesgo y monitoreo" },
   { key: "contexto", label: "Contexto operativo" },
   { key: "modulos", label: "Módulos y productos" },
+  { key: "cobre", label: "Cobre (México)" },
   { key: "historial", label: "Historial" },
 ];
 
