@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   borrarPersonaKyb,
   consultarAltaCobre,
+  marcarRevocadoRevisado,
   consultarBalanceCobre,
   crearBalancesMatriz,
   decidirTransferenciaCobre,
@@ -92,6 +93,10 @@ export function useCobreCliente(legajo: string) {
     }),
     enviar: useMutation({ mutationFn: () => enviarAltaCobre(legajo), onSettled: refrescar }),
     consultar: useMutation({ mutationFn: () => consultarAltaCobre(legajo), onSettled: refrescar }),
+    revocadoRevisado: useMutation({
+      mutationFn: () => marcarRevocadoRevisado(legajo),
+      onSettled: refrescar,
+    }),
     guardarEmpresa: (e: EmpresaKyb) => guardarEmpresaKyb(legajo, e).then(refrescar),
     guardarPersona: (p: PersonaKyb) => guardarPersonaKyb(legajo, p).then(refrescar),
     borrarPersona: (id: string) => borrarPersonaKyb(id).then(refrescar),

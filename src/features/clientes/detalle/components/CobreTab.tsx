@@ -69,6 +69,30 @@ export function CobreTab({ legajo }: { legajo: string }) {
                   <Badge tone="neutral">{a.modo}</Badge>
                 </div>
                 {a.alta?.motivo && <p className="text-danger-600">{a.alta.motivo}</p>}
+                {a.alta?.revocado_at && (
+                  <div className="rounded-md border border-danger-200 p-3">
+                    <p className="text-danger-600">
+                      Cobre rechazó el alta el {formatDateTime(a.alta.revocado_at)}, después de
+                      aprobarla (revisión de cumplimiento)
+                      {a.alta.revocado_motivo ? `: ${a.alta.revocado_motivo}` : ""}. Sus cuentas
+                      siguen operando; consultá con el KAM qué hacer.
+                    </p>
+                    {!a.alta.revocado_revisado && (
+                      <BtnOutline
+                        className="mt-2"
+                        disabled={c.revocadoRevisado.isPending}
+                        onClick={() =>
+                          c.revocadoRevisado.mutate(undefined, {
+                            onSuccess: () => toast.success("Marcado como revisado"),
+                            onError: avisar,
+                          })
+                        }
+                      >
+                        Marcar como revisado
+                      </BtnOutline>
+                    )}
+                  </div>
+                )}
                 <div className="flex flex-wrap gap-2">
                   {!bloqueado && (
                     <BtnPrimary

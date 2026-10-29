@@ -267,6 +267,10 @@ export type AltaCobre = {
     subcliente_externo_id: string | null;
     created_at: string;
     updated_at: string;
+    /** Cobre lo rechazó después de aprobarlo (revisión de cumplimiento); el Balance sigue. */
+    revocado_at: string | null;
+    revocado_motivo: string | null;
+    revocado_revisado: boolean;
   } | null;
   cuenta: {
     id: string;
@@ -280,6 +284,9 @@ export const getAltaCobre = (legajo: string) =>
   invocar<AltaCobre>("cobre-subclientes", { accion: "estado", legajo });
 export const enviarAltaCobre = (legajo: string) =>
   invocar<AltaCobre & { resultado: string }>("cobre-subclientes", { accion: "enviar", legajo });
+export const marcarRevocadoRevisado = (legajo: string) =>
+  invocar<{ ok: boolean }>("cobre-subclientes", { accion: "revocado_revisado", legajo });
+
 export const consultarAltaCobre = (legajo: string) =>
   invocar<AltaCobre & { resultado: string }>("cobre-subclientes", { accion: "consultar", legajo });
 
