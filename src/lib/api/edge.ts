@@ -1,6 +1,16 @@
 import { supabase } from "@/lib/supabase";
 import { DataAccessError } from "./errors";
 
+/**
+ * Error de una Edge Function con el mensaje que manda el servidor en el cuerpo (`{ error }`);
+ * sin cuerpo, el error original ("non-2xx status code").
+ */
+export async function errorDeFuncion(error: unknown): Promise<DataAccessError> {
+  const ctx = (error as { context?: Response }).context;
+  const cuerpo = ctx ? await ctx.json().catch(() => null) : null;
+  return new DataAccessError(cuerpo?.error ? new Error(String(cuerpo.error)) : (error as Error));
+}
+
 export type CrearAdminInput = {
   email: string;
   password: string;
@@ -27,7 +37,7 @@ export async function cambiarEstadoMovimiento(
   const { data, error } = await supabase.functions.invoke("cambiar-estado-movimiento", {
     body: { movimiento_id: movimientoId, nuevo_estado_id: nuevoEstadoId, observaciones },
   });
-  if (error) throw new DataAccessError(error);
+  if (error) throw await errorDeFuncion(error);
   return data;
 }
 
@@ -35,6 +45,6 @@ export async function cambiarEstadoMovimiento(
 export async function crearAdminUser(input: CrearAdminInput) {
   if (!supabase) throw new DataAccessError(new Error("Supabase no está configurado"));
   const { data, error } = await supabase.functions.invoke("crear-admin", { body: input });
-  if (error) throw new DataAccessError(error);
+  if (error) throw await errorDeFuncion(error);
   return data;
 }

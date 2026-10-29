@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { listAlertRules, reglasDePais, saveAlertRules } from "@/lib/api/alert-rules";
+import { PAIS_INSTALACION } from "@/shared/pais";
 import { CODES } from "../config";
 import { construir, toDraft, type Draft } from "../utils";
 
@@ -10,7 +11,10 @@ import { construir, toDraft, type Draft } from "../utils";
  * (Argentina); "MX" = los de México (montos en pesos mexicanos, UMAs, hora del centro).
  */
 export function useParametrosAlertas() {
-  const [pais, setPais] = useState<string | null>(null);
+  // Arranca en el país de la instalación (México en JPay); null = valores generales (Argentina).
+  const [pais, setPais] = useState<string | null>(
+    PAIS_INSTALACION === "AR" ? null : PAIS_INSTALACION,
+  );
   const queryClient = useQueryClient();
   const {
     data: rules,
@@ -55,9 +59,14 @@ export function useParametrosAlertas() {
       toast.error("Revisá los campos marcados antes de guardar");
       return;
     }
+    // Para un país se guardan solo las reglas que cambiaron: las demás siguen tomando los valores
+    // generales (si se mandaran todas, quedarían copiadas y dejarían de seguirlos).
+    const cambiadas = pais
+      ? aGuardar.filter((r) => JSON.stringify(draft[r.code]) !== JSON.stringify(original?.[r.code]))
+      : aGuardar;
     setGuardando(true);
     try {
-      await saveAlertRules(aGuardar, pais);
+      await saveAlertRules(cambiadas, pais);
       await queryClient.invalidateQueries({ queryKey: ["alert_rules"] });
       toast.success("Configuración de alertas guardada");
     } catch (e) {

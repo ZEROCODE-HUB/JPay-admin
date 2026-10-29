@@ -10,7 +10,7 @@ import { MODULOS, avisarError } from "../utils";
 
 /** Países: datos de formato, activación y módulos de cada uno. */
 export function PaisesCard({ paises }: { paises: Pais[] }) {
-  const { actualizarPais, predeterminar } = usePaisesMutaciones();
+  const { actualizarPais, cambiarModulo, predeterminar } = usePaisesMutaciones();
   const [aPredeterminar, setAPredeterminar] = useState<Pais | null>(null);
   const instalacionBase = paises.find((p) => p.predeterminado)?.codigo;
 
@@ -72,7 +72,10 @@ export function PaisesCard({ paises }: { paises: Pais[] }) {
                     label={`${nombre} en ${p.nombre}`}
                     enabled={!!p.modulos[clave]}
                     onClick={() =>
-                      cambiar(p, { modulos: { ...p.modulos, [clave]: !p.modulos[clave] } })
+                      cambiarModulo.mutate(
+                        { codigo: p.codigo, modulo: clave, activo: !p.modulos[clave] },
+                        { onError: avisarError },
+                      )
                     }
                   />
                   {nombre}

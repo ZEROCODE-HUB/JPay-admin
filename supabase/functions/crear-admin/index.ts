@@ -4,11 +4,12 @@
 // 3) Inserta la fila en admin_users con ese mismo id y rol_id.
 // Operación coordinada: si falla el insert en admin_users se elimina el usuario
 // de Auth para no dejar huérfanos.
-// Permisos: quien llama necesita `usuarios_backoffice: crear`, y solo un admin total
-// puede crear otro usuario con rol admin (si no, sería una escalada de privilegios).
+// Permisos: quien llama necesita `usuarios_backoffice: crear`; solo un admin total puede crear
+// otro usuario con rol admin, y los demás solo asignan roles con permisos que ya tienen
+// (`rol_asignable`), para que no haya escalada de privilegios.
 
 import { createClient } from "jsr:@supabase/supabase-js@2";
-import { esAdmin, exigirPermiso, handler, json } from "../_shared/http.ts";
+import { esAdmin, exigirPermiso, handler, json, userClient } from "../_shared/http.ts";
 
 Deno.serve(
   handler(async (req) => {
@@ -69,6 +70,13 @@ Deno.serve(
     }
     if (rol.nombre.toLowerCase() === "admin" && !(await esAdmin(req))) {
       return json({ error: "Solo un administrador puede crear usuarios con rol admin" }, 403);
+    }
+    // Sin escalada: quien no es admin solo asigna roles cuyos permisos ya tiene (RPC con su sesión).
+    const { data: asignable, error: errAsignable } = await userClient(req).rpc("rol_asignable", {
+      p_rol_id: rolId,
+    });
+    if (errAsignable || asignable !== true) {
+      return json({ error: "No podés asignar un rol con más permisos que el tuyo" }, 403);
     }
 
     // 2) Crear usuario en Auth.

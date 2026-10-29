@@ -23,6 +23,7 @@ import {
   probarConexionProveedor,
   setPaisPredeterminado,
   updateConfiguracionPagos,
+  setModuloPais,
   updatePais,
   updateProveedorPago,
   type ConfiguracionPagos,
@@ -103,6 +104,11 @@ export function usePaisesMutaciones() {
     actualizarPais: useMutation({
       mutationFn: (v: { codigo: string; cambios: Partial<Pick<Pais, "activo" | "modulos">> }) =>
         updatePais(v.codigo, v.cambios),
+      onSuccess,
+    }),
+    cambiarModulo: useMutation({
+      mutationFn: (v: { codigo: string; modulo: string; activo: boolean }) =>
+        setModuloPais(v.codigo, v.modulo, v.activo),
       onSuccess,
     }),
     predeterminar: useMutation({ mutationFn: setPaisPredeterminado, onSuccess }),

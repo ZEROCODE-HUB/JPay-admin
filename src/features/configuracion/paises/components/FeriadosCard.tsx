@@ -3,11 +3,13 @@ import { useFeriados } from "@/hooks/usePaises";
 import type { Pais } from "@/lib/api/paises";
 import { formatDate } from "@/shared/format";
 
-const hoyIso = () => new Date().toISOString().slice(0, 10);
+/** Fecha de hoy en la zona horaria del país (no en UTC: a la noche ya sería mañana). */
+const hoyIso = (timezone: string) =>
+  new Intl.DateTimeFormat("en-CA", { timeZone: timezone }).format(new Date());
 
 /** Próximos días no hábiles del país (los usa el cálculo de días hábiles). */
 export function FeriadosCard({ pais }: { pais: Pais }) {
-  const { data = [], isLoading, error } = useFeriados(pais.codigo, hoyIso());
+  const { data = [], isLoading, error } = useFeriados(pais.codigo, hoyIso(pais.timezone));
   return (
     <Card>
       <h3 className="font-semibold">Próximos días inhábiles · {pais.nombre}</h3>

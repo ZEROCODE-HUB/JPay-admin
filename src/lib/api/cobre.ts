@@ -2,6 +2,7 @@ import { requireSupabase } from "@/lib/supabase";
 import type { PersonaKyb } from "@/shared/cobre-kyb";
 import type { EmpresaKyb } from "@/shared/ui/kyb-cobre";
 import { DataAccessError } from "./errors";
+import { errorDeFuncion } from "./edge";
 
 /**
  * Cobre (México) desde el backoffice, según el Solution Design de JPAY: configuración, Balances
@@ -64,9 +65,7 @@ async function invocar<T>(fn: string, body: Record<string, unknown>): Promise<T>
   const sb = requireSupabase();
   const { data, error } = await sb.functions.invoke<T>(fn, { body });
   if (error) {
-    const ctx = (error as { context?: Response }).context;
-    const cuerpo = ctx ? await ctx.json().catch(() => null) : null;
-    throw new DataAccessError(cuerpo?.error ? new Error(cuerpo.error) : error);
+    throw await errorDeFuncion(error);
   }
   return data as T;
 }

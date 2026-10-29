@@ -43,11 +43,17 @@ export function ProveedoresCard({ proveedores }: { proveedores: ProveedorPago[] 
                   </Badge>
                 </td>
                 <td className="py-2.5 pr-4">
-                  <Toggle
-                    label={`Entorno de pruebas de ${p.nombre}`}
-                    enabled={p.sandbox}
-                    onClick={() => cambiar(p.codigo, { sandbox: !p.sandbox })}
-                  />
+                  {p.codigo === "cobre" ? (
+                    // El modo de Cobre lo fija el secreto COBRE_MODO; la prueba de conexión lo
+                    // refleja acá (un interruptor no tendría efecto).
+                    <span className="text-xs text-muted-foreground">Por COBRE_MODO</span>
+                  ) : (
+                    <Toggle
+                      label={`Entorno de pruebas de ${p.nombre}`}
+                      enabled={p.sandbox}
+                      onClick={() => cambiar(p.codigo, { sandbox: !p.sandbox })}
+                    />
+                  )}
                 </td>
                 <td className="py-2.5">
                   <Toggle

@@ -3,6 +3,7 @@ import type { Json } from "@/lib/database.types";
 import type { Tables, TablesUpdate } from "@/lib/database.types";
 import { toReporteCobros, type ReporteCobros } from "@/shared/reporte-cobros";
 import { DataAccessError } from "./errors";
+import { errorDeFuncion } from "./edge";
 
 /**
  * Configuración por país y por proveedor de pagos (migración 1015): países, feriados,
@@ -158,23 +159,29 @@ export async function updatePais(
   if (error) throw new DataAccessError(error);
 }
 
+/** Prende o apaga un módulo de un país sobre el valor guardado (dos clics seguidos no se pisan). */
+export async function setModuloPais(
+  codigo: string,
+  modulo: string,
+  activo: boolean,
+): Promise<void> {
+  const sb = requireSupabase();
+  const { error } = await sb.rpc("pais_cambiar_modulo", {
+    p_codigo: codigo,
+    p_modulo: modulo,
+    p_activo: activo,
+  });
+  if (error) throw new DataAccessError(error);
+}
+
 /**
- * Marca el país de la instalación. Hay un índice único sobre `predeterminado`, así que primero
- * se desmarca el actual. Para la interfaz el país lo fija `country` en brand.json.
+ * Marca el país de la instalación (desmarca el actual en la misma transacción). Para la interfaz
+ * el país lo fija `country` en brand.json.
  */
 export async function setPaisPredeterminado(codigo: string): Promise<void> {
   const sb = requireSupabase();
-  const { error: e1 } = await sb
-    .from("paises")
-    .update({ predeterminado: false })
-    .eq("predeterminado", true)
-    .neq("codigo", codigo);
-  if (e1) throw new DataAccessError(e1);
-  const { error: e2 } = await sb
-    .from("paises")
-    .update({ predeterminado: true, activo: true })
-    .eq("codigo", codigo);
-  if (e2) throw new DataAccessError(e2);
+  const { error } = await sb.rpc("pais_predeterminar", { p_codigo: codigo });
+  if (error) throw new DataAccessError(error);
 }
 
 export async function listProveedoresPago(): Promise<ProveedorPago[]> {
@@ -206,10 +213,7 @@ export async function probarConexionProveedor(codigo: string): Promise<{ ok: boo
   const sb = requireSupabase();
   const { data, error } = await sb.functions.invoke<{ ok: boolean }>(funcion, { body: {} });
   if (error) {
-    // En errores HTTP el mensaje útil viene en el cuerpo ({ error }) de la respuesta.
-    const ctx = (error as { context?: Response }).context;
-    const cuerpo = ctx ? await ctx.json().catch(() => null) : null;
-    throw new DataAccessError(cuerpo?.error ? new Error(cuerpo.error) : error);
+    throw await errorDeFuncion(error);
   }
   return { ok: data?.ok === true };
 }
@@ -289,9 +293,7 @@ export async function desconectarComercioEcartPay(comercioId: string): Promise<v
     body: { comercio_id: comercioId },
   });
   if (error) {
-    const ctx = (error as { context?: Response }).context;
-    const cuerpo = ctx ? await ctx.json().catch(() => null) : null;
-    throw new DataAccessError(cuerpo?.error ? new Error(cuerpo.error) : error);
+    throw await errorDeFuncion(error);
   }
 }
 
@@ -364,9 +366,7 @@ export async function reprocesarEventoWebhook(eventoId: string): Promise<void> {
     body: { evento_id: eventoId },
   });
   if (error) {
-    const ctx = (error as { context?: Response }).context;
-    const cuerpo = ctx ? await ctx.json().catch(() => null) : null;
-    throw new DataAccessError(cuerpo?.error ? new Error(cuerpo.error) : error);
+    throw await errorDeFuncion(error);
   }
 }
 
@@ -479,7 +479,7 @@ export async function listDiferenciasAbiertas(
 export async function resolverDiferencia(id: string, nota: string): Promise<void> {
   const sb = requireSupabase();
   const { data: auth } = await sb.auth.getUser();
-  const { error } = await sb
+  const { data, error } = await sb
     .from("conciliacion_proveedor_diferencias")
     .update({
       resuelta: true,
@@ -487,8 +487,15 @@ export async function resolverDiferencia(id: string, nota: string): Promise<void
       resuelta_por: auth.user?.id ?? null,
       nota: nota.trim() || null,
     })
-    .eq("id", id);
+    .eq("id", id)
+    .select("id");
   if (error) throw new DataAccessError(error);
+  // Sin permiso, RLS no da error: simplemente no actualiza ninguna fila.
+  if (!data?.length) {
+    throw new DataAccessError(
+      new Error("No se pudo marcar la diferencia (sin permiso o ya no existe)"),
+    );
+  }
 }
 
 /** Corre la conciliación ahora (Edge Function `<proveedor>-conciliacion`, solo admins). */
@@ -499,9 +506,7 @@ export async function conciliarAhora(proveedor: string): Promise<Record<string, 
     { body: { manual: true } },
   );
   if (error) {
-    const ctx = (error as { context?: Response }).context;
-    const cuerpo = ctx ? await ctx.json().catch(() => null) : null;
-    throw new DataAccessError(cuerpo?.error ? new Error(cuerpo.error) : error);
+    throw await errorDeFuncion(error);
   }
   return data ?? {};
 }
@@ -590,9 +595,7 @@ async function invocarMsi(body: Record<string, unknown>): Promise<ConfigMsi> {
   const sb = requireSupabase();
   const { data, error } = await sb.functions.invoke<ConfigMsi>("ecartpay-msi", { body });
   if (error) {
-    const ctx = (error as { context?: Response }).context;
-    const cuerpo = ctx ? await ctx.json().catch(() => null) : null;
-    throw new DataAccessError(cuerpo?.error ? new Error(cuerpo.error) : error);
+    throw await errorDeFuncion(error);
   }
   if (!data) throw new DataAccessError(new Error("Respuesta vacía de Ecart Pay"));
   return data;
