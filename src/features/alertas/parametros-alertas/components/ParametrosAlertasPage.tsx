@@ -23,6 +23,27 @@ export function ParametrosAlertasPage() {
         </div>
       </div>
 
+      <div className="mb-4 flex flex-wrap items-center gap-3">
+        <label htmlFor="alertas-pais" className="text-sm font-medium">
+          País
+        </label>
+        <select
+          id="alertas-pais"
+          className="h-9 rounded-md border border-input bg-card px-2 text-sm"
+          value={s.pais ?? ""}
+          disabled={!s.sinCambios}
+          onChange={(e) => s.setPais(e.target.value || null)}
+        >
+          <option value="">Argentina (valores generales)</option>
+          <option value="MX">México</option>
+        </select>
+        <span className="text-xs text-muted-foreground">
+          {s.pais === "MX"
+            ? "Montos en pesos mexicanos; las reglas en salarios mínimos se cuentan en UMAs mensuales y el horario es el del centro de México."
+            : "Montos en pesos argentinos, salario mínimo (SMVM) y hora de Argentina. Rigen para todo país sin valores propios."}
+        </span>
+      </div>
+
       {s.isLoading ? (
         <div className="flex items-center justify-center rounded-lg border bg-card py-16 text-sm text-muted-foreground">
           <Loader2 size={16} className="animate-spin mr-2" /> Cargando configuración…

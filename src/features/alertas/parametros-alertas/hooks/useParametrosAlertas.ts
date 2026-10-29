@@ -1,12 +1,16 @@
 import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { listAlertRules, saveAlertRules } from "@/lib/api/alert-rules";
+import { listAlertRules, reglasDePais, saveAlertRules } from "@/lib/api/alert-rules";
 import { CODES } from "../config";
 import { construir, toDraft, type Draft } from "../utils";
 
-/** Carga, edición (borrador) y guardado de las reglas de alertas. */
+/**
+ * Carga, edición (borrador) y guardado de las reglas de alertas. `pais` null = valores generales
+ * (Argentina); "MX" = los de México (montos en pesos mexicanos, UMAs, hora del centro).
+ */
 export function useParametrosAlertas() {
+  const [pais, setPais] = useState<string | null>(null);
   const queryClient = useQueryClient();
   const {
     data: rules,
@@ -23,7 +27,10 @@ export function useParametrosAlertas() {
   const [errores, setErrores] = useState<Record<string, string>>({});
   const [guardando, setGuardando] = useState(false);
 
-  const original = useMemo(() => (rules ? toDraft(rules) : null), [rules]);
+  const original = useMemo(
+    () => (rules ? toDraft(reglasDePais(rules, pais)) : null),
+    [rules, pais],
+  );
   useEffect(() => {
     if (original) setDraft(structuredClone(original));
   }, [original]);
@@ -50,7 +57,7 @@ export function useParametrosAlertas() {
     }
     setGuardando(true);
     try {
-      await saveAlertRules(aGuardar);
+      await saveAlertRules(aGuardar, pais);
       await queryClient.invalidateQueries({ queryKey: ["alert_rules"] });
       toast.success("Configuración de alertas guardada");
     } catch (e) {
@@ -61,6 +68,8 @@ export function useParametrosAlertas() {
   };
 
   return {
+    pais,
+    setPais,
     isLoading,
     isError,
     error,

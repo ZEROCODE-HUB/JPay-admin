@@ -16,13 +16,34 @@ const CAMPOS = [
 
 /** Tarjeta "Parámetros generales de bloqueos" (umbrales de la regla global). */
 export function ParametrosGeneralesCard({ g }: { g: ParametrosGenerales }) {
-  const { reglas, regla, params, setParams, errGen, guardandoGen, genSinCambios } = g;
+  const { reglas, regla, params, setParams, errGen, guardandoGen, genSinCambios, pais, setPais } =
+    g;
 
   return (
     <div className="bg-card border rounded-lg p-6">
       <h3 className="font-display text-sm font-semibold text-foreground mb-4 pb-2 border-b border-border">
         Parámetros generales de bloqueos
       </h3>
+      <div className="mb-4 flex flex-wrap items-center gap-3 text-sm">
+        <label htmlFor="bloqueos-pais" className="font-medium">
+          País
+        </label>
+        <select
+          id="bloqueos-pais"
+          className="h-9 rounded-md border border-input bg-card px-2 text-sm"
+          value={pais ?? ""}
+          disabled={!genSinCambios}
+          onChange={(e) => setPais(e.target.value || null)}
+        >
+          <option value="">Argentina (valores generales)</option>
+          <option value="MX">México</option>
+        </select>
+        <span className="text-xs text-muted-foreground">
+          {pais === "MX"
+            ? "En México los umbrales se cuentan en UMAs mensuales (no en salarios mínimos)."
+            : "En salarios mínimos (SMVM). Rigen para todo país sin valores propios."}
+        </span>
+      </div>
       {reglas.isLoading ? (
         <div className="flex items-center text-sm text-muted-foreground py-4">
           <Loader2 size={14} className="animate-spin mr-2" /> Cargando…

@@ -35,6 +35,8 @@ export type AlertRule = {
   isEnabled: boolean;
   sortOrder: number;
   updatedAt: string;
+  /** Valores propios por país (`{ MX: { is_enabled, parameters } }`); sin entrada = los generales. */
+  parametrosPais: Record<string, { is_enabled?: boolean; parameters?: Record<string, unknown> }>;
 };
 
 type AlertRuleRow = {
@@ -48,6 +50,7 @@ type AlertRuleRow = {
   is_enabled: boolean;
   sort_order: number;
   updated_at: string;
+  parametros_pais: AlertRule["parametrosPais"] | null;
 };
 
 export async function listAlertRules(): Promise<AlertRule[]> {
@@ -55,7 +58,7 @@ export async function listAlertRules(): Promise<AlertRule[]> {
   const { data, error } = await sb
     .from("alert_rules")
     .select(
-      "id, code, name, category, description, action, parameters, is_enabled, sort_order, updated_at",
+      "id, code, name, category, description, action, parameters, is_enabled, sort_order, updated_at, parametros_pais",
     )
     .order("sort_order", { ascending: true });
   if (error) throw new DataAccessError(error);
@@ -70,12 +73,26 @@ export async function listAlertRules(): Promise<AlertRule[]> {
     isEnabled: r.is_enabled,
     sortOrder: r.sort_order,
     updatedAt: r.updated_at,
+    parametrosPais: r.parametros_pais ?? {},
   }));
+}
+
+/** Reglas con los valores que rigen para un país (los propios o, si no tiene, los generales). */
+export function reglasDePais(rules: AlertRule[], pais: string | null): AlertRule[] {
+  if (!pais) return rules;
+  return rules.map((r) => {
+    const p = r.parametrosPais[pais];
+    return p
+      ? { ...r, isEnabled: p.is_enabled ?? r.isEnabled, parameters: p.parameters ?? r.parameters }
+      : r;
+  });
 }
 
 /** Guarda varias reglas en una sola transaccion (la base valida cada una). */
 export async function saveAlertRules(
   rules: { code: AlertRuleCode; isEnabled: boolean; parameters: AlertRuleParameters }[],
+  /** Con país se guardan los valores de ese país; sin país, los generales. */
+  pais: string | null = null,
 ): Promise<void> {
   const sb = requireSupabase();
   const { error } = await sb.rpc("guardar_alert_rules", {
@@ -83,6 +100,7 @@ export async function saveAlertRules(
       code: r.code,
       is_enabled: r.isEnabled,
       parameters: r.parameters,
+      ...(pais ? { pais } : {}),
     })),
   });
   if (error) throw new DataAccessError(error);
