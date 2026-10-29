@@ -9,8 +9,8 @@ import type {
 
 export const PAGE_SIZES = [10, 20, 50];
 
-/** En esta pantalla solo se cargan comisiones de Depósito y Retiro. */
-export const TIPOS_COMISION_USUARIOS: TipoOperacion[] = ["Depósito", "Retiro"];
+/** En esta pantalla se cargan comisiones de Depósito, Retiro y Conversión (pesos a dólares, México). */
+export const TIPOS_COMISION_USUARIOS: TipoOperacion[] = ["Depósito", "Retiro", "Conversión"];
 
 /** Monto de operación de referencia para el desglose de ejemplo. */
 export const MONTO_OPERACION_REF = 100000;
@@ -135,11 +135,12 @@ export function configLabel(c: Pick<Comision, "modalidad" | "montoFijo" | "porce
 
 /**
  * Código de operación de una comisión nueva (único por cliente):
- * RET|DEP - CVU|CTA - timestamp.
+ * RET|DEP|CNV - CVU|CTA - timestamp.
  */
 export function codigoOperacionNuevo(
   draft: Pick<ComisionDraft, "tipo" | "subcuentaId">,
   ahora: number,
 ): string {
-  return `${draft.tipo === "Retiro" ? "RET" : "DEP"}-${draft.subcuentaId ? "CVU" : "CTA"}-${ahora}`;
+  const prefijo = draft.tipo === "Retiro" ? "RET" : draft.tipo === "Conversión" ? "CNV" : "DEP";
+  return `${prefijo}-${draft.subcuentaId ? "CVU" : "CTA"}-${ahora}`;
 }

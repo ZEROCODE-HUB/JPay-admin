@@ -154,7 +154,8 @@ export type Cliente = {
 
 // --- comisiones_cliente ----------------------------------------------------
 
-export type TipoOperacion = "Depósito" | "Retiro" | "Link de pago" | "E-commerce";
+/** "Conversión": pesos a dólares en Cobre (México); solo existe como comisión del cliente. */
+export type TipoOperacion = "Depósito" | "Retiro" | "Link de pago" | "E-commerce" | "Conversión";
 export type ModalidadComision = "Porcentaje" | "Fijo";
 export type EstadoComision = "Habilitado" | "Deshabilitado";
 

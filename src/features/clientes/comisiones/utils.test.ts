@@ -68,6 +68,7 @@ describe("carga de comisiones: utils", () => {
 
   it("código de operación nuevo", () => {
     expect(codigoOperacionNuevo({ tipo: "Retiro", subcuentaId: "s" }, 5)).toBe("RET-CVU-5");
+    expect(codigoOperacionNuevo({ tipo: "Conversión", subcuentaId: null }, 6)).toBe("CNV-CTA-6");
     expect(codigoOperacionNuevo({ tipo: "Depósito", subcuentaId: null }, 7)).toBe("DEP-CTA-7");
   });
 });

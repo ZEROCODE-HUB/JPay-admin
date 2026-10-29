@@ -32,6 +32,7 @@ export function CobreCard({ simulado }: { simulado: boolean }) {
   const [monto, setMonto] = useState("");
   const [montoUsd, setMontoUsd] = useState("");
   const [otp, setOtp] = useState(false);
+  const [reglasFx, setReglasFx] = useState(false);
   const [dep, setDep] = useState({ clabe: "", monto: "" });
   const [r2p, setR2p] = useState("");
   const [saldos, setSaldos] = useState<Record<string, string>>({});
@@ -41,6 +42,7 @@ export function CobreCard({ simulado }: { simulado: boolean }) {
     setMonto(c.montoAprobacion != null ? String(c.montoAprobacion) : "");
     setMontoUsd(c.montoAprobacionUsd != null ? String(c.montoAprobacionUsd) : "");
     setOtp(c.exigirOtp);
+    setReglasFx(c.conversionEvaluaReglas);
   }, [c]);
 
   const guardar = () => {
@@ -50,7 +52,12 @@ export function CobreCard({ simulado }: { simulado: boolean }) {
       return toast.error("Monto de aprobación inválido");
     }
     m.guardar.mutate(
-      { montoAprobacion: mxn, montoAprobacionUsd: usd, exigirOtp: otp },
+      {
+        montoAprobacion: mxn,
+        montoAprobacionUsd: usd,
+        exigirOtp: otp,
+        conversionEvaluaReglas: reglasFx,
+      },
       { onSuccess: () => toast.success("Configuración de Cobre guardada"), onError: avisarError },
     );
   };
@@ -210,6 +217,21 @@ export function CobreCard({ simulado }: { simulado: boolean }) {
                 <Toggle label="Exigir OTP" enabled={otp} onClick={() => setOtp(!otp)} />
                 <span className="text-muted-foreground">{otp ? "Sí" : "No"}</span>
               </div>
+            </div>
+            <div className="text-xs md:col-span-3">
+              Conversiones a dólares: aplicar las reglas de prevención (como un retiro)
+              <div className="mt-2 flex items-center gap-2">
+                <Toggle
+                  label="Reglas en conversiones"
+                  enabled={reglasFx}
+                  onClick={() => setReglasFx(!reglasFx)}
+                />
+                <span className="text-muted-foreground">{reglasFx ? "Sí" : "No"}</span>
+              </div>
+              <p className="mt-1 text-muted-foreground">
+                La comisión de JPay por convertir se carga por cliente en Usuarios → Carga de
+                comisiones (tipo Conversión).
+              </p>
             </div>
             <div className="md:col-span-3 flex justify-end">
               <BtnPrimary onClick={guardar} disabled={m.guardar.isPending}>

@@ -13,6 +13,8 @@ export type ConfiguracionCobre = {
   montoAprobacion: number | null;
   montoAprobacionUsd: number | null;
   exigirOtp: boolean;
+  /** Si las conversiones a dólares pasan por las reglas de prevención (como un retiro). */
+  conversionEvaluaReglas: boolean;
 };
 
 export type BalanceMatriz = {
@@ -75,7 +77,7 @@ export async function getConfiguracionCobre(): Promise<ConfiguracionCobre> {
   const sb = requireSupabase();
   const { data, error } = await sb
     .from("cobre_configuracion")
-    .select("monto_aprobacion, monto_aprobacion_usd, exigir_otp")
+    .select("monto_aprobacion, monto_aprobacion_usd, exigir_otp, conversion_evalua_reglas")
     .eq("id", 1)
     .single();
   if (error) throw new DataAccessError(error);
@@ -84,6 +86,7 @@ export async function getConfiguracionCobre(): Promise<ConfiguracionCobre> {
     montoAprobacionUsd:
       data.monto_aprobacion_usd != null ? Number(data.monto_aprobacion_usd) : null,
     exigirOtp: data.exigir_otp,
+    conversionEvaluaReglas: data.conversion_evalua_reglas,
   };
 }
 
@@ -95,6 +98,7 @@ export async function guardarConfiguracionCobre(c: ConfiguracionCobre): Promise<
       monto_aprobacion: c.montoAprobacion,
       monto_aprobacion_usd: c.montoAprobacionUsd,
       exigir_otp: c.exigirOtp,
+      conversion_evalua_reglas: c.conversionEvaluaReglas,
       updated_at: new Date().toISOString(),
     })
     .eq("id", 1);
