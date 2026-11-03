@@ -52,7 +52,7 @@ export async function getProductosCliente(legajo: string): Promise<ProductoClien
   }
 
   const ids = (comercios.data ?? []).map((c) => c.id);
-  const [conexiones, sucursales] = ids.length
+  const [conexiones, sucursales, suscripciones, domiciliaciones] = ids.length
     ? await Promise.all([
         sb
           .from("comercio_proveedores")
@@ -64,8 +64,18 @@ export async function getProductosCliente(legajo: string): Promise<ProductoClien
           .select("id", { count: "exact", head: true })
           .in("comercio_id", ids)
           .is("eliminado_at", null),
+        sb
+          .from("suscripciones")
+          .select("id", { count: "exact", head: true })
+          .in("comercio_id", ids)
+          .in("estado", ["activa", "pausada"]),
+        sb
+          .from("domiciliaciones")
+          .select("id", { count: "exact", head: true })
+          .in("comercio_id", ids)
+          .in("estado", ["created", "active", "pending"]),
       ])
-    : [null, null];
+    : [null, null, null, null];
   if (conexiones?.error) throw new DataAccessError(conexiones.error);
   if (sucursales?.error) throw new DataAccessError(sucursales.error);
 
@@ -151,15 +161,23 @@ export async function getProductosCliente(legajo: string): Promise<ProductoClien
       proveedor: "Ecart Pay",
       nombre: "Suscripciones",
       descripcion: "Cobro recurrente con tarjeta",
-      estado: "proximamente",
-      detalle: "En desarrollo",
+      ...(conectado
+        ? {
+            estado: "activo" as const,
+            detalle: `${suscripciones?.count ?? 0} suscripciones vigentes`,
+          }
+        : sinEcart),
     },
     {
       proveedor: "Ecart Pay",
       nombre: "Domiciliación",
       descripcion: "Cobro recurrente con cuenta bancaria (CLABE del cliente)",
-      estado: "proximamente",
-      detalle: "En desarrollo",
+      ...(conectado
+        ? {
+            estado: "activo" as const,
+            detalle: `${domiciliaciones?.count ?? 0} domiciliaciones vigentes`,
+          }
+        : sinEcart),
     },
   ];
 }

@@ -22,6 +22,8 @@ export const MODULOS: Record<Modulo, string> = {
   transferencias_cobre: "CLABE y transferencias SPEI (Cobre)",
   qr: "Pagos y cobros con QR",
   monitoreo_automatico: "Alertas y bloqueos automáticos",
+  suscripciones: "Suscripciones con tarjeta (Ecart Pay)",
+  domiciliacion: "Domiciliación a CLABE (Ecart Pay)",
 };
 
 export const MODELOS_FONDOS: Record<ModeloFondos, { label: string; detalle: string }> = {

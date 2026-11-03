@@ -20,6 +20,7 @@ import {
   UserCog,
   Store,
   MapPinned,
+  Repeat,
 } from "lucide-react";
 import { PortalShell, type NavItem } from "@/components/portal-shell";
 import { useDemoMode } from "@/contexts/demo-mode";
@@ -65,6 +66,12 @@ const NAV: NavItem[] = [
       },
       { to: "/admin/comercios/link-pago", label: "Enlaces de pago", icon: Link2 },
       { to: "/admin/comercios/pos", label: "POS físico", icon: MapPinned, modulo: "pos" },
+      {
+        to: "/admin/comercios/recurrentes",
+        label: "Suscripciones y domiciliación",
+        icon: Repeat,
+        modulo: "suscripciones",
+      },
       { to: "/admin/comercios/impuestos", label: "Impuestos", icon: Receipt, modulo: "iibb" },
       { to: "/admin/comercios/apis", label: "APIs externas", icon: Code2 },
     ],

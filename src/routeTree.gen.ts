@@ -31,6 +31,7 @@ import { Route as AdminComerciosGestionRouteImport } from './routes/admin.comerc
 import { Route as AdminComerciosImpuestosRouteImport } from './routes/admin.comercios.impuestos'
 import { Route as AdminComerciosLinkPagoRouteImport } from './routes/admin.comercios.link-pago'
 import { Route as AdminComerciosPosRouteImport } from './routes/admin.comercios.pos'
+import { Route as AdminComerciosRecurrentesRouteImport } from './routes/admin.comercios.recurrentes'
 import { Route as AdminComerciosTransferenciaRouteImport } from './routes/admin.comercios.transferencia'
 import { Route as AdminConfiguracionIndexRouteImport } from './routes/admin.configuracion.index'
 import { Route as AdminConfiguracionConfiguracionesRouteImport } from './routes/admin.configuracion.configuraciones'
@@ -201,6 +202,12 @@ const AdminComerciosPosRoute = AdminComerciosPosRouteImport.update({
   path: '/pos',
   getParentRoute: () => AdminComerciosRoute,
 } as any)
+const AdminComerciosRecurrentesRoute =
+  AdminComerciosRecurrentesRouteImport.update({
+    id: '/recurrentes',
+    path: '/recurrentes',
+    getParentRoute: () => AdminComerciosRoute,
+  } as any)
 const AdminComerciosTransferenciaRoute =
   AdminComerciosTransferenciaRouteImport.update({
     id: '/transferencia',
@@ -548,6 +555,7 @@ export interface FileRoutesByFullPath {
   '/admin/comercios/impuestos': typeof AdminComerciosImpuestosRouteWithChildren
   '/admin/comercios/link-pago': typeof AdminComerciosLinkPagoRouteWithChildren
   '/admin/comercios/pos': typeof AdminComerciosPosRoute
+  '/admin/comercios/recurrentes': typeof AdminComerciosRecurrentesRoute
   '/admin/comercios/transferencia': typeof AdminComerciosTransferenciaRouteWithChildren
   '/admin/configuracion/configuraciones': typeof AdminConfiguracionConfiguracionesRoute
   '/admin/configuracion/logins': typeof AdminConfiguracionLoginsRoute
@@ -616,6 +624,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminIndexRoute
   '/admin/administracion/reportes': typeof AdminAdministracionReportesRoute
   '/admin/comercios/pos': typeof AdminComerciosPosRoute
+  '/admin/comercios/recurrentes': typeof AdminComerciosRecurrentesRoute
   '/admin/configuracion/configuraciones': typeof AdminConfiguracionConfiguracionesRoute
   '/admin/configuracion/logins': typeof AdminConfiguracionLoginsRoute
   '/admin/configuracion/paises': typeof AdminConfiguracionPaisesRoute
@@ -691,6 +700,7 @@ export interface FileRoutesById {
   '/admin/comercios/impuestos': typeof AdminComerciosImpuestosRouteWithChildren
   '/admin/comercios/link-pago': typeof AdminComerciosLinkPagoRouteWithChildren
   '/admin/comercios/pos': typeof AdminComerciosPosRoute
+  '/admin/comercios/recurrentes': typeof AdminComerciosRecurrentesRoute
   '/admin/comercios/transferencia': typeof AdminComerciosTransferenciaRouteWithChildren
   '/admin/configuracion/configuraciones': typeof AdminConfiguracionConfiguracionesRoute
   '/admin/configuracion/logins': typeof AdminConfiguracionLoginsRoute
@@ -772,6 +782,7 @@ export interface FileRouteTypes {
     | '/admin/comercios/impuestos'
     | '/admin/comercios/link-pago'
     | '/admin/comercios/pos'
+    | '/admin/comercios/recurrentes'
     | '/admin/comercios/transferencia'
     | '/admin/configuracion/configuraciones'
     | '/admin/configuracion/logins'
@@ -840,6 +851,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/admin/administracion/reportes'
     | '/admin/comercios/pos'
+    | '/admin/comercios/recurrentes'
     | '/admin/configuracion/configuraciones'
     | '/admin/configuracion/logins'
     | '/admin/configuracion/paises'
@@ -914,6 +926,7 @@ export interface FileRouteTypes {
     | '/admin/comercios/impuestos'
     | '/admin/comercios/link-pago'
     | '/admin/comercios/pos'
+    | '/admin/comercios/recurrentes'
     | '/admin/comercios/transferencia'
     | '/admin/configuracion/configuraciones'
     | '/admin/configuracion/logins'
@@ -1135,6 +1148,13 @@ declare module '@tanstack/react-router' {
       path: '/pos'
       fullPath: '/admin/comercios/pos'
       preLoaderRoute: typeof AdminComerciosPosRouteImport
+      parentRoute: typeof AdminComerciosRoute
+    }
+    '/admin/comercios/recurrentes': {
+      id: '/admin/comercios/recurrentes'
+      path: '/recurrentes'
+      fullPath: '/admin/comercios/recurrentes'
+      preLoaderRoute: typeof AdminComerciosRecurrentesRouteImport
       parentRoute: typeof AdminComerciosRoute
     }
     '/admin/comercios/transferencia': {
@@ -1646,6 +1666,7 @@ interface AdminComerciosRouteChildren {
   AdminComerciosImpuestosRoute: typeof AdminComerciosImpuestosRouteWithChildren
   AdminComerciosLinkPagoRoute: typeof AdminComerciosLinkPagoRouteWithChildren
   AdminComerciosPosRoute: typeof AdminComerciosPosRoute
+  AdminComerciosRecurrentesRoute: typeof AdminComerciosRecurrentesRoute
   AdminComerciosTransferenciaRoute: typeof AdminComerciosTransferenciaRouteWithChildren
   AdminComerciosIndexRoute: typeof AdminComerciosIndexRoute
 }
@@ -1656,6 +1677,7 @@ const AdminComerciosRouteChildren: AdminComerciosRouteChildren = {
   AdminComerciosImpuestosRoute: AdminComerciosImpuestosRouteWithChildren,
   AdminComerciosLinkPagoRoute: AdminComerciosLinkPagoRouteWithChildren,
   AdminComerciosPosRoute: AdminComerciosPosRoute,
+  AdminComerciosRecurrentesRoute: AdminComerciosRecurrentesRoute,
   AdminComerciosTransferenciaRoute:
     AdminComerciosTransferenciaRouteWithChildren,
   AdminComerciosIndexRoute: AdminComerciosIndexRoute,
