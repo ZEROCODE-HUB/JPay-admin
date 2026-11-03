@@ -5,7 +5,7 @@ import type { ActionItem } from "@/components/actions-dropdown";
 import { Badge } from "@/components/portal-shell";
 import { LegajoCell, LEGAJO_TOOLTIP } from "@/components/legajo-label";
 import type { CargaComisionesState } from "../hooks/useCargaComisiones";
-import { TIPOS_COMISION_USUARIOS, type Comision } from "../utils";
+import { etiquetaTipoComision, TIPOS_COMISION_USUARIOS, type Comision } from "../utils";
 
 export const columnasComisiones: Column<Comision>[] = [
   {
@@ -49,7 +49,7 @@ export const columnasComisiones: Column<Comision>[] = [
     label: "Operación",
     filterable: "enum",
     filterOptions: [...TIPOS_COMISION_USUARIOS],
-    render: (r) => r.tipo,
+    render: (r) => etiquetaTipoComision(r.tipo),
   },
   {
     key: "modalidad",

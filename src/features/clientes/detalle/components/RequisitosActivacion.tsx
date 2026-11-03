@@ -1,4 +1,5 @@
 import type { Cliente } from "@/lib/api/types";
+import { cuentaDelPais } from "@/lib/cuenta-pais";
 import type { ClienteDetalleData } from "../hooks/useClienteDetalle";
 
 /** Aviso de requisitos según el estado (homologado). */
@@ -11,6 +12,7 @@ export function RequisitosActivacion({
 }) {
   const { subcuentasQuery, comisionesRealesQuery } = data;
   const norm = (cliente.estado as string).toLowerCase();
+  const cuenta = cuentaDelPais();
   if (norm === "preactivado") {
     const hasCbu =
       Boolean(cliente.cbu && !cliente.cbuCancelado) || (subcuentasQuery.data?.length ?? 0) > 0;
@@ -19,10 +21,18 @@ export function RequisitosActivacion({
       <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
         <p className="font-semibold">Requisitos para activar</p>
         <ul className="mt-1 list-disc pl-5">
-          <li>CVU: {hasCbu ? "✓ cargado" : "✗ pendiente"}</li>
+          <li>
+            {cuenta}: {hasCbu ? "✓ cargada" : "✗ pendiente"}
+          </li>
           <li>Comisión: {hasCom ? "✓ cargada" : "✗ pendiente"}</li>
         </ul>
-        {!hasCbu && <p className="mt-1 text-xs">Cargar CVU en la pestaña Subcuentas y CVUs.</p>}
+        {!hasCbu && (
+          <p className="mt-1 text-xs">
+            {cuenta === "CLABE"
+              ? "Dar de alta al cliente en Cobre (pestaña Cobre (México)): al aprobarse se le asigna la CLABE."
+              : `Cargar ${cuenta} en la pestaña Subcuentas y ${cuenta}s.`}
+          </p>
+        )}
         {!hasCom && (
           <p className="mt-1 text-xs">Cargar comisión en Admin → Usuarios → Comisiones.</p>
         )}
@@ -40,7 +50,7 @@ export function RequisitosActivacion({
   if (norm === "deshabilitado") {
     return (
       <div className="mt-4 rounded-xl border border-neutral-300 bg-neutral-50 px-4 py-3 text-sm text-neutral-700">
-        Usuario deshabilitado — CVU cancelado. Historial conservado para auditoría BCRA.
+        Usuario deshabilitado — {cuenta} cancelada. Historial conservado para auditoría BCRA.
       </div>
     );
   }

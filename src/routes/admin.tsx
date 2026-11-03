@@ -43,7 +43,12 @@ const NAV: NavItem[] = [
     items: [
       { to: "/admin/general/usuarios", label: "Usuarios", icon: Users },
       { to: "/admin/general/movimientos", label: "Movimientos", icon: Activity },
-      { to: "/admin/general/alertas", label: "Alertas", icon: Bell },
+      {
+        to: "/admin/general/alertas",
+        label: "Alertas",
+        icon: Bell,
+        modulo: "monitoreo_automatico",
+      },
     ],
   },
   {
@@ -51,7 +56,12 @@ const NAV: NavItem[] = [
     icon: Store,
     items: [
       { to: "/admin/comercios/gestion", label: "Gestión de comercios", icon: Store },
-      { to: "/admin/comercios/transferencia", label: "Pagos con QR", icon: CreditCard },
+      {
+        to: "/admin/comercios/transferencia",
+        label: "Pagos con QR",
+        icon: CreditCard,
+        modulo: "qr",
+      },
       { to: "/admin/comercios/link-pago", label: "Enlaces de pago", icon: Link2 },
       { to: "/admin/comercios/impuestos", label: "Impuestos", icon: Receipt, modulo: "iibb" },
       { to: "/admin/comercios/apis", label: "APIs externas", icon: Code2 },

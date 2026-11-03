@@ -1,17 +1,23 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import type { ReactNode } from "react";
+import type { Modulo } from "@/shared/pais";
+import { usePaisConModulos } from "@/shared/modulos-pais";
 
 export type Tab = {
   label: string;
   to: string;
+  /** Solo se muestra si el país de la instalación tiene este módulo (`paises.modulos`). */
+  modulo?: Modulo;
 };
 
 function matchesPath(path: string, to: string) {
   return path === to || path.startsWith(to + "/");
 }
 
-export function TabLayout({ tabs, children }: { tabs: Tab[]; children: ReactNode }) {
+export function TabLayout({ tabs: todas, children }: { tabs: Tab[]; children: ReactNode }) {
   const path = useRouterState({ select: (r) => r.location.pathname });
+  const pais = usePaisConModulos();
+  const tabs = todas.filter((t) => !t.modulo || pais.modulos[t.modulo]);
 
   const active = tabs.reduce<string | null>((best, tab) => {
     const matches = matchesPath(path, tab.to);

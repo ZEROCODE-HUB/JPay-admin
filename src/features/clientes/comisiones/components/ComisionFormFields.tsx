@@ -6,7 +6,12 @@ import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { useClientesForSelect } from "@/hooks/useComercios";
 import { listSubcuentas } from "@/lib/api/subcuentas";
 import type { EstadoComision, ModalidadComision, TipoOperacion } from "@/lib/api/types";
-import { ivaPorDefecto, TIPOS_COMISION_USUARIOS, type ComisionDraft } from "../utils";
+import {
+  etiquetaTipoComision,
+  ivaPorDefecto,
+  TIPOS_COMISION_USUARIOS,
+  type ComisionDraft,
+} from "../utils";
 
 const SELECT_CLS =
   "w-full h-10 px-3 rounded-md border border-input bg-card text-sm outline-none focus:ring-2 focus:ring-ring/40 focus:border-ring";
@@ -142,7 +147,7 @@ export function ComisionFormFields({
         >
           {TIPOS_COMISION_USUARIOS.map((t) => (
             <option key={t} value={t}>
-              {t}
+              {etiquetaTipoComision(t)}
             </option>
           ))}
         </select>

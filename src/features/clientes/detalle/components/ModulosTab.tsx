@@ -1,10 +1,12 @@
-import { Eye, Globe, Inbox, Landmark, Link2, RefreshCw } from "lucide-react";
+import { Eye, Globe, Inbox, Landmark, LayoutGrid, Link2, RefreshCw } from "lucide-react";
 import { formatMoney } from "@/shared/format";
 import { Badge } from "@/components/portal-shell";
 import type { ClienteDetalleData } from "../hooks/useClienteDetalle";
 import type { ClienteDetalleUi } from "../hooks/useClienteDetalleUi";
 import { ApiUsuariosInline } from "./ApiUsuariosInline";
 import { SectionCard } from "./SectionCard";
+import { ProductosMx } from "./ProductosMx";
+import { usePaisConModulos } from "@/shared/modulos-pais";
 
 export function ModulosTab({
   legajo,
@@ -16,7 +18,23 @@ export function ModulosTab({
   ui: ClienteDetalleUi;
 }) {
   const { modulosQuery, clienteApiUsuariosQuery, comerciosPst, linksPago, apiCantidadReal } = data;
-  const { modulosSub, setModulosSub, setPstOpen, setLinksOpen, setApiDetalleId } = ui;
+  const { setModulosSub, setPstOpen, setLinksOpen, setApiDetalleId } = ui;
+  const pais = usePaisConModulos();
+  // "Productos": los de Cobre y Ecart Pay (México). PCT es el pago con transferencia / QR.
+  const subtabs = [
+    {
+      key: "productos" as const,
+      label: "Productos",
+      icon: LayoutGrid,
+      visible: pais.modulos.transferencias_cobre || pais.modulos.pagos_proveedor,
+    },
+    { key: "pct" as const, label: "PCT", icon: Landmark, visible: pais.modulos.qr },
+    { key: "links" as const, label: "Links de pago", icon: Link2, visible: true },
+    { key: "api" as const, label: "API externa", icon: Globe, visible: true },
+  ].filter((st) => st.visible);
+  const modulosSub = subtabs.some((st) => st.key === ui.modulosSub)
+    ? ui.modulosSub
+    : subtabs[0].key;
 
   return (
     <SectionCard
@@ -42,11 +60,7 @@ export function ModulosTab({
         <div>
           {/* Sub-tabs */}
           <div className="flex gap-1 border-b border-border mb-4">
-            {[
-              { key: "pct" as const, label: "PCT", icon: Landmark },
-              { key: "links" as const, label: "Links de pago", icon: Link2 },
-              { key: "api" as const, label: "API externa", icon: Globe },
-            ].map((st) => (
+            {subtabs.map((st) => (
               <button
                 key={st.key}
                 type="button"
@@ -62,6 +76,8 @@ export function ModulosTab({
               </button>
             ))}
           </div>
+
+          {modulosSub === "productos" && <ProductosMx legajo={legajo} />}
 
           {/* PCT sub-tab */}
           {modulosSub === "pct" && (

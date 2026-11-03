@@ -12,6 +12,7 @@ import { PAGE_SIZES, toCvuTableRow } from "../utils";
 import { columns } from "./columns";
 import { CvuDetalleDialog, CvuEditarDialog } from "./CvuDialogs";
 import { NuevoCvuDialog } from "./NuevoCvuDialog";
+import { cuentaDelPais } from "@/lib/cuenta-pais";
 
 /** Usuarios con CVU: listado de subcuentas con alta, edición y habilitación. */
 export function CvuPage() {
@@ -20,23 +21,30 @@ export function CvuPage() {
   const a = useCvuAcciones();
 
   const err = l.error instanceof DataAccessError ? l.error : null;
+  const cuenta = cuentaDelPais();
 
   return (
     <PermissionGuard recurso="usuarios">
       <PageHeader
-        title="Usuarios con CVU"
-        description="Cuentas Virtuales creadas — búsqueda rápida por email, refleja en detalle Subcuentas y CVUs recientes."
+        title={`Usuarios con ${cuenta}`}
+        description={
+          a.conBdc
+            ? "Cuentas Virtuales creadas — búsqueda rápida por email, refleja en detalle Subcuentas y CVUs recientes."
+            : `Subcuentas con su ${cuenta}. La ${cuenta} la asigna Cobre al aprobar el alta del cliente (detalle del cliente → pestaña Cobre).`
+        }
         action={
-          <BtnPrimary onClick={() => nuevo.setShowNuevo(true)} disabled={!a.puedeCrear}>
-            <Plus size={16} /> Nuevo CVU
-          </BtnPrimary>
+          a.conBdc ? (
+            <BtnPrimary onClick={() => nuevo.setShowNuevo(true)} disabled={!a.puedeCrear}>
+              <Plus size={16} /> Nuevo CVU
+            </BtnPrimary>
+          ) : undefined
         }
       />
 
       {l.isLoading ? (
         <div className="flex items-center justify-center rounded-xl border bg-card py-16 text-sm text-muted-foreground">
           <span className="inline-block w-4 h-4 border-2 border-muted-foreground/30 border-t-muted-foreground rounded-full animate-spin mr-2" />
-          Cargando CVU…
+          Cargando {cuenta}…
         </div>
       ) : l.isError ? (
         <div className="flex flex-col items-center gap-3 rounded-xl border border-danger-200 bg-danger-50 px-6 py-12 text-center text-sm text-danger-700">
@@ -52,7 +60,7 @@ export function CvuPage() {
       ) : l.rows.length === 0 ? (
         <div className="flex flex-col items-center gap-3 rounded-xl border bg-card px-6 py-12 text-center text-sm text-muted-foreground">
           <Inbox size={28} />
-          <p>No hay CVU que coincidan.</p>
+          <p>No hay {cuenta} que coincidan.</p>
         </div>
       ) : (
         <>
@@ -85,7 +93,7 @@ export function CvuPage() {
             totalPages={l.totalPages}
             pageSize={l.pageSize}
             total={l.total}
-            countLabel="CVU"
+            countLabel={cuenta}
             pageSizes={PAGE_SIZES}
             disabled={l.isFetching}
             onPageChange={(p) => l.setPage(p - 1)}

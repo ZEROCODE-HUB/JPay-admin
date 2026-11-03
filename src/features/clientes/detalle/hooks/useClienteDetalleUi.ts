@@ -10,7 +10,7 @@ export function useClienteDetalleUi() {
 
   const [activeTab, setActiveTab] = useState<TabKey>("identificacion");
   const [riesgoSub, setRiesgoSub] = useState<"alertas" | "bloqueos">("alertas");
-  const [modulosSub, setModulosSub] = useState<"pct" | "links" | "api">("pct");
+  const [modulosSub, setModulosSub] = useState<"productos" | "pct" | "links" | "api" | null>(null);
 
   const [editAlertasOpen, setEditAlertasOpen] = useState(false);
   const [editBloqueosOpen, setEditBloqueosOpen] = useState(false);

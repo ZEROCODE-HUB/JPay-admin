@@ -5,6 +5,8 @@ import { LegajoCell, LEGAJO_TOOLTIP } from "@/components/legajo-label";
 import type { SubcuentaTipo } from "@/lib/api/subcuentas";
 import { estadoCvu, TIPO_SUBCUENTA_META, tipoSubcuentaClases } from "../estados";
 import type { CvuTableRow } from "../utils";
+import { cuentaDelPais } from "@/lib/cuenta-pais";
+import { getPais } from "@/shared/pais";
 
 function EstadoBadge({ estado }: { estado: string }) {
   const m = estadoCvu(estado);
@@ -27,7 +29,7 @@ function TipoSubcuentaBadge({ tipo }: { tipo: SubcuentaTipo }) {
   );
 }
 
-export const columns: Column<CvuTableRow>[] = [
+const todas: Column<CvuTableRow>[] = [
   {
     key: "_legajo",
     label: "Legajo",
@@ -52,7 +54,7 @@ export const columns: Column<CvuTableRow>[] = [
   },
   {
     key: "_cvu",
-    label: "CVU",
+    label: cuentaDelPais(),
     filterable: true,
     render: (r) =>
       r._cvu && r._cvu !== "—" ? (
@@ -76,3 +78,7 @@ export const columns: Column<CvuTableRow>[] = [
     render: (r) => <span className="font-mono tabular-nums text-xs">{r._fechaAlta}</span>,
   },
 ];
+
+// CBK y alias son de los CVU argentinos (BDC / Coelsa); la CLABE de Cobre no los tiene.
+export const columns: Column<CvuTableRow>[] =
+  getPais().codigo === "AR" ? todas : todas.filter((c) => c.key !== "_cbk" && c.key !== "_alias");

@@ -7,6 +7,7 @@ export const OPERACIONES: { label: string; code: string }[] = [
   { label: "Depósito", code: "deposito" },
   { label: "Retiro", code: "retiro" },
   { label: "Transferencia", code: "transferencia" },
+  { label: "Conversión a dólares", code: "conversion" },
   { label: "Pago con tarjeta", code: "tarjeta" },
   { label: "Pago PCT", code: "pago_pct" },
   { label: "Cobro PCT", code: "cobro_pct" },

@@ -15,7 +15,8 @@ export const Route = createFileRoute("/admin/comercios/gestion")({
 const tabs: Tab[] = [
   { label: "Comercios", to: "/admin/comercios/gestion" },
   { label: "Códigos de categoría", to: "/admin/comercios/gestion/categoria" },
-  { label: "Métodos de pago", to: "/admin/comercios/gestion/metodos-pago" },
+  // Medios y cuotas de Payway; en México los métodos vienen de la integración (Ecart Pay).
+  { label: "Métodos de pago", to: "/admin/comercios/gestion/metodos-pago", modulo: "payway" },
 ];
 
 function GestionLayout() {

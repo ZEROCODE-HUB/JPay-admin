@@ -1,12 +1,14 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { Edit3, Eye, XCircle, Zap } from "lucide-react";
+import { useNavigate } from "@tanstack/react-router";
+import { Edit3, Eye, Landmark, XCircle, Zap } from "lucide-react";
 import { toast } from "sonner";
 import type { ActionItem } from "@/components/actions-dropdown";
 import { asignarCvuParaExistente } from "@/lib/api/cvu";
 import { updateAliasCvu, updateSubcuenta, type CvuRow } from "@/lib/api/subcuentas";
 import { useCan } from "@/lib/permissions";
 import { aliasDeFila, clienteParaCvu, validarAlias } from "../utils";
+import { usePaisConModulos } from "@/shared/modulos-pais";
 
 /** Menú de acciones por fila + estado de los modales de detalle y edición. */
 export function useCvuAcciones() {
@@ -18,6 +20,9 @@ export function useCvuAcciones() {
   const { can } = useCan();
   const puedeCrear = can("crear", "usuarios");
   const puedeModificar = can("modificar", "usuarios");
+  // CVU por BDC / Coelsa (Argentina). En México la CLABE la asigna Cobre con el alta del cliente.
+  const conBdc = usePaisConModulos().modulos.transferencias_salientes;
+  const navigate = useNavigate();
 
   const invalidar = (legajo: string) => {
     queryClient.invalidateQueries({ queryKey: ["cvus"] });
@@ -55,7 +60,18 @@ export function useCvuAcciones() {
     // puede pedir la asignacion contra BDC/COELSA. Toda la logica vive en
     // `asignarCvuParaExistente` (centralizada en `lib/api/cvu.ts`) para que
     // modal y menu compartan exactamente el mismo flow.
-    if (!row.cbu) {
+    if (!row.cbu && !conBdc) {
+      items.push({
+        label: "Dar de alta en Cobre",
+        icon: Landmark,
+        onClick: () =>
+          navigate({
+            to: "/admin/general/usuarios/$legajo",
+            params: { legajo: row.clienteLegajo },
+          }),
+      });
+    }
+    if (!row.cbu && conBdc) {
       items.push({
         label: "Generar CVU (BDC/COELSA)",
         icon: Zap,
@@ -80,15 +96,16 @@ export function useCvuAcciones() {
       });
     }
 
-    items.push({
-      label: "Editar",
-      icon: Edit3,
-      disabled: !puedeModificar,
-      onClick: () => {
-        setEditTarget(row);
-        setEditAlias(row.cliente?.alias ?? (row.cbu ? aliasDeFila(row) : ""));
-      },
-    });
+    if (conBdc)
+      items.push({
+        label: "Editar",
+        icon: Edit3,
+        disabled: !puedeModificar,
+        onClick: () => {
+          setEditTarget(row);
+          setEditAlias(row.cliente?.alias ?? (row.cbu ? aliasDeFila(row) : ""));
+        },
+      });
 
     items.push({
       label: row.estado === "Activa" ? "Deshabilitar" : "Habilitar",
@@ -111,6 +128,7 @@ export function useCvuAcciones() {
   };
 
   return {
+    conBdc,
     getActions,
     puedeCrear,
     viewing,

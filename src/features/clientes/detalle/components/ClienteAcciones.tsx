@@ -1,4 +1,5 @@
 import { Badge } from "@/components/portal-shell";
+import { cuentaDelPais } from "@/lib/cuenta-pais";
 import { useCan } from "@/lib/permissions";
 import type { Cliente } from "@/lib/api/types";
 import { estadoLabel, estadoTone, type ConfirmActionState } from "../utils";
@@ -61,7 +62,7 @@ export function ClienteAcciones({
                 onClick={() =>
                   setConfirmAction({
                     title: "Activar usuario",
-                    message: `¿Activar a ${cliente.nombre}? Requiere CVU y comisión cargados.`,
+                    message: `¿Activar a ${cliente.nombre}? Requiere ${cuentaDelPais()} y comisión cargadas.`,
                     confirmLabel: "Activar",
                     variant: "default",
                     onConfirm: () => {
@@ -121,7 +122,7 @@ export function ClienteAcciones({
                 onClick={() =>
                   setConfirmAction({
                     title: "Deshabilitar usuario",
-                    message: `¿Deshabilitar a ${cliente.nombre}? Se cancelará su CVU y se conservará el historial (auditoría BCRA).`,
+                    message: `¿Deshabilitar a ${cliente.nombre}? Se cancelará su ${cuentaDelPais()} y se conservará el historial para auditoría.`,
                     confirmLabel: "Deshabilitar",
                     variant: "danger",
                     onConfirm: () => {

@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { formatPercent } from "@/shared/format";
 import { FormDialog } from "@/shared/ui/form-dialog";
 import { LegajoCell } from "@/components/legajo-label";
-import { configLabel, desgloseDe, type Comision } from "../utils";
+import { configLabel, desgloseDe, type Comision, etiquetaTipoComision } from "../utils";
 import { DesglosePreview } from "./DesglosePreview";
 
 function Dato({ label, children, ancho }: { label: string; children: ReactNode; ancho?: boolean }) {
@@ -49,7 +49,7 @@ export function ComisionDetalleModal({
           )}
         </Dato>
         <Dato label="Tipo de operación">
-          <span className="font-medium">{viewing.tipo}</span>
+          <span className="font-medium">{etiquetaTipoComision(viewing.tipo)}</span>
         </Dato>
         <Dato label="Código de operación">
           <span className="font-medium font-mono tabular-nums">{viewing.operacion}</span>

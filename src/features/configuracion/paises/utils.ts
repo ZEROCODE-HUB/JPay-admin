@@ -20,6 +20,8 @@ export const MODULOS: Record<Modulo, string> = {
   payway: "Tarjetas con Payway",
   transferencias_salientes: "Transferencias BDC / Coelsa",
   transferencias_cobre: "CLABE y transferencias SPEI (Cobre)",
+  qr: "Pagos y cobros con QR",
+  monitoreo_automatico: "Alertas y bloqueos automáticos",
 };
 
 export const MODELOS_FONDOS: Record<ModeloFondos, { label: string; detalle: string }> = {

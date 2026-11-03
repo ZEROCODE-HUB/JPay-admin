@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { cuentaDelPais } from "@/lib/cuenta-pais";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Ban, FileUp, Plus } from "lucide-react";
 import { toast } from "sonner";
@@ -122,7 +123,7 @@ export function SubcuentasTab({
 
   return (
     <Seccion
-      titulo="Subcuentas y CVUs"
+      titulo={`Subcuentas y ${cuentaDelPais()}s`}
       loading={query.isLoading}
       error={query.isError ? query.error : null}
       onRetry={() => query.refetch()}

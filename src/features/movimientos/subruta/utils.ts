@@ -8,6 +8,7 @@ export const TIPO_LABEL: Record<string, string> = {
   deposito: "Depósito",
   retiro: "Retiro",
   transferencia: "Transferencia",
+  conversion: "Conversión a dólares",
   tarjeta: "Pago con tarjeta",
   pago_pct: "Pago PCT",
   cobro_pct: "Cobro PCT",

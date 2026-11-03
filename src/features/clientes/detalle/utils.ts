@@ -5,6 +5,7 @@ import type { Movimiento as DetailMovimiento } from "@/components/movimiento-det
 import { resolverEstadoMovimiento } from "@/lib/estados";
 
 import { idFiscalCliente, regimenFiscalCliente } from "@/lib/identificacion-cliente";
+import type { Modulo } from "@/shared/pais";
 export const estadoLabel: Record<EstadoCliente, string> = {
   pendiente_verificacion: "Pendiente de verificación de email",
   registrado: "Registrado",
@@ -42,14 +43,16 @@ export type TabKey =
   | "cobre"
   | "historial";
 
-export const TABS: { key: TabKey; label: string }[] = [
+/** Pestañas del detalle; con `modulo`, solo si el país de la instalación lo tiene. */
+export const TABS: { key: TabKey; label: string; modulo?: Modulo }[] = [
   { key: "identificacion", label: "Datos personales" },
   { key: "movimientos", label: "Movimientos" },
-  { key: "impuestos", label: "Impuestos" },
+  { key: "impuestos", label: "Impuestos", modulo: "iibb" },
   { key: "subcuentas", label: "Subcuentas y CVUs" },
   { key: "documentos", label: "Documentos" },
-  { key: "validaciones", label: "Validaciones automáticas" },
-  { key: "riesgo", label: "Riesgo y monitoreo" },
+  // Validaciones contra AFIP / RENAPER (Argentina).
+  { key: "validaciones", label: "Validaciones automáticas", modulo: "afip" },
+  { key: "riesgo", label: "Riesgo y monitoreo", modulo: "monitoreo_automatico" },
   { key: "contexto", label: "Contexto operativo" },
   { key: "modulos", label: "Módulos y productos" },
   { key: "cobre", label: "Cobre (México)" },

@@ -5,6 +5,8 @@ import type { ClienteDetalleData } from "../hooks/useClienteDetalle";
 import type { ClienteDetalleUi } from "../hooks/useClienteDetalleUi";
 import { useClienteAcciones } from "../hooks/useClienteAcciones";
 import { TABS, type TabKey } from "../utils";
+import { cuentaDelPais } from "@/lib/cuenta-pais";
+import { usePaisConModulos } from "@/shared/modulos-pais";
 import { ClienteAcciones } from "./ClienteAcciones";
 import { ClienteModales } from "./ClienteModales";
 import { CobreTab } from "./CobreTab";
@@ -52,8 +54,13 @@ export function ClienteDetalle({
     if (t.key === "identificacion") {
       return cliente.tipoPersona === "juridica" ? "Datos de persona jurídica" : "Datos personales";
     }
+    if (t.key === "subcuentas") return `Subcuentas y ${cuentaDelPais()}s`;
     return t.label;
   };
+  const pais = usePaisConModulos();
+  const tabs = TABS.filter(
+    (t) => (!t.modulo || pais.modulos[t.modulo]) && (t.key !== "cobre" || cliente.pais === "MX"),
+  );
 
   return (
     <div className="w-full">
@@ -87,7 +94,7 @@ export function ClienteDetalle({
 
       {/* --- Tabs --- */}
       <div className="mt-6 flex flex-wrap gap-1 border-b border-border">
-        {TABS.filter((t) => t.key !== "cobre" || cliente.pais === "MX").map((t) => (
+        {tabs.map((t) => (
           <button
             key={t.key}
             type="button"

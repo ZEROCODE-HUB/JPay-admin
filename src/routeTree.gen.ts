@@ -72,11 +72,13 @@ import { Route as AdminGeneralAlertasParametrosBloqueosRouteImport } from './rou
 import { Route as AdminGeneralMovimientosIndexRouteImport } from './routes/admin.general.movimientos.index'
 import { Route as AdminGeneralMovimientosCobrosQrRouteImport } from './routes/admin.general.movimientos.cobros-qr'
 import { Route as AdminGeneralMovimientosComisionesRouteImport } from './routes/admin.general.movimientos.comisiones'
+import { Route as AdminGeneralMovimientosConversionesRouteImport } from './routes/admin.general.movimientos.conversiones'
 import { Route as AdminGeneralMovimientosDepositosRouteImport } from './routes/admin.general.movimientos.depositos'
 import { Route as AdminGeneralMovimientosImpuestosRouteImport } from './routes/admin.general.movimientos.impuestos'
 import { Route as AdminGeneralMovimientosPagosQrRouteImport } from './routes/admin.general.movimientos.pagos-qr'
 import { Route as AdminGeneralMovimientosPagosTarjetaRouteImport } from './routes/admin.general.movimientos.pagos-tarjeta'
 import { Route as AdminGeneralMovimientosRetirosRouteImport } from './routes/admin.general.movimientos.retiros'
+import { Route as AdminGeneralMovimientosTransferenciasRouteImport } from './routes/admin.general.movimientos.transferencias'
 import { Route as AdminGeneralUsuariosIndexRouteImport } from './routes/admin.general.usuarios.index'
 import { Route as AdminGeneralUsuariosLegajoRouteImport } from './routes/admin.general.usuarios.$legajo'
 import { Route as AdminGeneralUsuariosComisionesRouteImport } from './routes/admin.general.usuarios.comisiones'
@@ -440,6 +442,12 @@ const AdminGeneralMovimientosComisionesRoute =
     path: '/comisiones',
     getParentRoute: () => AdminGeneralMovimientosRoute,
   } as any)
+const AdminGeneralMovimientosConversionesRoute =
+  AdminGeneralMovimientosConversionesRouteImport.update({
+    id: '/conversiones',
+    path: '/conversiones',
+    getParentRoute: () => AdminGeneralMovimientosRoute,
+  } as any)
 const AdminGeneralMovimientosDepositosRoute =
   AdminGeneralMovimientosDepositosRouteImport.update({
     id: '/depositos',
@@ -468,6 +476,12 @@ const AdminGeneralMovimientosRetirosRoute =
   AdminGeneralMovimientosRetirosRouteImport.update({
     id: '/retiros',
     path: '/retiros',
+    getParentRoute: () => AdminGeneralMovimientosRoute,
+  } as any)
+const AdminGeneralMovimientosTransferenciasRoute =
+  AdminGeneralMovimientosTransferenciasRouteImport.update({
+    id: '/transferencias',
+    path: '/transferencias',
     getParentRoute: () => AdminGeneralMovimientosRoute,
   } as any)
 const AdminGeneralUsuariosIndexRoute =
@@ -560,11 +574,13 @@ export interface FileRoutesByFullPath {
   '/admin/general/alertas/parametros-bloqueos': typeof AdminGeneralAlertasParametrosBloqueosRoute
   '/admin/general/movimientos/cobros-qr': typeof AdminGeneralMovimientosCobrosQrRoute
   '/admin/general/movimientos/comisiones': typeof AdminGeneralMovimientosComisionesRoute
+  '/admin/general/movimientos/conversiones': typeof AdminGeneralMovimientosConversionesRoute
   '/admin/general/movimientos/depositos': typeof AdminGeneralMovimientosDepositosRoute
   '/admin/general/movimientos/impuestos': typeof AdminGeneralMovimientosImpuestosRoute
   '/admin/general/movimientos/pagos-qr': typeof AdminGeneralMovimientosPagosQrRoute
   '/admin/general/movimientos/pagos-tarjeta': typeof AdminGeneralMovimientosPagosTarjetaRoute
   '/admin/general/movimientos/retiros': typeof AdminGeneralMovimientosRetirosRoute
+  '/admin/general/movimientos/transferencias': typeof AdminGeneralMovimientosTransferenciasRoute
   '/admin/general/usuarios/$legajo': typeof AdminGeneralUsuariosLegajoRoute
   '/admin/general/usuarios/comisiones': typeof AdminGeneralUsuariosComisionesRoute
   '/admin/general/usuarios/cvu': typeof AdminGeneralUsuariosCvuRoute
@@ -620,11 +636,13 @@ export interface FileRoutesByTo {
   '/admin/general/alertas/parametros-bloqueos': typeof AdminGeneralAlertasParametrosBloqueosRoute
   '/admin/general/movimientos/cobros-qr': typeof AdminGeneralMovimientosCobrosQrRoute
   '/admin/general/movimientos/comisiones': typeof AdminGeneralMovimientosComisionesRoute
+  '/admin/general/movimientos/conversiones': typeof AdminGeneralMovimientosConversionesRoute
   '/admin/general/movimientos/depositos': typeof AdminGeneralMovimientosDepositosRoute
   '/admin/general/movimientos/impuestos': typeof AdminGeneralMovimientosImpuestosRoute
   '/admin/general/movimientos/pagos-qr': typeof AdminGeneralMovimientosPagosQrRoute
   '/admin/general/movimientos/pagos-tarjeta': typeof AdminGeneralMovimientosPagosTarjetaRoute
   '/admin/general/movimientos/retiros': typeof AdminGeneralMovimientosRetirosRoute
+  '/admin/general/movimientos/transferencias': typeof AdminGeneralMovimientosTransferenciasRoute
   '/admin/general/usuarios/$legajo': typeof AdminGeneralUsuariosLegajoRoute
   '/admin/general/usuarios/comisiones': typeof AdminGeneralUsuariosComisionesRoute
   '/admin/general/usuarios/cvu': typeof AdminGeneralUsuariosCvuRoute
@@ -697,11 +715,13 @@ export interface FileRoutesById {
   '/admin/general/alertas/parametros-bloqueos': typeof AdminGeneralAlertasParametrosBloqueosRoute
   '/admin/general/movimientos/cobros-qr': typeof AdminGeneralMovimientosCobrosQrRoute
   '/admin/general/movimientos/comisiones': typeof AdminGeneralMovimientosComisionesRoute
+  '/admin/general/movimientos/conversiones': typeof AdminGeneralMovimientosConversionesRoute
   '/admin/general/movimientos/depositos': typeof AdminGeneralMovimientosDepositosRoute
   '/admin/general/movimientos/impuestos': typeof AdminGeneralMovimientosImpuestosRoute
   '/admin/general/movimientos/pagos-qr': typeof AdminGeneralMovimientosPagosQrRoute
   '/admin/general/movimientos/pagos-tarjeta': typeof AdminGeneralMovimientosPagosTarjetaRoute
   '/admin/general/movimientos/retiros': typeof AdminGeneralMovimientosRetirosRoute
+  '/admin/general/movimientos/transferencias': typeof AdminGeneralMovimientosTransferenciasRoute
   '/admin/general/usuarios/$legajo': typeof AdminGeneralUsuariosLegajoRoute
   '/admin/general/usuarios/comisiones': typeof AdminGeneralUsuariosComisionesRoute
   '/admin/general/usuarios/cvu': typeof AdminGeneralUsuariosCvuRoute
@@ -775,11 +795,13 @@ export interface FileRouteTypes {
     | '/admin/general/alertas/parametros-bloqueos'
     | '/admin/general/movimientos/cobros-qr'
     | '/admin/general/movimientos/comisiones'
+    | '/admin/general/movimientos/conversiones'
     | '/admin/general/movimientos/depositos'
     | '/admin/general/movimientos/impuestos'
     | '/admin/general/movimientos/pagos-qr'
     | '/admin/general/movimientos/pagos-tarjeta'
     | '/admin/general/movimientos/retiros'
+    | '/admin/general/movimientos/transferencias'
     | '/admin/general/usuarios/$legajo'
     | '/admin/general/usuarios/comisiones'
     | '/admin/general/usuarios/cvu'
@@ -835,11 +857,13 @@ export interface FileRouteTypes {
     | '/admin/general/alertas/parametros-bloqueos'
     | '/admin/general/movimientos/cobros-qr'
     | '/admin/general/movimientos/comisiones'
+    | '/admin/general/movimientos/conversiones'
     | '/admin/general/movimientos/depositos'
     | '/admin/general/movimientos/impuestos'
     | '/admin/general/movimientos/pagos-qr'
     | '/admin/general/movimientos/pagos-tarjeta'
     | '/admin/general/movimientos/retiros'
+    | '/admin/general/movimientos/transferencias'
     | '/admin/general/usuarios/$legajo'
     | '/admin/general/usuarios/comisiones'
     | '/admin/general/usuarios/cvu'
@@ -911,11 +935,13 @@ export interface FileRouteTypes {
     | '/admin/general/alertas/parametros-bloqueos'
     | '/admin/general/movimientos/cobros-qr'
     | '/admin/general/movimientos/comisiones'
+    | '/admin/general/movimientos/conversiones'
     | '/admin/general/movimientos/depositos'
     | '/admin/general/movimientos/impuestos'
     | '/admin/general/movimientos/pagos-qr'
     | '/admin/general/movimientos/pagos-tarjeta'
     | '/admin/general/movimientos/retiros'
+    | '/admin/general/movimientos/transferencias'
     | '/admin/general/usuarios/$legajo'
     | '/admin/general/usuarios/comisiones'
     | '/admin/general/usuarios/cvu'
@@ -1386,6 +1412,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminGeneralMovimientosComisionesRouteImport
       parentRoute: typeof AdminGeneralMovimientosRoute
     }
+    '/admin/general/movimientos/conversiones': {
+      id: '/admin/general/movimientos/conversiones'
+      path: '/conversiones'
+      fullPath: '/admin/general/movimientos/conversiones'
+      preLoaderRoute: typeof AdminGeneralMovimientosConversionesRouteImport
+      parentRoute: typeof AdminGeneralMovimientosRoute
+    }
     '/admin/general/movimientos/depositos': {
       id: '/admin/general/movimientos/depositos'
       path: '/depositos'
@@ -1419,6 +1452,13 @@ declare module '@tanstack/react-router' {
       path: '/retiros'
       fullPath: '/admin/general/movimientos/retiros'
       preLoaderRoute: typeof AdminGeneralMovimientosRetirosRouteImport
+      parentRoute: typeof AdminGeneralMovimientosRoute
+    }
+    '/admin/general/movimientos/transferencias': {
+      id: '/admin/general/movimientos/transferencias'
+      path: '/transferencias'
+      fullPath: '/admin/general/movimientos/transferencias'
+      preLoaderRoute: typeof AdminGeneralMovimientosTransferenciasRouteImport
       parentRoute: typeof AdminGeneralMovimientosRoute
     }
     '/admin/general/usuarios/': {
@@ -1711,11 +1751,13 @@ const AdminGeneralAlertasRouteWithChildren =
 interface AdminGeneralMovimientosRouteChildren {
   AdminGeneralMovimientosCobrosQrRoute: typeof AdminGeneralMovimientosCobrosQrRoute
   AdminGeneralMovimientosComisionesRoute: typeof AdminGeneralMovimientosComisionesRoute
+  AdminGeneralMovimientosConversionesRoute: typeof AdminGeneralMovimientosConversionesRoute
   AdminGeneralMovimientosDepositosRoute: typeof AdminGeneralMovimientosDepositosRoute
   AdminGeneralMovimientosImpuestosRoute: typeof AdminGeneralMovimientosImpuestosRoute
   AdminGeneralMovimientosPagosQrRoute: typeof AdminGeneralMovimientosPagosQrRoute
   AdminGeneralMovimientosPagosTarjetaRoute: typeof AdminGeneralMovimientosPagosTarjetaRoute
   AdminGeneralMovimientosRetirosRoute: typeof AdminGeneralMovimientosRetirosRoute
+  AdminGeneralMovimientosTransferenciasRoute: typeof AdminGeneralMovimientosTransferenciasRoute
   AdminGeneralMovimientosIndexRoute: typeof AdminGeneralMovimientosIndexRoute
 }
 
@@ -1724,6 +1766,8 @@ const AdminGeneralMovimientosRouteChildren: AdminGeneralMovimientosRouteChildren
     AdminGeneralMovimientosCobrosQrRoute: AdminGeneralMovimientosCobrosQrRoute,
     AdminGeneralMovimientosComisionesRoute:
       AdminGeneralMovimientosComisionesRoute,
+    AdminGeneralMovimientosConversionesRoute:
+      AdminGeneralMovimientosConversionesRoute,
     AdminGeneralMovimientosDepositosRoute:
       AdminGeneralMovimientosDepositosRoute,
     AdminGeneralMovimientosImpuestosRoute:
@@ -1732,6 +1776,8 @@ const AdminGeneralMovimientosRouteChildren: AdminGeneralMovimientosRouteChildren
     AdminGeneralMovimientosPagosTarjetaRoute:
       AdminGeneralMovimientosPagosTarjetaRoute,
     AdminGeneralMovimientosRetirosRoute: AdminGeneralMovimientosRetirosRoute,
+    AdminGeneralMovimientosTransferenciasRoute:
+      AdminGeneralMovimientosTransferenciasRoute,
     AdminGeneralMovimientosIndexRoute: AdminGeneralMovimientosIndexRoute,
   }
 
