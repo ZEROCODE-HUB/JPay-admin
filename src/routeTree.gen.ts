@@ -30,6 +30,7 @@ import { Route as AdminComerciosApisRouteImport } from './routes/admin.comercios
 import { Route as AdminComerciosGestionRouteImport } from './routes/admin.comercios.gestion'
 import { Route as AdminComerciosImpuestosRouteImport } from './routes/admin.comercios.impuestos'
 import { Route as AdminComerciosLinkPagoRouteImport } from './routes/admin.comercios.link-pago'
+import { Route as AdminComerciosPosRouteImport } from './routes/admin.comercios.pos'
 import { Route as AdminComerciosTransferenciaRouteImport } from './routes/admin.comercios.transferencia'
 import { Route as AdminConfiguracionIndexRouteImport } from './routes/admin.configuracion.index'
 import { Route as AdminConfiguracionConfiguracionesRouteImport } from './routes/admin.configuracion.configuraciones'
@@ -193,6 +194,11 @@ const AdminComerciosImpuestosRoute = AdminComerciosImpuestosRouteImport.update({
 const AdminComerciosLinkPagoRoute = AdminComerciosLinkPagoRouteImport.update({
   id: '/link-pago',
   path: '/link-pago',
+  getParentRoute: () => AdminComerciosRoute,
+} as any)
+const AdminComerciosPosRoute = AdminComerciosPosRouteImport.update({
+  id: '/pos',
+  path: '/pos',
   getParentRoute: () => AdminComerciosRoute,
 } as any)
 const AdminComerciosTransferenciaRoute =
@@ -541,6 +547,7 @@ export interface FileRoutesByFullPath {
   '/admin/comercios/gestion': typeof AdminComerciosGestionRouteWithChildren
   '/admin/comercios/impuestos': typeof AdminComerciosImpuestosRouteWithChildren
   '/admin/comercios/link-pago': typeof AdminComerciosLinkPagoRouteWithChildren
+  '/admin/comercios/pos': typeof AdminComerciosPosRoute
   '/admin/comercios/transferencia': typeof AdminComerciosTransferenciaRouteWithChildren
   '/admin/configuracion/configuraciones': typeof AdminConfiguracionConfiguracionesRoute
   '/admin/configuracion/logins': typeof AdminConfiguracionLoginsRoute
@@ -608,6 +615,7 @@ export interface FileRoutesByTo {
   '/legales/terminos': typeof LegalesTerminosRoute
   '/admin': typeof AdminIndexRoute
   '/admin/administracion/reportes': typeof AdminAdministracionReportesRoute
+  '/admin/comercios/pos': typeof AdminComerciosPosRoute
   '/admin/configuracion/configuraciones': typeof AdminConfiguracionConfiguracionesRoute
   '/admin/configuracion/logins': typeof AdminConfiguracionLoginsRoute
   '/admin/configuracion/paises': typeof AdminConfiguracionPaisesRoute
@@ -682,6 +690,7 @@ export interface FileRoutesById {
   '/admin/comercios/gestion': typeof AdminComerciosGestionRouteWithChildren
   '/admin/comercios/impuestos': typeof AdminComerciosImpuestosRouteWithChildren
   '/admin/comercios/link-pago': typeof AdminComerciosLinkPagoRouteWithChildren
+  '/admin/comercios/pos': typeof AdminComerciosPosRoute
   '/admin/comercios/transferencia': typeof AdminComerciosTransferenciaRouteWithChildren
   '/admin/configuracion/configuraciones': typeof AdminConfiguracionConfiguracionesRoute
   '/admin/configuracion/logins': typeof AdminConfiguracionLoginsRoute
@@ -762,6 +771,7 @@ export interface FileRouteTypes {
     | '/admin/comercios/gestion'
     | '/admin/comercios/impuestos'
     | '/admin/comercios/link-pago'
+    | '/admin/comercios/pos'
     | '/admin/comercios/transferencia'
     | '/admin/configuracion/configuraciones'
     | '/admin/configuracion/logins'
@@ -829,6 +839,7 @@ export interface FileRouteTypes {
     | '/legales/terminos'
     | '/admin'
     | '/admin/administracion/reportes'
+    | '/admin/comercios/pos'
     | '/admin/configuracion/configuraciones'
     | '/admin/configuracion/logins'
     | '/admin/configuracion/paises'
@@ -902,6 +913,7 @@ export interface FileRouteTypes {
     | '/admin/comercios/gestion'
     | '/admin/comercios/impuestos'
     | '/admin/comercios/link-pago'
+    | '/admin/comercios/pos'
     | '/admin/comercios/transferencia'
     | '/admin/configuracion/configuraciones'
     | '/admin/configuracion/logins'
@@ -1116,6 +1128,13 @@ declare module '@tanstack/react-router' {
       path: '/link-pago'
       fullPath: '/admin/comercios/link-pago'
       preLoaderRoute: typeof AdminComerciosLinkPagoRouteImport
+      parentRoute: typeof AdminComerciosRoute
+    }
+    '/admin/comercios/pos': {
+      id: '/admin/comercios/pos'
+      path: '/pos'
+      fullPath: '/admin/comercios/pos'
+      preLoaderRoute: typeof AdminComerciosPosRouteImport
       parentRoute: typeof AdminComerciosRoute
     }
     '/admin/comercios/transferencia': {
@@ -1626,6 +1645,7 @@ interface AdminComerciosRouteChildren {
   AdminComerciosGestionRoute: typeof AdminComerciosGestionRouteWithChildren
   AdminComerciosImpuestosRoute: typeof AdminComerciosImpuestosRouteWithChildren
   AdminComerciosLinkPagoRoute: typeof AdminComerciosLinkPagoRouteWithChildren
+  AdminComerciosPosRoute: typeof AdminComerciosPosRoute
   AdminComerciosTransferenciaRoute: typeof AdminComerciosTransferenciaRouteWithChildren
   AdminComerciosIndexRoute: typeof AdminComerciosIndexRoute
 }
@@ -1635,6 +1655,7 @@ const AdminComerciosRouteChildren: AdminComerciosRouteChildren = {
   AdminComerciosGestionRoute: AdminComerciosGestionRouteWithChildren,
   AdminComerciosImpuestosRoute: AdminComerciosImpuestosRouteWithChildren,
   AdminComerciosLinkPagoRoute: AdminComerciosLinkPagoRouteWithChildren,
+  AdminComerciosPosRoute: AdminComerciosPosRoute,
   AdminComerciosTransferenciaRoute:
     AdminComerciosTransferenciaRouteWithChildren,
   AdminComerciosIndexRoute: AdminComerciosIndexRoute,
