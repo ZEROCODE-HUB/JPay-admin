@@ -6,16 +6,22 @@ import { ComisionesCard } from "./ComisionesCard";
 import { VolumenSistemaRow } from "./VolumenSistemaRow";
 import { RegistrosAlertasRow } from "./RegistrosAlertasRow";
 import { useDashboardKpis } from "../hooks/useDashboardKpis";
+import { useDashboardDetalle } from "../hooks/useDashboardDetalle";
+import { CobrosProveedorCard } from "./CobrosProveedorCard";
+import { usePaisConModulos } from "@/shared/modulos-pais";
 import { formatMoney, formatNumber } from "@/shared/format";
 
-// Los indicadores de arriba salen de la base (`dashboard_kpis`). Sin datos hasta conectar:
-// acreditaciones, volumen, estado del sistema, últimos registros y alertas recientes.
+// Indicadores (`dashboard_kpis`) y el resto del inicio (`dashboard_detalle`) salen de la base.
+// La tarjeta de acreditaciones es la de Payway (Argentina); en México, los cobros con Ecart Pay.
 
 const plural = (n: number, uno: string, varios: string) =>
   `${formatNumber(n)} ${n === 1 ? uno : varios}`;
 
 export function DashboardPage() {
   const { data: k, isLoading, isError } = useDashboardKpis();
+  const detalle = useDashboardDetalle();
+  const pais = usePaisConModulos();
+  const det = { d: detalle.data, isLoading: detalle.isLoading, isError: detalle.isError };
   const valor = (v: string) => (isLoading ? "…" : isError || !k ? "—" : v);
   const sub = (v: string) => (isLoading ? "Cargando…" : isError || !k ? "No se pudo cargar" : v);
   return (
@@ -63,15 +69,16 @@ export function DashboardPage() {
       </div>
 
       {/* Acreditaciones — formato operación */}
-      <AcreditacionesCard />
+      {pais.modulos.payway && <AcreditacionesCard />}
+      {pais.modulos.pagos_proveedor && <CobrosProveedorCard {...det} />}
 
       <ComisionesCard />
 
       {/* Volume chart + system health */}
-      <VolumenSistemaRow />
+      <VolumenSistemaRow {...det} />
 
       {/* Lower row */}
-      <RegistrosAlertasRow />
+      <RegistrosAlertasRow {...det} />
     </div>
   );
 }

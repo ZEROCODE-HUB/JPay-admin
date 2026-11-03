@@ -1,59 +1,82 @@
 import { CheckCircle2, XCircle } from "lucide-react";
 import { Card } from "@/components/portal-shell";
+import type { DashboardDetalle } from "@/lib/api/dashboard";
+import { formatDateTime, formatMoney, formatNumber } from "@/shared/format";
 
-import { monedaActiva } from "@/shared/format";
-// Sin datos hasta conectar con la base: volumen y estado del sistema eran valores de ejemplo
-// escritos a mano.
-const volumeData: number[] = [];
+type Props = { d?: DashboardDetalle; isLoading: boolean; isError: boolean };
 
-/** Gráfico de volumen transaccional + estado del sistema. */
-export function VolumenSistemaRow() {
-  const max = Math.max(1, ...volumeData);
+const diaDelMes = (iso: string) => Number(iso.slice(8, 10));
+
+/** Gráfico de volumen transaccional (14 días) + estado de conexiones y tareas programadas. */
+export function VolumenSistemaRow({ d, isLoading, isError }: Props) {
+  const puntos = d?.volumen14d ?? [];
+  const max = Math.max(1, ...puntos.map((p) => p.monto));
+  const total = puntos.reduce((s, p) => s + p.monto, 0);
+  const aviso = isLoading ? "Cargando…" : isError ? "No se pudo cargar." : null;
+
   return (
     <div className="grid lg:grid-cols-3 gap-6 mb-6">
       <Card className="lg:col-span-2">
         <div className="flex items-end justify-between mb-4">
           <div>
             <h3 className="font-display font-semibold">Volumen transaccional</h3>
-            <p className="text-xs text-muted-foreground">ultimos 14 dias — {monedaActiva()}</p>
+            <p className="text-xs text-muted-foreground">
+              Últimos 14 días — {d?.moneda ?? "—"}
+              {d && ` · ${formatMoney(total, { moneda: d.moneda })} en total`}
+            </p>
           </div>
         </div>
-        {volumeData.length === 0 && (
+        {aviso || total === 0 ? (
           <div className="flex items-center justify-center h-44 text-sm text-muted-foreground">
-            Sin datos de volumen.
+            {aviso ?? "Sin movimientos en los últimos 14 días."}
+          </div>
+        ) : (
+          <div className="flex items-end gap-1.5 h-44">
+            {puntos.map((p) => (
+              <div
+                key={p.dia}
+                className="flex-1 h-full flex flex-col items-center justify-end gap-1"
+                title={`${p.dia}: ${formatMoney(p.monto, { moneda: d?.moneda })} · ${formatNumber(p.operaciones)} operaciones`}
+              >
+                <div
+                  className="w-full rounded-t bg-gradient-to-t from-secondary to-primary"
+                  style={{ height: `${p.monto > 0 ? Math.max(2, (p.monto / max) * 100) : 0}%` }}
+                />
+                <span className="text-[10px] text-muted-foreground">{diaDelMes(p.dia)}</span>
+              </div>
+            ))}
           </div>
         )}
-        <div className={`flex items-end gap-1.5 h-44 ${volumeData.length === 0 ? "hidden" : ""}`}>
-          {volumeData.map((v, i) => (
-            <div key={i} className="flex-1 flex flex-col items-center gap-1">
-              <div
-                className="w-full rounded-t bg-gradient-to-t from-secondary to-primary"
-                style={{ height: `${(v / max) * 100}%` }}
-              />
-              <span className="text-[10px] text-muted-foreground">{i + 1}</span>
-            </div>
-          ))}
-        </div>
       </Card>
 
       <Card>
         <h3 className="font-display font-semibold mb-4">Estado del sistema</h3>
-        <p className="text-sm text-muted-foreground">Sin monitoreo configurado.</p>
-        <ul className="space-y-3 text-sm">
-          {([] as string[][]).map(([n, e, l]) => (
-            <li key={n} className="flex items-center justify-between">
-              <span className="flex items-center gap-2">
-                {e === "operativo" ? (
-                  <CheckCircle2 size={16} className="text-primary-ink" />
-                ) : (
-                  <XCircle size={16} className="text-amber-600" />
-                )}
-                {n}
-              </span>
-              <span className="text-xs text-muted-foreground font-mono tabular-nums">{l}</span>
-            </li>
-          ))}
-        </ul>
+        {aviso ? (
+          <p className="text-sm text-muted-foreground">{aviso}</p>
+        ) : (d?.estadoSistema ?? []).length === 0 ? (
+          <p className="text-sm text-muted-foreground">Sin proveedores activos ni tareas.</p>
+        ) : (
+          <ul className="space-y-3 text-sm">
+            {d!.estadoSistema.map((s) => (
+              <li key={s.nombre} className="flex items-start justify-between gap-3">
+                <span className="flex items-center gap-2 min-w-0">
+                  {s.ok ? (
+                    <CheckCircle2 size={16} className="text-primary-ink shrink-0" />
+                  ) : (
+                    <XCircle size={16} className="text-amber-600 shrink-0" />
+                  )}
+                  <span className="truncate">{s.nombre}</span>
+                </span>
+                <span className="text-right text-xs text-muted-foreground tabular-nums shrink-0">
+                  {s.ok || !s.at ? s.detalle : "Atrasada"}
+                  {s.at && (
+                    <span className="block font-mono text-[11px]">{formatDateTime(s.at)}</span>
+                  )}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
       </Card>
     </div>
   );
