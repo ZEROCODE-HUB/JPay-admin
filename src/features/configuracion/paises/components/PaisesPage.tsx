@@ -1,4 +1,5 @@
 import { usePaisesConfig } from "@/hooks/usePaises";
+import { ReembolsosVerificacionCard } from "./ReembolsosVerificacionCard";
 import { AlertasProveedorCard } from "./AlertasProveedorCard";
 import { CobreCard } from "./CobreCard";
 import { ConciliacionCard } from "./ConciliacionCard";
@@ -39,6 +40,7 @@ export function PaisesPage() {
           descripcion="Todos los días se comparan los pagos de JPay con las transacciones de cada comercio (últimos 3 días). También guarda la comisión y el neto de Ecart Pay en cada pago."
         />
       )}
+      {ecartpay && <ReembolsosVerificacionCard />}
       {ecartpay && <ContracargosCard />}
       {ecartpay && <EventosWebhookCard />}
       {ecartpay && <MsiCard />}

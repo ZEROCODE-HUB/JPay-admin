@@ -8194,6 +8194,24 @@ export type Database = {
         Args: { p_conexion_id: string }
         Returns: string
       }
+      reembolsos_en_verificacion: {
+        Args: never
+        Returns: {
+          cliente_legajo: string
+          created_at: string
+          error: string
+          id: string
+          metodo: string
+          monto: number
+          monto_pago: number
+          motivo: string
+          nota: string
+          origen: string
+          pago_id: string
+          proveedor: string
+          proveedor_orden_id: string
+        }[]
+      }
       registrar_deposito_entrante: {
         Args: {
           p_cbu_destino: string
@@ -8343,6 +8361,31 @@ export type Database = {
       resolver_alerta: {
         Args: { p_id: string; p_notes: string; p_resolution: string }
         Returns: undefined
+      }
+      resolver_reembolso: {
+        Args: { p_id: string; p_nota: string; p_ok: boolean }
+        Returns: {
+          created_at: string
+          error: string | null
+          estado: string
+          finalizado_at: string | null
+          id: string
+          monto: number
+          motivo: string
+          nota: string | null
+          origen: string
+          pago_id: string
+          proveedor: string
+          proveedor_reembolso_id: string | null
+          respuesta: Json
+          solicitado_por: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "reembolsos"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       resumen_lotes_admin: {
         Args: { p_desde?: string; p_hasta?: string }
