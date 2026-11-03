@@ -52,7 +52,12 @@ export function PaisesPage() {
         />
       )}
       {cobre && <AlertasProveedorCard proveedor="cobre" nombre="Cobre" />}
-      {cobre && <CobreCard simulado={cobre.conexion.modo === "simulado"} />}
+      {/* Sin prueba de conexión todavía, el modo es el simulado (COBRE_MODO por defecto). */}
+      {cobre && (
+        <CobreCard
+          simulado={cobre.conexion.modo !== "prueba" && cobre.conexion.modo !== "produccion"}
+        />
+      )}
       {cobre && (
         <ConciliacionCard
           proveedor="cobre"

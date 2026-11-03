@@ -55,7 +55,7 @@ export const TABS: { key: TabKey; label: string; modulo?: Modulo }[] = [
   { key: "riesgo", label: "Riesgo y monitoreo", modulo: "monitoreo_automatico" },
   { key: "contexto", label: "Contexto operativo" },
   { key: "modulos", label: "Módulos y productos" },
-  { key: "cobre", label: "Cobre (México)" },
+  { key: "cobre", label: "Cobre (México)", modulo: "transferencias_cobre" },
   { key: "historial", label: "Historial" },
 ];
 
