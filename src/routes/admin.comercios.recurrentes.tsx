@@ -43,9 +43,7 @@ function Page() {
               {comercios.isLoading ? (
                 <p className="mt-2 text-sm text-muted-foreground">Cargando…</p>
               ) : comercios.isError ? (
-                <p className="mt-2 text-sm text-danger-600">
-                  {(comercios.error as Error).message}
-                </p>
+                <p className="mt-2 text-sm text-danger-600">{(comercios.error as Error).message}</p>
               ) : lista.length === 0 ? (
                 <p className="mt-2 text-sm text-muted-foreground">
                   Ningún comercio tiene Ecart Pay conectado.
