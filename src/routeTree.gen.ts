@@ -27,6 +27,7 @@ import { Route as AdminAdministracionSoporteRouteImport } from './routes/admin.a
 import { Route as AdminAdministracionUsuariosRouteImport } from './routes/admin.administracion.usuarios'
 import { Route as AdminComerciosIndexRouteImport } from './routes/admin.comercios.index'
 import { Route as AdminComerciosApisRouteImport } from './routes/admin.comercios.apis'
+import { Route as AdminComerciosComisionesJpayRouteImport } from './routes/admin.comercios.comisiones-jpay'
 import { Route as AdminComerciosGestionRouteImport } from './routes/admin.comercios.gestion'
 import { Route as AdminComerciosImpuestosRouteImport } from './routes/admin.comercios.impuestos'
 import { Route as AdminComerciosLinkPagoRouteImport } from './routes/admin.comercios.link-pago'
@@ -182,6 +183,12 @@ const AdminComerciosApisRoute = AdminComerciosApisRouteImport.update({
   path: '/apis',
   getParentRoute: () => AdminComerciosRoute,
 } as any)
+const AdminComerciosComisionesJpayRoute =
+  AdminComerciosComisionesJpayRouteImport.update({
+    id: '/comisiones-jpay',
+    path: '/comisiones-jpay',
+    getParentRoute: () => AdminComerciosRoute,
+  } as any)
 const AdminComerciosGestionRoute = AdminComerciosGestionRouteImport.update({
   id: '/gestion',
   path: '/gestion',
@@ -551,6 +558,7 @@ export interface FileRoutesByFullPath {
   '/admin/administracion/soporte': typeof AdminAdministracionSoporteRouteWithChildren
   '/admin/administracion/usuarios': typeof AdminAdministracionUsuariosRouteWithChildren
   '/admin/comercios/apis': typeof AdminComerciosApisRouteWithChildren
+  '/admin/comercios/comisiones-jpay': typeof AdminComerciosComisionesJpayRoute
   '/admin/comercios/gestion': typeof AdminComerciosGestionRouteWithChildren
   '/admin/comercios/impuestos': typeof AdminComerciosImpuestosRouteWithChildren
   '/admin/comercios/link-pago': typeof AdminComerciosLinkPagoRouteWithChildren
@@ -623,6 +631,7 @@ export interface FileRoutesByTo {
   '/legales/terminos': typeof LegalesTerminosRoute
   '/admin': typeof AdminIndexRoute
   '/admin/administracion/reportes': typeof AdminAdministracionReportesRoute
+  '/admin/comercios/comisiones-jpay': typeof AdminComerciosComisionesJpayRoute
   '/admin/comercios/pos': typeof AdminComerciosPosRoute
   '/admin/comercios/recurrentes': typeof AdminComerciosRecurrentesRoute
   '/admin/configuracion/configuraciones': typeof AdminConfiguracionConfiguracionesRoute
@@ -696,6 +705,7 @@ export interface FileRoutesById {
   '/admin/administracion/soporte': typeof AdminAdministracionSoporteRouteWithChildren
   '/admin/administracion/usuarios': typeof AdminAdministracionUsuariosRouteWithChildren
   '/admin/comercios/apis': typeof AdminComerciosApisRouteWithChildren
+  '/admin/comercios/comisiones-jpay': typeof AdminComerciosComisionesJpayRoute
   '/admin/comercios/gestion': typeof AdminComerciosGestionRouteWithChildren
   '/admin/comercios/impuestos': typeof AdminComerciosImpuestosRouteWithChildren
   '/admin/comercios/link-pago': typeof AdminComerciosLinkPagoRouteWithChildren
@@ -778,6 +788,7 @@ export interface FileRouteTypes {
     | '/admin/administracion/soporte'
     | '/admin/administracion/usuarios'
     | '/admin/comercios/apis'
+    | '/admin/comercios/comisiones-jpay'
     | '/admin/comercios/gestion'
     | '/admin/comercios/impuestos'
     | '/admin/comercios/link-pago'
@@ -850,6 +861,7 @@ export interface FileRouteTypes {
     | '/legales/terminos'
     | '/admin'
     | '/admin/administracion/reportes'
+    | '/admin/comercios/comisiones-jpay'
     | '/admin/comercios/pos'
     | '/admin/comercios/recurrentes'
     | '/admin/configuracion/configuraciones'
@@ -922,6 +934,7 @@ export interface FileRouteTypes {
     | '/admin/administracion/soporte'
     | '/admin/administracion/usuarios'
     | '/admin/comercios/apis'
+    | '/admin/comercios/comisiones-jpay'
     | '/admin/comercios/gestion'
     | '/admin/comercios/impuestos'
     | '/admin/comercios/link-pago'
@@ -1120,6 +1133,13 @@ declare module '@tanstack/react-router' {
       path: '/apis'
       fullPath: '/admin/comercios/apis'
       preLoaderRoute: typeof AdminComerciosApisRouteImport
+      parentRoute: typeof AdminComerciosRoute
+    }
+    '/admin/comercios/comisiones-jpay': {
+      id: '/admin/comercios/comisiones-jpay'
+      path: '/comisiones-jpay'
+      fullPath: '/admin/comercios/comisiones-jpay'
+      preLoaderRoute: typeof AdminComerciosComisionesJpayRouteImport
       parentRoute: typeof AdminComerciosRoute
     }
     '/admin/comercios/gestion': {
@@ -1662,6 +1682,7 @@ const AdminComerciosTransferenciaRouteWithChildren =
 
 interface AdminComerciosRouteChildren {
   AdminComerciosApisRoute: typeof AdminComerciosApisRouteWithChildren
+  AdminComerciosComisionesJpayRoute: typeof AdminComerciosComisionesJpayRoute
   AdminComerciosGestionRoute: typeof AdminComerciosGestionRouteWithChildren
   AdminComerciosImpuestosRoute: typeof AdminComerciosImpuestosRouteWithChildren
   AdminComerciosLinkPagoRoute: typeof AdminComerciosLinkPagoRouteWithChildren
@@ -1673,6 +1694,7 @@ interface AdminComerciosRouteChildren {
 
 const AdminComerciosRouteChildren: AdminComerciosRouteChildren = {
   AdminComerciosApisRoute: AdminComerciosApisRouteWithChildren,
+  AdminComerciosComisionesJpayRoute: AdminComerciosComisionesJpayRoute,
   AdminComerciosGestionRoute: AdminComerciosGestionRouteWithChildren,
   AdminComerciosImpuestosRoute: AdminComerciosImpuestosRouteWithChildren,
   AdminComerciosLinkPagoRoute: AdminComerciosLinkPagoRouteWithChildren,

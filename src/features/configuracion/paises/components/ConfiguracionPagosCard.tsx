@@ -31,6 +31,8 @@ export function ConfiguracionPagosCard({ config }: { config: ConfiguracionPagos 
     comisionPct: parseMonto(texto.comisionPct),
     comisionFija: parseMonto(texto.comisionFija),
     ivaComisionPct: parseMonto(texto.ivaComisionPct),
+    comisionSuscripcionPct: parseMonto(texto.comisionSuscripcionPct),
+    comisionDomiciliacionPct: parseMonto(texto.comisionDomiciliacionPct),
   };
   const errores = validarConfiguracion(actual);
   const valido = Object.keys(errores).length === 0;
@@ -78,6 +80,8 @@ export function ConfiguracionPagosCard({ config }: { config: ConfiguracionPagos 
             ["comisionPct", "Comisión (%)"],
             ["comisionFija", "Comisión fija por cobro"],
             ["ivaComisionPct", "IVA sobre la comisión (%)"],
+            ["comisionSuscripcionPct", "Comisión en suscripciones (%)"],
+            ["comisionDomiciliacionPct", "Comisión en domiciliación (%)"],
           ] as const
         ).map(([campo, etiqueta]) => (
           <div key={campo}>
@@ -110,6 +114,8 @@ const aTexto = (c: ConfiguracionPagos) => ({
   comisionPct: String(c.comisionPct),
   comisionFija: String(c.comisionFija),
   ivaComisionPct: String(c.ivaComisionPct),
+  comisionSuscripcionPct: String(c.comisionSuscripcionPct),
+  comisionDomiciliacionPct: String(c.comisionDomiciliacionPct),
 });
 
 function Opciones({

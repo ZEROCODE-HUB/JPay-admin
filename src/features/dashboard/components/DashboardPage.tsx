@@ -9,6 +9,7 @@ import { useDashboardKpis } from "../hooks/useDashboardKpis";
 import { useDashboardDetalle } from "../hooks/useDashboardDetalle";
 import { CobrosProveedorCard } from "./CobrosProveedorCard";
 import { usePaisConModulos } from "@/shared/modulos-pais";
+import { useRealtimeInvalidate } from "@/shared/realtime";
 import { formatMoney, formatNumber } from "@/shared/format";
 
 // Indicadores (`dashboard_kpis`) y el resto del inicio (`dashboard_detalle`) salen de la base.
@@ -20,6 +21,14 @@ const plural = (n: number, uno: string, varios: string) =>
 export function DashboardPage() {
   const { data: k, isLoading, isError } = useDashboardKpis();
   const detalle = useDashboardDetalle();
+  // Tiempo real: cualquier cambio en estas tablas vuelve a pedir los datos del inicio.
+  useRealtimeInvalidate("realtime-dashboard", {
+    transactions: [["dashboard"]],
+    pagos: [["dashboard"]],
+    alerts: [["dashboard"]],
+    clientes: [["dashboard"]],
+    cobros_recurrentes: [["dashboard"]],
+  });
   const pais = usePaisConModulos();
   const det = { d: detalle.data, isLoading: detalle.isLoading, isError: detalle.isError };
   const valor = (v: string) => (isLoading ? "…" : isError || !k ? "—" : v);

@@ -54,7 +54,15 @@ export const COBROS_COMISION: Record<CobroComision, { label: string; detalle: st
 };
 
 export type ErroresConfiguracion = Partial<
-  Record<"cobroComision" | "comisionPct" | "comisionFija" | "ivaComisionPct", string>
+  Record<
+    | "cobroComision"
+    | "comisionPct"
+    | "comisionFija"
+    | "ivaComisionPct"
+    | "comisionSuscripcionPct"
+    | "comisionDomiciliacionPct",
+    string
+  >
 >;
 
 /** Mismas reglas que los CHECK de `configuracion_pagos`. */
@@ -70,6 +78,9 @@ export function validarConfiguracion(c: ConfiguracionPagos): ErroresConfiguracio
     e.comisionFija = "No puede ser negativa.";
   if (!Number.isFinite(c.ivaComisionPct) || c.ivaComisionPct < 0 || c.ivaComisionPct >= 100) {
     e.ivaComisionPct = "Entre 0 y 99.99.";
+  }
+  for (const k of ["comisionSuscripcionPct", "comisionDomiciliacionPct"] as const) {
+    if (!Number.isFinite(c[k]) || c[k] < 0 || c[k] >= 100) e[k] = "Entre 0 y 99.99.";
   }
   return e;
 }

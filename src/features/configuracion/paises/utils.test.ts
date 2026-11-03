@@ -10,6 +10,8 @@ const base: ConfiguracionPagos = {
   comisionPct: 2.5,
   comisionFija: 3,
   ivaComisionPct: 16,
+  comisionSuscripcionPct: 0,
+  comisionDomiciliacionPct: 0,
   updatedAt: "",
 };
 

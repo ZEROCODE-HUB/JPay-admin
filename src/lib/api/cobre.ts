@@ -16,6 +16,11 @@ export type ConfiguracionCobre = {
   exigirOtp: boolean;
   /** Si las conversiones a dólares pasan por las reglas de prevención (como un retiro). */
   conversionEvaluaReglas: boolean;
+  /**
+   * 'descontar': la comisión de JPay se descuenta del saldo en cada operación; 'calcular': no se
+   * descuenta y se le pide el pago a la empresa (calculadora de comisiones).
+   */
+  modoComision: "descontar" | "calcular";
 };
 
 export type BalanceMatriz = {
@@ -76,7 +81,9 @@ export async function getConfiguracionCobre(): Promise<ConfiguracionCobre> {
   const sb = requireSupabase();
   const { data, error } = await sb
     .from("cobre_configuracion")
-    .select("monto_aprobacion, monto_aprobacion_usd, exigir_otp, conversion_evalua_reglas")
+    .select(
+      "monto_aprobacion, monto_aprobacion_usd, exigir_otp, conversion_evalua_reglas, modo_comision",
+    )
     .eq("id", 1)
     .single();
   if (error) throw new DataAccessError(error);
@@ -86,6 +93,7 @@ export async function getConfiguracionCobre(): Promise<ConfiguracionCobre> {
       data.monto_aprobacion_usd != null ? Number(data.monto_aprobacion_usd) : null,
     exigirOtp: data.exigir_otp,
     conversionEvaluaReglas: data.conversion_evalua_reglas,
+    modoComision: data.modo_comision === "calcular" ? "calcular" : "descontar",
   };
 }
 
@@ -98,6 +106,7 @@ export async function guardarConfiguracionCobre(c: ConfiguracionCobre): Promise<
       monto_aprobacion_usd: c.montoAprobacionUsd,
       exigir_otp: c.exigirOtp,
       conversion_evalua_reglas: c.conversionEvaluaReglas,
+      modo_comision: c.modoComision,
       updated_at: new Date().toISOString(),
     })
     .eq("id", 1);

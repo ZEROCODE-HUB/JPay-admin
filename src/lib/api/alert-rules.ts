@@ -18,7 +18,9 @@ export type AlertRuleCode =
   | "minors_transfer_policy"
   | "unusual_hours"
   | "deposit_min_wages_block"
-  | "plaft_screening";
+  | "plaft_screening"
+  | "payment_link_amount"
+  | "payment_links_per_day";
 
 export type ScheduleDay = { day: number; enabled: boolean; start: string; end: string };
 export type MinorsPolicy = "allow" | "alert" | "block";

@@ -60,6 +60,9 @@ export type ConfiguracionPagos = {
   comisionPct: number;
   comisionFija: number;
   ivaComisionPct: number;
+  /** Comisión de JPay sobre cada cobro de una suscripción / domiciliación (Ecart Pay). */
+  comisionSuscripcionPct: number;
+  comisionDomiciliacionPct: number;
   updatedAt: string;
 };
 
@@ -132,6 +135,8 @@ function toConfiguracion(r: Tables<"configuracion_pagos">): ConfiguracionPagos {
     comisionPct: Number(r.comision_pct),
     comisionFija: Number(r.comision_fija),
     ivaComisionPct: Number(r.iva_comision_pct),
+    comisionSuscripcionPct: Number(r.comision_suscripcion_pct ?? 0),
+    comisionDomiciliacionPct: Number(r.comision_domiciliacion_pct ?? 0),
     updatedAt: r.updated_at,
   };
 }
@@ -239,6 +244,8 @@ export async function updateConfiguracionPagos(
       comision_pct: input.comisionPct,
       comision_fija: input.comisionFija,
       iva_comision_pct: input.ivaComisionPct,
+      comision_suscripcion_pct: input.comisionSuscripcionPct,
+      comision_domiciliacion_pct: input.comisionDomiciliacionPct,
     })
     .eq("pais", pais)
     .eq("proveedor", proveedor);

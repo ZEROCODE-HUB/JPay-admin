@@ -72,6 +72,7 @@ const NAV: NavItem[] = [
         icon: Repeat,
         modulo: "suscripciones",
       },
+      { to: "/admin/comercios/comisiones-jpay", label: "Comisiones de JPay", icon: Receipt },
       { to: "/admin/comercios/impuestos", label: "Impuestos", icon: Receipt, modulo: "iibb" },
       { to: "/admin/comercios/apis", label: "APIs externas", icon: Code2 },
     ],

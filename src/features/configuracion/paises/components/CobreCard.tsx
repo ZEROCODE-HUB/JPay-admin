@@ -33,6 +33,7 @@ export function CobreCard({ simulado }: { simulado: boolean }) {
   const [montoUsd, setMontoUsd] = useState("");
   const [otp, setOtp] = useState(false);
   const [reglasFx, setReglasFx] = useState(false);
+  const [modoComision, setModoComision] = useState<"descontar" | "calcular">("descontar");
   const [dep, setDep] = useState({ clabe: "", monto: "" });
   const [r2p, setR2p] = useState("");
   const [saldos, setSaldos] = useState<Record<string, string>>({});
@@ -43,6 +44,7 @@ export function CobreCard({ simulado }: { simulado: boolean }) {
     setMontoUsd(c.montoAprobacionUsd != null ? String(c.montoAprobacionUsd) : "");
     setOtp(c.exigirOtp);
     setReglasFx(c.conversionEvaluaReglas);
+    setModoComision(c.modoComision);
   }, [c]);
 
   const guardar = () => {
@@ -57,6 +59,7 @@ export function CobreCard({ simulado }: { simulado: boolean }) {
         montoAprobacionUsd: usd,
         exigirOtp: otp,
         conversionEvaluaReglas: reglasFx,
+        modoComision,
       },
       { onSuccess: () => toast.success("Configuración de Cobre guardada"), onError: avisarError },
     );
@@ -217,6 +220,25 @@ export function CobreCard({ simulado }: { simulado: boolean }) {
                 <Toggle label="Exigir OTP" enabled={otp} onClick={() => setOtp(!otp)} />
                 <span className="text-muted-foreground">{otp ? "Sí" : "No"}</span>
               </div>
+            </div>
+            <div className="text-xs md:col-span-3">
+              <label htmlFor="cobre-modo-comision">Comisión de JPay</label>
+              <select
+                id="cobre-modo-comision"
+                className="mt-2 block w-full md:w-[28rem] h-9 px-2 rounded-md border border-input bg-card text-sm"
+                value={modoComision}
+                onChange={(e) => setModoComision(e.target.value as "descontar" | "calcular")}
+              >
+                <option value="descontar">
+                  Descontarla del saldo del comercio en cada operación
+                </option>
+                <option value="calcular">
+                  No descontarla: calcularla y pedirle el pago a la empresa
+                </option>
+              </select>
+              <p className="mt-1 text-muted-foreground">
+                Lo calculado se ve en Comercios → Comisiones de JPay.
+              </p>
             </div>
             <div className="text-xs md:col-span-3">
               Conversiones a dólares: aplicar las reglas de prevención (como un retiro)

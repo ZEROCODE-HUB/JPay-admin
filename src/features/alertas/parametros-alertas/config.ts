@@ -134,6 +134,21 @@ export const GROUPS: GroupView[] = [
     ],
   },
   {
+    title: "Enlaces de pago",
+    rules: [
+      {
+        code: "payment_link_amount",
+        switchLabel: "Cobro alto por link de pago",
+        numbers: [{ key: "min_amount", label: "Alertar desde (monto por cobro)" }],
+      },
+      {
+        code: "payment_links_per_day",
+        switchLabel: "Muchos links de pago en el día",
+        numbers: [{ key: "max_per_day", label: "Máximo de links por día", integer: true }],
+      },
+    ],
+  },
+  {
     title: "Movimiento en horario inusual",
     full: true,
     rules: [{ code: "unusual_hours", switchLabel: "Regla de horario inusual habilitada" }],
