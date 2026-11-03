@@ -8010,6 +8010,7 @@ export type Database = {
       current_admin_id: { Args: never; Returns: string }
       current_cliente_id: { Args: never; Returns: string }
       current_cliente_legajo: { Args: never; Returns: string }
+      dashboard_kpis: { Args: never; Returns: Json }
       ejecutar_barrido_compliance: { Args: never; Returns: Json }
       eliminar_auth_por_email: { Args: { p_email: string }; Returns: undefined }
       eliminar_lote: { Args: { p_lote_id: string }; Returns: undefined }
