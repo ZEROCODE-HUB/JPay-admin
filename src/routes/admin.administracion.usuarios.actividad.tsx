@@ -7,25 +7,12 @@ import { DataTable, type Column } from "@/shared/ui/data-table";
 import { FormDialog } from "@/shared/ui/form-dialog";
 import { ActionsDropdown, type ActionItem } from "@/components/actions-dropdown";
 import { Badge, BtnOutline, PageHeader } from "@/components/portal-shell";
+import { useQuery } from "@tanstack/react-query";
+import { listActividad, type EventoActividad } from "@/lib/api/actividad";
+import { cuentaDelPais } from "@/lib/cuenta-pais";
+import { getPais } from "@/shared/pais";
 
-type Evento = {
-  legajo: string;
-  email: string;
-  fecha: string;
-  hora: string;
-  tipo: string;
-  monto: string;
-  estado: string;
-  nombre: string;
-  destino: string;
-  cuit: string;
-  destinatario: string;
-  cvu: string;
-  cvuBalance: string;
-};
-
-// Sin datos hasta conectar con la base (antes eran datos de ejemplo).
-const mock: Evento[] = [];
+type Evento = EventoActividad;
 
 export const Route = createFileRoute("/admin/administracion/usuarios/actividad")({
   head: () => ({ meta: [{ title: "Actividad en backoffice — Admin Panel" }] }),
@@ -49,6 +36,10 @@ function downloadExcel(filename: string, rows: Record<string, unknown>[]) {
 }
 
 function Page() {
+  const q = useQuery({ queryKey: ["actividad-clientes"], queryFn: () => listActividad() });
+  const mock = q.data ?? [];
+  const cuenta = cuentaDelPais();
+  const idFiscal = getPais().codigo === "AR" ? "CUIT" : "RFC";
   const [detalle, setDetalle] = useState<Evento | null>(null);
 
   const getActions = (r: Evento): ActionItem[] => [
@@ -88,27 +79,27 @@ function Page() {
       key: "estado",
       label: "Estado",
       filterable: "enum",
-      filterOptions: ["Exitoso", "Pendiente", "Completado", "Resuelto"],
+      filterOptions: [...new Set(mock.map((r) => r.estado))],
       render: (r) => <Badge>{r.estado}</Badge>,
     },
     { key: "nombre", label: "Nombre", filterable: true, render: (r) => r.nombre },
     { key: "destino", label: "Destino", filterable: true, render: (r) => r.destino },
     {
       key: "cuit",
-      label: "CUIT",
+      label: idFiscal,
       filterable: true,
       render: (r) => <span className="font-mono text-xs">{r.cuit}</span>,
     },
     { key: "destinatario", label: "Destinatario", filterable: true, render: (r) => r.destinatario },
     {
       key: "cvu",
-      label: "CVU",
+      label: cuenta,
       filterable: true,
       render: (r) => <span className="font-mono text-xs tabular-nums">{r.cvu}</span>,
     },
     {
       key: "cvuBalance",
-      label: "CVU de balance",
+      label: `${cuenta} del cliente`,
       filterable: true,
       render: (r) => <span className="font-mono text-xs tabular-nums">{r.cvuBalance}</span>,
     },
@@ -125,17 +116,17 @@ function Page() {
       Estado: r.estado,
       Nombre: r.nombre,
       Destino: r.destino,
-      CUIT: r.cuit,
+      [idFiscal]: r.cuit,
       Destinatario: r.destinatario,
-      CVU: r.cvu,
-      "CVU de balance": r.cvuBalance,
+      [cuenta]: r.cvu,
+      [`${cuenta} del cliente`]: r.cvuBalance,
     }));
 
   return (
     <>
       <PageHeader
         title="Actividad en backoffice"
-        description="Registro de eventos del panel administrativo"
+        description="Últimos movimientos de los clientes (los más nuevos primero)"
         action={
           <BtnOutline
             onClick={() => {
@@ -150,7 +141,7 @@ function Page() {
       <DataTable
         columns={columns}
         data={mock}
-        keyExtractor={(r) => r.legajo + r.fecha + r.hora + r.tipo}
+        keyExtractor={(r) => r.id}
         pageSize={10}
         actions={(r) => <ActionsDropdown actions={getActions(r)} />}
         showDownloadButton={false}
@@ -203,7 +194,7 @@ function Page() {
               <span className="font-medium">{detalle.destino}</span>
             </div>
             <div>
-              <span className="text-muted-foreground">CUIT:</span>{" "}
+              <span className="text-muted-foreground">{idFiscal}:</span>{" "}
               <span className="font-medium font-mono text-xs">{detalle.cuit}</span>
             </div>
             <div>
@@ -211,11 +202,11 @@ function Page() {
               <span className="font-medium">{detalle.destinatario}</span>
             </div>
             <div>
-              <span className="text-muted-foreground">CVU:</span>{" "}
+              <span className="text-muted-foreground">{cuenta}:</span>{" "}
               <span className="font-medium font-mono text-xs tabular-nums">{detalle.cvu}</span>
             </div>
             <div>
-              <span className="text-muted-foreground">CVU de balance:</span>{" "}
+              <span className="text-muted-foreground">{cuenta} del cliente:</span>{" "}
               <span className="font-medium font-mono text-xs tabular-nums">
                 {detalle.cvuBalance}
               </span>

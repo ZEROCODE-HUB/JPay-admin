@@ -1,11 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
 import { CheckCircle2, XCircle, Eye } from "lucide-react";
 import { DataTable, type Column } from "@/shared/ui/data-table";
 import { PageHeader, Card, Badge, BtnOutline } from "@/components/portal-shell";
 import { ActionsDropdown, type ActionItem } from "@/components/actions-dropdown";
 import { DeveloperModeToggle } from "@/components/developer-mode-toggle";
 import { pageTitle } from "@/brand/brand";
+import { useEventosNotificacion } from "@/hooks/useEventosNotificacion";
+import type { EventoNotificacion } from "@/lib/api/types";
+import { formatDateTime } from "@/shared/format";
 
 export const Route = createFileRoute("/admin/notificaciones/")({
   component: Page,
@@ -21,7 +23,7 @@ type Destinatarios = "Admin" | "Cliente" | "Ambos";
 type Canal = "Email" | "Telegram" | "WhatsApp";
 
 type Evento = {
-  id: number;
+  id: string;
   evento: string;
   afecta: string;
   fecha: string;
@@ -30,98 +32,19 @@ type Evento = {
   entregado: boolean;
 };
 
-const eventosIniciales: Evento[] = [
-  {
-    id: 1,
-    evento: "Timeout en la conexión con AFIP",
-    afecta: "Operaciones (general)",
-    fecha: "11/08/2026 09:15",
-    destinatarios: "Admin",
-    canal: "Telegram",
-    entregado: true,
-  },
-  {
-    id: 2,
-    evento: "El procesador de pagos por CVU dejó de responder",
-    afecta: "Procesamiento de pagos",
-    fecha: "11/08/2026 08:55",
-    destinatarios: "Admin",
-    canal: "Telegram",
-    entregado: true,
-  },
-  {
-    id: 3,
-    evento: "Intento de acceso sospechoso desde una IP no habitual",
-    afecta: "Seguridad (general)",
-    fecha: "11/08/2026 07:15",
-    destinatarios: "Admin",
-    canal: "Telegram",
-    entregado: true,
-  },
-  {
-    id: 4,
-    evento: "Un cliente tiene la documentación (KYC) vencida",
-    afecta: "Consorcio Belgrano",
-    fecha: "10/08/2026 23:30",
-    destinatarios: "Ambos",
-    canal: "Email",
-    entregado: true,
-  },
-  {
-    id: 5,
-    evento: "No se pudo entregar la confirmación de un cobro externo",
-    afecta: "Integraciones (general)",
-    fecha: "10/08/2026 22:10",
-    destinatarios: "Admin",
-    canal: "Telegram",
-    entregado: false,
-  },
-  {
-    id: 6,
-    evento: "Resumen diario de operaciones disponible",
-    afecta: "Administración (general)",
-    fecha: "10/08/2026 20:00",
-    destinatarios: "Admin",
-    canal: "Email",
-    entregado: true,
-  },
-  {
-    id: 7,
-    evento: "Frecuencia anómala de pagos detectada",
-    afecta: "Prevención de fraude",
-    fecha: "10/08/2026 18:30",
-    destinatarios: "Admin",
-    canal: "Telegram",
-    entregado: true,
-  },
-  {
-    id: 8,
-    evento: "Nuevo comercio registrado y activo en la plataforma",
-    afecta: "Comercio Demo SA",
-    fecha: "10/08/2026 15:00",
-    destinatarios: "Ambos",
-    canal: "Email",
-    entregado: true,
-  },
-  {
-    id: 9,
-    evento: "El cobro no pudo procesarse",
-    afecta: "Pagos Express SRL",
-    fecha: "10/08/2026 12:40",
-    destinatarios: "Cliente",
-    canal: "WhatsApp",
-    entregado: true,
-  },
-  {
-    id: 10,
-    evento: "Los fondos acreditados ya están disponibles",
-    afecta: "Microcréditos del Sur",
-    fecha: "10/08/2026 11:05",
-    destinatarios: "Cliente",
-    canal: "WhatsApp",
-    entregado: false,
-  },
-];
+/** Evento de `eventos_notificacion` en el formato de la tabla. */
+function aEvento(n: EventoNotificacion): Evento {
+  const afecta = n.metadata?.afecta;
+  return {
+    id: n.id,
+    evento: n.titulo,
+    afecta: typeof afecta === "string" && afecta ? afecta : n.mensaje,
+    fecha: formatDateTime(n.fecha),
+    destinatarios: n.audiencia,
+    canal: n.canal,
+    entregado: n.estadoEntrega === "enviado",
+  };
+}
 
 const destinatarioTone: Record<Destinatarios, "neutral" | "success" | "warn"> = {
   Admin: "neutral",
@@ -136,7 +59,8 @@ const canalTone: Record<Canal, "neutral" | "success" | "warn"> = {
 };
 
 function Page() {
-  const [eventos] = useState(eventosIniciales);
+  const q = useEventosNotificacion({ page: 0, pageSize: 200 });
+  const eventos = q.rows.map(aEvento);
 
   const getActions = (_r: Evento): ActionItem[] => [
     {
@@ -220,12 +144,14 @@ function Page() {
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
         <Card>
           <div className="text-xs uppercase tracking-wide text-muted-foreground">
-            Notificaciones (7 días)
+            Notificaciones
           </div>
           <div className="font-display text-xl md:text-2xl font-semibold mt-1 tabular-nums">
             {eventos.length}
           </div>
-          <div className="text-xs text-muted-foreground mt-1">últimos eventos registrados</div>
+          <div className="text-xs text-muted-foreground mt-1">
+            {q.isLoading ? "Cargando…" : "últimos eventos registrados"}
+          </div>
         </Card>
         <Card>
           <div className="text-xs uppercase tracking-wide text-muted-foreground">Entregadas</div>

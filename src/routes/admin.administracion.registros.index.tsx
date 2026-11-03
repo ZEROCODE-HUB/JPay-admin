@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Download, Eye } from "lucide-react";
 import * as XLSX from "xlsx";
@@ -7,20 +8,10 @@ import { DataTable, type Column } from "@/shared/ui/data-table";
 import { FormDialog } from "@/shared/ui/form-dialog";
 import { ActionsDropdown, type ActionItem } from "@/components/actions-dropdown";
 import { Badge, PageHeader } from "@/components/portal-shell";
-
-type Fondo = {
-  legajo: string;
-  email: string;
-  nombre: string;
-  cvu: string;
-  alias: string;
-  balance: string;
-  estado: string;
-  alerta?: string;
-};
-
-// Sin datos hasta conectar con la base (antes eran datos de ejemplo).
-const mock: Fondo[] = [];
+import { listFondosPorUsuario, type FondoSubcuenta } from "@/lib/api/fondos";
+import { cuentaDelPais } from "@/lib/cuenta-pais";
+import { formatMoney } from "@/shared/format";
+import { getPais } from "@/shared/pais";
 
 export const Route = createFileRoute("/admin/administracion/registros/")({
   head: () => ({ meta: [{ title: "Fondos por usuario — Admin Panel" }] }),
@@ -43,65 +34,92 @@ function downloadExcel(filename: string, rows: Record<string, unknown>[]) {
   URL.revokeObjectURL(url);
 }
 
-function Page() {
-  const [viewing, setViewing] = useState<Fondo | null>(null);
+const saldo = (r: FondoSubcuenta) => formatMoney(r.disponible + r.retenido, { moneda: r.moneda });
 
-  const getActions = (r: Fondo): ActionItem[] => [
+function Page() {
+  const [viewing, setViewing] = useState<FondoSubcuenta | null>(null);
+  const q = useQuery({ queryKey: ["fondos-por-usuario"], queryFn: listFondosPorUsuario });
+  const filas = q.data ?? [];
+  const cuenta = cuentaDelPais();
+  const conAlias = getPais().codigo === "AR";
+
+  const getActions = (r: FondoSubcuenta): ActionItem[] => [
     { label: "Ver detalles", icon: Eye, onClick: () => setViewing(r) },
   ];
 
-  const columns: Column<Fondo>[] = [
-    {
-      key: "legajo",
-      label: "Legajo",
-      sortable: true,
-      filterable: true,
-      render: (r) => <span className="font-mono tabular-nums">{r.legajo}</span>,
-    },
+  const columns: Column<FondoSubcuenta>[] = [
+    { key: "legajo", label: "Legajo", sortable: true, filterable: true, render: (r) => r.legajo },
     { key: "email", label: "Email", filterable: true, render: (r) => r.email },
     { key: "nombre", label: "Nombre", filterable: true, render: (r) => r.nombre },
+    { key: "subcuenta", label: "Subcuenta", filterable: true, render: (r) => r.subcuenta },
     {
-      key: "cvu",
-      label: "CVU",
+      key: "cuenta",
+      label: cuenta,
       filterable: true,
-      render: (r) => <span className="font-mono text-xs tabular-nums">{r.cvu}</span>,
+      render: (r) => <span className="font-mono text-xs tabular-nums">{r.cuenta ?? "—"}</span>,
     },
-    { key: "alias", label: "Alias", filterable: true, render: (r) => r.alias },
+    ...(conAlias
+      ? [
+          {
+            key: "alias",
+            label: "Alias",
+            filterable: true,
+            render: (r: FondoSubcuenta) => r.alias ?? "—",
+          },
+        ]
+      : []),
     {
-      key: "balance",
-      label: "Balance",
+      key: "disponible",
+      label: "Disponible",
       sortable: true,
-      render: (r) => <span className="font-semibold font-mono text-xs">{r.balance}</span>,
+      render: (r) => (
+        <span className="font-semibold font-mono text-xs">
+          {formatMoney(r.disponible, { moneda: r.moneda })}
+        </span>
+      ),
     },
     {
-      key: "estado",
+      key: "retenido",
+      label: "Retenido",
+      sortable: true,
+      render: (r) => (
+        <span className="font-mono text-xs">{formatMoney(r.retenido, { moneda: r.moneda })}</span>
+      ),
+    },
+    {
+      key: "activa",
       label: "Estado",
-      filterable: "enum",
-      filterOptions: ["Activo", "Suspendido"],
-      render: (r) => <Badge tone={r.estado === "Activo" ? "success" : "danger"}>{r.estado}</Badge>,
+      render: (r) => (
+        <Badge tone={r.activa ? "success" : "danger"}>{r.activa ? "Activa" : "Suspendida"}</Badge>
+      ),
     },
   ];
 
-  const excelRows = (data: Fondo[]) =>
+  const excelRows = (data: FondoSubcuenta[]) =>
     data.map((r) => ({
       Legajo: r.legajo,
       Email: r.email,
       Nombre: r.nombre,
-      CVU: r.cvu,
-      Alias: r.alias,
-      Balance: r.balance,
+      Subcuenta: r.subcuenta,
+      [cuenta]: r.cuenta ?? "",
+      ...(conAlias ? { Alias: r.alias ?? "" } : {}),
+      Moneda: r.moneda,
+      Disponible: r.disponible,
+      Retenido: r.retenido,
+      Estado: r.activa ? "Activa" : "Suspendida",
     }));
 
   return (
     <>
       <PageHeader
         title="Fondos por usuario"
-        description="Incluye subcuentas por usuario"
+        description="Saldo disponible y retenido de cada subcuenta de los clientes"
         action={
           <button
-            className="inline-flex items-center gap-2 h-10 px-4 rounded-md bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90"
+            className="inline-flex items-center gap-2 h-10 px-4 rounded-md bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90 disabled:opacity-50"
+            disabled={!filas.length}
             onClick={() => {
-              downloadExcel("fondos_por_usuario.xlsx", excelRows(mock));
+              downloadExcel("fondos_por_usuario.xlsx", excelRows(filas));
               toast.success("Archivo Excel descargado correctamente");
             }}
           >
@@ -109,21 +127,27 @@ function Page() {
           </button>
         }
       />
-      <DataTable
-        columns={columns}
-        data={mock}
-        keyExtractor={(r) => r.cvu}
-        pageSize={10}
-        actions={(r) => <ActionsDropdown actions={getActions(r)} />}
-        onDownloadCSV={() => downloadExcel("fondos_filtrados.xlsx", excelRows(mock))}
-      />
+      {q.isLoading ? (
+        <p className="text-sm text-muted-foreground">Cargando…</p>
+      ) : q.isError ? (
+        <p className="text-sm text-danger-600">{(q.error as Error).message}</p>
+      ) : (
+        <DataTable
+          columns={columns}
+          data={filas}
+          keyExtractor={(r) => r.id}
+          pageSize={10}
+          actions={(r) => <ActionsDropdown actions={getActions(r)} />}
+          onDownloadCSV={() => downloadExcel("fondos_filtrados.xlsx", excelRows(filas))}
+        />
+      )}
 
       {viewing && (
         <FormDialog
           open={!!viewing}
           onClose={() => setViewing(null)}
           title="Detalle de fondo"
-          description={`${viewing.nombre} — ${viewing.cvu}`}
+          description={`${viewing.nombre} — ${viewing.subcuenta}`}
           onSubmit={() => setViewing(null)}
           submitLabel="Cerrar"
         >
@@ -141,27 +165,33 @@ function Page() {
               <span className="font-medium">{viewing.email}</span>
             </div>
             <div>
-              <span className="text-muted-foreground">CVU:</span>{" "}
-              <span className="font-medium font-mono text-xs">{viewing.cvu}</span>
+              <span className="text-muted-foreground">{cuenta}:</span>{" "}
+              <span className="font-medium font-mono text-xs">{viewing.cuenta ?? "—"}</span>
             </div>
             <div>
-              <span className="text-muted-foreground">Alias:</span>{" "}
-              <span className="font-medium">{viewing.alias}</span>
+              <span className="text-muted-foreground">Moneda:</span>{" "}
+              <span className="font-medium">{viewing.moneda}</span>
             </div>
             <div>
-              <span className="text-muted-foreground">Balance:</span>{" "}
-              <span className="font-medium font-mono">{viewing.balance}</span>
+              <span className="text-muted-foreground">Disponible:</span>{" "}
+              <span className="font-medium font-mono">
+                {formatMoney(viewing.disponible, { moneda: viewing.moneda })}
+              </span>
+            </div>
+            <div>
+              <span className="text-muted-foreground">Retenido:</span>{" "}
+              <span className="font-medium font-mono">
+                {formatMoney(viewing.retenido, { moneda: viewing.moneda })}
+              </span>
+            </div>
+            <div>
+              <span className="text-muted-foreground">Saldo total:</span>{" "}
+              <span className="font-medium font-mono">{saldo(viewing)}</span>
             </div>
             <div>
               <span className="text-muted-foreground">Estado:</span>{" "}
-              <span className="font-medium">{viewing.estado}</span>
+              <span className="font-medium">{viewing.activa ? "Activa" : "Suspendida"}</span>
             </div>
-            {viewing.alerta && (
-              <div className="col-span-2">
-                <span className="text-muted-foreground">Alerta:</span>{" "}
-                <span className="font-medium text-amber-600">{viewing.alerta}</span>
-              </div>
-            )}
           </div>
         </FormDialog>
       )}

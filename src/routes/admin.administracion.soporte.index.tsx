@@ -3,6 +3,8 @@ import { useState } from "react";
 import { Search, ArrowLeftRight, Banknote } from "lucide-react";
 import { Input, BtnPrimary, PageHeader } from "@/components/portal-shell";
 import { EmptyState } from "@/shared/ui/empty-state";
+import { ConsultaSpeiMx } from "@/features/soporte/ConsultaSpeiMx";
+import { usePaisConModulos } from "@/shared/modulos-pais";
 
 type QueryType = "deposito" | "retiro";
 
@@ -11,7 +13,13 @@ export const Route = createFileRoute("/admin/administracion/soporte/")({
   component: Page,
 });
 
+/** México: búsqueda SPEI de Cobre. Argentina: consulta por ID de Coelsa. */
 function Page() {
+  const conCobre = usePaisConModulos().modulos.transferencias_cobre;
+  return conCobre ? <ConsultaSpeiMx /> : <ConsultaCoelsa />;
+}
+
+function ConsultaCoelsa() {
   const [tipo, setTipo] = useState<QueryType>("deposito");
   const [id, setId] = useState("");
   // La consulta a Coelsa todavía no está conectada (antes devolvía un resultado
