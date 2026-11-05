@@ -20,7 +20,7 @@ export function ComisionesFiltrosExtra({ s }: { s: CargaComisionesState }) {
         </select>
       </div>
       <div className="space-y-1 min-w-[170px]">
-        <label className="text-xs font-medium text-muted-foreground">Legajo</label>
+        <label className="text-xs font-medium text-muted-foreground">Número de cliente</label>
         <input
           value={s.legajoFiltro}
           onChange={(e) => {

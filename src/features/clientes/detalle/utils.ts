@@ -173,7 +173,7 @@ export function camposIdentificacion(c: Cliente) {
   const apellidoDerivado = c.tipoPersona === "juridica" ? "—" : partes.slice(1).join(" ") || "—";
   const nombreDerivado = c.tipoPersona === "juridica" ? c.nombre : (partes[0] ?? c.nombre);
   const personal: { label: string; valor: string }[] = [
-    { label: "Legajo", valor: c.legajo },
+    { label: "Número de cliente", valor: c.legajo },
     { label: "Email", valor: c.correo },
     { label: "Fecha de registro", valor: formatDate(c.fechaAlta) },
     {

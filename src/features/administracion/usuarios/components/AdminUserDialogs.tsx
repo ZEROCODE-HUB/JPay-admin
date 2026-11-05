@@ -28,7 +28,7 @@ export function AdminUserDetalle({
           <span className="font-medium">{detail.nombre}</span>
         </div>
         <div>
-          <span className="text-muted-foreground">Legajo:</span>{" "}
+          <span className="text-muted-foreground">Número de cliente:</span>{" "}
           <span className="font-medium">{detail.legajo}</span>
         </div>
         <div className="col-span-2">

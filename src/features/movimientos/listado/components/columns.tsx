@@ -23,7 +23,7 @@ export function buildColumns({
   return [
     {
       key: "legajo",
-      label: "Legajo",
+      label: "Número de cliente",
       hint: LEGAJO_TOOLTIP,
       minWidth: 130,
       render: (r) => <LegajoCell legajo={r.legajo} />,

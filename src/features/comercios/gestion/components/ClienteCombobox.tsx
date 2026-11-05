@@ -45,7 +45,7 @@ export function ClienteCombobox({
           }}
           onFocus={() => setAbierto(true)}
           onBlur={() => setTimeout(() => setAbierto(false), 150)}
-          placeholder="Buscar por nombre, legajo o correo…"
+          placeholder="Buscar por nombre, número de cliente o correo…"
           className="pl-9"
           autoComplete="off"
         />

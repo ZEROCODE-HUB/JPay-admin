@@ -8,7 +8,7 @@ import type { JuridicaRow } from "../utils";
 export const columns: Column<JuridicaRow>[] = [
   {
     key: "legajo",
-    label: "Legajo",
+    label: "Número de cliente",
     hint: LEGAJO_TOOLTIP,
     filterable: true,
     minWidth: 110,
@@ -20,7 +20,7 @@ export const columns: Column<JuridicaRow>[] = [
     filterable: true,
     minWidth: 130,
     render: (r) => (
-      <span className="font-mono text-xs tabular-nums" title={`Legajo: ${r.legajo}`}>
+      <span className="font-mono text-xs tabular-nums" title={`Número de cliente: ${r.legajo}`}>
         {r.rfc}
       </span>
     ),

@@ -74,7 +74,7 @@ export const KB: KbEntry[] = [
       "suspender comercio",
     ],
     response:
-      "Gestión de comercios (Comercios → Gestión de comercios) es el listado centralizado de todos los comercios. Desde aquí se puede: crear un comercio nuevo (usuario, legajo, nombre, categoría, nivel, estado), editar, ver el detalle con sus canales y puntos de venta, y eliminar. También se activa o suspende el comercio. Los cambios se reflejan en las demás vistas de Comercios.",
+      "Gestión de comercios (Comercios → Gestión de comercios) es el listado centralizado de todos los comercios. Desde aquí se puede: crear un comercio nuevo (usuario, número de cliente, nombre, categoría, nivel, estado), editar, ver el detalle con sus canales y puntos de venta, y eliminar. También se activa o suspende el comercio. Los cambios se reflejan en las demás vistas de Comercios.",
   },
   {
     keywords: ["link de pago", "link-pago", "cobrar link"],
@@ -100,7 +100,7 @@ export const KB: KbEntry[] = [
       "actividad backoffice",
     ],
     response:
-      "Actividad de Usuarios: se busca por Legajo y rango de fechas. La tabla muestra Legajo, Email, Fecha, Hora, Tipo de transacción, Monto, Estado, Nombre, Destino, RFC, Destinatario, CLABE y CLABE del cliente; se puede exportar a Excel con esos mismos campos.",
+      "Actividad de Usuarios: se busca por Número de cliente y rango de fechas. La tabla muestra Número de cliente, Email, Fecha, Hora, Tipo de transacción, Monto, Estado, Nombre, Destino, RFC, Destinatario, CLABE y CLABE del cliente; se puede exportar a Excel con esos mismos campos.",
   },
   {
     keywords: [
@@ -139,7 +139,7 @@ export const KB: KbEntry[] = [
       "subcuentas",
     ],
     response:
-      "Administración → Registros → Fondos por usuario: listado de los fondos de cada usuario con sus subcuentas (un mismo legajo puede tener varias subcuentas, cada una con su CLABE y su saldo). Muestra Legajo, Email, Nombre, Subcuenta, CLABE, Disponible, Retenido y Estado. Permite ver el detalle de cada fondo y descargar el Excel.",
+      "Administración → Registros → Fondos por usuario: listado de los fondos de cada usuario con sus subcuentas (un mismo número de cliente puede tener varias subcuentas, cada una con su CLABE y su saldo). Muestra Número de cliente, Email, Nombre, Subcuenta, CLABE, Disponible, Retenido y Estado. Permite ver el detalle de cada fondo y descargar el Excel.",
   },
   {
     keywords: [
@@ -169,7 +169,7 @@ export const KB: KbEntry[] = [
   {
     keywords: ["usuarios general", "personas físicas", "jurídicas", "clabe", "comisiones usuario"],
     response:
-      "General → Usuarios: es el ABC de las cuentas de los usuarios de la plataforma, con pestañas:\n\n• Personas físicas: listado de usuarios (legajo, correo, nombres, apellidos, estado, fecha de registro) con acciones como suspender o eliminar.\n• Personas jurídicas: gestión de empresas.\n• Usuarios con CLABE: subcuentas con su CLABE (la asigna Cobre).\n• Carga de comisiones: asignación de comisiones por usuario.",
+      "General → Usuarios: es el ABC de las cuentas de los usuarios de la plataforma, con pestañas:\n\n• Personas físicas: listado de usuarios (número de cliente, correo, nombres, apellidos, estado, fecha de registro) con acciones como suspender o eliminar.\n• Personas jurídicas: gestión de empresas.\n• Usuarios con CLABE: subcuentas con su CLABE (la asigna Cobre).\n• Carga de comisiones: asignación de comisiones por usuario.",
   },
   {
     keywords: [
@@ -177,7 +177,7 @@ export const KB: KbEntry[] = [
       "detalle usuario",
       "ver usuario",
       "perfil usuario",
-      "consulta usuario por legajo",
+      "consulta usuario por número de cliente",
     ],
     response:
       "General → Usuarios → Ficha de usuario: desde el listado de personas físicas se accede a la ficha completa de un usuario (ruta /admin/general/usuarios/$legajo) con toda su información y operaciones.",

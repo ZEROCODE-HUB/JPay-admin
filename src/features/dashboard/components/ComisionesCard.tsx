@@ -9,7 +9,7 @@ import type { ComisionPorComercio } from "../utils";
 const desgloseColumns: Column<ComisionPorComercio>[] = [
   {
     key: "legajo",
-    label: "Legajo",
+    label: "Número de cliente",
     render: (r) => <span className="font-mono text-xs">{r.legajo}</span>,
   },
   {

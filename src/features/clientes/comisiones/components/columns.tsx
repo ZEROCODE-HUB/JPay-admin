@@ -10,7 +10,7 @@ import { etiquetaTipoComision, TIPOS_COMISION_USUARIOS, type Comision } from "..
 export const columnasComisiones: Column<Comision>[] = [
   {
     key: "legajo",
-    label: "Legajo",
+    label: "Número de cliente",
     hint: LEGAJO_TOOLTIP,
     filterable: true,
     render: (r) => <LegajoCell legajo={r.legajo} />,

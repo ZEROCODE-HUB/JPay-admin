@@ -56,7 +56,7 @@ export function EnlaceDetalle({ enlace, onClose }: { enlace: EnlacePago; onClose
                 <div className="font-semibold">{enlace.comercioNombre}</div>
               </div>
               <div>
-                <span className="text-muted-foreground">Usuario / Legajo</span>
+                <span className="text-muted-foreground">Usuario / Número de cliente</span>
                 <div className="font-semibold break-all">
                   {enlace.usuario ?? enlace.clienteLegajo}
                 </div>

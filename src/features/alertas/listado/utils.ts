@@ -35,7 +35,7 @@ export function filtrosAlertas(panel: TableServerFilters, search: string): Alert
 export const alertaAbierta = (a: AlertItem) => a.status === "pending" || a.status === "in_review";
 
 export const CSV_CABECERA = [
-  "Legajo",
+  "Número de cliente",
   "Correo",
   "Nombre",
   "Tipo",

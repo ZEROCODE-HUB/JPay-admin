@@ -23,7 +23,7 @@ export function ParametrosUsuariosCard({ c }: { c: ParametrosClientes }) {
     () => [
       {
         key: "legajo",
-        label: "Legajo",
+        label: "Número de cliente",
         filterable: true,
         render: (r) => <LegajoCell legajo={r.legajo} />,
       },

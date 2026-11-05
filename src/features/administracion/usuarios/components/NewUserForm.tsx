@@ -46,7 +46,9 @@ export function NewUserForm({
         <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
       </div>
       <div>
-        <label className="block text-xs font-semibold text-muted-foreground mb-1">Legajo</label>
+        <label className="block text-xs font-semibold text-muted-foreground mb-1">
+          Número de cliente
+        </label>
         <Input value={legajo} onChange={(e) => setLegajo(e.target.value)} placeholder="Opcional" />
       </div>
       <div>

@@ -48,7 +48,7 @@ function Page() {
   const columns: Column<Evento>[] = [
     {
       key: "legajo",
-      label: "Legajo",
+      label: "Número de cliente",
       sortable: true,
       filterable: true,
       render: (r) => <span className="font-mono tabular-nums">{r.legajo}</span>,
@@ -106,7 +106,7 @@ function Page() {
 
   const excelRows = (data: Evento[]) =>
     data.map((r) => ({
-      Legajo: r.legajo,
+      "Número de cliente": r.legajo,
       Email: r.email,
       Fecha: r.fecha,
       Hora: r.hora,
@@ -157,7 +157,7 @@ function Page() {
         >
           <div className="grid grid-cols-2 gap-3 text-sm">
             <div>
-              <span className="text-muted-foreground">Legajo:</span>{" "}
+              <span className="text-muted-foreground">Número de cliente:</span>{" "}
               <span className="font-medium font-mono">{detalle.legajo}</span>
             </div>
             <div>

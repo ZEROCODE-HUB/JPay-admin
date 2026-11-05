@@ -70,7 +70,7 @@ export function accionesAlerta(
 export const columnasAlertas: Column<AlertItem>[] = [
   {
     key: "legajo",
-    label: "Legajo",
+    label: "Número de cliente",
     minWidth: 130,
     render: (r) => <LegajoCell legajo={r.legajo} />,
   },

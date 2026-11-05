@@ -61,7 +61,7 @@ export function ComisionFormFields({
             }}
             onFocus={() => setOpen(true)}
             onBlur={() => setTimeout(() => setOpen(false), 150)}
-            placeholder="Buscar por email, legajo o nombre..."
+            placeholder="Buscar por email, número de cliente o nombre..."
             className="pl-9"
             autoComplete="off"
           />

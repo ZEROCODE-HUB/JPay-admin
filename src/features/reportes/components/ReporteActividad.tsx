@@ -138,12 +138,12 @@ export function ReporteActividad() {
   return (
     <div className="space-y-4">
       <p className="text-sm text-muted-foreground">
-        Ingresa un Legajo para consultar la actividad del usuario. Los datos se muestran como en el
-        historial de cambios del detalle del usuario.
+        Ingresa un número de cliente para consultar la actividad del usuario. Los datos se muestran
+        como en el historial de cambios del detalle del usuario.
       </p>
       <div className="flex flex-wrap items-end gap-3">
         <div className="min-w-[180px]">
-          <Label htmlFor="act-legajo">Legajo</Label>
+          <Label htmlFor="act-legajo">Número de cliente</Label>
           <Input
             id="act-legajo"
             value={legajo}

@@ -62,7 +62,7 @@ export function ParametroClienteDialogs({
         >
           <div className="grid grid-cols-2 gap-3 text-sm">
             <div>
-              <span className="text-muted-foreground">Legajo:</span>{" "}
+              <span className="text-muted-foreground">Número de cliente:</span>{" "}
               <span className="font-mono tabular-nums font-medium">{viendo.legajo}</span>
             </div>
             <div>

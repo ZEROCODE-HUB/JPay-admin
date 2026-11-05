@@ -33,7 +33,7 @@ export function filtrosBloqueos(panel: TableServerFilters, search: string): Bloc
 }
 
 export const CSV_CABECERA = [
-  "Legajo",
+  "Número de cliente",
   "Usuario",
   "Nombre",
   "Origen",

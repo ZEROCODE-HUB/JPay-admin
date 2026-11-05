@@ -58,7 +58,7 @@ export function ComercioDetalle({
             <div className="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-4">
               <Field label="Usuario" value={comercio.usuario} />
               <Field
-                label="Legajo"
+                label="Número de cliente"
                 value={
                   <span className="inline-flex items-center gap-1">
                     <LegajoCell legajo={comercio.legajo} />

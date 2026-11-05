@@ -15,7 +15,13 @@ import { AdminUserDetalle, NuevoAdminUserModal } from "./AdminUserDialogs";
 
 function buildColumns(rolNombre: Map<string, string>): Column<AdminUser>[] {
   return [
-    { key: "legajo", label: "Legajo", sortable: true, filterable: true, render: (r) => r.legajo },
+    {
+      key: "legajo",
+      label: "Número de cliente",
+      sortable: true,
+      filterable: true,
+      render: (r) => r.legajo,
+    },
     { key: "nombre", label: "Nombre", sortable: true, filterable: true, render: (r) => r.nombre },
     { key: "email", label: "Email", sortable: true, filterable: true, render: (r) => r.email },
     {

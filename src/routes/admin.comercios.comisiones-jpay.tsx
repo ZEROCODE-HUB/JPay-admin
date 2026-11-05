@@ -38,7 +38,7 @@ function descargarCsv(nombre: string, filas: FilaComision[]) {
   const enc = [
     "Proveedor",
     "Producto",
-    "Legajo",
+    "Número de cliente",
     "Comercio",
     "Operaciones",
     "Base",
@@ -355,7 +355,7 @@ function RegistrarPagoDialog({
         </div>
         {f.proveedor === "cobre" && (
           <div>
-            <Label htmlFor="rp-legajo">Legajo de la empresa</Label>
+            <Label htmlFor="rp-legajo">Número de cliente de la empresa</Label>
             <Input
               id="rp-legajo"
               className="mt-1"

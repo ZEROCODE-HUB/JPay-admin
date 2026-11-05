@@ -49,8 +49,8 @@ export function PlaftRiesgoModal({
         <div>
           <h3 className="font-display font-semibold text-lg">Nivel de riesgo PLAFT</h3>
           <p className="text-xs text-muted-foreground mt-1">
-            Legajo <span className="font-mono">{legajo}</span>. La evaluación vigente anterior se
-            cierra automáticamente; toda la historia queda registrada.
+            Número de cliente <span className="font-mono">{legajo}</span>. La evaluación vigente
+            anterior se cierra automáticamente; toda la historia queda registrada.
           </p>
         </div>
 

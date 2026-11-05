@@ -31,7 +31,7 @@ export function AlertaDetalleDialog({ detalle, onClose, onAceptar, onDictamen }:
       size="lg"
     >
       <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
-        <Campo label="Legajo" value={detalle.legajo} mono />
+        <Campo label="Número de cliente" value={detalle.legajo} mono />
         <Campo label="Cliente" value={`${detalle.nombre} · ${detalle.correo}`} />
         <Campo label="Estado" value={ALERT_STATUS_LABEL[detalle.status]} />
         <Campo label="Regla" value={detalle.ruleCode ?? "—"} mono />

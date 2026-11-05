@@ -9,7 +9,7 @@ import { ALCANCE_LABEL, COMPLIANCE_LABEL, ESTADO_LABEL } from "../utils";
 export const columnasBloqueos: Column<AccountBlock>[] = [
   {
     key: "legajo",
-    label: "Legajo",
+    label: "Número de cliente",
     minWidth: 130,
     render: (r) => <LegajoCell legajo={r.legajo} />,
   },

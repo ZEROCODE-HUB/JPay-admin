@@ -47,7 +47,7 @@ export function ClienteParamFields({
                 }}
                 onFocus={() => setAbierto(true)}
                 onBlur={() => setTimeout(() => setAbierto(false), 150)}
-                placeholder="Buscar por legajo, correo o nombre…"
+                placeholder="Buscar por número de cliente, correo o nombre…"
                 className={`${inputCls} pl-9`}
                 autoComplete="off"
               />

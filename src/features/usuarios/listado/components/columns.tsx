@@ -9,7 +9,7 @@ import { KycBadge, PerfilConsumo, RiesgoBadge } from "./Indicadores";
 const columns: Column<Usuario>[] = [
   {
     key: "legajo",
-    label: "Legajo",
+    label: "Número de cliente",
     hint: LEGAJO_TOOLTIP,
     filterable: true,
     minWidth: 110,
@@ -21,7 +21,7 @@ const columns: Column<Usuario>[] = [
     filterable: true,
     minWidth: 130,
     render: (row) => (
-      <span className="font-mono text-xs tabular-nums" title={`Legajo: ${row.legajo}`}>
+      <span className="font-mono text-xs tabular-nums" title={`Número de cliente: ${row.legajo}`}>
         {row.rfc}
       </span>
     ),

@@ -29,7 +29,7 @@ function TipoSubcuentaBadge({ tipo }: { tipo: SubcuentaTipo }) {
 export const columns: Column<ClabeTableRow>[] = [
   {
     key: "_legajo",
-    label: "Legajo",
+    label: "Número de cliente",
     hint: LEGAJO_TOOLTIP,
     filterable: true,
     render: (r) => (

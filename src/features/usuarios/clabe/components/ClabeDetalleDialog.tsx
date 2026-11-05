@@ -21,7 +21,7 @@ export function ClabeDetalleDialog({
     >
       <div className="grid grid-cols-2 gap-4 text-sm">
         <div>
-          <span className="text-muted-foreground">Legajo:</span>{" "}
+          <span className="text-muted-foreground">Número de cliente:</span>{" "}
           <LegajoCell legajo={viewing.legajo} />
         </div>
         <div>

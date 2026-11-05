@@ -92,7 +92,7 @@ export function validarDraft(
 }
 
 export const CSV_CABECERA = [
-  "Legajo",
+  "Número de cliente",
   "Usuario (correo)",
   "Nombre",
   "Salarios mínimos por persona",

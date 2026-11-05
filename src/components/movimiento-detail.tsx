@@ -105,7 +105,7 @@ export function MovimientoDetail({ m, onClose }: { m: Movimiento; onClose: () =>
       onClose={onClose}
       rows={[
         {
-          label: "Legajo",
+          label: "Número de cliente",
           value: <LegajoCell legajo={m.legajo} />,
         },
         { label: "ID Transacción", value: <span className="font-mono text-xs">{m.id}</span> },

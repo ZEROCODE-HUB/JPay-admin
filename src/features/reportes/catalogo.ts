@@ -36,7 +36,7 @@ export const reports: ReportDef[] = [
     name: "Actividad de Usuarios",
     icon: Users,
     color: "text-indigo-500",
-    description: "Actividad registrada por legajo de backoffice.",
+    description: "Actividad registrada por número de cliente de backoffice.",
   },
 ];
 

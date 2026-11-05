@@ -46,7 +46,13 @@ function Page() {
   ];
 
   const columns: Column<FondoSubcuenta>[] = [
-    { key: "legajo", label: "Legajo", sortable: true, filterable: true, render: (r) => r.legajo },
+    {
+      key: "legajo",
+      label: "Número de cliente",
+      sortable: true,
+      filterable: true,
+      render: (r) => r.legajo,
+    },
     { key: "email", label: "Email", filterable: true, render: (r) => r.email },
     { key: "nombre", label: "Nombre", filterable: true, render: (r) => r.nombre },
     { key: "subcuenta", label: "Subcuenta", filterable: true, render: (r) => r.subcuenta },
@@ -85,7 +91,7 @@ function Page() {
 
   const excelRows = (data: FondoSubcuenta[]) =>
     data.map((r) => ({
-      Legajo: r.legajo,
+      "Número de cliente": r.legajo,
       Email: r.email,
       Nombre: r.nombre,
       Subcuenta: r.subcuenta,
@@ -140,7 +146,7 @@ function Page() {
         >
           <div className="grid grid-cols-2 gap-3 text-sm">
             <div>
-              <span className="text-muted-foreground">Legajo:</span>{" "}
+              <span className="text-muted-foreground">Número de cliente:</span>{" "}
               <span className="font-medium font-mono">{viewing.legajo}</span>
             </div>
             <div>

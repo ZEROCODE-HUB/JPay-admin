@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import { brand } from "@/brand/brand";
 
 export const LEGAJO_TOOLTIP =
-  `Legajo: identificador interno del cliente (empresa o persona que contrató ${brand.name}). ` +
+  `Número de cliente: identificador interno del cliente (empresa o persona que contrató ${brand.name}). ` +
   "No es el usuario (mail de login). Formato LPF-#### (Persona Física) o LPJ-#### (Persona Jurídica).";
 
 /**
@@ -19,7 +19,7 @@ export function LegajoCell({ legajo, className }: { legajo: string; className?: 
   );
 }
 
-export function LegajoTooltip({ children = "Legajo" }: { children?: ReactNode }) {
+export function LegajoTooltip({ children = "Número de cliente" }: { children?: ReactNode }) {
   return (
     <span title={LEGAJO_TOOLTIP} className="cursor-help inline-flex items-center gap-1">
       {children}

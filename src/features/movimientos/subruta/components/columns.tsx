@@ -8,7 +8,7 @@ import { pctSobreOperacion, TIPO_LABEL, type FilaSubRuta } from "../utils";
 export const columnasSubRuta: Column<FilaSubRuta>[] = [
   {
     key: "legajo",
-    label: "Legajo",
+    label: "Número de cliente",
     hint: LEGAJO_TOOLTIP,
     filterable: true,
     minWidth: 100,

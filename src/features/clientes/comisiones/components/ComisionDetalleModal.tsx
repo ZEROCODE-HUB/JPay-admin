@@ -32,7 +32,7 @@ export function ComisionDetalleModal({
       size="lg"
     >
       <div className="grid grid-cols-2 gap-4 text-sm">
-        <Dato label="Legajo">
+        <Dato label="Número de cliente">
           <LegajoCell legajo={viewing.legajo} />
         </Dato>
         <Dato label="Correo">

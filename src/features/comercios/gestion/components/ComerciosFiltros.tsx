@@ -24,7 +24,7 @@ export function ComerciosFiltros({ s }: { s: ComerciosGestionState }) {
             id="buscar"
             value={s.searchInput}
             onChange={(e) => cambiar(s.setSearchInput)(e.target.value)}
-            placeholder="Usuario (email) o legajo…"
+            placeholder="Usuario (email) o número de cliente…"
           />
         </div>
         <div>
