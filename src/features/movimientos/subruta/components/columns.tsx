@@ -3,7 +3,7 @@ import type { Column } from "@/shared/ui/data-table";
 import { estadoBadge } from "@/components/movimiento-detail";
 import { LegajoCell, LEGAJO_TOOLTIP } from "@/components/legajo-label";
 import { ESTADOS_MOVIMIENTO } from "@/lib/api/types";
-import { comisionPayway, pctSobreOperacion, TIPO_LABEL, type FilaSubRuta } from "../utils";
+import { pctSobreOperacion, TIPO_LABEL, type FilaSubRuta } from "../utils";
 
 export const columnasSubRuta: Column<FilaSubRuta>[] = [
   {
@@ -122,24 +122,3 @@ export const columnasSubRuta: Column<FilaSubRuta>[] = [
     render: (row) => estadoBadge(row.estado),
   },
 ];
-
-/** Columna "Comisión Payway" (solo tarjeta): % del lote o, si no hay, de la bandera. */
-export function columnaPayway(
-  loteSnapshotMap: Map<string, { pct: number }> | undefined,
-  banderasLookup: Map<string, number>,
-): Column<FilaSubRuta> {
-  return {
-    key: "payway",
-    label: "Comisión Payway",
-    render: (r) => {
-      const { pct, monto } = comisionPayway(r, loteSnapshotMap, banderasLookup);
-      if (!r._bandera || !r._comercioId)
-        return <span className="font-mono tabular-nums text-muted-foreground">—</span>;
-      return (
-        <span className="font-mono tabular-nums">
-          {formatMoney(monto)} <span className="text-muted-foreground">({formatPercent(pct)})</span>
-        </span>
-      );
-    },
-  };
-}

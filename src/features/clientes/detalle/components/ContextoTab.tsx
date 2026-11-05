@@ -2,7 +2,6 @@ import { Eye } from "lucide-react";
 import { Badge } from "@/components/portal-shell";
 import { ModalDialog } from "@/shared/ui/modal-dialog";
 import type { Subcuenta } from "@/lib/api/subcuentas";
-import type { ImpuestoAsignacion } from "@/lib/api/types";
 import type { ClienteDetalleData } from "../hooks/useClienteDetalle";
 import type { ClienteDetalleUi } from "../hooks/useClienteDetalleUi";
 import { KpiCard } from "./KpiCard";
@@ -12,7 +11,6 @@ export function ContextoTab({ data, ui }: { data: ClienteDetalleData; ui: Client
   const {
     subcuentasQuery,
     comisionesRealesQuery,
-    impuestosQuery,
     alertasQuery,
     bloqueosQuery,
     modulosQuery,
@@ -25,9 +23,9 @@ export function ContextoTab({ data, ui }: { data: ClienteDetalleData; ui: Client
       <h2 className="font-display text-base font-semibold text-foreground mb-3">
         Contexto operativo
       </h2>
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5">
         <KpiCard
-          label="CVUs"
+          label="Subcuentas"
           value={
             subcuentasQuery.isError ? "Por definir" : String(subcuentasQuery.data?.length ?? 0)
           }
@@ -45,10 +43,6 @@ export function ContextoTab({ data, ui }: { data: ClienteDetalleData; ui: Client
           }
         />
         <KpiCard
-          label="Impuestos"
-          value={impuestosQuery.isError ? "Por definir" : String(impuestosQuery.rows.length)}
-        />
-        <KpiCard
           label="Alertas"
           value={alertasQuery.isError ? "Por definir" : String(alertasQuery.data?.length ?? 0)}
         />
@@ -64,7 +58,7 @@ export function ContextoTab({ data, ui }: { data: ClienteDetalleData; ui: Client
 
       <div className="mt-4 grid grid-cols-1 gap-3 lg:grid-cols-2">
         <MiniDashboard
-          titulo="CVUs recientes"
+          titulo="Subcuentas recientes"
           columnas={[
             {
               label: "Nombre",
@@ -169,20 +163,6 @@ export function ContextoTab({ data, ui }: { data: ClienteDetalleData; ui: Client
             );
           })()}
         </div>
-        <MiniDashboard
-          titulo="Impuestos recientes"
-          columnas={[
-            {
-              label: "Impuesto",
-              render: (a: ImpuestoAsignacion) => a.impuesto?.nombre ?? a.impuestoId,
-            },
-            { label: "Estado", render: (a: ImpuestoAsignacion) => a.estado },
-            { label: "Fecha", render: () => "—" },
-          ]}
-          datos={impuestosQuery.rows.slice(0, 10)}
-        />
-        {/* Pendiente de conectar a la base: sin datos de ejemplo. */}
-        <MiniDashboard titulo="Impuestos por cobrar" columnas={[]} datos={[]} />
         <MiniDashboard
           titulo="Alertas y bloqueos recientes"
           columnas={[

@@ -33,10 +33,8 @@ export const estadoTone: Record<EstadoCliente, "success" | "danger" | "warn" | "
 export type TabKey =
   | "identificacion"
   | "movimientos"
-  | "impuestos"
   | "subcuentas"
   | "documentos"
-  | "validaciones"
   | "riesgo"
   | "contexto"
   | "modulos"
@@ -47,15 +45,12 @@ export type TabKey =
 export const TABS: { key: TabKey; label: string; modulo?: Modulo }[] = [
   { key: "identificacion", label: "Datos personales" },
   { key: "movimientos", label: "Movimientos" },
-  { key: "impuestos", label: "Impuestos", modulo: "iibb" },
-  { key: "subcuentas", label: "Subcuentas y CVUs" },
+  { key: "subcuentas", label: "Subcuentas" },
   { key: "documentos", label: "Documentos" },
-  // Validaciones contra AFIP / RENAPER (Argentina).
-  { key: "validaciones", label: "Validaciones automáticas", modulo: "afip" },
   { key: "riesgo", label: "Riesgo y monitoreo", modulo: "monitoreo_automatico" },
   { key: "contexto", label: "Contexto operativo" },
   { key: "modulos", label: "Módulos y productos" },
-  { key: "cobre", label: "Cobre (México)", modulo: "transferencias_cobre" },
+  { key: "cobre", label: "Cobre", modulo: "transferencias_cobre" },
   { key: "historial", label: "Historial" },
 ];
 

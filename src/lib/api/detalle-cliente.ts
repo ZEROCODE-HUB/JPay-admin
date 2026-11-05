@@ -1,4 +1,3 @@
-import { createDcExcepcion, createDcExcepcionAmbos } from "./dc-excepciones";
 import { requireSupabase } from "@/lib/supabase";
 import { DataAccessError } from "./errors";
 
@@ -10,13 +9,6 @@ export type HistorialCambio = {
   fecha: string;
   hora: string | null;
   usuario: string | null;
-};
-
-export type Validacion = {
-  id: string;
-  proveedor: string;
-  estado: string;
-  fecha: string;
 };
 
 export type Alerta = {
@@ -50,14 +42,6 @@ export type ParametroConfig = {
   periodo: string | null;
 };
 
-export type ComercioPst = {
-  id: string;
-  cliente_legajo: string;
-  nombre: string;
-  email: string | null;
-  legajo_comercio: string | null;
-};
-
 export type LinkPago = {
   id: string;
   cliente_legajo: string;
@@ -76,14 +60,6 @@ type HistorialCambioRow = {
   fecha: string;
   hora: string | null;
   usuario: string | null;
-};
-
-type ValidacionRow = {
-  id: string;
-  cliente_legajo: string;
-  proveedor: string;
-  estado: string;
-  fecha: string;
 };
 
 // Alertas y bloqueos reales del cliente (vistas v_alerts / v_account_blocks).
@@ -122,14 +98,6 @@ type ParametroConfigRow = {
   periodo: string | null;
 };
 
-type ComercioPstRow = {
-  id: string;
-  cliente_legajo: string;
-  nombre: string;
-  email: string | null;
-  legajo_comercio: string | null;
-};
-
 type LinkPagoRow = {
   id: string;
   cliente_legajo: string;
@@ -141,13 +109,11 @@ type LinkPagoRow = {
 
 const HISTORIAL_COLUMNS =
   "id, cliente_legajo, campo, valor_anterior, valor_nuevo, fecha, hora, usuario";
-const VALIDACIONES_COLUMNS = "id, cliente_legajo, proveedor, estado, fecha";
 const ALERTAS_COLUMNS = "id, type, created_at, status";
 const BLOQUEOS_COLUMNS = "id, reason, scope, subcuenta_nombre, block_status";
 const MODULOS_COLUMNS = "id, cliente_legajo, clave, titulo, cantidad, detalle";
 const PARAM_ALERTAS_COLUMNS = "id, cliente_legajo, clave, habilitado, valor, periodo";
 const PARAM_BLOQUEOS_COLUMNS = "id, cliente_legajo, clave, habilitado, valor, periodo";
-const COMERCIOS_PST_COLUMNS = "id, cliente_legajo, nombre, email, legajo_comercio";
 const LINKS_PAGO_COLUMNS = "id, cliente_legajo, comercio_nombre, url, monto, estado";
 
 export async function listHistorialCambios(clienteLegajo: string): Promise<HistorialCambio[]> {
@@ -167,23 +133,6 @@ export async function listHistorialCambios(clienteLegajo: string): Promise<Histo
     fecha: r.fecha,
     hora: r.hora,
     usuario: r.usuario,
-  }));
-}
-
-export async function listValidaciones(clienteLegajo: string): Promise<Validacion[]> {
-  const sb = requireSupabase();
-  const { data, error } = await sb
-    .from("validaciones")
-    .select(VALIDACIONES_COLUMNS)
-    .eq("cliente_legajo", clienteLegajo)
-    .order("fecha", { ascending: false });
-  if (error) throw new DataAccessError(error);
-  const rows = (data as ValidacionRow[] | null) ?? [];
-  return rows.map((r) => ({
-    id: r.id,
-    proveedor: r.proveedor,
-    estado: r.estado,
-    fecha: r.fecha,
   }));
 }
 
@@ -317,24 +266,6 @@ export async function upsertParametroBloqueo(
   if (error) throw new DataAccessError(error);
 }
 
-export async function listComerciosPst(clienteLegajo: string): Promise<ComercioPst[]> {
-  const sb = requireSupabase();
-  const { data, error } = await sb
-    .from("cliente_comercios_pst")
-    .select(COMERCIOS_PST_COLUMNS)
-    .eq("cliente_legajo", clienteLegajo)
-    .order("nombre", { ascending: true });
-  if (error) throw new DataAccessError(error);
-  const rows = (data as ComercioPstRow[] | null) ?? [];
-  return rows.map((r) => ({
-    id: r.id,
-    cliente_legajo: r.cliente_legajo,
-    nombre: r.nombre,
-    email: r.email,
-    legajo_comercio: r.legajo_comercio,
-  }));
-}
-
 export async function listLinksPago(clienteLegajo: string): Promise<LinkPago[]> {
   const sb = requireSupabase();
   const { data, error } = await sb
@@ -352,54 +283,6 @@ export async function listLinksPago(clienteLegajo: string): Promise<LinkPago[]> 
     monto: r.monto === null ? null : Number(r.monto),
     estado: r.estado,
   }));
-}
-
-export async function forzarValidacion(clienteLegajo: string): Promise<void> {
-  const sb = requireSupabase();
-  const { error } = await sb.from("validaciones").insert({
-    cliente_legajo: clienteLegajo,
-    proveedor: "Manual",
-    estado: "En proceso",
-    fecha: new Date().toISOString().slice(0, 10),
-  });
-  if (error) throw new DataAccessError(error);
-}
-
-export type ExencionDireccion = "Entrantes" | "Salientes" | "Ambos";
-
-export type ExencionInput = {
-  cuit: string;
-  direccion: ExencionDireccion;
-  motivo: string;
-  vigenciaDesde: string | null;
-  vigenciaHasta: string | null;
-};
-
-/**
- * Alta de una exención de débitos/créditos para el cliente. Se guarda en `dc_excepciones`
- * (la misma tabla que la pantalla de Impuestos > Débitos y créditos), identificada por el
- * email del cliente; "Ambos" se registra como dos excepciones (entrantes y salientes).
- */
-export async function crearExencion(clienteLegajo: string, input: ExencionInput): Promise<void> {
-  const sb = requireSupabase();
-  const { data: cli, error } = await sb
-    .from("clientes")
-    .select("correo")
-    .eq("legajo", clienteLegajo)
-    .maybeSingle();
-  if (error) throw new DataAccessError(error);
-  if (!cli) throw new Error(`No existe el cliente ${clienteLegajo}`);
-
-  const base = {
-    email: cli.correo,
-    cuit: input.cuit,
-    tipo: "Exención" as const,
-    motivo: input.motivo,
-    vigencia_desde: input.vigenciaDesde || new Date().toISOString().slice(0, 10),
-    vigencia_hasta: input.vigenciaHasta || null,
-  };
-  if (input.direccion === "Ambos") await createDcExcepcionAmbos(base);
-  else await createDcExcepcion({ ...base, direccion: input.direccion });
 }
 
 export type ComisionCliente = {

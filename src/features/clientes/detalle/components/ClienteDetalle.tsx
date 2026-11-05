@@ -5,7 +5,6 @@ import type { ClienteDetalleData } from "../hooks/useClienteDetalle";
 import type { ClienteDetalleUi } from "../hooks/useClienteDetalleUi";
 import { useClienteAcciones } from "../hooks/useClienteAcciones";
 import { TABS, type TabKey } from "../utils";
-import { cuentaDelPais } from "@/lib/cuenta-pais";
 import { usePaisConModulos } from "@/shared/modulos-pais";
 import { ClienteAcciones } from "./ClienteAcciones";
 import { ClienteModales } from "./ClienteModales";
@@ -14,13 +13,11 @@ import { ContextoTab } from "./ContextoTab";
 import { DocumentosTab } from "./DocumentosTab";
 import { HistorialTab } from "./HistorialTab";
 import { IdentificacionTab } from "./IdentificacionTab";
-import { ImpuestosTab } from "./ImpuestosTab";
 import { ModulosTab } from "./ModulosTab";
 import { MovimientosTab } from "./MovimientosTab";
 import { RequisitosActivacion } from "./RequisitosActivacion";
 import { RiesgoTab } from "./RiesgoTab";
 import { SubcuentasTab } from "./SubcuentasTab";
-import { ValidacionesTab } from "./ValidacionesTab";
 
 /** Ficha de cliente ya cargada: encabezado, pestañas y modales. */
 export function ClienteDetalle({
@@ -35,12 +32,8 @@ export function ClienteDetalle({
   ui: ClienteDetalleUi;
 }) {
   const navigate = useNavigate();
-  const { activeTab, setActiveTab, setConfirmAction, setExencionOpen, forzando } = ui;
-  const { cambiarEstadoHomologado, forzarNuevaValidacion } = useClienteAcciones(
-    legajo,
-    ui,
-    data.validacionesQuery,
-  );
+  const { activeTab, setActiveTab, setConfirmAction } = ui;
+  const { cambiarEstadoHomologado } = useClienteAcciones(ui);
 
   const backToList = () =>
     navigate({
@@ -54,7 +47,6 @@ export function ClienteDetalle({
     if (t.key === "identificacion") {
       return cliente.tipoPersona === "juridica" ? "Datos de persona jurídica" : "Datos personales";
     }
-    if (t.key === "subcuentas") return `Subcuentas y ${cuentaDelPais()}s`;
     return t.label;
   };
   const pais = usePaisConModulos();
@@ -111,23 +103,11 @@ export function ClienteDetalle({
       </div>
 
       <div className="mt-2">
-        {activeTab === "identificacion" && (
-          <IdentificacionTab cliente={cliente} data={data} ui={ui} />
-        )}
+        {activeTab === "identificacion" && <IdentificacionTab cliente={cliente} data={data} />}
         {activeTab === "movimientos" && <MovimientosTab data={data} ui={ui} />}
-        {activeTab === "impuestos" && <ImpuestosTab data={data} ui={ui} />}
-        {activeTab === "subcuentas" && (
-          <SubcuentasTab legajo={cliente.legajo} onEximirCuit={() => setExencionOpen(true)} />
-        )}
+        {activeTab === "subcuentas" && <SubcuentasTab legajo={cliente.legajo} />}
 
         {activeTab === "documentos" && <DocumentosTab legajo={cliente.legajo} />}
-        {activeTab === "validaciones" && (
-          <ValidacionesTab
-            data={data}
-            forzando={forzando}
-            forzarNuevaValidacion={forzarNuevaValidacion}
-          />
-        )}
         {activeTab === "contexto" && <ContextoTab data={data} ui={ui} />}
         {activeTab === "riesgo" && <RiesgoTab cliente={cliente} data={data} ui={ui} />}
         {activeTab === "modulos" && <ModulosTab legajo={legajo} data={data} ui={ui} />}

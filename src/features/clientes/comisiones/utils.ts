@@ -1,5 +1,4 @@
 import { formatMoney, formatPercent } from "@/shared/format";
-import { getPais } from "@/shared/pais";
 import { desgloseDesdeConfig, type Desglose } from "@/lib/aranceles";
 import type {
   ComisionCliente,
@@ -14,11 +13,10 @@ export const PAGE_SIZES = [10, 20, 50];
 export const TIPOS_COMISION_USUARIOS: TipoOperacion[] = ["Depósito", "Retiro", "Conversión"];
 
 /**
- * Nombre visible del tipo de comisión. En México se usan los nombres de los productos de Cobre
- * (pay-in, pay-out); el valor guardado no cambia.
+ * Nombre visible del tipo de comisión: los nombres de los productos de Cobre (pay-in, pay-out).
+ * El valor guardado no cambia.
  */
 export function etiquetaTipoComision(tipo: TipoOperacion): string {
-  if (getPais().codigo !== "MX") return tipo;
   const mx: Partial<Record<TipoOperacion, string>> = {
     Depósito: "Pay-in (depósitos y cobros)",
     Retiro: "Pay-out (transferencias)",
@@ -27,8 +25,8 @@ export function etiquetaTipoComision(tipo: TipoOperacion): string {
   return mx[tipo] ?? tipo;
 }
 
-/** IVA por defecto sobre la comisión según el país del cliente (México 16 %, Argentina 21 %). */
-export const ivaPorDefecto = (pais?: string | null) => (pais === "MX" ? 16 : 21);
+/** IVA por defecto sobre la comisión (México: 16 %). */
+export const IVA_POR_DEFECTO = 16;
 
 /** Monto de operación de referencia para el desglose de ejemplo. */
 export const MONTO_OPERACION_REF = 100000;

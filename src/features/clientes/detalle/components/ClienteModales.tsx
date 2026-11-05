@@ -1,11 +1,10 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
-import { formatDate, formatMoney } from "@/shared/format";
 import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
 import { FormDialog } from "@/shared/ui/form-dialog";
 import { AlertaGestionModal } from "@/components/alerta-gestion";
-import { DetailModal, MovimientoDetail } from "@/components/movimiento-detail";
+import { MovimientoDetail } from "@/components/movimiento-detail";
 import { registrarEvaluacionRiesgo, updatePerfilTransaccional } from "@/lib/api/clientes";
 import { useCambiarEstadoMovimiento } from "@/hooks/useMovimientoActions";
 import type { Cliente } from "@/lib/api/types";
@@ -13,7 +12,6 @@ import type { ClienteDetalleData } from "../hooks/useClienteDetalle";
 import type { ClienteDetalleUi } from "../hooks/useClienteDetalleUi";
 import { ALERTA_PARAM_DEF, BLOQUEO_PARAM_DEF } from "../utils";
 import { ApiDetalleModal } from "./ApiDetalleModal";
-import { ExencionModal } from "./ExencionModal";
 import { ModulosModales } from "./ModulosModales";
 import { ParametrosEditorModal } from "./ParametrosEditorModal";
 import { PlaftPerfilModal } from "./PlaftPerfilModal";
@@ -56,12 +54,8 @@ export function ClienteModales({
     gestionTarget,
     setGestionTarget,
     setGestiones,
-    exencionOpen,
-    setExencionOpen,
     movDetail,
     setMovDetail,
-    impuestoDetail,
-    setImpuestoDetail,
     estadoTarget,
     setEstadoTarget,
     confirmAction,
@@ -165,39 +159,7 @@ export function ClienteModales({
         }}
       />
 
-      <ExencionModal
-        open={exencionOpen}
-        onClose={() => setExencionOpen(false)}
-        legajo={cliente.legajo}
-        cuitDefault={cliente.cuit}
-      />
-
       {movDetail && <MovimientoDetail m={movDetail} onClose={() => setMovDetail(null)} />}
-
-      {impuestoDetail && (
-        <DetailModal
-          title="Detalle de impuesto asignado"
-          onClose={() => setImpuestoDetail(null)}
-          rows={[
-            {
-              label: "Impuesto",
-              value: impuestoDetail.impuesto?.nombre ?? impuestoDetail.impuestoId,
-            },
-            { label: "Código", value: impuestoDetail.impuesto?.codigo ?? "—" },
-            { label: "Tipo", value: impuestoDetail.impuesto?.tipo ?? impuestoDetail.tipo },
-            {
-              label: "Monto / Tasa",
-              value:
-                (impuestoDetail.impuesto?.tipo ?? impuestoDetail.tipo) === "Porcentaje"
-                  ? `${impuestoDetail.impuesto?.monto ?? impuestoDetail.monto ?? 0} %`
-                  : formatMoney(impuestoDetail.impuesto?.monto ?? impuestoDetail.monto),
-            },
-            { label: "Fecha asignación", value: formatDate(impuestoDetail.fechaAsignacion) },
-            { label: "Estado", value: impuestoDetail.estado },
-            { label: "Legajo", value: impuestoDetail.clienteLegajo },
-          ]}
-        />
-      )}
 
       {estadoTarget && (
         <FormDialog

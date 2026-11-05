@@ -1,4 +1,4 @@
-import { Eye, Globe, Inbox, Landmark, LayoutGrid, Link2, RefreshCw } from "lucide-react";
+import { Eye, Globe, Inbox, LayoutGrid, Link2, RefreshCw } from "lucide-react";
 import { formatMoney } from "@/shared/format";
 import { Badge } from "@/components/portal-shell";
 import type { ClienteDetalleData } from "../hooks/useClienteDetalle";
@@ -17,10 +17,10 @@ export function ModulosTab({
   data: ClienteDetalleData;
   ui: ClienteDetalleUi;
 }) {
-  const { modulosQuery, clienteApiUsuariosQuery, comerciosPst, linksPago, apiCantidadReal } = data;
-  const { setModulosSub, setPstOpen, setLinksOpen, setApiDetalleId } = ui;
+  const { modulosQuery, clienteApiUsuariosQuery, linksPago, apiCantidadReal } = data;
+  const { setModulosSub, setLinksOpen, setApiDetalleId } = ui;
   const pais = usePaisConModulos();
-  // "Productos": los de Cobre y Ecart Pay (México). PCT es el pago con transferencia / QR.
+  // "Productos": los de Cobre y Ecart Pay.
   const subtabs = [
     {
       key: "productos" as const,
@@ -28,7 +28,6 @@ export function ModulosTab({
       icon: LayoutGrid,
       visible: pais.modulos.transferencias_cobre || pais.modulos.pagos_proveedor,
     },
-    { key: "pct" as const, label: "PCT", icon: Landmark, visible: pais.modulos.qr },
     { key: "links" as const, label: "Links de pago", icon: Link2, visible: true },
     { key: "api" as const, label: "API externa", icon: Globe, visible: true },
   ].filter((st) => st.visible);
@@ -78,66 +77,6 @@ export function ModulosTab({
           </div>
 
           {modulosSub === "productos" && <ProductosMx legajo={legajo} />}
-
-          {/* PCT sub-tab */}
-          {modulosSub === "pct" && (
-            <div className="space-y-4">
-              <div className="rounded-lg border border-border p-4">
-                <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground mb-2">
-                  Comercios vinculados
-                </div>
-                <div className="text-2xl font-semibold tabular-nums">{comerciosPst.length}</div>
-                {comerciosPst.length === 0 ? (
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    No se encontró comercio PCT asociado por email o legajo.
-                  </p>
-                ) : (
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    {comerciosPst.length} comercio(s) PCT vinculado(s) a este cliente.
-                  </p>
-                )}
-              </div>
-              {comerciosPst.length > 0 ? (
-                <div className="overflow-x-auto rounded-xl border border-border bg-card">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-muted-foreground">
-                        <th className="px-4 py-3 font-medium">Comercio</th>
-                        <th className="px-4 py-3 font-medium">Email</th>
-                        <th className="px-4 py-3 font-medium">Legajo</th>
-                        <th className="px-4 py-3 font-medium text-right">Acciones</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {comerciosPst.map((c) => (
-                        <tr key={c.id} className="border-b border-border last:border-b-0">
-                          <td className="px-4 py-3 font-medium">{c.nombre}</td>
-                          <td className="px-4 py-3 text-muted-foreground">{c.email ?? "—"}</td>
-                          <td className="px-4 py-3 font-mono text-xs">
-                            {c.legajo_comercio ?? "—"}
-                          </td>
-                          <td className="px-4 py-3 text-right">
-                            <button
-                              type="button"
-                              onClick={() => setPstOpen(true)}
-                              className="inline-flex items-center gap-1 h-8 rounded-md border border-input px-2 text-xs font-medium text-foreground hover:bg-accent"
-                            >
-                              <Eye size={13} /> Ver detalle
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-card px-6 py-8 text-sm text-muted-foreground">
-                  <Inbox size={22} />
-                  <p>No se encontró comercio PCT asociado por email o legajo.</p>
-                </div>
-              )}
-            </div>
-          )}
 
           {/* Links de pago sub-tab */}
           {modulosSub === "links" && (

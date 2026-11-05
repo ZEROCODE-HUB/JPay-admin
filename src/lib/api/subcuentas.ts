@@ -4,7 +4,7 @@ import { DataAccessError } from "./errors";
 
 // Modelo de saldos — referencia rápida:
 //
-//   subaccounts                  →  identidad de la subcuenta (CBU, tipo,
+//   subaccounts                  →  identidad de la subcuenta (CLABE en `cbu`, tipo,
 //                                   estado, configuración). Sin saldos.
 //   subaccount_balances          →  saldos 1:1 por subcuenta. La fila se
 //                                   crea por trigger al insertar la
@@ -151,7 +151,7 @@ export async function listSubcuentas(clienteLegajo: string): Promise<Subcuenta[]
   return ((data as SubcuentaRow[]) ?? []).map(toSubcuenta);
 }
 
-export type CvuFilters = {
+export type SubcuentasFilters = {
   page: number;
   pageSize: number;
   search?: string;
@@ -160,25 +160,35 @@ export type CvuFilters = {
   fechaHasta?: string;
 };
 
-export type CvuRow = Subcuenta & {
+/** Subcuenta con los datos de su cliente (Usuarios → Usuarios con CLABE). */
+export type SubcuentaConCliente = Subcuenta & {
   cliente?: {
     id: string;
     correo: string;
     nombre: string;
-    cuit: string;
+    /** RFC del cliente. */
+    taxId: string | null;
     tipoPersona: string;
-    /** `clientes.alias`: subaccounts no tiene columna de alias. */
-    alias: string | null;
   } | null;
   legajo: string;
 };
 
-const COLUMNS_WITH_CLIENTE =
-  `${COLUMNS}, clientes(id, legajo, correo, nombre, cuit, tipo_persona, alias)` as const;
+type ClienteJoined = {
+  id: string;
+  legajo: string;
+  correo: string;
+  nombre: string;
+  tax_id: string | null;
+  tipo_persona: string;
+};
 
-export async function listAllCvus(
-  filters: CvuFilters,
-): Promise<{ rows: CvuRow[]; total: number; page: number; pageSize: number }> {
+const COLUMNS_WITH_CLIENTE =
+  `${COLUMNS}, clientes(id, legajo, correo, nombre, tax_id, tipo_persona)` as const;
+
+/** Todas las subcuentas con su cuenta (columna `cbu`: la CLABE) y su cliente, paginadas. */
+export async function listSubcuentasConCliente(
+  filters: SubcuentasFilters,
+): Promise<{ rows: SubcuentaConCliente[]; total: number; page: number; pageSize: number }> {
   const sb = requireSupabase();
   const { page, pageSize, search, estado, fechaDesde, fechaHasta } = filters;
   const from = page * pageSize;
@@ -197,59 +207,24 @@ export async function listAllCvus(
   const { data, error, count } = await query;
   if (error) throw new DataAccessError(error);
   const rows = (
-    (data ?? []) as (SubcuentaRow & {
-      clientes?: {
-        id: string;
-        legajo: string;
-        correo: string;
-        nombre: string;
-        cuit: string;
-        tipo_persona: string;
-        alias: string | null;
-      } | null;
-    })[]
-  ).map((r) => {
-    const base = toSubcuenta(r as SubcuentaRow);
-    const cli = r.clientes as unknown as {
-      id: string;
-      legajo: string;
-      correo: string;
-      nombre: string;
-      cuit: string;
-      tipo_persona: string;
-      alias: string | null;
-    } | null;
+    (data ?? []) as unknown as (SubcuentaRow & { clientes?: ClienteJoined | null })[]
+  ).map((r): SubcuentaConCliente => {
+    const cli = r.clientes ?? null;
     return {
-      ...base,
+      ...toSubcuenta(r),
       legajo: r.cliente_legajo,
       cliente: cli
         ? {
             id: cli.id,
             correo: cli.correo,
             nombre: cli.nombre,
-            cuit: cli.cuit,
+            taxId: cli.tax_id ?? null,
             tipoPersona: cli.tipo_persona,
-            alias: cli.alias ?? null,
           }
         : null,
-    } as CvuRow;
+    };
   });
   return { rows, total: count ?? rows.length, page, pageSize };
-}
-
-export function generarCbu(): string {
-  // 22 dígitos, prefijo 00000031 (banco) + 14 aleatorios
-  const rand = Array.from({ length: 14 }, () => Math.floor(Math.random() * 10)).join("");
-  return `00000031${rand}`;
-}
-
-export function generarAlias(email: string): string {
-  const base =
-    email
-      .split("@")[0]
-      ?.toLowerCase()
-      .replace(/[^a-z0-9]/g, ".") ?? "usuario";
-  return `${base}.${Math.floor(100 + Math.random() * 900)}`;
 }
 
 export type SubcuentaInput = {
@@ -346,19 +321,6 @@ export async function updateSubcuenta(
     .single();
   if (error) throw new DataAccessError(error);
   return toSubcuenta(data as SubcuentaRow);
-}
-
-/**
- * Guarda el alias del CVU. `subaccounts` no tiene columna de alias: el alias vive en
- * `clientes.alias` (junto al CVU principal del cliente), así que se actualiza ahí.
- */
-export async function updateAliasCvu(clienteId: string, alias: string): Promise<void> {
-  const sb = requireSupabase();
-  const { error } = await sb
-    .from("clientes")
-    .update({ alias: alias.trim() || null })
-    .eq("id", clienteId);
-  if (error) throw new DataAccessError(error);
 }
 
 export async function deleteSubcuenta(clienteLegajo: string, id: string): Promise<void> {

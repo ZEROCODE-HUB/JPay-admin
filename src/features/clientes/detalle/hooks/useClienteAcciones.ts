@@ -8,22 +8,16 @@ import {
   reactivarCliente,
   suspenderCliente,
 } from "@/lib/api/clientes";
-import { forzarValidacion } from "@/lib/api/detalle-cliente";
 import type { Cliente } from "@/lib/api/types";
-import type { ClienteDetalleData } from "./useClienteDetalle";
 import type { ClienteDetalleUi } from "./useClienteDetalleUi";
 
 export type AccionCliente =
   "aprobar" | "activar" | "suspender" | "reactivar" | "deshabilitar" | "eliminar";
 
-/** Cambios de estado del cliente (homologado) y forzado de validación KYC. */
-export function useClienteAcciones(
-  legajo: string,
-  ui: ClienteDetalleUi,
-  validacionesQuery: ClienteDetalleData["validacionesQuery"],
-) {
+/** Cambios de estado del cliente (homologado). */
+export function useClienteAcciones(ui: ClienteDetalleUi) {
   const queryClient = useQueryClient();
-  const { setConfirmAction, setForzando } = ui;
+  const { setConfirmAction } = ui;
 
   const cambiarEstadoHomologado = async (c: Cliente, accion: AccionCliente) => {
     try {
@@ -59,23 +53,5 @@ export function useClienteAcciones(
     }
   };
 
-  const forzarNuevaValidacion = async () => {
-    setForzando(true);
-    try {
-      await forzarValidacion(legajo);
-      await validacionesQuery.refetch();
-    } catch (e) {
-      setConfirmAction({
-        title: "No se pudo forzar la validación",
-        message: (e as Error).message,
-        confirmLabel: "Cerrar",
-        variant: "danger",
-        onConfirm: () => setConfirmAction(null),
-      });
-    } finally {
-      setForzando(false);
-    }
-  };
-
-  return { cambiarEstadoHomologado, forzarNuevaValidacion };
+  return { cambiarEstadoHomologado };
 }

@@ -5,7 +5,6 @@ import { LegajoCell } from "@/components/legajo-label";
 import type { Comercio } from "@/lib/api/types";
 import { formatDate } from "@/shared/format";
 import { estadoComercioTone } from "../estados";
-import { BanderasSection } from "./BanderasSection";
 
 const TITULO_SECCION =
   "font-display text-xs font-semibold uppercase tracking-wide text-muted-foreground";
@@ -19,7 +18,7 @@ function Field({ label, value }: { label: string; value: ReactNode }) {
   );
 }
 
-/** Modal de solo lectura con la ficha del comercio y sus banderas. */
+/** Modal de solo lectura con la ficha del comercio. */
 export function ComercioDetalle({
   comercio,
   onClose,
@@ -48,7 +47,7 @@ export function ComercioDetalle({
             <div className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800">
               <p className="font-semibold">Comercio pendiente de aprobación</p>
               <p className="text-xs mt-1">
-                Este comercio no puede operar hasta que se le asigne CVU y comisión. El estado
+                Este comercio no puede operar hasta que se le asigne CLABE y comisión. El estado
                 actual no permite transacciones ni acreditaciones.
               </p>
             </div>
@@ -69,10 +68,10 @@ export function ComercioDetalle({
               <Field label="Nombre del comercio" value={comercio.nombreComercio ?? "—"} />
               <Field label="Cliente" value={comercio.cliente?.nombre ?? "—"} />
               <Field
-                label="CUIT del cliente"
+                label="RFC del cliente"
                 value={
                   <span className="font-mono tabular-nums text-xs">
-                    {comercio.cliente?.cuit ?? "—"}
+                    {comercio.cliente?.taxId ?? "—"}
                   </span>
                 }
               />
@@ -90,10 +89,6 @@ export function ComercioDetalle({
               />
               <Field label="Nivel" value={comercio.nivel} />
               <Field
-                label="site_id (Payway)"
-                value={<span className="font-mono text-xs">{comercio.siteId ?? "—"}</span>}
-              />
-              <Field
                 label="Estado"
                 value={<Badge tone={estadoComercioTone(comercio.estado)}>{comercio.estado}</Badge>}
               />
@@ -108,24 +103,13 @@ export function ComercioDetalle({
             </div>
           </Card>
 
-          <BanderasSection comercioId={comercio.id} />
-
-          {/* Impuestos por pagar: todavía no hay fuente real (antes salía de datos de ejemplo). */}
-          <Card className="p-5">
-            <h4 className={`${TITULO_SECCION} mb-3`}>Impuestos por pagar — lote de acreditación</h4>
-            <div className="text-sm text-muted-foreground">
-              Sin impuestos pendientes para este comercio según lotes de acreditación.
-            </div>
-          </Card>
-
           <Card className="p-0">
             <div className="px-5 pt-5 pb-1">
               <h4 className={TITULO_SECCION}>Resumen</h4>
             </div>
             <div className="px-5 pb-5 pt-3 text-sm text-muted-foreground">
-              Los puntos de venta / QR se gestionan en{" "}
-              <span className="font-semibold">Pagos con QR</span> y los enlaces en{" "}
-              <span className="font-semibold">Enlaces de pago</span>.
+              Los puntos de venta se gestionan en <span className="font-semibold">POS físico</span>{" "}
+              y los enlaces en <span className="font-semibold">Enlaces de pago</span>.
             </div>
           </Card>
         </div>

@@ -14,7 +14,6 @@ import type {
 import { ESTADOS_COMERCIO, NIVELES_COMERCIO } from "@/lib/api/types";
 import { FormDialog } from "@/shared/ui/form-dialog";
 import type { ComercioFormInput } from "../utils";
-import { BanderasSection } from "./BanderasSection";
 import { ClienteCombobox } from "./ClienteCombobox";
 
 const SELECT =
@@ -71,7 +70,6 @@ export function ComercioFormModal({
     comercio?.estado ?? "Pendiente de aprobación",
   );
   const [ejecutivoId, setEjecutivoId] = useState(comercio?.ejecutivoResponsableId ?? "");
-  const [siteId, setSiteId] = useState(comercio?.siteId ?? "");
 
   const clienteSeleccionado = clientes.find((c) => c.legajo === clienteLegajo) ?? null;
 
@@ -96,7 +94,6 @@ export function ComercioFormModal({
       nivel,
       estado,
       ejecutivoResponsableId: ejecutivoId || null,
-      siteId: siteId.trim() || null,
     });
   };
 
@@ -154,9 +151,9 @@ export function ComercioFormModal({
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <span className="text-xs text-muted-foreground">CUIT / CUIL</span>
+                  <span className="text-xs text-muted-foreground">RFC</span>
                   <Input
-                    value={clienteSeleccionado.cuit ?? "—"}
+                    value={clienteSeleccionado.taxId ?? "—"}
                     disabled
                     className="font-mono text-sm"
                   />
@@ -196,21 +193,6 @@ export function ComercioFormModal({
             value={nombreComercio}
             onChange={(e) => setNombreComercio(e.target.value)}
             placeholder="Ej: Kiosco Central, Distribuidora Delta"
-          />
-        </div>
-        <div className="sm:col-span-2">
-          <LabelAyuda
-            htmlFor="gc-site-id"
-            hint="Es el número que Payway le asignó a este comercio (también llamado “site id”) para reconocer sus cobros y liquidaciones. Lo entrega el equipo de Payway al dar de alta el comercio."
-          >
-            Nro. de Establecimiento (Payway)
-          </LabelAyuda>
-          <Input
-            id="gc-site-id"
-            value={siteId}
-            onChange={(e) => setSiteId(e.target.value)}
-            placeholder="Ej: 12345"
-            className="font-mono"
           />
         </div>
         <div className="sm:col-span-2">
@@ -278,17 +260,6 @@ export function ComercioFormModal({
           </select>
         </div>
       </div>
-
-      {comercio && (
-        <div className="mt-6 border-t border-border pt-5">
-          <BanderasSection comercioId={comercio.id} />
-        </div>
-      )}
-      {!comercio && (
-        <p className="text-xs text-muted-foreground mt-4 border rounded-lg bg-muted/30 px-3 py-2">
-          Las banderas se configuran luego de crear el comercio, desde el detalle o edición.
-        </p>
-      )}
     </FormDialog>
   );
 }

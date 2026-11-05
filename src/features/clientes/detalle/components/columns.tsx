@@ -1,6 +1,6 @@
 import { Badge } from "@/components/portal-shell";
 import type { Column } from "@/shared/ui/data-table";
-import type { HistorialCambio, Validacion } from "@/lib/api/detalle-cliente";
+import type { HistorialCambio } from "@/lib/api/detalle-cliente";
 import type { AlertaView, BloqueoView } from "../utils";
 
 export const historialColumns: Column<HistorialCambio>[] = [
@@ -10,12 +10,6 @@ export const historialColumns: Column<HistorialCambio>[] = [
   { key: "fecha", label: "Fecha", render: (r) => r.fecha },
   { key: "hora", label: "Hora", render: (r) => r.hora ?? "—" },
   { key: "usuario", label: "Usuario", render: (r) => r.usuario ?? "—" },
-];
-
-export const validacionesColumns: Column<Validacion>[] = [
-  { key: "proveedor", label: "Proveedor", render: (r) => r.proveedor },
-  { key: "estado", label: "Estado", render: (r) => r.estado },
-  { key: "fecha", label: "Fecha", render: (r) => r.fecha },
 ];
 
 export const riesgoColumns: Column<AlertaView>[] = [

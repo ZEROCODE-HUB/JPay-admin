@@ -5,50 +5,13 @@ import { ModalDialog } from "@/shared/ui/modal-dialog";
 import type { ClienteDetalleData } from "../hooks/useClienteDetalle";
 import type { ClienteDetalleUi } from "../hooks/useClienteDetalleUi";
 
-/** Pop-ups de la pestaña Módulos: comercios PST y links de pago. */
+/** Pop-ups de la pestaña Módulos: links de pago. */
 export function ModulosModales({ data, ui }: { data: ClienteDetalleData; ui: ClienteDetalleUi }) {
-  const { comerciosPstQuery, linksPagoQuery, comerciosPst, linksPago } = data;
-  const { pstOpen, setPstOpen, linksOpen, setLinksOpen } = ui;
+  const { linksPagoQuery, linksPago } = data;
+  const { linksOpen, setLinksOpen } = ui;
 
   return (
     <>
-      <ModalDialog
-        open={pstOpen}
-        onClose={() => setPstOpen(false)}
-        title="Comercios PST vinculados"
-        description="Comercios vinculados al cliente vía PST."
-      >
-        {comerciosPstQuery.isLoading ? (
-          <p className="text-sm text-muted-foreground">Cargando…</p>
-        ) : comerciosPst.length === 0 ? (
-          <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-border bg-card px-6 py-8 text-sm text-muted-foreground">
-            <Inbox size={22} />
-            <p>No se encontró comercio PST asociado por email o por legajo.</p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto rounded-xl border border-border bg-card">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-muted-foreground">
-                  <th className="px-4 py-3 font-medium">Comercio</th>
-                  <th className="px-4 py-3 font-medium">Email</th>
-                  <th className="px-4 py-3 font-medium">Legajo</th>
-                </tr>
-              </thead>
-              <tbody>
-                {comerciosPst.map((c) => (
-                  <tr key={c.id} className="border-b border-border last:border-b-0">
-                    <td className="px-4 py-3">{c.nombre}</td>
-                    <td className="px-4 py-3">{c.email ?? "—"}</td>
-                    <td className="px-4 py-3 font-mono text-xs">{c.legajo_comercio ?? "—"}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </ModalDialog>
-
       <ModalDialog
         open={linksOpen}
         onClose={() => setLinksOpen(false)}

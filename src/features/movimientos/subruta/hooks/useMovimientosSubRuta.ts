@@ -1,16 +1,13 @@
 import { useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
 import type { TableServerFilters } from "@/shared/ui/data-table";
 import { useMovimientos } from "@/hooks/useMovimientos";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { useEstadosMovimiento, useEstadosPorTipo } from "@/hooks/useEstados";
-import { listBanderasByComercioIds } from "@/lib/api/comercio-banderas";
-import { getLotePaywaySnapshotForMovimientos } from "@/lib/api/lotes";
 import type { EstadoMovimiento } from "@/lib/api/types";
 import { rangoFechaApi } from "../../comun/utils";
 import { PAGE_SIZE, toFilaSubRuta, type FilaSubRuta } from "../utils";
 
-/** Filtros, datos, estados válidos y lookups de comisión Payway de una sub-ruta de movimientos. */
+/** Filtros, datos y estados válidos de una sub-ruta de movimientos. */
 export function useMovimientosSubRuta({
   tipoCode,
   soloConImpuesto,
@@ -78,29 +75,6 @@ export function useMovimientosSubRuta({
   const byTxn = new Map(rows.map((r) => [r.idTxn, r]));
   const data: FilaSubRuta[] = rows.map((m) => toFilaSubRuta(m, catalogoEstados));
 
-  // PASO 2: Comisión Payway solo para tarjeta — cruce comercio_banderas + snapshot lote
-  const isTarjeta = tipoCode === "tarjeta";
-  const comercioIds = useMemo(
-    () => [...new Set(data.map((d) => d._comercioId).filter(Boolean) as string[])],
-    [data],
-  );
-  const movimientoIds = useMemo(() => data.map((d) => d._dbId), [data]);
-  const { data: banderasPayway } = useQuery({
-    queryKey: ["banderas-payway", comercioIds],
-    queryFn: () => listBanderasByComercioIds(comercioIds),
-    enabled: isTarjeta && comercioIds.length > 0,
-  });
-  const banderasLookup = useMemo(() => {
-    const m = new Map<string, number>();
-    for (const b of banderasPayway ?? []) m.set(`${b.comercioId}::${b.bandera}`, b.comisionPayway);
-    return m;
-  }, [banderasPayway]);
-  const { data: loteSnapshotMap } = useQuery({
-    queryKey: ["lote-snapshot-payway", movimientoIds],
-    queryFn: () => getLotePaywaySnapshotForMovimientos(movimientoIds),
-    enabled: isTarjeta && movimientoIds.length > 0,
-  });
-
   return {
     query,
     page,
@@ -111,8 +85,5 @@ export function useMovimientosSubRuta({
     byTxn,
     catalogoEstados,
     destinosEstado,
-    isTarjeta,
-    banderasLookup,
-    loteSnapshotMap,
   };
 }

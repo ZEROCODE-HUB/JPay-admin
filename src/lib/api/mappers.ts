@@ -212,6 +212,7 @@ export function toComercio(r: ComercioRow): Comercio {
           legajo: cli.legajo,
           nombre: cli.nombre,
           cuit: cli.cuit,
+          taxId: cli.tax_id ?? null,
           tipoPersona: cli.tipo_persona,
           correo: cli.correo,
         }

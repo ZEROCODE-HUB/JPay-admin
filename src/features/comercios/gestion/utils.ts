@@ -11,7 +11,6 @@ export type ComercioFormInput = {
   nivel: NivelComercio;
   estado: EstadoComercio;
   ejecutivoResponsableId: string | null;
-  siteId: string | null;
 };
 
 /** Acepta vacío o un decimal con punto o coma (mientras se escribe). */

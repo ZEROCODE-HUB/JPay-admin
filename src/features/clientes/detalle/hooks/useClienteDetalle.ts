@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { useClienteByLegajo } from "@/hooks/useClientes";
-import { useImpuestosAsignaciones } from "@/hooks/useImpuestos";
 import { useEstadosMovimiento } from "@/hooks/useEstados";
 import { listEvaluacionesRiesgo } from "@/lib/api/clientes";
 import { listSubcuentas } from "@/lib/api/subcuentas";
@@ -11,13 +10,11 @@ import {
   listBloqueos,
   listClienteApiUsuarios,
   listClienteModulos,
-  listComerciosPst,
   listComisionesCliente,
   listHistorialCambios,
   listLinksPago,
   listParametrosAlertas,
   listParametrosBloqueos,
-  listValidaciones,
 } from "@/lib/api/detalle-cliente";
 import type { Cliente } from "@/lib/api/types";
 import { useMovimientosCliente } from "./useMovimientosCliente";
@@ -40,11 +37,6 @@ export function useClienteDetalle(legajo: string) {
     queryFn: () => listSubcuentas(legajo),
     enabled: !!cliente,
   });
-  const impuestosQuery = useImpuestosAsignaciones({
-    page: 0,
-    pageSize: 25,
-    cliente_legajo: legajo ?? undefined,
-  });
   const comisionesQuery = useQuery({
     queryKey: ["comisiones_cliente", legajo],
     queryFn: () => listComisionesCliente(legajo),
@@ -64,11 +56,6 @@ export function useClienteDetalle(legajo: string) {
   const historialCambiosQuery = useQuery({
     queryKey: ["historial_cambios", legajo],
     queryFn: () => listHistorialCambios(legajo),
-    enabled: !!cliente,
-  });
-  const validacionesQuery = useQuery({
-    queryKey: ["validaciones", legajo],
-    queryFn: () => listValidaciones(legajo),
     enabled: !!cliente,
   });
   const alertasQuery = useQuery({
@@ -94,11 +81,6 @@ export function useClienteDetalle(legajo: string) {
   const paramBloqueosQuery = useQuery({
     queryKey: ["param_bloqueos", legajo],
     queryFn: () => listParametrosBloqueos(legajo),
-    enabled: !!cliente,
-  });
-  const comerciosPstQuery = useQuery({
-    queryKey: ["comercios_pst", legajo],
-    queryFn: () => listComerciosPst(legajo),
     enabled: !!cliente,
   });
   const linksPagoQuery = useQuery({
@@ -127,7 +109,6 @@ export function useClienteDetalle(legajo: string) {
 
   const modulosData = modulosQuery.data ?? [];
   const apiModulo = modulosData.find((m) => m.clave === "api");
-  const comerciosPst = comerciosPstQuery.data ?? [];
   const linksPago = linksPagoQuery.data ?? [];
   const apiUsuariosVinculados = clienteApiUsuariosQuery.data ?? [];
   // cantidad real prevalece sobre desnormalizado cliente_modulos.cantidad
@@ -143,18 +124,15 @@ export function useClienteDetalle(legajo: string) {
     refetch,
     movimientos,
     subcuentasQuery,
-    impuestosQuery,
     comisionesQuery,
     comisionesRealesQuery,
     documentosResumenQuery,
     historialCambiosQuery,
-    validacionesQuery,
     alertasQuery,
     bloqueosQuery,
     modulosQuery,
     paramAlertasQuery,
     paramBloqueosQuery,
-    comerciosPstQuery,
     linksPagoQuery,
     clienteApiUsuariosQuery,
     evaluacionesQuery,
@@ -162,7 +140,6 @@ export function useClienteDetalle(legajo: string) {
     evaluacionesAnteriores,
     catalogoEstados,
     modulosData,
-    comerciosPst,
     linksPago,
     apiCantidadReal,
   };

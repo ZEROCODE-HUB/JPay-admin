@@ -95,7 +95,6 @@ export function useComerciosGestion() {
         nivel: input.nivel,
         estado: input.estado,
         ejecutivoResponsableId: input.ejecutivoResponsableId,
-        siteId: input.siteId,
       };
       if (editTarget) {
         await updateComercio(editTarget.id, datos);

@@ -1,7 +1,6 @@
 import { Activity } from "lucide-react";
 import { PageHeader, Stat } from "@/components/portal-shell";
 import { brand } from "@/brand/brand";
-import { AcreditacionesCard } from "./AcreditacionesCard";
 import { ComisionesCard } from "./ComisionesCard";
 import { VolumenSistemaRow } from "./VolumenSistemaRow";
 import { RegistrosAlertasRow } from "./RegistrosAlertasRow";
@@ -13,7 +12,7 @@ import { useRealtimeInvalidate } from "@/shared/realtime";
 import { formatMoney, formatNumber } from "@/shared/format";
 
 // Indicadores (`dashboard_kpis`) y el resto del inicio (`dashboard_detalle`) salen de la base.
-// La tarjeta de acreditaciones es la de Payway (Argentina); en México, los cobros con Ecart Pay.
+// Los cobros salen de Ecart Pay.
 
 const plural = (n: number, uno: string, varios: string) =>
   `${formatNumber(n)} ${n === 1 ? uno : varios}`;
@@ -77,8 +76,6 @@ export function DashboardPage() {
         />
       </div>
 
-      {/* Acreditaciones — formato operación */}
-      {pais.modulos.payway && <AcreditacionesCard />}
       {pais.modulos.pagos_proveedor && <CobrosProveedorCard {...det} />}
 
       <ComisionesCard />

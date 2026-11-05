@@ -216,6 +216,8 @@ export type ComisionCliente = {
     legajo: string;
     correo: string;
     cuit: string;
+    /** RFC del cliente. */
+    taxId?: string | null;
     nombre: string;
     tipoPersona: TipoPersona;
   } | null;
@@ -607,6 +609,7 @@ type ComercioClienteJoined = {
   legajo: string;
   nombre: string;
   cuit: string;
+  tax_id?: string | null;
   tipo_persona: TipoPersona;
   correo: string;
 };
@@ -622,6 +625,8 @@ export type Comercio = {
     legajo: string;
     nombre: string;
     cuit: string;
+    /** RFC del cliente. */
+    taxId?: string | null;
     tipoPersona: TipoPersona;
     correo: string;
   } | null;
@@ -657,8 +662,10 @@ export type ClienteSelect = {
   nombre: string;
   correo: string;
   cuit?: string;
+  /** RFC del cliente. */
+  taxId?: string | null;
   tipoPersona?: TipoPersona;
-  /** País del cliente (AR, MX): define el IVA por defecto de sus comisiones. */
+  /** País del cliente: define el IVA por defecto de sus comisiones. */
   pais?: string | null;
 };
 

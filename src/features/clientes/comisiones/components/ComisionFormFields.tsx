@@ -8,7 +8,7 @@ import { listSubcuentas } from "@/lib/api/subcuentas";
 import type { EstadoComision, ModalidadComision, TipoOperacion } from "@/lib/api/types";
 import {
   etiquetaTipoComision,
-  ivaPorDefecto,
+  IVA_POR_DEFECTO,
   TIPOS_COMISION_USUARIOS,
   type ComisionDraft,
 } from "../utils";
@@ -83,7 +83,7 @@ export function ComisionFormFields({
                     cuit: (c.cuit as string) ?? draft.cuit,
                     tipoPersona:
                       (c.tipoPersona as ComisionDraft["tipoPersona"]) ?? draft.tipoPersona,
-                    porcentajeImpuesto: ivaPorDefecto(c.pais),
+                    porcentajeImpuesto: IVA_POR_DEFECTO,
                   } as ComisionDraft);
                   setOpen(false);
                 }}

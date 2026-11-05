@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { cuentaDelPais } from "@/lib/cuenta-pais";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Ban, FileUp, Plus } from "lucide-react";
+import { FileUp, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
 import {
@@ -19,13 +19,7 @@ import { CargaMasivaSubcuentas } from "./CargaMasivaSubcuentas";
 import { KpiCard } from "./KpiCard";
 import { Seccion } from "./Seccion";
 
-export function SubcuentasTab({
-  legajo,
-  onEximirCuit,
-}: {
-  legajo: string;
-  onEximirCuit: () => void;
-}) {
+export function SubcuentasTab({ legajo }: { legajo: string }) {
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [masivaOpen, setMasivaOpen] = useState(false);
@@ -123,27 +117,20 @@ export function SubcuentasTab({
 
   return (
     <Seccion
-      titulo={`Subcuentas y ${cuentaDelPais()}s`}
+      titulo="Subcuentas"
       loading={query.isLoading}
       error={query.isError ? query.error : null}
       onRetry={() => query.refetch()}
       vacio={!query.isLoading && (query.data?.length ?? 0) === 0}
     >
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-        <KpiCard label="CVUs informadas" value={String(totalSubcuentas)} />
+        <KpiCard label="Subcuentas" value={String(totalSubcuentas)} />
         <KpiCard label="Máximo de subcuentas" value="—" />
         <KpiCard label="Redirección automática" value="Inactiva" tone="muted" />
         <KpiCard label="Presión operativa" value="Sin tope" tone="muted" />
       </div>
 
       <div className="flex flex-wrap justify-end gap-2 mb-3">
-        <button
-          type="button"
-          onClick={onEximirCuit}
-          className="inline-flex items-center gap-1.5 h-9 rounded-md border border-input px-3 text-sm font-medium text-foreground hover:bg-accent"
-        >
-          <Ban size={16} /> Eximir CUIT principal
-        </button>
         <button
           type="button"
           onClick={() => setMasivaOpen(true)}
@@ -191,7 +178,7 @@ export function SubcuentasTab({
           />
           <input
             className="rounded-md border border-input px-3 py-2 text-sm"
-            placeholder="CVU"
+            placeholder={cuentaDelPais()}
             value={form.cbu}
             onChange={(e) => setForm({ ...form, cbu: e.target.value })}
           />

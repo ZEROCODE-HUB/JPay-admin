@@ -28,12 +28,12 @@ export function CargaMasivaSubcuentas({
     const data = hasHeader ? lines.slice(1) : lines;
     return data.map((l) => {
       const cols = l.split(/[,;]/).map((c) => c.trim().replace(/^"|"$/g, ""));
-      const [nombre, apellido = "", email, cbu = "", tipo = "Operativa"] = cols;
+      const [nombre, apellido = "", email, clabe = "", tipo = "Operativa"] = cols;
       return {
         nombre,
         apellido,
         email,
-        cbu: cbu || undefined,
+        cbu: clabe || undefined,
         tipo: (tipo as SubcuentaTipo) || "Operativa",
       };
     });
@@ -80,8 +80,8 @@ export function CargaMasivaSubcuentas({
     <ModalDialog open={open} onClose={onClose} title="Carga masiva de subcuentas" size="lg">
       <div className="space-y-3">
         <p className="text-xs text-muted-foreground">
-          Columnas esperadas: <code>nombre, apellido, email, cbu, tipo</code>. La primera fila puede
-          ser el encabezado.
+          Columnas esperadas: <code>nombre, apellido, email, clabe, tipo</code>. La primera fila
+          puede ser el encabezado.
         </p>
         <input
           type="file"

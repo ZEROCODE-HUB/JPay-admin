@@ -29,7 +29,7 @@ export type ComercioFilters = Pagination & {
 // + relaciones clientes, codigos_categoria, puntos_venta
 // Ya no existe metodos_config ni habilitado_* — migrado a comercio_banderas.
 const COLUMNS =
-  "id, usuario, legajo, nombre_comercio, categoria_id, estado, nivel, ejecutivo_responsable_id, site_id, created_at, updated_at, clientes(legajo, nombre, cuit, tipo_persona, correo), codigos_categoria(id, codigo, nombre, descripcion, estado), puntos_venta(id, nombre, estado, created_at), admin_users!left(id, nombre, email)";
+  "id, usuario, legajo, nombre_comercio, categoria_id, estado, nivel, ejecutivo_responsable_id, site_id, created_at, updated_at, clientes(legajo, nombre, cuit, tax_id, tipo_persona, correo), codigos_categoria(id, codigo, nombre, descripcion, estado), puntos_venta(id, nombre, estado, created_at), admin_users!left(id, nombre, email)";
 
 function escapeLike(q: string): string {
   return q.trim().replace(/[%_]/g, "\\$&");
@@ -167,7 +167,7 @@ export async function listClientesForSelect(search?: string): Promise<ClienteSel
   const sb = requireSupabase();
   let query = sb
     .from("clientes")
-    .select("legajo, nombre, correo, cuit, tipo_persona, pais")
+    .select("legajo, nombre, correo, cuit, tax_id, tipo_persona, pais")
     .order("nombre", { ascending: true })
     .limit(20);
   if (search?.trim()) {
@@ -182,6 +182,7 @@ export async function listClientesForSelect(search?: string): Promise<ClienteSel
       nombre: string;
       correo: string;
       cuit: string;
+      tax_id: string | null;
       tipo_persona: string;
       pais: string | null;
     }): ClienteSelect => ({
@@ -189,6 +190,7 @@ export async function listClientesForSelect(search?: string): Promise<ClienteSel
       nombre: r.nombre,
       correo: r.correo,
       cuit: r.cuit,
+      taxId: r.tax_id,
       tipoPersona: r.tipo_persona as ClienteSelect["tipoPersona"],
       pais: r.pais,
     }),

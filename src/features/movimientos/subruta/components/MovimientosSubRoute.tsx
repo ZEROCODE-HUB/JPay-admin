@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { Eye, FilterX, Inbox, ShieldAlert } from "lucide-react";
 import { DataTable } from "@/shared/ui/data-table";
@@ -13,8 +13,8 @@ import { CambiarEstadoDialog } from "../../comun/components/CambiarEstadoDialog"
 import { CargandoMovimientos, ErrorMovimientos } from "../../comun/components/EstadosCarga";
 import type { EstadoTarget } from "../../comun/utils";
 import { useMovimientosSubRuta } from "../hooks/useMovimientosSubRuta";
-import { columnaVisible, insertarDespues, PAGE_SIZE } from "../utils";
-import { columnaPayway, columnasSubRuta } from "./columns";
+import { columnaVisible, PAGE_SIZE } from "../utils";
+import { columnasSubRuta } from "./columns";
 
 /**
  * Grilla de movimientos compartida por las sub-rutas de Movimientos.
@@ -42,7 +42,6 @@ export function MovimientosSubRoute({
   const navigate = useNavigate();
   const s = useMovimientosSubRuta({ tipoCode, soloConImpuesto, soloConComision });
   const { total, isLoading, isFetching, isError, error, isEmpty, refetch, isEstimated } = s.query;
-  const { isTarjeta, banderasLookup, loteSnapshotMap } = s;
 
   const [detail, setDetail] = useState<Movimiento | null>(null);
   const [estadoTarget, setEstadoTarget] = useState<EstadoTarget | null>(null);
@@ -76,17 +75,8 @@ export function MovimientosSubRoute({
 
   const totalPaginas = Math.max(1, Math.ceil((total || 0) / PAGE_SIZE));
 
-  const allColumns = useMemo(() => {
-    if (!isTarjeta) return columnasSubRuta;
-    return insertarDespues(
-      columnasSubRuta,
-      "comision",
-      columnaPayway(loteSnapshotMap, banderasLookup),
-    );
-  }, [isTarjeta, banderasLookup, loteSnapshotMap]);
-
-  const visibles = allColumns.filter((c) =>
-    columnaVisible(c.key, { tipoCode, soloConComision, isTarjeta }),
+  const visibles = columnasSubRuta.filter((c) =>
+    columnaVisible(c.key, { tipoCode, soloConComision }),
   );
 
   return (
