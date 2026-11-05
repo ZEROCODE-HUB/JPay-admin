@@ -39,22 +39,22 @@ describe("carga de comisiones: utils", () => {
       correo: "—",
       tipoPersona: "fisica",
       descripcion: "",
-      cvu: "000",
+      clabe: "000",
     });
   });
 
   it("borradores: vacío y desde una comisión (legajo '—' → '')", () => {
-    expect(draftVacio()).toMatchObject({ tipo: "Depósito", porcentaje: 1, porcentajeImpuesto: 21 });
+    expect(draftVacio()).toMatchObject({ tipo: "Depósito", porcentaje: 1, porcentajeImpuesto: 16 });
     const d = draftDesdeComision(comisionDesdeApi(api()));
     expect(d.id).toBe("c1");
     expect(d.legajo).toBe("");
   });
 
-  it("desglose: 1 % + 21 % de IVA sobre 100.000", () => {
+  it("desglose: 1 % + 16 % de IVA sobre 100,000", () => {
     const d = desgloseDe(draftVacio());
     expect(d.comision).toBeCloseTo(1000);
-    expect(d.impuesto).toBeCloseTo(210);
-    expect(d.total).toBeCloseTo(1210);
+    expect(d.impuesto).toBeCloseTo(160);
+    expect(d.total).toBeCloseTo(1160);
   });
 
   it("configLabel según modalidad", () => {
@@ -67,7 +67,7 @@ describe("carga de comisiones: utils", () => {
   });
 
   it("código de operación nuevo", () => {
-    expect(codigoOperacionNuevo({ tipo: "Retiro", subcuentaId: "s" }, 5)).toBe("RET-CVU-5");
+    expect(codigoOperacionNuevo({ tipo: "Retiro", subcuentaId: "s" }, 5)).toBe("RET-SUB-5");
     expect(codigoOperacionNuevo({ tipo: "Conversión", subcuentaId: null }, 6)).toBe("CNV-CTA-6");
     expect(codigoOperacionNuevo({ tipo: "Depósito", subcuentaId: null }, 7)).toBe("DEP-CTA-7");
   });

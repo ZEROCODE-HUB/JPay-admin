@@ -104,8 +104,8 @@ export function EnlaceDetalle({ enlace, onClose }: { enlace: EnlacePago; onClose
                 <div className="font-mono">{enlace.pagos}</div>
               </div>
               <div className="col-span-2 text-xs text-muted-foreground border-t pt-3 mt-1">
-                <span className="font-semibold">Ciclo:</span> PayWay crea → Pendiente de aprobación
-                → Activado (sin cobro) → Pagado / Expirado (24h) / Desactivado (comercio) /
+                <span className="font-semibold">Ciclo:</span> se crea → Pendiente de aprobación →
+                Activado (sin cobro) → Pagado / Expirado (24h) / Desactivado (comercio) /
                 Contracargo (comprador desconoce)
               </div>
             </div>
@@ -136,9 +136,9 @@ export function EnlaceDetalle({ enlace, onClose }: { enlace: EnlacePago; onClose
                   <div className="font-semibold">{pago.marcaTarjeta ?? "—"}</div>
                 </div>
                 <div>
-                  <span className="text-muted-foreground">Cuotas</span>
+                  <span className="text-muted-foreground">Meses</span>
                   <div className="font-mono font-semibold">
-                    {pago.cuotas} {pago.cuotas === 1 ? "cuota (pago único)" : "cuotas"}
+                    {pago.cuotas === 1 ? "Pago único" : `${pago.cuotas} meses sin intereses`}
                   </div>
                 </div>
                 <div>
@@ -176,8 +176,8 @@ export function EnlaceDetalle({ enlace, onClose }: { enlace: EnlacePago; onClose
                 </div>
                 {esContracargo && (
                   <div className="col-span-2 rounded-lg bg-danger-50 border border-danger-200 px-3 py-2 text-xs text-danger-800 mt-1">
-                    Este pago entró en flujo de <strong>contracargo</strong> (desconocimiento). Ver
-                    pestaña <strong>Contracargos</strong> para ticket PayWay y documentación.
+                    Este pago entró en flujo de <strong>contracargo</strong> (desconocimiento). Su
+                    seguimiento con Ecart Pay está en Sistema → Integraciones → Contracargos.
                   </div>
                 )}
               </div>
@@ -187,7 +187,7 @@ export function EnlaceDetalle({ enlace, onClose }: { enlace: EnlacePago; onClose
           {/* Leyenda estados para quien consulta un link */}
           {!pago && (
             <p className="text-xs text-muted-foreground">
-              El detalle de método/tarjeta/cuotas aparece cuando el link está en estado{" "}
+              El detalle de método/tarjeta/meses aparece cuando el link está en estado{" "}
               <strong>Pagado</strong> (o <strong>Contracargo</strong>). Permite entender cómo se
               realizó el pago.
             </p>

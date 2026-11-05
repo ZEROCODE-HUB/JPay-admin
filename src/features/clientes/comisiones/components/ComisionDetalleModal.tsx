@@ -38,12 +38,12 @@ export function ComisionDetalleModal({
         <Dato label="Correo">
           <span className="font-medium">{viewing.correo}</span>
         </Dato>
-        <Dato label="CUIT">
-          <span className="font-mono tabular-nums">{viewing.cuit}</span>
+        <Dato label="RFC">
+          <span className="font-mono tabular-nums">{viewing.rfc}</span>
         </Dato>
-        <Dato label="CVU">
-          {viewing.cvu ? (
-            <span className="font-medium font-mono tabular-nums">{viewing.cvu}</span>
+        <Dato label="CLABE">
+          {viewing.clabe ? (
+            <span className="font-medium font-mono tabular-nums">{viewing.clabe}</span>
           ) : (
             <span className="font-medium">Toda la cuenta (respaldo del cliente)</span>
           )}

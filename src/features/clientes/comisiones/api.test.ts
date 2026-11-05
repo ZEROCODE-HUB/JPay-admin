@@ -45,7 +45,7 @@ beforeEach(() => {
 });
 
 describe("comisiones: una sola habilitada por alcance", () => {
-  it("cuenta en el servidor las otras habilitadas del mismo cliente, tipo y CVU", async () => {
+  it("cuenta en el servidor las otras habilitadas del mismo cliente, tipo y subcuenta", async () => {
     resultado = { data: null, error: null, count: 1 };
     const n = await contarOtrasComisionesHabilitadas({
       clienteId: "cl1",
@@ -65,7 +65,7 @@ describe("comisiones: una sola habilitada por alcance", () => {
     ]);
   });
 
-  it("sin CVU busca las de toda la cuenta (subcuenta null) y sin excluir en el alta", async () => {
+  it("sin subcuenta busca las de toda la cuenta (subcuenta null) y sin excluir en el alta", async () => {
     const n = await contarOtrasComisionesHabilitadas({
       clienteId: "cl1",
       tipo: "Depósito",

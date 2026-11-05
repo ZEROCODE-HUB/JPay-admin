@@ -31,7 +31,7 @@ export function RestriccionFormModal({
       description={
         restriccion
           ? `Configuración de la restricción de "${restriccion.apiUsuario?.nombreCompleto}".`
-          : "Definí los datos del usuario y la vigencia de la restricción."
+          : "Define los datos del usuario y la vigencia de la restricción."
       }
       onSubmit={guardar}
       submitLabel={restriccion ? "Guardar cambios" : "Crear restricción"}
@@ -46,7 +46,7 @@ export function RestriccionFormModal({
             onChange={(e) => setForm((f) => ({ ...f, apiUsuarioId: e.target.value }))}
             disabled={!!restriccion}
           >
-            <option value="">Seleccioná un usuario…</option>
+            <option value="">Selecciona un usuario…</option>
             {usuarios.map((u) => (
               <option key={u.id} value={u.id}>
                 {u.usuario} · {u.nombreCompleto} · Código #{u.codigoUsuarioApi}
@@ -55,7 +55,7 @@ export function RestriccionFormModal({
           </select>
           {!restriccion && (
             <p className="text-[11px] text-muted-foreground mt-1">
-              Seleccioná el usuario de API al que aplica la restricción.
+              Selecciona el usuario de API al que aplica la restricción.
             </p>
           )}
         </div>

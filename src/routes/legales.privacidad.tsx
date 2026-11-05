@@ -7,7 +7,7 @@ export const Route = createFileRoute("/legales/privacidad")({
   head: () => ({
     meta: [
       { title: pageTitle("Política de Privacidad") },
-      { name: "description", content: "Politica de privacidad y tratamiento de datos personales." },
+      { name: "description", content: "Política de privacidad y tratamiento de datos personales." },
     ],
   }),
   component: Page,
@@ -29,9 +29,9 @@ function Page() {
       </header>
       <article className="max-w-3xl mx-auto px-6 py-16">
         <h1 className="font-display text-3xl md:text-4xl font-semibold tracking-tight">
-          Politica de Privacidad
+          Política de Privacidad
         </h1>
-        <p className="text-sm text-muted-foreground mt-2">ultima actualizacion: 01/06/2026</p>
+        <p className="text-sm text-muted-foreground mt-2">Última actualización: 01/06/2026</p>
 
         <section className="mt-8 space-y-6 text-sm leading-relaxed text-muted-foreground">
           <div>
@@ -49,9 +49,9 @@ function Page() {
               2. Datos recolectados
             </h2>
             <p>
-              Recolectamos datos identificatorios de la persona juridica y de sus representantes,
-              datos operativos de la cuenta y datos de navegacion con fines de seguridad y
-              prevencion de fraude.
+              Recabamos datos de identificación de la persona moral y de sus representantes, datos
+              operativos de la cuenta y datos de navegación con fines de seguridad y prevención de
+              fraude.
             </p>
           </div>
           <div>
@@ -59,8 +59,9 @@ function Page() {
               3. Finalidad
             </h2>
             <p>
-              Los datos se utilizan para prestar el servicio, cumplir obligaciones regulatorias (Ley
-              25.246 de Prevencion de Lavado de Activos) y comunicaciones vinculadas al servicio.
+              Los datos se utilizan para prestar el servicio, cumplir obligaciones regulatorias en
+              materia de prevención de lavado de dinero y enviar comunicaciones vinculadas al
+              servicio.
             </p>
           </div>
           <div>
@@ -68,18 +69,19 @@ function Page() {
               4. Derechos del titular
             </h2>
             <p>
-              De acuerdo con la Ley 25.326, el titular podra ejercer los derechos de acceso,
-              rectificacion, actualizacion y supresion de sus datos escribiendo a{" "}
-              {brand.contact.privacy}.
+              De acuerdo con la Ley Federal de Protección de Datos Personales en Posesión de los
+              Particulares, el titular puede ejercer sus derechos de acceso, rectificación,
+              cancelación y oposición (derechos ARCO) escribiendo a {brand.contact.privacy}.
             </p>
           </div>
           <div>
             <h2 className="font-display text-lg font-semibold text-foreground mb-2">
-              5. Autoridad de contralor
+              5. Autoridad competente
             </h2>
             <p>
-              La Agencia de Acceso a la Informacion Publica, en su caracter de organo de Control de
-              la Ley 25.326, tiene la atribucion de atender las denuncias y reclamos.
+              Si considera que su derecho a la protección de datos personales ha sido vulnerado,
+              puede acudir ante la autoridad competente en materia de protección de datos personales
+              en México.
             </p>
           </div>
         </section>

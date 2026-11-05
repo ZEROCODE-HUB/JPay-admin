@@ -8,11 +8,13 @@ import { PAIS_INSTALACION } from "@/shared/pais";
 import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
 import { MODULOS, avisarError } from "../utils";
 
-/** Países: datos de formato, activación y módulos de cada uno. */
-export function PaisesCard({ paises }: { paises: Pais[] }) {
+/** País de la instalación (México): datos de formato, activación y módulos. */
+export function PaisesCard({ paises: todos }: { paises: Pais[] }) {
+  // La base puede traer filas de otros países (es compartida); el admin solo opera México.
+  const paises = todos.filter((p) => p.codigo === PAIS_INSTALACION);
   const { actualizarPais, cambiarModulo, predeterminar } = usePaisesMutaciones();
   const [aPredeterminar, setAPredeterminar] = useState<Pais | null>(null);
-  const instalacionBase = paises.find((p) => p.predeterminado)?.codigo;
+  const instalacionBase = todos.find((p) => p.predeterminado)?.codigo;
 
   const cambiar = (p: Pais, cambios: Partial<Pick<Pais, "activo" | "modulos">>) =>
     actualizarPais.mutate({ codigo: p.codigo, cambios }, { onError: avisarError });

@@ -10,7 +10,6 @@ import { Badge, BtnOutline, PageHeader } from "@/components/portal-shell";
 import { useQuery } from "@tanstack/react-query";
 import { listActividad, type EventoActividad } from "@/lib/api/actividad";
 import { cuentaDelPais } from "@/lib/cuenta-pais";
-import { getPais } from "@/shared/pais";
 
 type Evento = EventoActividad;
 
@@ -39,7 +38,7 @@ function Page() {
   const q = useQuery({ queryKey: ["actividad-clientes"], queryFn: () => listActividad() });
   const mock = q.data ?? [];
   const cuenta = cuentaDelPais();
-  const idFiscal = getPais().codigo === "AR" ? "CUIT" : "RFC";
+  const idFiscal = "RFC contraparte";
   const [detalle, setDetalle] = useState<Evento | null>(null);
 
   const getActions = (r: Evento): ActionItem[] => [
@@ -85,23 +84,23 @@ function Page() {
     { key: "nombre", label: "Nombre", filterable: true, render: (r) => r.nombre },
     { key: "destino", label: "Destino", filterable: true, render: (r) => r.destino },
     {
-      key: "cuit",
+      key: "rfc",
       label: idFiscal,
       filterable: true,
-      render: (r) => <span className="font-mono text-xs">{r.cuit}</span>,
+      render: (r) => <span className="font-mono text-xs">{r.rfc}</span>,
     },
     { key: "destinatario", label: "Destinatario", filterable: true, render: (r) => r.destinatario },
     {
-      key: "cvu",
+      key: "clabe",
       label: cuenta,
       filterable: true,
-      render: (r) => <span className="font-mono text-xs tabular-nums">{r.cvu}</span>,
+      render: (r) => <span className="font-mono text-xs tabular-nums">{r.clabe}</span>,
     },
     {
-      key: "cvuBalance",
+      key: "clabeCliente",
       label: `${cuenta} del cliente`,
       filterable: true,
-      render: (r) => <span className="font-mono text-xs tabular-nums">{r.cvuBalance}</span>,
+      render: (r) => <span className="font-mono text-xs tabular-nums">{r.clabeCliente}</span>,
     },
   ];
 
@@ -116,10 +115,10 @@ function Page() {
       Estado: r.estado,
       Nombre: r.nombre,
       Destino: r.destino,
-      [idFiscal]: r.cuit,
+      [idFiscal]: r.rfc,
       Destinatario: r.destinatario,
-      [cuenta]: r.cvu,
-      [`${cuenta} del cliente`]: r.cvuBalance,
+      [cuenta]: r.clabe,
+      [`${cuenta} del cliente`]: r.clabeCliente,
     }));
 
   return (
@@ -195,7 +194,7 @@ function Page() {
             </div>
             <div>
               <span className="text-muted-foreground">{idFiscal}:</span>{" "}
-              <span className="font-medium font-mono text-xs">{detalle.cuit}</span>
+              <span className="font-medium font-mono text-xs">{detalle.rfc}</span>
             </div>
             <div>
               <span className="text-muted-foreground">Destinatario:</span>{" "}
@@ -203,12 +202,12 @@ function Page() {
             </div>
             <div>
               <span className="text-muted-foreground">{cuenta}:</span>{" "}
-              <span className="font-medium font-mono text-xs tabular-nums">{detalle.cvu}</span>
+              <span className="font-medium font-mono text-xs tabular-nums">{detalle.clabe}</span>
             </div>
             <div>
               <span className="text-muted-foreground">{cuenta} del cliente:</span>{" "}
               <span className="font-medium font-mono text-xs tabular-nums">
-                {detalle.cvuBalance}
+                {detalle.clabeCliente}
               </span>
             </div>
           </div>

@@ -10,7 +10,6 @@ import {
   FileBarChart2,
   BookOpen,
   Puzzle,
-  CreditCard,
   Link2,
   Receipt,
   Code2,
@@ -58,12 +57,6 @@ const NAV: NavItem[] = [
     icon: Store,
     items: [
       { to: "/admin/comercios/gestion", label: "Gestión de comercios", icon: Store },
-      {
-        to: "/admin/comercios/transferencia",
-        label: "Pagos con QR",
-        icon: CreditCard,
-        modulo: "qr",
-      },
       { to: "/admin/comercios/link-pago", label: "Enlaces de pago", icon: Link2 },
       { to: "/admin/comercios/pos", label: "POS físico", icon: MapPinned, modulo: "pos" },
       {
@@ -73,7 +66,6 @@ const NAV: NavItem[] = [
         modulo: "suscripciones",
       },
       { to: "/admin/comercios/comisiones-jpay", label: "Comisiones de JPay", icon: Receipt },
-      { to: "/admin/comercios/impuestos", label: "Impuestos", icon: Receipt, modulo: "iibb" },
       { to: "/admin/comercios/apis", label: "APIs externas", icon: Code2 },
     ],
   },

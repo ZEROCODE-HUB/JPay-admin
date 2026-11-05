@@ -107,10 +107,8 @@ export function MovimientosPage({ legajo, txidUrl }: { legajo?: string; txidUrl?
               <FiltrosExtra
                 txid={l.txid}
                 onTxid={l.filtrarTxid}
-                cuit={l.cuit}
-                onCuit={l.setCuit}
-                cvu={l.cvu}
-                onCvu={l.setCvu}
+                clabe={l.clabe}
+                onClabe={l.setClabe}
                 operacion={l.operacion}
                 onOperacion={l.setOperacion}
                 agrupar={l.agrupar}

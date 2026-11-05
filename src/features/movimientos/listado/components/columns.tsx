@@ -79,11 +79,11 @@ export function buildColumns({
       ),
     },
     {
-      key: "cvu",
-      label: "CVU",
+      key: "clabe",
+      label: "CLABE",
       minWidth: 190,
       maxWidth: 230,
-      render: (r) => <span className="font-mono tabular-nums">{r.cvu || "-"}</span>,
+      render: (r) => <span className="font-mono tabular-nums">{r.clabe || "-"}</span>,
     },
     { key: "email", label: "Email", minWidth: 180, maxWidth: 260, render: (r) => r.email ?? "-" },
     {
@@ -99,12 +99,6 @@ export function buildColumns({
       minWidth: 180,
       maxWidth: 280,
       render: (r) => r.nombreDestino ?? "-",
-    },
-    {
-      key: "cuit",
-      label: "CUIT",
-      minWidth: 120,
-      render: (r) => <span className="font-mono tabular-nums">{r.cuit || "-"}</span>,
     },
     {
       key: "monto",

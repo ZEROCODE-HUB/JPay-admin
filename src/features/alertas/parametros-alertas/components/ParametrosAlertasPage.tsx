@@ -23,26 +23,10 @@ export function ParametrosAlertasPage() {
         </div>
       </div>
 
-      <div className="mb-4 flex flex-wrap items-center gap-3">
-        <label htmlFor="alertas-pais" className="text-sm font-medium">
-          País
-        </label>
-        <select
-          id="alertas-pais"
-          className="h-9 rounded-md border border-input bg-card px-2 text-sm"
-          value={s.pais ?? ""}
-          disabled={!s.sinCambios}
-          onChange={(e) => s.setPais(e.target.value || null)}
-        >
-          <option value="">Argentina (valores generales)</option>
-          <option value="MX">México</option>
-        </select>
-        <span className="text-xs text-muted-foreground">
-          {s.pais === "MX"
-            ? "Montos en pesos mexicanos; las reglas en salarios mínimos se cuentan en UMAs mensuales y el horario es el del centro de México."
-            : "Montos en pesos argentinos, salario mínimo (SMVM) y hora de Argentina. Rigen para todo país sin valores propios."}
-        </span>
-      </div>
+      <p className="mb-4 text-xs text-muted-foreground">
+        Montos en pesos mexicanos; las reglas por cantidad de salarios se cuentan en UMAs mensuales
+        y el horario es el del centro de México.
+      </p>
 
       {s.isLoading ? (
         <div className="flex items-center justify-center rounded-lg border bg-card py-16 text-sm text-muted-foreground">
@@ -64,7 +48,7 @@ export function ParametrosAlertasPage() {
         <div className="bg-card border rounded-lg p-4 md:p-6">
           {s.faltantes.length > 0 && (
             <div className="mb-4 rounded-md border border-danger-200 bg-danger-50 px-3 py-2 text-xs text-danger-700">
-              Faltan reglas en la base ({s.faltantes.join(", ")}). Aplicá la migración de
+              Faltan reglas en la base ({s.faltantes.join(", ")}). Aplica la migración de
               configuración de alertas.
             </div>
           )}

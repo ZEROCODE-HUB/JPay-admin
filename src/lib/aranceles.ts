@@ -7,8 +7,7 @@ import type { EstadoComision, ModalidadComision, TipoOperacion } from "@/lib/api
  * - `tipo`: categoría de la operación (4 valores fijos).
  * - `modalidad`: Porcentaje | Fijo.
  * - `porcentaje` / `montoFijo`: según modalidad.
- * - `porcentajeImpuesto`: IVA sobre la comisión que la plataforma retiene y paga (hoy 21%).
- *   Es independiente de las retenciones al cliente (IIBB, débito/crédito).
+ * - `porcentajeImpuesto`: IVA sobre la comisión que la plataforma retiene y paga (16 %).
  */
 export type ConfigComision = {
   operacion: string;
@@ -54,8 +53,7 @@ export type Desglose = {
  * Desglose del cobro al cliente:
  *   monto cobrado = comisión × (1 + impuesto%)
  * Devuelve los tres componentes por separado (Comisión / Impuesto / Total).
- * El impuesto es el que la plataforma retiene y paga por el servicio (hoy IVA 21%),
- * NO debe confundirse con retenciones al cliente (IIBB, débito/crédito).
+ * El impuesto es el que la plataforma retiene y paga por el servicio (IVA 16 %).
  */
 export function calcularDesglose(comision: number, porcentajeImpuesto: number): Desglose {
   const impuesto = comision * (porcentajeImpuesto / 100);
@@ -70,20 +68,4 @@ export function desgloseDesdeConfig(config: ConfigComision, montoOperacion: numb
     montoOperacion,
   });
   return calcularDesglose(comision, config.porcentajeImpuesto);
-}
-
-/**
- * Desglose de referencia para la demo: 1% de comisión + 21% de IVA,
- * es decir se cobra un 1,21% sobre el monto de la operación (ejemplo de la definición).
- */
-export function desgloseDemo(montoOperacion: number, porcentajeImpuesto = 21): Desglose {
-  return calcularDesglose(
-    calcularComision({
-      modalidad: "Porcentaje",
-      porcentaje: 1,
-      montoFijo: null,
-      montoOperacion,
-    }),
-    porcentajeImpuesto,
-  );
 }

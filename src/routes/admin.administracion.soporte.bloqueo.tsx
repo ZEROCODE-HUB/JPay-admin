@@ -151,7 +151,7 @@ function Page() {
     <>
       <PageHeader
         title="Bloqueo de funciones"
-        description="Gestioná los bloqueos de funcionalidades por usuario o globales"
+        description="Gestiona los bloqueos de funcionalidades por usuario o globales"
         action={
           <button
             onClick={openNew}
@@ -178,7 +178,7 @@ function Page() {
         }}
         title={editTarget ? "Editar bloqueo" : "Nuevo bloqueo"}
         description={
-          editTarget ? "Modificá los datos del bloqueo" : "Configurá un nuevo bloqueo de función"
+          editTarget ? "Modifica los datos del bloqueo" : "Configura un nuevo bloqueo de función"
         }
         onSubmit={persist}
         submitLabel={editTarget ? "Guardar cambios" : "Crear bloqueo"}

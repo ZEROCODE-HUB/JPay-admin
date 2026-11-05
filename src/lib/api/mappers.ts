@@ -1,5 +1,4 @@
 import type {
-  AmbitoImpuesto,
   AdminUser,
   AdminUserRow,
   ApiEndpoint,
@@ -10,38 +9,20 @@ import type {
   ApiUsuarioRow,
   CanalNotificacion,
   CanalNotificacionRow,
-  CodigoError,
-  CodigoErrorRow,
   Cliente,
   ClienteRow,
   Comercio,
   ComercioRow,
   ComisionCliente,
   ComisionClienteRow,
-  DcExcepcion,
-  DcExcepcionRow,
-  DcSyncRetroactivo,
-  DcSyncRetroactivoRow,
   EventoNotificacion,
   EventoNotificacionRow,
-  Impuesto,
-  ImpuestoRow,
-  ImpuestoAsignacion,
-  ImpuestoAsignacionRow,
-  Alicuota,
-  AlicuotaRow,
-  IbPadron,
-  IbPadronRow,
-  IbNormalizacionPreview,
-  IbNormalizacionPreviewRow,
   Integracion,
   IntegracionRow,
   Movimiento,
   MovimientoRow,
   PuntoVenta,
   PuntoVentaRow,
-  Resolver,
-  ResolverRow,
   CodigoCategoria,
   CodigoCategoriaRow,
 } from "./types";
@@ -71,7 +52,6 @@ export function toCliente(r: ClienteRow): Cliente {
     cbu: (r.cbu as string | null) ?? null,
     cbuCancelado: (r.cbu_cancelado as boolean) ?? false,
     genero: (r.genero as string | null) ?? null,
-    cuitCuil: (r.cuit_cuil as string | null) ?? null,
     fechaNacimiento: (r.fecha_nacimiento as string | null) ?? null,
     ocupacion: (r.ocupacion as string | null) ?? null,
     origenFondos: (r.origen_fondos as string | null) ?? null,
@@ -115,6 +95,7 @@ export function toComision(r: ComisionClienteRow): ComisionCliente {
           legajo: cli.legajo,
           correo: cli.correo,
           cuit: cli.cuit,
+          taxId: cli.tax_id ?? null,
           nombre: cli.nombre,
           tipoPersona: cli.tipo_persona,
         }
@@ -131,7 +112,7 @@ export function toMovimiento(r: MovimientoRow): Movimiento {
     legajo: r.legajo,
     idTxn: r.id_txn,
     tipo: r.tipo,
-    cvu: r.cvu,
+    clabe: r.cvu,
     montoOperacion: r.monto_operacion,
     comision: r.comision,
     impuesto: r.impuesto,
@@ -143,12 +124,8 @@ export function toMovimiento(r: MovimientoRow): Movimiento {
     fecha: r.fecha,
     createdAt: r.created_at,
     comercioId: (r as MovimientoRow).comercio_id ?? null,
-    /** Texto denormalizado. FK real: banderaId */
-    bandera: (r as MovimientoRow).bandera ?? null,
-    /** FK a banderas.id */
-    banderaId: (r as MovimientoRow).bandera_id ?? null,
     destinatarioNombre: (r as MovimientoRow).destinatario_nombre ?? null,
-    destinatarioCuit: (r as MovimientoRow).destinatario_cuit ?? null,
+    destinatarioRfc: (r as MovimientoRow).destinatario_cuit ?? null,
     destinatarioBanco: (r as MovimientoRow).destinatario_banco ?? null,
     cliente: cli,
   };
@@ -260,25 +237,6 @@ export function toCodigoCategoria(r: CodigoCategoriaRow): CodigoCategoria {
   };
 }
 
-export function toResolver(r: ResolverRow): Resolver {
-  return {
-    id: r.id,
-    nombre: r.nombre,
-    cuit: r.cuit,
-    url: r.url,
-    estado: r.estado,
-    nombreReverso: r.nombre_reverso,
-    formatoWeb: r.formato_web,
-    pcpId: r.pcp_id,
-    idPcp: r.id_pcp,
-    token: r.token,
-    asHeader: r.as_header,
-    soa: r.soa,
-    createdAt: r.created_at,
-    updatedAt: r.updated_at,
-  };
-}
-
 export function toApiUsuario(r: ApiUsuarioRow): ApiUsuario {
   return {
     id: r.id,
@@ -336,20 +294,6 @@ export function toIntegracion(r: IntegracionRow): Integracion {
   };
 }
 
-export function toCodigoError(r: CodigoErrorRow): CodigoError {
-  return {
-    id: r.id,
-    codigo: r.codigo,
-    mensaje: r.mensaje,
-    audiencia: r.audiencia,
-    canalDefecto: r.canal_defecto,
-    descripcion: r.descripcion,
-    activo: r.activo,
-    createdAt: r.created_at,
-    updatedAt: r.updated_at,
-  };
-}
-
 export function toCanalNotificacion(r: CanalNotificacionRow): CanalNotificacion {
   return {
     id: r.id,
@@ -382,135 +326,5 @@ export function toEventoNotificacion(
     createdAt: r.created_at,
     updatedAt: r.updated_at,
     codigoError: ce ? { codigo: ce.codigo, mensaje: ce.mensaje } : null,
-  };
-}
-
-function parseAmbitoImpuesto(r: ImpuestoRow): AmbitoImpuesto {
-  const raw = (r as unknown as { ambito?: unknown }).ambito;
-  if (raw === "Interno" || raw === "Externo") return raw as AmbitoImpuesto;
-  return "Externo";
-}
-
-export function toImpuesto(
-  r: ImpuestoRow & { impuestos_alicuotas?: AlicuotaRow[] | null },
-): Impuesto {
-  const alicuotas = Array.isArray(r.impuestos_alicuotas)
-    ? r.impuestos_alicuotas.map(toAlicuota)
-    : [];
-  return {
-    id: r.id,
-    codigo: r.codigo,
-    nombre: r.nombre,
-    descripcion: r.descripcion ?? null,
-    tipo: r.tipo,
-    monto: r.monto,
-    estado: r.estado,
-    ambito: parseAmbitoImpuesto(r),
-    alicuotas,
-    createdAt: r.created_at,
-    updatedAt: r.updated_at,
-  };
-}
-
-export function toAlicuota(r: AlicuotaRow): Alicuota {
-  return {
-    id: r.id,
-    impuestoId: r.impuesto_id,
-    codigo: r.codigo,
-    tasa: r.tasa,
-    descripcion: r.descripcion,
-    estado: r.estado,
-    createdAt: r.created_at,
-    updatedAt: r.updated_at ?? r.created_at,
-  };
-}
-
-export function toImpuestoAsignacion(r: ImpuestoAsignacionRow): ImpuestoAsignacion {
-  const imp = firstOrNull(r.impuestos);
-  const cli = firstOrNull(r.clientes);
-  return {
-    id: r.id,
-    clienteLegajo: r.legajo,
-    impuestoId: r.impuesto_id,
-    tipo: r.tipo,
-    monto: r.monto,
-    estado: r.estado,
-    fechaAsignacion: r.fecha_asignacion,
-    tipoOperacion: r.tipo_operacion ?? null,
-    impuesto: imp
-      ? {
-          codigo: imp.codigo,
-          nombre: imp.nombre,
-          tipo: imp.tipo,
-          monto: imp.monto,
-        }
-      : null,
-    cliente: cli
-      ? {
-          legajo: cli.legajo,
-          nombre: cli.nombre,
-          cuit: cli.cuit,
-          tipoPersona: cli.tipo_persona,
-          correo: cli.correo,
-        }
-      : null,
-  };
-}
-
-export function toIbPadron(r: IbPadronRow): IbPadron {
-  return {
-    id: r.id,
-    impuestoId: r.impuesto_id,
-    nombre: r.nombre,
-    archivo: r.archivo,
-    estado: r.estado,
-    progreso: r.progreso,
-    createdAt: r.created_at,
-  };
-}
-
-export function toIbNormalizacionPreview(r: IbNormalizacionPreviewRow): IbNormalizacionPreview {
-  return {
-    id: r.id,
-    padronId: r.padron_id,
-    kpisJson: r.kpis_json,
-    creadosJson: r.creados_json,
-    desactivadosJson: r.desactivados_json,
-    omitidosJson: r.omitidos_json,
-    aplicado: r.aplicado,
-    createdAt: r.created_at,
-  };
-}
-
-export function toDcExcepcion(r: DcExcepcionRow): DcExcepcion {
-  const imp = Array.isArray(r.impuestos) ? (r.impuestos[0] ?? null) : null;
-  return {
-    id: r.id,
-    email: r.usuario,
-    cuit: r.cuit,
-    tipo: r.tipo,
-    direccion: r.direccion,
-    motivo: r.motivo,
-    vigenciaDesde: r.vigencia_desde,
-    vigenciaHasta: r.vigencia_hasta,
-    autorizacionCodigo: r.autorizacion_codigo,
-    estado: r.estado,
-    archivoCertificado: r.archivo_certificado ?? null,
-    impuestoId: r.impuesto_id ?? null,
-    impuestoNombre: imp?.nombre ?? null,
-    createdAt: r.fecha_creacion,
-    updatedAt: r.fecha_actualizacion,
-  };
-}
-
-export function toDcSyncRetroactivo(r: DcSyncRetroactivoRow): DcSyncRetroactivo {
-  return {
-    id: r.id,
-    cuit: r.cuit,
-    desde: r.desde,
-    hasta: r.hasta,
-    previewJson: r.preview_json,
-    aplicado: r.aplicado,
-    createdAt: r.created_at,
   };
 }

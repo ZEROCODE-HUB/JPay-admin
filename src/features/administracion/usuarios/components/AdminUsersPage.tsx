@@ -79,7 +79,7 @@ export function AdminUsersPage() {
           <AlertTriangle size={28} />
           <p className="font-semibold">
             {err?.permission
-              ? "No tenés permiso para ver esto"
+              ? "No tienes permiso para ver esto"
               : "Ocurrió un error al cargar los usuarios"}
           </p>
           <p>{err?.message ?? "Error desconocido"}</p>

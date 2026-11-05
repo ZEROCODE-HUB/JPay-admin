@@ -8,7 +8,7 @@ import { formatDateTime, formatMoney } from "@/shared/format";
 
 /**
  * Consultas frecuentes en México: busca un depósito o una transferencia SPEI de Cobre por clave
- * de rastreo, TXID de JPay o ID de Cobre (en lugar del ID de Coelsa de Argentina).
+ * de rastreo, TXID de JPay o ID de Cobre.
  */
 export function ConsultaSpeiMx() {
   const [texto, setTexto] = useState("");
@@ -18,7 +18,7 @@ export function ConsultaSpeiMx() {
 
   const consultar = async () => {
     if (!texto.trim()) {
-      setError("Ingresá una clave de rastreo, un TXID o un ID de Cobre");
+      setError("Ingresa una clave de rastreo, un TXID o un ID de Cobre");
       return;
     }
     setError(null);
@@ -37,7 +37,7 @@ export function ConsultaSpeiMx() {
     <>
       <PageHeader
         title="Consultas frecuentes"
-        description="Buscá un depósito o una transferencia SPEI por clave de rastreo, TXID o ID de Cobre"
+        description="Busca un depósito o una transferencia SPEI por clave de rastreo, TXID o ID de Cobre"
       />
       <div className="bg-card border rounded-lg p-5 space-y-4 max-w-2xl">
         <div className="flex items-end gap-3">

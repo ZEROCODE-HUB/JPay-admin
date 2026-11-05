@@ -24,10 +24,10 @@ export const GROUPS: GroupView[] = [
         code: "deposit_min_wages",
         switchLabel: "Límite de depósito excedido",
         numbers: [
-          { key: "min_wages_count", label: "Salario mínimo (cantidad)", integer: true },
+          { key: "min_wages_count", label: "UMAs mensuales (cantidad)", integer: true },
           {
             key: "min_wage_deposits_per_transfer",
-            label: "Depósitos de salario mínimo por transferencia",
+            label: "Depósitos en UMAs por transferencia",
             integer: true,
           },
         ],
@@ -124,7 +124,7 @@ export const GROUPS: GroupView[] = [
     rules: [{ code: "minors_transfer_policy", switchLabel: "Transferencia a menor" }],
   },
   {
-    title: "Screening PLAFT (REPET)",
+    title: "Screening PLD (listas de personas bloqueadas)",
     rules: [
       {
         code: "plaft_screening",

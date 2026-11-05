@@ -17,9 +17,7 @@ export function IdentificacionTab({
   const { personal: personalRaw, compliance } = camposIdentificacion(cliente);
   const cuentasCount = subcuentasQuery.isLoading ? "…" : String(subcuentasQuery.data?.length ?? 0);
   const personal = personalRaw.map((p) =>
-    p.label === "Cant. cuentas bancarias" || p.label === "Cant. cuentas virtuales"
-      ? { ...p, valor: cuentasCount }
-      : p,
+    p.label === "Cant. subcuentas" ? { ...p, valor: cuentasCount } : p,
   );
 
   return (

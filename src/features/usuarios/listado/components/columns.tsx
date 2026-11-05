@@ -16,13 +16,13 @@ const columns: Column<Usuario>[] = [
     render: (row) => <LegajoCell legajo={row.legajo} />,
   },
   {
-    key: "cuit",
-    label: "ID fiscal",
+    key: "rfc",
+    label: "RFC",
     filterable: true,
     minWidth: 130,
     render: (row) => (
       <span className="font-mono text-xs tabular-nums" title={`Legajo: ${row.legajo}`}>
-        {row.cuitFormatted}
+        {row.rfc}
       </span>
     ),
   },
@@ -64,14 +64,14 @@ const columns: Column<Usuario>[] = [
     render: (row) => <PepCelda esPep={row.esPep} />,
   },
   {
-    key: "cvuCount",
-    label: "CVUs",
+    key: "subcuentasCount",
+    label: "Subcuentas",
     minWidth: 80,
     render: (row) => (
       <span
-        className={`text-xs font-medium tabular-nums ${row.cvuCount > 0 ? "text-foreground" : "text-muted-foreground"}`}
+        className={`text-xs font-medium tabular-nums ${row.subcuentasCount > 0 ? "text-foreground" : "text-muted-foreground"}`}
       >
-        {row.cvuCount} {row.cvuCount === 1 ? "CVU" : "CVUs"}
+        {row.subcuentasCount} {row.subcuentasCount === 1 ? "subcuenta" : "subcuentas"}
       </span>
     ),
   },

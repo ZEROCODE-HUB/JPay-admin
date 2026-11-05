@@ -78,13 +78,13 @@ export function ParametroClienteDialogs({
               <span className="font-medium">{formatDateTime(viendo.updatedAt)}</span>
             </div>
             <div>
-              <span className="text-muted-foreground">Salarios mínimos por persona:</span>{" "}
+              <span className="text-muted-foreground">UMAs mensuales por persona física:</span>{" "}
               <span className="font-mono tabular-nums font-medium">
                 {viendo.individualMinWages ?? `General (${generales.persona ?? "—"})`}
               </span>
             </div>
             <div>
-              <span className="text-muted-foreground">Salarios mínimos por empresa:</span>{" "}
+              <span className="text-muted-foreground">UMAs mensuales por persona moral:</span>{" "}
               <span className="font-mono tabular-nums font-medium">
                 {viendo.companyMinWages ?? `General (${generales.empresa ?? "—"})`}
               </span>

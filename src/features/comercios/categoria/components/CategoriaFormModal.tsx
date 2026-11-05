@@ -27,7 +27,7 @@ export function CategoriaFormModal({
       title={categoria ? "Editar categoría" : "Nueva categoría"}
       description={
         categoria
-          ? `Modificá los datos de la categoría ${categoria.codigo}.`
+          ? `Modifica los datos de la categoría ${categoria.codigo}.`
           : "Complete los datos para crear una nueva categoría."
       }
       onSubmit={guardar}

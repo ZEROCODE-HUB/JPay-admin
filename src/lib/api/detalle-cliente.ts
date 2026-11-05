@@ -27,7 +27,8 @@ export type Bloqueo = {
 
 export type ClienteModulo = {
   id: string;
-  clave: "pct" | "blp" | "api";
+  /** Clave del módulo en `cliente_modulos` (p. ej. "api"). */
+  clave: string;
   titulo: string;
   cantidad: number;
   detalle: string | null;
@@ -83,7 +84,7 @@ const ESTADO_ALERTA: Record<string, string> = {
 type ClienteModuloRow = {
   id: string;
   cliente_legajo: string;
-  clave: "pct" | "blp" | "api";
+  clave: string;
   titulo: string;
   cantidad: number;
   detalle: string | null;

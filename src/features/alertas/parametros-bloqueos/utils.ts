@@ -23,7 +23,7 @@ export function leerUmbral(
   const t = v.trim();
   if (t === "") return { ok: true, value: null };
   const n = Number(t);
-  if (!Number.isFinite(n)) return { ok: false, error: "Ingresá un número" };
+  if (!Number.isFinite(n)) return { ok: false, error: "Ingresa un número" };
   if (n < 0) return { ok: false, error: "No puede ser negativo" };
   if (!Number.isInteger(n)) return { ok: false, error: "Debe ser un número entero" };
   return { ok: true, value: n };
@@ -79,14 +79,14 @@ export function validarDraft(
 ):
   | { ok: true; individualMinWages: number | null; companyMinWages: number | null }
   | { ok: false; error: string } {
-  if (!draft.legajo) return { ok: false, error: "Seleccioná un cliente de la lista." };
+  if (!draft.legajo) return { ok: false, error: "Selecciona un cliente de la lista." };
   const p = leerUmbral(draft.persona);
   const e = leerUmbral(draft.empresa);
   if (!p.ok || !e.ok) {
     return { ok: false, error: `Salarios mínimos: ${!p.ok ? p.error : !e.ok ? e.error : ""}` };
   }
   if (p.value == null && e.value == null) {
-    return { ok: false, error: "Completá al menos uno de los dos umbrales." };
+    return { ok: false, error: "Completa al menos uno de los dos umbrales." };
   }
   return { ok: true, individualMinWages: p.value, companyMinWages: e.value };
 }

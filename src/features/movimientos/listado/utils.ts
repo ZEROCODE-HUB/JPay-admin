@@ -9,11 +9,6 @@ export const OPERACIONES: { label: string; code: string }[] = [
   { label: "Transferencia", code: "transferencia" },
   { label: "Conversión a dólares", code: "conversion" },
   { label: "Pago con tarjeta", code: "tarjeta" },
-  { label: "Pago PCT", code: "pago_pct" },
-  { label: "Cobro PCT", code: "cobro_pct" },
-  { label: "Liquidación de lote", code: "liquidacion_lote" },
-  { label: "Acreditación de lote", code: "acreditacion_lote" },
-  { label: "Adelanto", code: "adelanto" },
   { label: "Ajuste de saldo", code: "ajuste_manual" },
 ];
 export const OPERACION_LABEL = new Map(OPERACIONES.map((o) => [o.code, o.label]));

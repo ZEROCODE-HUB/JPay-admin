@@ -53,7 +53,7 @@ export function construir(draft: Draft): {
         const raw = (d.values[f.key] ?? "").trim();
         const n = Number(raw);
         const id = `${rv.code}.${f.key}`;
-        if (raw === "" || !Number.isFinite(n)) errores[id] = "Ingresá un número";
+        if (raw === "" || !Number.isFinite(n)) errores[id] = "Ingresa un número";
         else if (n < 0) errores[id] = "No puede ser negativo";
         else if (f.integer && !Number.isInteger(n)) errores[id] = "Debe ser un número entero";
         else parameters[f.key] = n;

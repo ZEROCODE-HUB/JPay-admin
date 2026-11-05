@@ -60,7 +60,7 @@ export function useBloqueosListado() {
   const liberar = async () => {
     if (!liberando) return;
     if (notas.trim().length < 5) {
-      toast.error("Indicá el motivo de la liberación (al menos 5 caracteres)");
+      toast.error("Indica el motivo de la liberación (al menos 5 caracteres)");
       return;
     }
     setEnviando(true);

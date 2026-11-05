@@ -20,61 +20,19 @@ export const Route = createFileRoute("/admin/configuracion/logins")({
 
 type Salud = "ok" | "warning" | "error";
 
-// Mock data for operational metrics — ⚠️ datos de REFERENCIA (mock)
-// Provenientes de un sistema de monitoreo/cron real que aún no existe.
-const mockSalud: Record<string, Salud> = {
-  "pct:wondersoft": "ok",
-  "pds:pago_mis_cuentas": "ok",
-  "bank.bdc_conecta": "warning",
-  "cpf:coelsa_cpf": "ok",
-  "pct:coelsa_cvu": "ok",
-  "pct:coelsa_debin": "error",
-};
+// Métricas operativas por integración: vacías hasta que exista el sistema de monitoreo/cron
+// que las informe (antes eran datos de ejemplo).
+const mockSalud: Record<string, Salud> = {};
 
-const mockUltimaEjecucion: Record<string, string> = {
-  "pct:wondersoft": "11/08/2026 08:00",
-  "pds:pago_mis_cuentas": "11/08/2026 07:55",
-  "bank.bdc_conecta": "11/08/2026 07:30",
-  "cpf:coelsa_cpf": "11/08/2026 08:05",
-  "pct:coelsa_cvu": "11/08/2026 08:02",
-  "pct:coelsa_debin": "11/08/2026 07:45",
-};
+const mockUltimaEjecucion: Record<string, string> = {};
 
-const mockProximaEjecucion: Record<string, string> = {
-  "pct:wondersoft": "11/08/2026 08:15",
-  "pds:pago_mis_cuentas": "11/08/2026 08:10",
-  "bank.bdc_conecta": "11/08/2026 08:00",
-  "cpf:coelsa_cpf": "11/08/2026 08:20",
-  "pct:coelsa_cvu": "11/08/2026 08:17",
-  "pct:coelsa_debin": "11/08/2026 08:10",
-};
+const mockProximaEjecucion: Record<string, string> = {};
 
-const mockTiempoRestante: Record<string, string> = {
-  "pct:wondersoft": "02:41",
-  "pds:pago_mis_cuentas": "00:12",
-  "bank.bdc_conecta": "05:44",
-  "cpf:coelsa_cpf": "08:01",
-  "pct:coelsa_cvu": "05:33",
-  "pct:coelsa_debin": "00:51",
-};
+const mockTiempoRestante: Record<string, string> = {};
 
-const mockEjecuciones: Record<string, number> = {
-  "pct:wondersoft": 12480,
-  "pds:pago_mis_cuentas": 8931,
-  "bank.bdc_conecta": 4572,
-  "cpf:coelsa_cpf": 21003,
-  "pct:coelsa_cvu": 20177,
-  "pct:coelsa_debin": 18954,
-};
+const mockEjecuciones: Record<string, number> = {};
 
-const mockProgramacion: Record<string, string> = {
-  "pct:wondersoft": "*/15 * * * *",
-  "pds:pago_mis_cuentas": "*/15 * * * *",
-  "bank.bdc_conecta": "*/30 * * * *",
-  "cpf:coelsa_cpf": "*/15 * * * *",
-  "pct:coelsa_cvu": "*/15 * * * *",
-  "pct:coelsa_debin": "*/15 * * * *",
-};
+const mockProgramacion: Record<string, string> = {};
 
 type LoginConfig = {
   nombre: string;

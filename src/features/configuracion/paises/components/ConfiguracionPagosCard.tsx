@@ -100,7 +100,7 @@ export function ConfiguracionPagosCard({ config }: { config: ConfiguracionPagos 
         <p className="text-xs text-muted-foreground">
           {ejemplo
             ? `Ejemplo: en un cobro de ${formatMoney(EJEMPLO)} la comisión es ${formatMoney(ejemplo.comision)} + IVA ${formatMoney(ejemplo.iva)} = ${formatMoney(ejemplo.total)}.`
-            : "Corregí los campos marcados para ver el ejemplo."}
+            : "Corrige los campos marcados para ver el ejemplo."}
         </p>
         <BtnPrimary onClick={guardar} disabled={!valido || guardarConfiguracion.isPending}>
           {guardarConfiguracion.isPending ? "Guardando…" : "Guardar"}

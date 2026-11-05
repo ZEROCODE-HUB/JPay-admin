@@ -183,7 +183,7 @@ export const acceptAlert = (id: string) => rpc((sb) => sb.rpc("aceptar_alerta", 
 export const resolveAlert = (id: string, resolution: AlertResolution, notes: string) =>
   rpc((sb) => sb.rpc("resolver_alerta", { p_id: id, p_resolution: resolution, p_notes: notes }));
 
-/** Barrido manual (reemplaza al cron mientras no exista): consume coincidencias PLAFT pendientes. */
+/** Barrido manual (reemplaza al cron mientras no exista): consume coincidencias pendientes de las listas PLD. */
 export const runComplianceSweep = () =>
   rpc<{
     coincidencias_revisadas: number;
@@ -193,7 +193,6 @@ export const runComplianceSweep = () =>
 
 export type SimulatedDeposit = {
   estado: string;
-  idCoelsa?: string;
   importe?: number;
   comision?: number;
   impuesto?: number;
@@ -203,19 +202,21 @@ export type SimulatedDeposit = {
 
 /** Depósito entrante simulado (solo desarrollo) para probar las reglas de depósitos. */
 export const simulateDeposit = (input: {
-  cbuDestino: string;
+  /** CLABE de la subcuenta destino (parámetro `p_cbu_destino` de la base). */
+  clabeDestino: string;
   importe: number;
-  cuitOrigen?: string;
+  /** RFC del depositante (parámetro `p_cuit_origen` de la base). */
+  rfcOrigen?: string;
   titularOrigen?: string;
-  cbuOrigen?: string;
+  clabeOrigen?: string;
 }) =>
   rpc<SimulatedDeposit>((sb) =>
     sb.rpc("simular_deposito_entrante", {
-      p_cbu_destino: input.cbuDestino,
+      p_cbu_destino: input.clabeDestino,
       p_importe: input.importe,
-      p_cuit_origen: input.cuitOrigen || undefined,
+      p_cuit_origen: input.rfcOrigen || undefined,
       p_titular_origen: input.titularOrigen || undefined,
-      p_cbu_origen: input.cbuOrigen || undefined,
+      p_cbu_origen: input.clabeOrigen || undefined,
     }),
   );
 
@@ -236,7 +237,8 @@ export type AccountBlock = {
   scope: BlockScope;
   subaccountId: string | null;
   subcuentaNombre: string | null;
-  subcuentaCvu: string | null;
+  /** CLABE de la subcuenta (columna `subcuenta_cvu` de la vista). */
+  subcuentaClabe: string | null;
   origin: "rule" | "manual";
   ruleName: string | null;
   alertId: string | null;
@@ -296,7 +298,7 @@ const toBlock = (r: BlockRow): AccountBlock => ({
   scope: r.scope,
   subaccountId: r.subaccount_id,
   subcuentaNombre: r.subcuenta_nombre,
-  subcuentaCvu: r.subcuenta_cvu,
+  subcuentaClabe: r.subcuenta_cvu,
   origin: r.origin,
   ruleName: r.rule_name,
   alertId: r.alert_id,
@@ -385,10 +387,3 @@ export const releaseBlock = (id: string, notes: string) =>
   rpc<{ ok: boolean; depositos_liberados: number; monto_liberado: number }>((sb) =>
     sb.rpc("liberar_bloqueo", { p_id: id, p_notes: notes }),
   );
-
-// ============================================================================
-// SMVM (valor de referencia de las reglas en salarios mínimos)
-// ============================================================================
-
-export const readSmvm = () => rpc<number>((sb) => sb.rpc("leer_smvm")).then((v) => Number(v ?? 0));
-export const saveSmvm = (monto: number) => rpc((sb) => sb.rpc("guardar_smvm", { p_monto: monto }));

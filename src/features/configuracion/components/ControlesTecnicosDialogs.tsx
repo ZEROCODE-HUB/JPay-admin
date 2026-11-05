@@ -91,7 +91,7 @@ export function ControlesTecnicosDialogs({
         open={c.confirmEjecutarTodos}
         onClose={() => c.setConfirmEjecutarTodos(false)}
         title="Ejecutar todos los logins"
-        message="Se disparará una corrida manual de los 6 logins configurados. ¿Deseás continuar?"
+        message="Se disparará una corrida manual de todos los logins configurados. ¿Deseas continuar?"
         confirmLabel="Ejecutar todos"
         onConfirm={() => {
           toast.success("Corrida manual de todos los logins iniciada");

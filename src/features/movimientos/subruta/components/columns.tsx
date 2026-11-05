@@ -30,12 +30,12 @@ export const columnasSubRuta: Column<FilaSubRuta>[] = [
     render: (r) => TIPO_LABEL[r.tipo] ?? r.tipo,
   },
   {
-    key: "cvu",
-    label: "CVU",
+    key: "clabe",
+    label: "CLABE",
     filterable: true,
     minWidth: 120,
     maxWidth: 200,
-    render: (r) => <span className="font-mono tabular-nums">{r.cvu}</span>,
+    render: (r) => <span className="font-mono tabular-nums">{r.clabe}</span>,
   },
   {
     key: "usuario",
@@ -54,11 +54,11 @@ export const columnasSubRuta: Column<FilaSubRuta>[] = [
     render: (r) => r.nombreOrigen,
   },
   {
-    key: "cuit",
-    label: "CUIT",
+    key: "rfc",
+    label: "RFC contraparte",
     filterable: true,
     minWidth: 120,
-    render: (r) => <span className="font-mono tabular-nums">{r.cuit}</span>,
+    render: (r) => <span className="font-mono tabular-nums">{r.rfc}</span>,
   },
   {
     key: "monto",

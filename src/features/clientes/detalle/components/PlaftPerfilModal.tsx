@@ -14,7 +14,7 @@ export function PlaftPerfilModal({
   open: boolean;
   onClose: () => void;
   clienteId: string;
-  /** Identificador fiscal con su etiqueta ("RFC …", "CUIT …"). */
+  /** Identificador fiscal con su etiqueta ("RFC …"). */
   idFiscal: string;
   initial: {
     limiteTransferencia: number | null;

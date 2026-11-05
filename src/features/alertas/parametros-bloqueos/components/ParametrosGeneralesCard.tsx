@@ -4,46 +4,28 @@ import type { ParametrosGenerales } from "../hooks/useParametrosGenerales";
 const CAMPOS = [
   [
     "persona",
-    "Cantidad de salarios mínimos depositados por persona",
+    "Cantidad de UMAs mensuales depositadas por persona física",
     "Si una persona física supera este acumulado de depósitos, la cuenta se bloquea automáticamente.",
   ],
   [
     "empresa",
-    "Cantidad de salarios mínimos depositados por empresa",
-    "Si una persona jurídica supera este acumulado de depósitos, la cuenta se bloquea automáticamente.",
+    "Cantidad de UMAs mensuales depositadas por persona moral",
+    "Si una persona moral supera este acumulado de depósitos, la cuenta se bloquea automáticamente.",
   ],
 ] as const;
 
 /** Tarjeta "Parámetros generales de bloqueos" (umbrales de la regla global). */
 export function ParametrosGeneralesCard({ g }: { g: ParametrosGenerales }) {
-  const { reglas, regla, params, setParams, errGen, guardandoGen, genSinCambios, pais, setPais } =
-    g;
+  const { reglas, regla, params, setParams, errGen, guardandoGen, genSinCambios } = g;
 
   return (
     <div className="bg-card border rounded-lg p-6">
       <h3 className="font-display text-sm font-semibold text-foreground mb-4 pb-2 border-b border-border">
         Parámetros generales de bloqueos
       </h3>
-      <div className="mb-4 flex flex-wrap items-center gap-3 text-sm">
-        <label htmlFor="bloqueos-pais" className="font-medium">
-          País
-        </label>
-        <select
-          id="bloqueos-pais"
-          className="h-9 rounded-md border border-input bg-card px-2 text-sm"
-          value={pais ?? ""}
-          disabled={!genSinCambios}
-          onChange={(e) => setPais(e.target.value || null)}
-        >
-          <option value="">Argentina (valores generales)</option>
-          <option value="MX">México</option>
-        </select>
-        <span className="text-xs text-muted-foreground">
-          {pais === "MX"
-            ? "En México los umbrales se cuentan en UMAs mensuales (no en salarios mínimos)."
-            : "En salarios mínimos (SMVM). Rigen para todo país sin valores propios."}
-        </span>
-      </div>
+      <p className="mb-4 text-xs text-muted-foreground">
+        Los umbrales se cuentan en UMAs mensuales.
+      </p>
       {reglas.isLoading ? (
         <div className="flex items-center text-sm text-muted-foreground py-4">
           <Loader2 size={14} className="animate-spin mr-2" /> Cargando…
@@ -53,7 +35,7 @@ export function ParametrosGeneralesCard({ g }: { g: ParametrosGenerales }) {
           <AlertTriangle size={14} />
           {reglas.isError
             ? `No se pudo cargar: ${(reglas.error as Error).message}`
-            : "Falta la regla de bloqueo en la base: aplicá la migración de configuración de alertas."}
+            : "Falta la regla de bloqueo en la base: aplica la migración de configuración de alertas."}
         </div>
       ) : (
         <>

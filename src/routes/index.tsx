@@ -192,7 +192,7 @@ function AdminLogin() {
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-primary-500/25 bg-primary-500/10">
               <ShieldCheck size={12} className="text-primary-300" />
               <span className="text-[10px] font-semibold uppercase tracking-wider text-primary-300">
-                Registrado ante BCRA
+                Acceso restringido
               </span>
             </div>
             <p className="text-center text-[11px] text-white/45 leading-relaxed">

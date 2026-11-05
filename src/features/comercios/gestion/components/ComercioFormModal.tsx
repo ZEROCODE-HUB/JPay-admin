@@ -104,8 +104,8 @@ export function ComercioFormModal({
       title={comercio ? "Editar comercio" : "Nuevo comercio"}
       description={
         comercio
-          ? `Modificá los datos del comercio ${comercio.usuario}.`
-          : "Asociá un cliente existente a un nuevo comercio."
+          ? `Modifica los datos del comercio ${comercio.usuario}.`
+          : "Asocia un cliente existente a un nuevo comercio."
       }
       onSubmit={guardar}
       submitLabel={isSaving ? "Guardando…" : comercio ? "Guardar cambios" : "Crear comercio"}
@@ -184,7 +184,7 @@ export function ComercioFormModal({
         <div className="sm:col-span-2">
           <LabelAyuda
             htmlFor="gc-nombre-comercio"
-            hint="Es el nombre que ve el cliente cuando paga con Link de Pago o QR."
+            hint="Es el nombre que ve el cliente cuando paga con un enlace de pago o en el punto de venta."
           >
             Nombre del comercio
           </LabelAyuda>
@@ -192,7 +192,7 @@ export function ComercioFormModal({
             id="gc-nombre-comercio"
             value={nombreComercio}
             onChange={(e) => setNombreComercio(e.target.value)}
-            placeholder="Ej: Kiosco Central, Distribuidora Delta"
+            placeholder="Ej: Abarrotes Central, Distribuidora Delta"
           />
         </div>
         <div className="sm:col-span-2">

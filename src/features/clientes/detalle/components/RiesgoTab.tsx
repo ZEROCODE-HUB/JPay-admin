@@ -86,7 +86,7 @@ export function RiesgoTab({
           </div>
           <p className="mt-3 text-xs text-foreground">
             {riesgoVigente?.motivo ??
-              "El cliente no tiene evaluación de riesgo vigente. Completá una evaluación inicial."}
+              "El cliente no tiene evaluación de riesgo vigente. Completa una evaluación inicial."}
           </p>
           {evaluacionesAnteriores.length > 0 && (
             <details className="mt-3">

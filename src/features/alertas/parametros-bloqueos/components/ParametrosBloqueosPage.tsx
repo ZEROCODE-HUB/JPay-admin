@@ -2,7 +2,6 @@ import { ShieldAlert } from "lucide-react";
 import { PageHeader } from "@/components/portal-shell";
 import { useParametrosGenerales } from "../hooks/useParametrosGenerales";
 import { useParametrosClientes } from "../hooks/useParametrosClientes";
-import { SmvmCard } from "./SmvmCard";
 import { ParametrosGeneralesCard } from "./ParametrosGeneralesCard";
 import { ParametrosUsuariosCard } from "./ParametrosUsuariosCard";
 import { ParametroClienteDialogs } from "./ParametroClienteDialogs";
@@ -26,8 +25,6 @@ export function ParametrosBloqueosPage() {
           revise y la reactive manualmente.
         </div>
       </div>
-
-      <SmvmCard />
 
       <ParametrosGeneralesCard g={generales} />
 

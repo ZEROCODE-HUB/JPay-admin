@@ -70,7 +70,7 @@ export function filaCsvBloqueo(b: AccountBlock): (string | number | null)[] {
 export function alcanceDetalle(b: AccountBlock): string {
   return b.scope === "client"
     ? "Toda la cuenta"
-    : `Subcuenta ${b.subcuentaNombre ?? ""} ${b.subcuentaCvu ?? ""}`;
+    : `Subcuenta ${b.subcuentaNombre ?? ""} ${b.subcuentaClabe ?? ""}`;
 }
 
 /** Toast de resultado de la liberación de un bloqueo. */

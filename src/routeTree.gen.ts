@@ -17,7 +17,6 @@ import { Route as AdminConfiguracionRouteImport } from './routes/admin.configura
 import { Route as AdminIncidentesRouteImport } from './routes/admin.incidentes'
 import { Route as AdminModulosRouteImport } from './routes/admin.modulos'
 import { Route as AdminNotificacionesRouteImport } from './routes/admin.notificaciones'
-import { Route as LegalesArrepentimientoRouteImport } from './routes/legales.arrepentimiento'
 import { Route as LegalesComisionesRouteImport } from './routes/legales.comisiones'
 import { Route as LegalesPrivacidadRouteImport } from './routes/legales.privacidad'
 import { Route as LegalesTerminosRouteImport } from './routes/legales.terminos'
@@ -49,7 +48,6 @@ import { Route as AdminAdministracionUsuariosActividadRouteImport } from './rout
 import { Route as AdminAdministracionUsuariosRolesRouteImport } from './routes/admin.administracion.usuarios.roles'
 import { Route as AdminComerciosApisIndexRouteImport } from './routes/admin.comercios.apis.index'
 import { Route as AdminComerciosApisEndpointsRouteImport } from './routes/admin.comercios.apis.endpoints'
-import { Route as AdminComerciosApisResolversRouteImport } from './routes/admin.comercios.apis.resolvers'
 import { Route as AdminComerciosApisRestriccionesRouteImport } from './routes/admin.comercios.apis.restricciones'
 import { Route as AdminComerciosGestionIndexRouteImport } from './routes/admin.comercios.gestion.index'
 import { Route as AdminComerciosGestionCategoriaRouteImport } from './routes/admin.comercios.gestion.categoria'
@@ -108,11 +106,6 @@ const AdminNotificacionesRoute = AdminNotificacionesRouteImport.update({
   id: '/notificaciones',
   path: '/notificaciones',
   getParentRoute: () => AdminRoute,
-} as any)
-const LegalesArrepentimientoRoute = LegalesArrepentimientoRouteImport.update({
-  id: '/legales/arrepentimiento',
-  path: '/legales/arrepentimiento',
-  getParentRoute: () => rootRouteImport,
 } as any)
 const LegalesComisionesRoute = LegalesComisionesRouteImport.update({
   id: '/legales/comisiones',
@@ -287,12 +280,6 @@ const AdminComerciosApisEndpointsRoute =
     path: '/endpoints',
     getParentRoute: () => AdminComerciosApisRoute,
   } as any)
-const AdminComerciosApisResolversRoute =
-  AdminComerciosApisResolversRouteImport.update({
-    id: '/resolvers',
-    path: '/resolvers',
-    getParentRoute: () => AdminComerciosApisRoute,
-  } as any)
 const AdminComerciosApisRestriccionesRoute =
   AdminComerciosApisRestriccionesRouteImport.update({
     id: '/restricciones',
@@ -410,7 +397,6 @@ export interface FileRoutesByFullPath {
   '/admin/incidentes': typeof AdminIncidentesRoute
   '/admin/modulos': typeof AdminModulosRoute
   '/admin/notificaciones': typeof AdminNotificacionesRouteWithChildren
-  '/legales/arrepentimiento': typeof LegalesArrepentimientoRoute
   '/legales/comisiones': typeof LegalesComisionesRoute
   '/legales/privacidad': typeof LegalesPrivacidadRoute
   '/legales/terminos': typeof LegalesTerminosRoute
@@ -439,7 +425,6 @@ export interface FileRoutesByFullPath {
   '/admin/administracion/usuarios/actividad': typeof AdminAdministracionUsuariosActividadRoute
   '/admin/administracion/usuarios/roles': typeof AdminAdministracionUsuariosRolesRoute
   '/admin/comercios/apis/endpoints': typeof AdminComerciosApisEndpointsRoute
-  '/admin/comercios/apis/resolvers': typeof AdminComerciosApisResolversRoute
   '/admin/comercios/apis/restricciones': typeof AdminComerciosApisRestriccionesRoute
   '/admin/comercios/gestion/categoria': typeof AdminComerciosGestionCategoriaRoute
   '/admin/general/alertas/bloqueos': typeof AdminGeneralAlertasBloqueosRoute
@@ -467,7 +452,6 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin/incidentes': typeof AdminIncidentesRoute
   '/admin/modulos': typeof AdminModulosRoute
-  '/legales/arrepentimiento': typeof LegalesArrepentimientoRoute
   '/legales/comisiones': typeof LegalesComisionesRoute
   '/legales/privacidad': typeof LegalesPrivacidadRoute
   '/legales/terminos': typeof LegalesTerminosRoute
@@ -487,7 +471,6 @@ export interface FileRoutesByTo {
   '/admin/administracion/usuarios/actividad': typeof AdminAdministracionUsuariosActividadRoute
   '/admin/administracion/usuarios/roles': typeof AdminAdministracionUsuariosRolesRoute
   '/admin/comercios/apis/endpoints': typeof AdminComerciosApisEndpointsRoute
-  '/admin/comercios/apis/resolvers': typeof AdminComerciosApisResolversRoute
   '/admin/comercios/apis/restricciones': typeof AdminComerciosApisRestriccionesRoute
   '/admin/comercios/gestion/categoria': typeof AdminComerciosGestionCategoriaRoute
   '/admin/general/alertas/bloqueos': typeof AdminGeneralAlertasBloqueosRoute
@@ -520,7 +503,6 @@ export interface FileRoutesById {
   '/admin/incidentes': typeof AdminIncidentesRoute
   '/admin/modulos': typeof AdminModulosRoute
   '/admin/notificaciones': typeof AdminNotificacionesRouteWithChildren
-  '/legales/arrepentimiento': typeof LegalesArrepentimientoRoute
   '/legales/comisiones': typeof LegalesComisionesRoute
   '/legales/privacidad': typeof LegalesPrivacidadRoute
   '/legales/terminos': typeof LegalesTerminosRoute
@@ -549,7 +531,6 @@ export interface FileRoutesById {
   '/admin/administracion/usuarios/actividad': typeof AdminAdministracionUsuariosActividadRoute
   '/admin/administracion/usuarios/roles': typeof AdminAdministracionUsuariosRolesRoute
   '/admin/comercios/apis/endpoints': typeof AdminComerciosApisEndpointsRoute
-  '/admin/comercios/apis/resolvers': typeof AdminComerciosApisResolversRoute
   '/admin/comercios/apis/restricciones': typeof AdminComerciosApisRestriccionesRoute
   '/admin/comercios/gestion/categoria': typeof AdminComerciosGestionCategoriaRoute
   '/admin/general/alertas/bloqueos': typeof AdminGeneralAlertasBloqueosRoute
@@ -583,7 +564,6 @@ export interface FileRouteTypes {
     | '/admin/incidentes'
     | '/admin/modulos'
     | '/admin/notificaciones'
-    | '/legales/arrepentimiento'
     | '/legales/comisiones'
     | '/legales/privacidad'
     | '/legales/terminos'
@@ -612,7 +592,6 @@ export interface FileRouteTypes {
     | '/admin/administracion/usuarios/actividad'
     | '/admin/administracion/usuarios/roles'
     | '/admin/comercios/apis/endpoints'
-    | '/admin/comercios/apis/resolvers'
     | '/admin/comercios/apis/restricciones'
     | '/admin/comercios/gestion/categoria'
     | '/admin/general/alertas/bloqueos'
@@ -640,7 +619,6 @@ export interface FileRouteTypes {
     | '/'
     | '/admin/incidentes'
     | '/admin/modulos'
-    | '/legales/arrepentimiento'
     | '/legales/comisiones'
     | '/legales/privacidad'
     | '/legales/terminos'
@@ -660,7 +638,6 @@ export interface FileRouteTypes {
     | '/admin/administracion/usuarios/actividad'
     | '/admin/administracion/usuarios/roles'
     | '/admin/comercios/apis/endpoints'
-    | '/admin/comercios/apis/resolvers'
     | '/admin/comercios/apis/restricciones'
     | '/admin/comercios/gestion/categoria'
     | '/admin/general/alertas/bloqueos'
@@ -692,7 +669,6 @@ export interface FileRouteTypes {
     | '/admin/incidentes'
     | '/admin/modulos'
     | '/admin/notificaciones'
-    | '/legales/arrepentimiento'
     | '/legales/comisiones'
     | '/legales/privacidad'
     | '/legales/terminos'
@@ -721,7 +697,6 @@ export interface FileRouteTypes {
     | '/admin/administracion/usuarios/actividad'
     | '/admin/administracion/usuarios/roles'
     | '/admin/comercios/apis/endpoints'
-    | '/admin/comercios/apis/resolvers'
     | '/admin/comercios/apis/restricciones'
     | '/admin/comercios/gestion/categoria'
     | '/admin/general/alertas/bloqueos'
@@ -749,7 +724,6 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRouteWithChildren
-  LegalesArrepentimientoRoute: typeof LegalesArrepentimientoRoute
   LegalesComisionesRoute: typeof LegalesComisionesRoute
   LegalesPrivacidadRoute: typeof LegalesPrivacidadRoute
   LegalesTerminosRoute: typeof LegalesTerminosRoute
@@ -812,13 +786,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/notificaciones'
       preLoaderRoute: typeof AdminNotificacionesRouteImport
       parentRoute: typeof AdminRoute
-    }
-    '/legales/arrepentimiento': {
-      id: '/legales/arrepentimiento'
-      path: '/legales/arrepentimiento'
-      fullPath: '/legales/arrepentimiento'
-      preLoaderRoute: typeof LegalesArrepentimientoRouteImport
-      parentRoute: typeof rootRouteImport
     }
     '/legales/comisiones': {
       id: '/legales/comisiones'
@@ -1037,13 +1004,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminComerciosApisEndpointsRouteImport
       parentRoute: typeof AdminComerciosApisRoute
     }
-    '/admin/comercios/apis/resolvers': {
-      id: '/admin/comercios/apis/resolvers'
-      path: '/resolvers'
-      fullPath: '/admin/comercios/apis/resolvers'
-      preLoaderRoute: typeof AdminComerciosApisResolversRouteImport
-      parentRoute: typeof AdminComerciosApisRoute
-    }
     '/admin/comercios/apis/restricciones': {
       id: '/admin/comercios/apis/restricciones'
       path: '/restricciones'
@@ -1175,14 +1135,12 @@ declare module '@tanstack/react-router' {
 
 interface AdminComerciosApisRouteChildren {
   AdminComerciosApisEndpointsRoute: typeof AdminComerciosApisEndpointsRoute
-  AdminComerciosApisResolversRoute: typeof AdminComerciosApisResolversRoute
   AdminComerciosApisRestriccionesRoute: typeof AdminComerciosApisRestriccionesRoute
   AdminComerciosApisIndexRoute: typeof AdminComerciosApisIndexRoute
 }
 
 const AdminComerciosApisRouteChildren: AdminComerciosApisRouteChildren = {
   AdminComerciosApisEndpointsRoute: AdminComerciosApisEndpointsRoute,
-  AdminComerciosApisResolversRoute: AdminComerciosApisResolversRoute,
   AdminComerciosApisRestriccionesRoute: AdminComerciosApisRestriccionesRoute,
   AdminComerciosApisIndexRoute: AdminComerciosApisIndexRoute,
 }
@@ -1431,7 +1389,6 @@ const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
-  LegalesArrepentimientoRoute: LegalesArrepentimientoRoute,
   LegalesComisionesRoute: LegalesComisionesRoute,
   LegalesPrivacidadRoute: LegalesPrivacidadRoute,
   LegalesTerminosRoute: LegalesTerminosRoute,

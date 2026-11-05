@@ -20,7 +20,7 @@ export function ErrorMovimientos({ error, onRetry }: { error: unknown; onRetry: 
       <div>
         <p className="font-semibold">
           {err?.permission
-            ? "No tenés permiso para ver esto"
+            ? "No tienes permiso para ver esto"
             : "Ocurrió un error al cargar los movimientos"}
         </p>
         <p className="mt-1">{err?.message ?? "Error desconocido"}</p>

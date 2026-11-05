@@ -30,7 +30,7 @@ export type ConfirmActionState = {
   onConfirm: () => void;
 };
 
-export type Alcance = "" | "cvu" | "cuenta";
+export type Alcance = "" | "subcuenta" | "cuenta";
 
 /** Filtros, datos, formulario y acciones de la carga de comisiones de usuarios. */
 export function useCargaComisiones() {
@@ -51,9 +51,9 @@ export function useCargaComisiones() {
   };
   const [alcance, setAlcance] = useState<Alcance>("");
   const [legajoFiltro, setLegajoFiltro] = useState("");
-  const [cvuFiltro, setCvuFiltro] = useState("");
+  const [clabeFiltro, setClabeFiltro] = useState("");
   const legajoQ = useDebouncedValue(legajoFiltro.trim(), 350);
-  const cvuQ = useDebouncedValue(cvuFiltro.trim(), 350);
+  const clabeQ = useDebouncedValue(clabeFiltro.trim(), 350);
 
   // Depósito y Retiro se filtran en la base: así el total y las páginas coinciden.
   const listado = useComisiones({
@@ -66,7 +66,7 @@ export function useCargaComisiones() {
     estado: (filtrosPanel.enums.estado as EstadoComision) || undefined,
     alcance: alcance || undefined,
     legajo: legajoQ || undefined,
-    cvu: cvuQ || undefined,
+    clabe: clabeQ || undefined,
   });
 
   const [viewing, setViewing] = useState<Comision | null>(null);
@@ -112,7 +112,7 @@ export function useCargaComisiones() {
 
   const cambiarEstado = async (row: Comision, nuevo: EstadoComision) => {
     try {
-      // Solo puede haber UNA comision Habilitada por CVU (o por cliente) y tipo:
+      // Solo puede haber UNA comisión Habilitada por subcuenta (o por cliente) y tipo:
       // antes de activar esta, se verifica que no haya otra activa del mismo alcance.
       if (nuevo === "Habilitado") {
         const cliente = await getClienteByCorreo(row.correo.toLowerCase());
@@ -124,10 +124,12 @@ export function useCargaComisiones() {
             excluirId: row.id,
           });
           if (otras > 0) {
-            const alcanceTxt = row.cvu ? `el CVU ${row.cvu}` : "toda la cuenta";
+            const alcanceTxt = row.subcuentaId
+              ? `la CLABE ${row.clabe ?? "de la subcuenta"}`
+              : "toda la cuenta";
             errorDialogo(
               "Ya hay una comisión activa de ese tipo",
-              `Ya hay una comisión de "${row.tipo}" habilitada para ${alcanceTxt}. Deshabilitá esa antes de activar otra.`,
+              `Ya hay una comisión de "${row.tipo}" habilitada para ${alcanceTxt}. Deshabilita esa antes de activar otra.`,
             );
             return;
           }
@@ -163,7 +165,7 @@ export function useCargaComisiones() {
   const guardarDraft = async () => {
     setFormError(null);
     if (!draft.correo) {
-      setFormError("Seleccioná el email del cliente (búsqueda rápida).");
+      setFormError("Selecciona el email del cliente (búsqueda rápida).");
       return;
     }
     setSaving(true);
@@ -175,8 +177,8 @@ export function useCargaComisiones() {
         return;
       }
 
-      // Solo puede haber UNA comision HABILITADA por alcance (CVU, o cliente si no
-      // hay CVU) y tipo: se pueden guardar deshabilitadas, pero no dos activas del
+      // Solo puede haber UNA comisión HABILITADA por alcance (subcuenta, o cliente si no
+      // hay subcuenta) y tipo: se pueden guardar deshabilitadas, pero no dos activas del
       // mismo alcance a la vez.
       if (draft.estado === "Habilitado") {
         const otras = await contarOtrasComisionesHabilitadas({
@@ -187,10 +189,10 @@ export function useCargaComisiones() {
         });
         if (otras > 0) {
           const alcanceTxt = draft.subcuentaId
-            ? `el CVU elegido`
+            ? `la subcuenta elegida`
             : `toda la cuenta de ${cliente.correo}`;
           setFormError(
-            `Ya hay una comisión de "${draft.tipo}" activa para ${alcanceTxt}. Deshabilitá esa, o guardá esta como "Deshabilitado".`,
+            `Ya hay una comisión de "${draft.tipo}" activa para ${alcanceTxt}. Deshabilita esa, o guarda esta como "Deshabilitado".`,
           );
           setSaving(false);
           return;
@@ -239,8 +241,8 @@ export function useCargaComisiones() {
     setAlcance,
     legajoFiltro,
     setLegajoFiltro,
-    cvuFiltro,
-    setCvuFiltro,
+    clabeFiltro,
+    setClabeFiltro,
     puedeCrear,
     puedeModificar,
     viewing,

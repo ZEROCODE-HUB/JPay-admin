@@ -28,14 +28,13 @@ const FULL_KB = [
 ];
 
 const DEFAULT_RESPONSE =
-  "No encontré una respuesta exacta, pero puedo ayudarte con cualquiera de estas áreas del panel: transacciones y estados, impuestos (propios y retenciones), alertas vs. bloqueos, comercios (gestión, PCT, link de pago, impuestos, APIs externas), reportes, registros y fondos, soporte (consultas por ID de Coelsa y bloqueo de funciones), usuarios y roles, movimientos, configuración e integraciones, módulos, notificaciones e incidentes. Escribime tu duda con más detalle y la busco.";
+  "No encontré una respuesta exacta, pero puedo ayudarte con cualquiera de estas áreas del panel: transacciones y estados, alertas vs. bloqueos, comercios (gestión, enlaces de pago, POS físico, suscripciones, comisiones de JPay, APIs externas), reportes, registros y fondos, soporte (búsqueda de transferencias SPEI y bloqueo de funciones), usuarios y roles, movimientos, configuración e integraciones, módulos, notificaciones e incidentes. Escríbeme tu duda con más detalle y la busco.";
 
 const SUGGESTED = [
-  "¿Qué tipos de impuestos existen?",
+  "¿Cómo busco una transferencia SPEI?",
   "¿Cuál es la diferencia entre alerta y bloqueo?",
   "¿Cómo navego en el panel?",
   "¿Qué estados tiene una transacción?",
-  "¿Cómo consulto un ID de Coelsa?",
   "¿Qué es el total de fondos?",
 ];
 
@@ -76,7 +75,7 @@ function findResponse(input: string): string {
       normalize(r.path).includes(clean),
   );
   if (routeHit) {
-    return `Podés encontrarlo en: ${routeHit.title} (${routeHit.path}).`;
+    return `Puedes encontrarlo en: ${routeHit.title} (${routeHit.path}).`;
   }
 
   return DEFAULT_RESPONSE;
@@ -149,8 +148,8 @@ export function AdminChatbot() {
           <div className="flex-1 overflow-y-auto p-4 space-y-3">
             {messages.length === 0 && (
               <div className="text-sm text-muted-foreground text-center py-6">
-                ¡Hola! Soy el asistente virtual de {brand.shortName}. Seleccioná una consulta o
-                escribí tu pregunta.
+                ¡Hola! Soy el asistente virtual de {brand.shortName}. Selecciona una consulta o
+                escribe tu pregunta.
               </div>
             )}
 
@@ -218,7 +217,7 @@ export function AdminChatbot() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Escribí tu consulta..."
+              placeholder="Escribe tu consulta..."
               className="flex-1 h-10 px-3 rounded-md border border-input bg-card text-sm outline-none focus:ring-2 focus:ring-ring/40 focus:border-ring"
             />
             <button

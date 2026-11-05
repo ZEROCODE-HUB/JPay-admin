@@ -26,7 +26,7 @@ export function AlertasPage() {
     <>
       <PageHeader
         title="Listado de alertas"
-        description="Alertas generadas por el motor de monitoreo y el screening PLAFT."
+        description="Alertas generadas por el motor de monitoreo y el screening PLD (listas de personas bloqueadas)."
         action={
           <div className="flex flex-wrap gap-2">
             <BtnOutline onClick={() => s.setSimOpen(true)}>

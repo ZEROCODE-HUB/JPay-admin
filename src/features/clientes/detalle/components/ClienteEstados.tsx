@@ -41,7 +41,7 @@ export function ClienteError({ error, refetch }: { error: Error | null; refetch:
         <div>
           <p className="font-semibold">
             {err?.permission
-              ? "No tenés permiso para ver esto"
+              ? "No tienes permiso para ver esto"
               : "Ocurrió un error al cargar el cliente"}
           </p>
           <p className="mt-1">{error?.message ?? "Error desconocido"}</p>

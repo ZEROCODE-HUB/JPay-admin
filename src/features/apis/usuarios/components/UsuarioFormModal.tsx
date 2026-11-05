@@ -56,7 +56,7 @@ export function UsuarioFormModal({
             id="au-usuario"
             value={form.usuario}
             onChange={(e) => setForm((f) => ({ ...f, usuario: e.target.value }))}
-            placeholder={`afip@${brand.web.domain}`}
+            placeholder={`integracion@${brand.web.domain}`}
           />
         </div>
         <div className="sm:col-span-2">
@@ -65,7 +65,7 @@ export function UsuarioFormModal({
             id="au-nombre"
             value={form.nombreCompleto}
             onChange={(e) => setForm((f) => ({ ...f, nombreCompleto: e.target.value }))}
-            placeholder="Integración AFIP"
+            placeholder="Integración ERP"
           />
         </div>
         <div>

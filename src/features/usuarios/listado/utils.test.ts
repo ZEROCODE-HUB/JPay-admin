@@ -8,7 +8,7 @@ const cliente = {
   legajo: "L-1",
   correo: "a@b.com",
   nombre: "Ana",
-  cuit: "20123456789",
+  taxId: "GODE561231GR8",
   estado: "activado",
   fechaAlta: "01/01/2026",
   esPep: true,
@@ -23,7 +23,7 @@ describe("personas físicas: utils", () => {
     expect(u.esPep).toBe(true);
     expect(u.riesgo).toBeNull();
     expect(u.kycCompleto).toBe(false);
-    expect(u.cvuCount).toBe(0);
+    expect(u.subcuentasCount).toBe(0);
     expect(u.consumoMensualPct).toBeNull();
     expect(u.limiteTransferencia).toBe(1000);
   });
@@ -33,13 +33,13 @@ describe("personas físicas: utils", () => {
       riesgo: "alto",
       riesgoMotivo: "x",
       kycCompleto: true,
-      cvuCount: 2,
+      subcuentasCount: 2,
       consumoMensualPct: 40,
     });
     expect(u.riesgo).toBe("alto");
     expect(u.riesgoMotivo).toBe("x");
     expect(u.kycCompleto).toBe(true);
-    expect(u.cvuCount).toBe(2);
+    expect(u.subcuentasCount).toBe(2);
     expect(u.consumoMensualPct).toBe(40);
   });
 

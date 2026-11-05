@@ -6,7 +6,7 @@ function SinPermiso() {
   return (
     <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-border bg-card px-6 py-12 text-center text-sm text-muted-foreground">
       <Lock size={28} />
-      <p>No tenés permiso para acceder a esta sección.</p>
+      <p>No tienes permiso para acceder a esta sección.</p>
     </div>
   );
 }

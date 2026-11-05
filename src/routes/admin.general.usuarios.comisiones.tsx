@@ -42,7 +42,7 @@ function ComisionesPage() {
     <PermissionGuard recurso="usuarios">
       <PageHeader
         title="Carga de comisiones"
-        description="Comisión e IVA de Retiro (transferencias salientes) y Depósito (ingresos al CVU), por CVU o para toda la cuenta del cliente como respaldo. La del CVU manda. Entre CVUs del mismo cliente no se cobra."
+        description="Comisión e IVA de Retiro (transferencias salientes) y Depósito (ingresos a la CLABE), por subcuenta o para toda la cuenta del cliente como respaldo. La de la subcuenta manda. Entre subcuentas del mismo cliente no se cobra."
         action={
           <BtnPrimary onClick={s.abrirNueva} disabled={!s.puedeCrear}>
             <Plus size={16} />

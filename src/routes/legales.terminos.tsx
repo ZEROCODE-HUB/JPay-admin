@@ -42,10 +42,9 @@ function Page() {
           <div>
             <h2 className="font-display text-lg font-semibold text-foreground mb-2">1. Objeto</h2>
             <p>
-              {brand.company.legalName} (en adelante "{brand.company.shortName}") es un Proveedor de
-              Servicios de Pago con Cuentas de Pago (PSPCP) inscripto ante el Banco Central de la
-              Republica Argentina. Estos términos regulan el uso de la plataforma por parte de
-              personas jurídicas.
+              {brand.company.legalName} (en adelante "{brand.company.shortName}") ofrece servicios
+              de cobro y pago a empresas en México. Estos términos regulan el uso de la plataforma
+              por parte de personas morales.
             </p>
           </div>
           <div>
@@ -62,10 +61,9 @@ function Page() {
               3. Uso de la cuenta de pago
             </h2>
             <p>
-              Los fondos depositados no constituyen depositos en una entidad financiera ni cuentan
-              con la garantia de la Ley 24.485. {brand.company.shortName} mantiene el 100% de los
-              fondos de los clientes en cuentas de terceros en entidades financieras del sistema
-              argentino.
+              Los fondos depositados no constituyen depósitos bancarios. {brand.company.shortName}{" "}
+              mantiene el 100% de los fondos de los clientes en cuentas en entidades financieras del
+              sistema financiero mexicano.
             </p>
           </div>
           <div>
@@ -85,11 +83,8 @@ function Page() {
               5. Rescision
             </h2>
             <p>
-              El usuario podra dar de baja la cuenta en cualquier momento a traves del{" "}
-              <Link to="/legales/arrepentimiento" className="text-primary-ink underline">
-                Boton de Arrepentimiento
-              </Link>{" "}
-              o comunicandose con nuestro equipo.
+              El usuario podrá dar de baja la cuenta en cualquier momento comunicándose con nuestro
+              equipo.
             </p>
           </div>
           <div>
@@ -97,8 +92,8 @@ function Page() {
               6. Jurisdiccion
             </h2>
             <p>
-              Para cualquier controversia se aplicara la legislacion de la Republica Argentina y
-              seran competentes los tribunales ordinarios de la Ciudad Autonoma de Buenos Aires.
+              Para cualquier controversia se aplicarán las leyes de los Estados Unidos Mexicanos y
+              serán competentes los tribunales de la Ciudad de México.
             </p>
           </div>
         </section>

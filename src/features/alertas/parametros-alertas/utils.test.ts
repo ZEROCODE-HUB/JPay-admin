@@ -32,7 +32,7 @@ describe("construir", () => {
     expect(errores["transfers_per_hour.max_per_hour"]).toBe("Debe ser un número entero");
     expect(errores["abnormal_volume.min_amount"]).toBe("El mínimo no puede superar al máximo");
     expect(errores["plaft_screening.threshold"]).toBe("Va de 0 a 100");
-    expect(errores["deposit_company_max.max_amount"]).toBe("Ingresá un número");
+    expect(errores["deposit_company_max.max_amount"]).toBe("Ingresa un número");
   });
 
   it("arma los parámetros válidos y la política por defecto", () => {

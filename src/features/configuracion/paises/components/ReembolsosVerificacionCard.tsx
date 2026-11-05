@@ -35,7 +35,7 @@ export function ReembolsosVerificacionCard() {
 
   const decidir = (id: string, hecho: boolean) => {
     const nota = (notas[id] ?? "").trim();
-    if (!nota) return toast.error("Escribí qué viste en el panel de Ecart Pay");
+    if (!nota) return toast.error("Escribe qué viste en el panel de Ecart Pay");
     resolver.mutate({ id, hecho, nota });
   };
 
@@ -43,7 +43,7 @@ export function ReembolsosVerificacionCard() {
     <Card>
       <h3 className="font-semibold">Reembolsos en verificación</h3>
       <p className="text-xs text-muted-foreground mt-1">
-        Ecart Pay no respondió con claridad y no se sabe si el reembolso se hizo. Buscá la orden en
+        Ecart Pay no respondió con claridad y no se sabe si el reembolso se hizo. Busca la orden en
         el panel de Ecart Pay y resolvelo; mientras tanto, el monto sigue reservado.
       </p>
       {q.isLoading ? (

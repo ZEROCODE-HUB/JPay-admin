@@ -36,7 +36,7 @@ export function PlaftRiesgoModal({
   const submit = () => {
     if (motivo.trim().length < 10) {
       setMotivoError(
-        "Describí brevemente por qué (mín. 10 caracteres). Queda en la auditoría PLAFT.",
+        "Describe brevemente por qué (mín. 10 caracteres). Queda en la auditoría PLAFT.",
       );
       return;
     }
@@ -103,7 +103,7 @@ export function PlaftRiesgoModal({
             className="h-9 rounded-md border border-input bg-background px-3 text-sm focus:ring-2 focus:ring-ring/40 outline-none"
           />
           <p className="mt-1 text-xs text-muted-foreground">
-            Si lo dejás vacío, la evaluación queda vigente hasta que se reevalúe.
+            Si lo dejas vacío, la evaluación queda vigente hasta que se reevalúe.
           </p>
         </div>
 

@@ -8,7 +8,7 @@ type Props = { d?: DashboardDetalle; isLoading: boolean; isError: boolean };
 
 const METODO: Record<string, string> = { tarjeta: "Tarjeta", spei: "SPEI", oxxo: "OXXO" };
 
-/** Cobros de enlaces de pago con Ecart Pay en el mes (México); en Argentina va la de Payway. */
+/** Cobros de enlaces de pago con Ecart Pay en el mes. */
 export function CobrosProveedorCard({ d, isLoading, isError }: Props) {
   const c = d?.cobrosMes;
   const m = (n: number) => formatMoney(n, { moneda: d?.moneda });

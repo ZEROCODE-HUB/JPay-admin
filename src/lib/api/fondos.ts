@@ -1,4 +1,5 @@
 import { requireSupabase } from "@/lib/supabase";
+import { getPais } from "@/shared/pais";
 import { DataAccessError } from "./errors";
 
 /** Saldo de cada subcuenta de los clientes (Administración → Registros → Fondos por usuario). */
@@ -8,9 +9,8 @@ export type FondoSubcuenta = {
   email: string;
   nombre: string;
   subcuenta: string;
-  /** CLABE (México) o CBU/CVU (Argentina); null si todavía no tiene. */
+  /** CLABE (columna `cbu`); null si todavía no tiene. */
   cuenta: string | null;
-  alias: string | null;
   moneda: string;
   disponible: number;
   retenido: number;
@@ -29,7 +29,6 @@ type Fila = {
   clientes: {
     correo: string | null;
     nombre: string | null;
-    alias: string | null;
     pais: string | null;
   } | null;
   subaccount_balances:
@@ -38,14 +37,12 @@ type Fila = {
     | null;
 };
 
-const MONEDA_PAIS: Record<string, string> = { MX: "MXN", AR: "ARS" };
-
 export async function listFondosPorUsuario(): Promise<FondoSubcuenta[]> {
   const sb = requireSupabase();
   const { data, error } = await sb
     .from("subaccounts")
     .select(
-      "id, cliente_legajo, nombre, tipo, cbu, moneda, estado, clientes(correo, nombre, alias, pais), subaccount_balances(saldo_disponible, saldo_retenido)",
+      "id, cliente_legajo, nombre, tipo, cbu, moneda, estado, clientes(correo, nombre, pais), subaccount_balances(saldo_disponible, saldo_retenido)",
     )
     .order("cliente_legajo")
     .order("created_at");
@@ -61,8 +58,7 @@ export async function listFondosPorUsuario(): Promise<FondoSubcuenta[]> {
       nombre: r.clientes?.nombre ?? "—",
       subcuenta: r.nombre || r.tipo || "Principal",
       cuenta: r.cbu,
-      alias: r.clientes?.alias ?? null,
-      moneda: r.moneda ?? MONEDA_PAIS[r.clientes?.pais ?? ""] ?? "ARS",
+      moneda: r.moneda ?? getPais().moneda,
       disponible: Number(b?.saldo_disponible ?? 0),
       retenido: Number(b?.saldo_retenido ?? 0),
       activa: r.estado === "Activa",

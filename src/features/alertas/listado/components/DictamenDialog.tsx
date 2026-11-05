@@ -37,8 +37,8 @@ export function DictamenDialog({
       )}
       {dictamen.resolution === "false_positive" && dictamen.alert.plaftMatchId != null && (
         <div className="mb-3 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
-          Esta coincidencia REPET queda descartada y no vuelve a generar alertas. Otras
-          coincidencias del cliente sí.
+          Esta coincidencia con las listas de PLD queda descartada y no vuelve a generar alertas.
+          Otras coincidencias del cliente sí.
         </div>
       )}
       <label className="text-xs font-semibold text-foreground mb-1.5 block">

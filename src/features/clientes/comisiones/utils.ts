@@ -35,7 +35,8 @@ export type Comision = {
   id: string;
   legajo: string;
   correo: string;
-  cuit: string;
+  /** RFC del cliente. */
+  rfc: string;
   tipoPersona: "fisica" | "juridica";
   operacion: string;
   tipo: TipoOperacion;
@@ -45,26 +46,28 @@ export type Comision = {
   montoFijo: number | null;
   porcentajeImpuesto: number;
   descripcion: string;
-  /** CVU al que aplica la comisión (null = comisión del cliente, respaldo). */
+  /** Subcuenta a la que aplica la comisión (null = comisión del cliente, respaldo). */
   subcuentaId: string | null;
-  cvu: string | null;
+  /** CLABE de esa subcuenta. */
+  clabe: string | null;
 };
 
 export type ComisionDraft = {
   id?: string;
   correo: string;
-  /** Legajo del cliente elegido (para listar sus CVUs). */
+  /** Legajo del cliente elegido (para listar sus subcuentas). */
   legajo: string;
-  cuit: string;
+  /** RFC del cliente (solo se muestra). */
+  rfc: string;
   tipoPersona: "fisica" | "juridica";
-  /** CVU al que aplica; null = comisión del cliente (respaldo de todos sus CVUs). */
+  /** Subcuenta a la que aplica; null = comisión del cliente (respaldo de todas sus subcuentas). */
   subcuentaId: string | null;
   tipo: TipoOperacion;
   modalidad: ModalidadComision;
   porcentaje: number | null;
   montoFijo: number | null;
   porcentajeImpuesto: number;
-  /** Solo puede haber una Habilitada por CVU (o por cliente) y tipo. */
+  /** Solo puede haber una Habilitada por subcuenta (o por cliente) y tipo. */
   estado: EstadoComision;
   descripcion: string;
 };
@@ -75,7 +78,7 @@ export function comisionDesdeApi(c: ComisionCliente): Comision {
     id: c.id,
     legajo: c.cliente?.legajo ?? "—",
     correo: c.cliente?.correo ?? "—",
-    cuit: c.cliente?.cuit ?? "—",
+    rfc: c.cliente?.taxId ?? "—",
     tipoPersona: c.cliente?.tipoPersona ?? "fisica",
     operacion: c.operacion,
     tipo: c.tipo,
@@ -86,23 +89,23 @@ export function comisionDesdeApi(c: ComisionCliente): Comision {
     porcentajeImpuesto: c.porcentajeImpuesto,
     descripcion: c.descripcion ?? "",
     subcuentaId: c.subcuentaId,
-    cvu: c.subcuenta?.cbu ?? null,
+    clabe: c.subcuenta?.cbu ?? null,
   };
 }
 
-/** Borrador de una comisión nueva: Depósito, 1 % + 21 % de IVA, habilitada. */
+/** Borrador de una comisión nueva: Depósito, 1 % + 16 % de IVA, habilitada. */
 export function draftVacio(): ComisionDraft {
   return {
     correo: "",
     legajo: "",
-    cuit: "",
+    rfc: "",
     tipoPersona: "fisica",
     subcuentaId: null,
     tipo: "Depósito",
     modalidad: "Porcentaje",
     porcentaje: 1,
     montoFijo: null,
-    porcentajeImpuesto: 21,
+    porcentajeImpuesto: IVA_POR_DEFECTO,
     estado: "Habilitado",
     descripcion: "",
   };
@@ -114,7 +117,7 @@ export function draftDesdeComision(c: Comision): ComisionDraft {
     id: c.id,
     correo: c.correo,
     legajo: c.legajo === "—" ? "" : c.legajo,
-    cuit: c.cuit,
+    rfc: c.rfc,
     tipoPersona: c.tipoPersona,
     subcuentaId: c.subcuentaId,
     tipo: c.tipo,
@@ -151,12 +154,12 @@ export function configLabel(c: Pick<Comision, "modalidad" | "montoFijo" | "porce
 
 /**
  * Código de operación de una comisión nueva (único por cliente):
- * RET|DEP|CNV - CVU|CTA - timestamp.
+ * RET|DEP|CNV - SUB|CTA - timestamp (SUB = de una subcuenta, CTA = de toda la cuenta).
  */
 export function codigoOperacionNuevo(
   draft: Pick<ComisionDraft, "tipo" | "subcuentaId">,
   ahora: number,
 ): string {
   const prefijo = draft.tipo === "Retiro" ? "RET" : draft.tipo === "Conversión" ? "CNV" : "DEP";
-  return `${prefijo}-${draft.subcuentaId ? "CVU" : "CTA"}-${ahora}`;
+  return `${prefijo}-${draft.subcuentaId ? "SUB" : "CTA"}-${ahora}`;
 }

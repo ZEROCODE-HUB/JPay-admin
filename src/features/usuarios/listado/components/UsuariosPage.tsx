@@ -10,7 +10,7 @@ import { visibleColumns } from "./columns";
 
 /** Listado de personas físicas. */
 export function UsuariosPage() {
-  // Enrichment paralelo: riesgo PLAFT + CVUs + KYC + consumo del mes.
+  // Enrichment paralelo: riesgo PLAFT + subcuentas + KYC + consumo del mes.
   const listado = useClientesListado({
     tipoPersona: "fisica",
     enrichmentKey: "clientes-enrichment",

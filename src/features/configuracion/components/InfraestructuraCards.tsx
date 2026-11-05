@@ -72,19 +72,24 @@ export function InfraestructuraCards() {
           <div className="space-y-3 text-sm">
             <div className="flex justify-between py-2 border-b">
               <span className="text-muted-foreground">Total de logins</span>
-              <span className="font-semibold tabular-nums">6</span>
+              <span className="font-semibold tabular-nums">—</span>
             </div>
             <div className="flex justify-between py-2 border-b">
               <span className="text-muted-foreground">Grupos de ejecución</span>
-              <span className="font-semibold tabular-nums">2</span>
+              <span className="font-semibold tabular-nums">—</span>
             </div>
             <div className="py-2">
               <div className="text-muted-foreground">Próximo grupo a ejecutar</div>
               <div className="mt-2 rounded-lg bg-muted/50 p-3">
                 <div className="font-semibold flex items-center gap-1.5">
-                  <Timer size={14} className="text-secondary" /> Grupo A — en 45 s
+                  <Timer size={14} className="text-secondary" /> Sin programar
                 </div>
                 <div className="flex flex-wrap gap-1.5 mt-2">
+                  {proximoGrupo.length === 0 && (
+                    <span className="text-xs text-muted-foreground">
+                      Sin ejecuciones programadas.
+                    </span>
+                  )}
                   {proximoGrupo.map((l) => (
                     <span
                       key={l}

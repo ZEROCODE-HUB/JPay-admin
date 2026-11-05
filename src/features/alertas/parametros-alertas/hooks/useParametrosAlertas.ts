@@ -7,14 +7,11 @@ import { CODES } from "../config";
 import { construir, toDraft, type Draft } from "../utils";
 
 /**
- * Carga, edición (borrador) y guardado de las reglas de alertas. `pais` null = valores generales
- * (Argentina); "MX" = los de México (montos en pesos mexicanos, UMAs, hora del centro).
+ * Carga, edición (borrador) y guardado de las reglas de alertas de México (montos en pesos
+ * mexicanos, UMAs, hora del centro).
  */
 export function useParametrosAlertas() {
-  // Arranca en el país de la instalación (México en JPay); null = valores generales (Argentina).
-  const [pais, setPais] = useState<string | null>(
-    PAIS_INSTALACION === "AR" ? null : PAIS_INSTALACION,
-  );
+  const pais: string = PAIS_INSTALACION;
   const queryClient = useQueryClient();
   const {
     data: rules,
@@ -56,14 +53,14 @@ export function useParametrosAlertas() {
     const { rules: aGuardar, errores: errs } = construir(draft);
     setErrores(errs);
     if (Object.keys(errs).length > 0) {
-      toast.error("Revisá los campos marcados antes de guardar");
+      toast.error("Revisa los campos marcados antes de guardar");
       return;
     }
-    // Para un país se guardan solo las reglas que cambiaron: las demás siguen tomando los valores
-    // generales (si se mandaran todas, quedarían copiadas y dejarían de seguirlos).
-    const cambiadas = pais
-      ? aGuardar.filter((r) => JSON.stringify(draft[r.code]) !== JSON.stringify(original?.[r.code]))
-      : aGuardar;
+    // Se guardan solo las reglas que cambiaron: las demás siguen tomando los valores generales
+    // de la base (si se mandaran todas, quedarían copiadas y dejarían de seguirlos).
+    const cambiadas = aGuardar.filter(
+      (r) => JSON.stringify(draft[r.code]) !== JSON.stringify(original?.[r.code]),
+    );
     setGuardando(true);
     try {
       await saveAlertRules(cambiadas, pais);
@@ -77,8 +74,6 @@ export function useParametrosAlertas() {
   };
 
   return {
-    pais,
-    setPais,
     isLoading,
     isError,
     error,

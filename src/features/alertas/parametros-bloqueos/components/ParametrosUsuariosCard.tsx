@@ -30,7 +30,7 @@ export function ParametrosUsuariosCard({ c }: { c: ParametrosClientes }) {
       { key: "correo", label: "Usuario (correo)", filterable: true, render: (r) => r.correo },
       {
         key: "persona",
-        label: "Cantidad de salarios mínimos depositados por persona",
+        label: "Cantidad de UMAs mensuales depositadas por persona física",
         render: (r) => (
           <span
             className={`font-mono tabular-nums ${r.individualMinWages == null ? "text-muted-foreground" : ""}`}
@@ -41,7 +41,7 @@ export function ParametrosUsuariosCard({ c }: { c: ParametrosClientes }) {
       },
       {
         key: "empresa",
-        label: "Cantidad de salarios mínimos depositados por empresa",
+        label: "Cantidad de UMAs mensuales depositadas por persona moral",
         render: (r) => (
           <span
             className={`font-mono tabular-nums ${r.companyMinWages == null ? "text-muted-foreground" : ""}`}

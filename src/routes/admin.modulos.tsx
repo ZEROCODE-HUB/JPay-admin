@@ -21,14 +21,14 @@ type ModuleStatus = {
 
 const modules: ModuleStatus[] = [
   { name: "API Pública", status: "operativo", latency: "120 ms" },
-  { name: "Procesador CVU", status: "operativo", latency: "210 ms" },
-  { name: "QR Realtime", status: "operativo", latency: "85 ms" },
+  { name: "Procesador SPEI / CLABE", status: "operativo", latency: "210 ms" },
+  { name: "POS físico", status: "operativo", latency: "85 ms" },
   { name: "Webhooks", status: "degradado", latency: "640 ms" },
   { name: "Conciliación Batch", status: "operativo", latency: "—" },
   { name: "Módulo de Pagos", status: "operativo", latency: "95 ms" },
   { name: "KYC/KYB", status: "caído", latency: "—" },
   { name: "Notificaciones", status: "operativo", latency: "45 ms" },
-  { name: "Módulo de Impuestos", status: "operativo", latency: "150 ms" },
+  { name: "Ecart Pay", status: "operativo", latency: "150 ms" },
   { name: "Transferencias", status: "degradado", latency: "380 ms" },
 ];
 

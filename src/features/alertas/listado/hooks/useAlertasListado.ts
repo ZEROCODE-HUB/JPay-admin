@@ -66,7 +66,7 @@ export function useAlertasListado() {
   const confirmarDictamen = async () => {
     if (!dictamen) return;
     if (notas.trim().length < 5) {
-      toast.error("Escribí el dictamen (al menos 5 caracteres)");
+      toast.error("Escribe el dictamen (al menos 5 caracteres)");
       return;
     }
     setEnviando(true);

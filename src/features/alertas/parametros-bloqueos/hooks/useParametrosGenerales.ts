@@ -7,15 +7,13 @@ import { ALERT_RULES_KEY, useAlertRules } from "../../parametros-comun/useAlertR
 import { REGLA_GLOBAL, generalesDeRegla, validarGenerales } from "../utils";
 
 /**
- * Umbrales generales de bloqueo (regla global): formulario, validación y guardado. `pais` null =
- * valores generales (Argentina, en salarios mínimos); "MX" = los de México (en UMAs mensuales).
+ * Umbrales generales de bloqueo (regla global) de México, en UMAs mensuales: formulario,
+ * validación y guardado.
  */
 export function useParametrosGenerales() {
   const queryClient = useQueryClient();
   const reglas = useAlertRules();
-  const [pais, setPais] = useState<string | null>(
-    PAIS_INSTALACION === "AR" ? null : PAIS_INSTALACION,
-  );
+  const pais: string = PAIS_INSTALACION;
   const regla = reglasDePais(reglas.data ?? [], pais).find((r) => r.code === REGLA_GLOBAL);
   const generales = generalesDeRegla(regla);
   const [params, setParams] = useState({ persona: "", empresa: "" });
@@ -66,8 +64,6 @@ export function useParametrosGenerales() {
   };
 
   return {
-    pais,
-    setPais,
     reglas,
     regla,
     generales,

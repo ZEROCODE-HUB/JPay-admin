@@ -94,7 +94,7 @@ export function ConexionProveedorCard({
       )}
       {c.pasos.length === 0 && (
         <p className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
-          <CircleDashed size={16} /> Probá la conexión para ver el detalle de cada paso.
+          <CircleDashed size={16} /> Prueba la conexión para ver el detalle de cada paso.
         </p>
       )}
     </Card>

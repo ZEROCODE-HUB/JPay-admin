@@ -22,11 +22,11 @@ export function SimularDepositoDialog({
   onDone: () => void;
 }) {
   const [form, setForm] = useState<FormSimulacion>({
-    cbu: "",
+    clabe: "",
     importe: "",
-    cuit: "",
+    rfc: "",
     titular: "",
-    cbuOrigen: "",
+    clabeOrigen: "",
   });
   const [enviando, setEnviando] = useState(false);
 
@@ -66,13 +66,13 @@ export function SimularDepositoDialog({
       <div className="grid grid-cols-2 gap-3">
         <div className="col-span-2">
           <label className="text-xs font-semibold mb-1.5 block">
-            CVU destino (subcuenta del cliente)
+            CLABE destino (subcuenta del cliente)
           </label>
           <input
             className={`${inputCls} font-mono`}
-            value={form.cbu}
-            onChange={(e) => setForm({ ...form, cbu: e.target.value })}
-            placeholder="0000003100..."
+            value={form.clabe}
+            onChange={(e) => setForm({ ...form, clabe: e.target.value })}
+            placeholder="032180000118359719"
           />
         </div>
         <div>
@@ -87,12 +87,12 @@ export function SimularDepositoDialog({
           />
         </div>
         <div>
-          <label className="text-xs font-semibold mb-1.5 block">CUIT del depositante</label>
+          <label className="text-xs font-semibold mb-1.5 block">RFC del depositante</label>
           <input
             className={`${inputCls} font-mono`}
-            value={form.cuit}
-            onChange={(e) => setForm({ ...form, cuit: e.target.value })}
-            placeholder="20123456789"
+            value={form.rfc}
+            onChange={(e) => setForm({ ...form, rfc: e.target.value })}
+            placeholder="GODE561231GR8"
           />
         </div>
         <div>
@@ -104,11 +104,11 @@ export function SimularDepositoDialog({
           />
         </div>
         <div>
-          <label className="text-xs font-semibold mb-1.5 block">CBU de origen</label>
+          <label className="text-xs font-semibold mb-1.5 block">CLABE de origen</label>
           <input
             className={`${inputCls} font-mono`}
-            value={form.cbuOrigen}
-            onChange={(e) => setForm({ ...form, cbuOrigen: e.target.value })}
+            value={form.clabeOrigen}
+            onChange={(e) => setForm({ ...form, clabeOrigen: e.target.value })}
           />
         </div>
       </div>

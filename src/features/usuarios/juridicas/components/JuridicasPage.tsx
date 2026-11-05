@@ -10,7 +10,7 @@ import { columns } from "./columns";
 
 /** Listado de personas jurídicas. */
 export function JuridicasPage() {
-  // Enrichment paralelo: comercios y CVUs por legajo (mismo patrón que Personas Físicas).
+  // Enrichment paralelo: comercios y subcuentas por legajo (mismo patrón que Personas Físicas).
   const listado = useClientesListado({
     tipoPersona: "juridica",
     enrichmentKey: "clientes-enrichment-juridicas",

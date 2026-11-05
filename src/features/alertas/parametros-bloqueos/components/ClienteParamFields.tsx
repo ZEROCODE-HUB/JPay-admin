@@ -84,7 +84,7 @@ export function ClienteParamFields({
       </div>
       <div>
         <label className="text-xs font-semibold text-foreground mb-1.5 block">
-          Salarios mínimos por persona
+          UMAs mensuales por persona física
         </label>
         <input
           type="number"
@@ -98,7 +98,7 @@ export function ClienteParamFields({
       </div>
       <div>
         <label className="text-xs font-semibold text-foreground mb-1.5 block">
-          Salarios mínimos por empresa
+          UMAs mensuales por persona moral
         </label>
         <input
           type="number"
@@ -111,7 +111,7 @@ export function ClienteParamFields({
         />
       </div>
       <p className="col-span-2 text-[11px] text-muted-foreground">
-        Dejá un campo vacío para que ese cliente use el valor general.
+        Deja un campo vacío para que ese cliente use el valor general.
       </p>
     </div>
   );

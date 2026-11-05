@@ -11,7 +11,6 @@ import { Badge, PageHeader } from "@/components/portal-shell";
 import { listFondosPorUsuario, type FondoSubcuenta } from "@/lib/api/fondos";
 import { cuentaDelPais } from "@/lib/cuenta-pais";
 import { formatMoney } from "@/shared/format";
-import { getPais } from "@/shared/pais";
 
 export const Route = createFileRoute("/admin/administracion/registros/")({
   head: () => ({ meta: [{ title: "Fondos por usuario — Admin Panel" }] }),
@@ -41,7 +40,6 @@ function Page() {
   const q = useQuery({ queryKey: ["fondos-por-usuario"], queryFn: listFondosPorUsuario });
   const filas = q.data ?? [];
   const cuenta = cuentaDelPais();
-  const conAlias = getPais().codigo === "AR";
 
   const getActions = (r: FondoSubcuenta): ActionItem[] => [
     { label: "Ver detalles", icon: Eye, onClick: () => setViewing(r) },
@@ -58,16 +56,6 @@ function Page() {
       filterable: true,
       render: (r) => <span className="font-mono text-xs tabular-nums">{r.cuenta ?? "—"}</span>,
     },
-    ...(conAlias
-      ? [
-          {
-            key: "alias",
-            label: "Alias",
-            filterable: true,
-            render: (r: FondoSubcuenta) => r.alias ?? "—",
-          },
-        ]
-      : []),
     {
       key: "disponible",
       label: "Disponible",
@@ -102,7 +90,6 @@ function Page() {
       Nombre: r.nombre,
       Subcuenta: r.subcuenta,
       [cuenta]: r.cuenta ?? "",
-      ...(conAlias ? { Alias: r.alias ?? "" } : {}),
       Moneda: r.moneda,
       Disponible: r.disponible,
       Retenido: r.retenido,

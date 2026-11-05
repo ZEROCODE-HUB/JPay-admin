@@ -54,7 +54,7 @@ export function ClienteCombobox({
         <div className="absolute z-20 mt-1 w-full rounded-md border border-input bg-card shadow-lg max-h-60 overflow-auto">
           {opciones.length === 0 ? (
             <div className="px-3 py-6 text-center text-sm text-muted-foreground">
-              {hayBusqueda ? "Sin resultados." : "Escribí para buscar (máx. 20 resultados)."}
+              {hayBusqueda ? "Sin resultados." : "Escribe para buscar (máx. 20 resultados)."}
             </div>
           ) : (
             opciones.map((c) => (

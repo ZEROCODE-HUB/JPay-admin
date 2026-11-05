@@ -3,26 +3,7 @@ import { saludIconClass, saludMeta } from "./estados";
 import { buildIntegracionUI } from "./utils";
 
 describe("configuracion: utils", () => {
-  it("buildIntegracionUI usa los mocks conocidos", () => {
-    expect(
-      buildIntegracionUI({
-        id: "pct:coelsa_debin",
-        nombre: "DEBIN",
-        proveedor: "Coelsa",
-        createdAt: "",
-      }),
-    ).toEqual({
-      id: "pct:coelsa_debin",
-      nombre: "DEBIN",
-      proveedor: "Coelsa",
-      salud: "error",
-      ultimaEjecucion: "11/08/2026 07:45",
-      proximaEjecucion: "11/08/2026 08:10",
-      ejecuciones: 18954,
-    });
-  });
-
-  it("buildIntegracionUI cae a valores por defecto", () => {
+  it("buildIntegracionUI sin métricas usa valores por defecto", () => {
     const ui = buildIntegracionUI({ id: "x", nombre: "X", proveedor: "P", createdAt: "" });
     expect(ui.salud).toBe("ok");
     expect(ui.ultimaEjecucion).toBe("—");

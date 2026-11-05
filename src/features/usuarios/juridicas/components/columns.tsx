@@ -15,13 +15,13 @@ export const columns: Column<JuridicaRow>[] = [
     render: (r) => <LegajoCell legajo={r.legajo} />,
   },
   {
-    key: "cuit",
-    label: "ID fiscal",
+    key: "rfc",
+    label: "RFC",
     filterable: true,
     minWidth: 130,
     render: (r) => (
       <span className="font-mono text-xs tabular-nums" title={`Legajo: ${r.legajo}`}>
-        {r.cuitFormatted}
+        {r.rfc}
       </span>
     ),
   },
@@ -68,7 +68,7 @@ export const columns: Column<JuridicaRow>[] = [
   },
   {
     key: "comerciosCount",
-    label: "Comercios / CVUs",
+    label: "Comercios / subcuentas",
     minWidth: 160,
     render: (r) => (
       <div className="flex items-center gap-3 text-xs font-medium tabular-nums">
@@ -81,10 +81,10 @@ export const columns: Column<JuridicaRow>[] = [
         </span>
         <span className="text-muted-foreground/50">·</span>
         <span
-          className={`inline-flex items-center gap-1 ${r.cvuCount > 0 ? "text-foreground" : "text-muted-foreground"}`}
-          title="CVUs / Subcuentas"
+          className={`inline-flex items-center gap-1 ${r.subcuentasCount > 0 ? "text-foreground" : "text-muted-foreground"}`}
+          title="Subcuentas"
         >
-          {r.cvuCount} {r.cvuCount === 1 ? "CVU" : "CVUs"}
+          {r.subcuentasCount} {r.subcuentasCount === 1 ? "subcuenta" : "subcuentas"}
         </span>
       </div>
     ),

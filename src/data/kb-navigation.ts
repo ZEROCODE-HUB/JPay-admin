@@ -23,28 +23,19 @@ export const KB_NAVIGATION = `Estructura actual del panel administrativo (se gen
    - ${pageTitle("Comercios — Admin")}  (/admin/comercios)
    - ${pageTitle("APIs externas — Admin")}  (/admin/comercios/apis)
    - ${pageTitle("APIs externas — Endpoints — Admin")}  (/admin/comercios/apis/endpoints)
-   - ${pageTitle("Resolvers — APIs externas — Admin")}  (/admin/comercios/apis/resolvers)
    - ${pageTitle("APIs externas — Restricciones — Admin")}  (/admin/comercios/apis/restricciones)
+   - ${pageTitle("Comisiones de JPay — Admin")}  (/admin/comercios/comisiones-jpay)
    - ${pageTitle("Gestión — Admin")}  (/admin/comercios/gestion)
    - ${pageTitle("Códigos de categoría — Admin")}  (/admin/comercios/gestion/categoria)
-   - ${pageTitle("Métodos de pago — Gestión — Admin")}  (/admin/comercios/gestion/metodos-pago)
-   - ${pageTitle("Impuestos — Admin")}  (/admin/comercios/impuestos)
-   - ${pageTitle("Débitos y créditos — Admin")}  (/admin/comercios/impuestos/debitos-creditos)
-   - ${pageTitle("Ingresos Brutos — Admin")}  (/admin/comercios/impuestos/ingresos-brutos)
-   - ${pageTitle("Usuarios con impuestos — Admin")}  (/admin/comercios/impuestos/usuarios)
    - ${pageTitle("Link de pago — Admin")}  (/admin/comercios/link-pago)
-   - ${pageTitle("Adelantos de Dinero — Links de Pago — Admin")}  (/admin/comercios/link-pago/adelantos)
-   - ${pageTitle("Calendario de Acreditaciones — Links de Pago — Admin")}  (/admin/comercios/link-pago/calendario-acreditaciones)
-   - ${pageTitle("Contracargos — Links de Pago — Admin")}  (/admin/comercios/link-pago/contracargos)
-   - ${pageTitle("Lotes de Acreditación — Links de Pago — Admin")}  (/admin/comercios/link-pago/lotes)
-   - ${pageTitle("Lotes de Venta — Links de Pago — Admin")}  (/admin/comercios/link-pago/lotes-venta)
-   - ${pageTitle("Resumen general — Link de Pago — Admin")}  (/admin/comercios/link-pago/resumen)
-   - ${pageTitle("Pagos con transferencia — Admin")}  (/admin/comercios/transferencia)
+   - ${pageTitle("POS físico — Admin")}  (/admin/comercios/pos)
+   - ${pageTitle("Suscripciones y domiciliación — Admin")}  (/admin/comercios/recurrentes)
 
 • Configuración:
    - ${pageTitle("Configuración — Admin")}  (/admin/configuracion)
    - ${pageTitle("Configuraciones de login — Admin")}  (/admin/configuracion/configuraciones)
    - ${pageTitle("Logins configurados — Admin")}  (/admin/configuracion/logins)
+   - ${pageTitle("País y proveedores — Admin")}  (/admin/configuracion/paises)
 
 • General:
    - ${pageTitle("Alertas — Admin")}  (/admin/general/alertas)
@@ -52,17 +43,14 @@ export const KB_NAVIGATION = `Estructura actual del panel administrativo (se gen
    - Parámetros de alertas — Admin Panel  (/admin/general/alertas/parametros-alertas)
    - Parámetros de bloqueos — Admin Panel  (/admin/general/alertas/parametros-bloqueos)
    - ${pageTitle("Movimientos — Admin")}  (/admin/general/movimientos)
-   - ${pageTitle("Cobros QR — Movimientos — Admin")}  (/admin/general/movimientos/cobros-qr)
    - ${pageTitle("Cobro de comisiones — Movimientos — Admin")}  (/admin/general/movimientos/comisiones)
+   - ${pageTitle("Conversiones — Movimientos — Admin")}  (/admin/general/movimientos/conversiones)
    - ${pageTitle("Depósitos — Movimientos — Admin")}  (/admin/general/movimientos/depositos)
-   - ${pageTitle("Impuestos cobrados — Movimientos — Admin")}  (/admin/general/movimientos/impuestos)
-   - ${pageTitle("Pagos QR — Movimientos — Admin")}  (/admin/general/movimientos/pagos-qr)
-   - ${pageTitle("Pagos con tarjeta — Movimientos — Admin")}  (/admin/general/movimientos/pagos-tarjeta)
-   - ${pageTitle("Retiros — Movimientos — Admin")}  (/admin/general/movimientos/retiros)
+   - ${pageTitle("Transferencias — Movimientos — Admin")}  (/admin/general/movimientos/transferencias)
    - ${pageTitle("Usuarios — Admin")}  (/admin/general/usuarios)
    - ${pageTitle("Ficha de cliente — Admin")}  (/admin/general/usuarios/$legajo)
+   - ${pageTitle("Usuarios con CLABE — Usuarios — Admin")}  (/admin/general/usuarios/clabe)
    - ${pageTitle("Carga de comisiones — Usuarios — Admin")}  (/admin/general/usuarios/comisiones)
-   - ${pageTitle("Usuarios con CVU — Usuarios — Admin")}  (/admin/general/usuarios/cvu)
    - ${pageTitle("Personas jurídicas — Usuarios — Admin")}  (/admin/general/usuarios/juridicas)
 
 • Comunicación:
@@ -101,42 +89,30 @@ export const KB_ROUTES: { path: string; title: string }[] = [
   { path: "/admin/comercios", title: pageTitle("Comercios — Admin") },
   { path: "/admin/comercios/apis", title: pageTitle("APIs externas — Admin") },
   { path: "/admin/comercios/apis/endpoints", title: pageTitle("APIs externas — Endpoints — Admin") },
-  { path: "/admin/comercios/apis/resolvers", title: pageTitle("Resolvers — APIs externas — Admin") },
   { path: "/admin/comercios/apis/restricciones", title: pageTitle("APIs externas — Restricciones — Admin") },
+  { path: "/admin/comercios/comisiones-jpay", title: pageTitle("Comisiones de JPay — Admin") },
   { path: "/admin/comercios/gestion", title: pageTitle("Gestión — Admin") },
   { path: "/admin/comercios/gestion/categoria", title: pageTitle("Códigos de categoría — Admin") },
-  { path: "/admin/comercios/gestion/metodos-pago", title: pageTitle("Métodos de pago — Gestión — Admin") },
-  { path: "/admin/comercios/impuestos", title: pageTitle("Impuestos — Admin") },
-  { path: "/admin/comercios/impuestos/debitos-creditos", title: pageTitle("Débitos y créditos — Admin") },
-  { path: "/admin/comercios/impuestos/ingresos-brutos", title: pageTitle("Ingresos Brutos — Admin") },
-  { path: "/admin/comercios/impuestos/usuarios", title: pageTitle("Usuarios con impuestos — Admin") },
   { path: "/admin/comercios/link-pago", title: pageTitle("Link de pago — Admin") },
-  { path: "/admin/comercios/link-pago/adelantos", title: pageTitle("Adelantos de Dinero — Links de Pago — Admin") },
-  { path: "/admin/comercios/link-pago/calendario-acreditaciones", title: pageTitle("Calendario de Acreditaciones — Links de Pago — Admin") },
-  { path: "/admin/comercios/link-pago/contracargos", title: pageTitle("Contracargos — Links de Pago — Admin") },
-  { path: "/admin/comercios/link-pago/lotes", title: pageTitle("Lotes de Acreditación — Links de Pago — Admin") },
-  { path: "/admin/comercios/link-pago/lotes-venta", title: pageTitle("Lotes de Venta — Links de Pago — Admin") },
-  { path: "/admin/comercios/link-pago/resumen", title: pageTitle("Resumen general — Link de Pago — Admin") },
-  { path: "/admin/comercios/transferencia", title: pageTitle("Pagos con transferencia — Admin") },
+  { path: "/admin/comercios/pos", title: pageTitle("POS físico — Admin") },
+  { path: "/admin/comercios/recurrentes", title: pageTitle("Suscripciones y domiciliación — Admin") },
   { path: "/admin/configuracion", title: pageTitle("Configuración — Admin") },
   { path: "/admin/configuracion/configuraciones", title: pageTitle("Configuraciones de login — Admin") },
   { path: "/admin/configuracion/logins", title: pageTitle("Logins configurados — Admin") },
+  { path: "/admin/configuracion/paises", title: pageTitle("País y proveedores — Admin") },
   { path: "/admin/general/alertas", title: pageTitle("Alertas — Admin") },
   { path: "/admin/general/alertas/bloqueos", title: "Listado de bloqueos — Admin Panel" },
   { path: "/admin/general/alertas/parametros-alertas", title: "Parámetros de alertas — Admin Panel" },
   { path: "/admin/general/alertas/parametros-bloqueos", title: "Parámetros de bloqueos — Admin Panel" },
   { path: "/admin/general/movimientos", title: pageTitle("Movimientos — Admin") },
-  { path: "/admin/general/movimientos/cobros-qr", title: pageTitle("Cobros QR — Movimientos — Admin") },
   { path: "/admin/general/movimientos/comisiones", title: pageTitle("Cobro de comisiones — Movimientos — Admin") },
+  { path: "/admin/general/movimientos/conversiones", title: pageTitle("Conversiones — Movimientos — Admin") },
   { path: "/admin/general/movimientos/depositos", title: pageTitle("Depósitos — Movimientos — Admin") },
-  { path: "/admin/general/movimientos/impuestos", title: pageTitle("Impuestos cobrados — Movimientos — Admin") },
-  { path: "/admin/general/movimientos/pagos-qr", title: pageTitle("Pagos QR — Movimientos — Admin") },
-  { path: "/admin/general/movimientos/pagos-tarjeta", title: pageTitle("Pagos con tarjeta — Movimientos — Admin") },
-  { path: "/admin/general/movimientos/retiros", title: pageTitle("Retiros — Movimientos — Admin") },
+  { path: "/admin/general/movimientos/transferencias", title: pageTitle("Transferencias — Movimientos — Admin") },
   { path: "/admin/general/usuarios", title: pageTitle("Usuarios — Admin") },
   { path: "/admin/general/usuarios/$legajo", title: pageTitle("Ficha de cliente — Admin") },
+  { path: "/admin/general/usuarios/clabe", title: pageTitle("Usuarios con CLABE — Usuarios — Admin") },
   { path: "/admin/general/usuarios/comisiones", title: pageTitle("Carga de comisiones — Usuarios — Admin") },
-  { path: "/admin/general/usuarios/cvu", title: pageTitle("Usuarios con CVU — Usuarios — Admin") },
   { path: "/admin/general/usuarios/juridicas", title: pageTitle("Personas jurídicas — Usuarios — Admin") },
   { path: "/admin/incidentes", title: "Comunicación de incidentes — Admin Panel" },
   { path: "/admin/modulos", title: pageTitle("Salud de módulos — Admin") },

@@ -75,25 +75,25 @@ export function mensajeBarrido(r: {
   ultima_corrida_plaft: string | null;
 }): string {
   return (
-    `Barrido ejecutado: ${r.coincidencias_revisadas} coincidencias PLAFT revisadas, ${r.alertas_nuevas} alertas nuevas.` +
+    `Barrido ejecutado: ${r.coincidencias_revisadas} coincidencias en listas PLD revisadas, ${r.alertas_nuevas} alertas nuevas.` +
     (r.ultima_corrida_plaft
-      ? ` Última corrida PLAFT: ${formatDateTime(r.ultima_corrida_plaft)}.`
-      : " No hay corridas PLAFT registradas.")
+      ? ` Última corrida de listas PLD: ${formatDateTime(r.ultima_corrida_plaft)}.`
+      : " No hay corridas de listas PLD registradas.")
   );
 }
 
 export type FormSimulacion = {
-  cbu: string;
+  clabe: string;
   importe: string;
-  cuit: string;
+  rfc: string;
   titular: string;
-  cbuOrigen: string;
+  clabeOrigen: string;
 };
 
 /** Valida el formulario de depósito simulado; devuelve el error a mostrar o null. */
 export function validarSimulacion(form: FormSimulacion): string | null {
-  if (!/^\d{22}$/.test(form.cbu.trim())) return "El CVU destino debe tener 22 dígitos";
-  if (!(Number(form.importe) > 0)) return "Ingresá un importe mayor a 0";
+  if (!/^\d{18}$/.test(form.clabe.trim())) return "La CLABE destino debe tener 18 dígitos";
+  if (!(Number(form.importe) > 0)) return "Ingresa un importe mayor a 0";
   return null;
 }
 
@@ -101,11 +101,11 @@ export function validarSimulacion(form: FormSimulacion): string | null {
 export function inputSimulacion(form: FormSimulacion) {
   const importe = Number(form.importe);
   return {
-    cbuDestino: form.cbu.trim(),
+    clabeDestino: form.clabe.trim(),
     importe: Math.round(importe * 100) / 100,
-    cuitOrigen: form.cuit.replace(/\D/g, ""),
+    rfcOrigen: form.rfc.replace(/[\s-]/g, "").toUpperCase(),
     titularOrigen: form.titular.trim(),
-    cbuOrigen: form.cbuOrigen.trim(),
+    clabeOrigen: form.clabeOrigen.trim(),
   };
 }
 
@@ -115,15 +115,15 @@ export function resultadoSimulacion(r: SimulatedDeposit): { ok: boolean; mensaje
     return {
       ok: true,
       mensaje: r.retenido
-        ? `Depósito ${r.idCoelsa} acreditado RETENIDO (bloqueo preventivo).`
-        : `Depósito ${r.idCoelsa} acreditado (${r.decision === "alert" ? "con alertas" : "sin alertas"}).`,
+        ? "Depósito acreditado RETENIDO (bloqueo preventivo)."
+        : `Depósito acreditado (${r.decision === "alert" ? "con alertas" : "sin alertas"}).`,
     };
   }
   return {
     ok: false,
     mensaje:
       r.estado === "sin_subcuenta"
-        ? "No hay ninguna subcuenta con ese CVU"
+        ? "No hay ninguna subcuenta con esa CLABE"
         : `Resultado: ${r.estado}`,
   };
 }

@@ -16,21 +16,21 @@ type Mensaje = {
 const historialMock: Mensaje[] = [
   {
     id: "MSG-001",
-    asunto: "Mantenimiento programado — QR",
-    segmento: "Módulo QR",
+    asunto: "Mantenimiento programado — POS físico",
+    segmento: "Módulo POS físico",
     fecha: "2026-07-15 14:30",
     estado: "Enviado",
     contenido:
-      "Informamos que el servicio QR estará en mantenimiento el 17/07 de 02:00 a 04:00 hs.",
+      "Informamos que el servicio de POS físico estará en mantenimiento el 17/07 de 02:00 a 04:00 hs.",
   },
   {
     id: "MSG-002",
-    asunto: "Demora en procesamiento COELSA",
+    asunto: "Demora en transferencias SPEI",
     segmento: "Todos",
     fecha: "2026-07-14 09:15",
     estado: "Enviado",
     contenido:
-      "Estamos experimentando demoras en la confirmación de transacciones por COELSA. Disculpe las molestias.",
+      "Estamos experimentando demoras en la confirmación de transferencias SPEI. Disculpa las molestias.",
   },
   {
     id: "MSG-003",
@@ -55,7 +55,7 @@ const historialMock: Mensaje[] = [
     segmento: "Usuarios activos",
     fecha: "2026-07-05 10:00",
     estado: "Borrador",
-    contenido: "Lanzamos nuestro programa de referidos. Compartí el link y obtené beneficios.",
+    contenido: "Lanzamos nuestro programa de referidos. Comparte el link y obtén beneficios.",
   },
 ];
 
@@ -82,7 +82,13 @@ function Page() {
       key: "segmento",
       label: "Segmento",
       filterable: "enum",
-      filterOptions: ["Todos", "Módulo QR", "Módulo Link de pago", "Comercios", "Usuarios activos"],
+      filterOptions: [
+        "Todos",
+        "Módulo POS físico",
+        "Módulo Link de pago",
+        "Comercios",
+        "Usuarios activos",
+      ],
       render: (r) => r.segmento,
     },
     {
@@ -130,7 +136,7 @@ function Page() {
               className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring/40"
             >
               <option>Todos</option>
-              <option>Módulo QR</option>
+              <option>Módulo POS físico</option>
               <option>Módulo Link de pago</option>
               <option>Comercios</option>
               <option>Usuarios activos</option>
@@ -144,7 +150,7 @@ function Page() {
               value={contenido}
               onChange={(e) => setContenido(e.target.value)}
               rows={4}
-              placeholder="Escribí el mensaje de difusión..."
+              placeholder="Escribe el mensaje de difusión..."
               className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring/40"
             />
           </div>

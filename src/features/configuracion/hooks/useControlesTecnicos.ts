@@ -6,7 +6,7 @@ export function useControlesTecnicos() {
   const [logNivel, setLogNivel] = useState("INFO");
   const [logRetencion, setLogRetencion] = useState("7");
   const [showEjecutarEspecifico, setShowEjecutarEspecifico] = useState(false);
-  const [loginSeleccionado, setLoginSeleccionado] = useState("pct:wondersoft");
+  const [loginSeleccionado, setLoginSeleccionado] = useState("");
   const [confirmEjecutarTodos, setConfirmEjecutarTodos] = useState(false);
 
   return {

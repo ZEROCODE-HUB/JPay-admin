@@ -9,8 +9,7 @@ export type Usuario = {
   legajo: string;
   correo: string;
   nombres: string;
-  cuit: string;
-  cuitFormatted: string;
+  rfc: string;
   estadoRaw: EstadoCliente;
   estadoLabel: string;
   estadoTone: Tono;
@@ -20,7 +19,7 @@ export type Usuario = {
   riesgo: RiesgoPLD | null;
   riesgoMotivo: string | null;
   kycCompleto: boolean;
-  cvuCount: number;
+  subcuentasCount: number;
   consumoMensualPct: number | null;
   limiteTransferencia: number | null;
 };
@@ -33,8 +32,7 @@ export function toUsuario(c: Cliente, e: ClienteEnrichment = {}): Usuario {
     legajo: c.legajo,
     correo: c.correo,
     nombres: c.nombre,
-    cuit: c.cuit,
-    cuitFormatted: idFiscalCliente(c).valor,
+    rfc: idFiscalCliente(c).valor,
     estadoRaw: c.estado,
     estadoLabel: ESTADO_LABEL[norm],
     estadoTone: ESTADO_TONE[norm] as Usuario["estadoTone"],
@@ -43,7 +41,7 @@ export function toUsuario(c: Cliente, e: ClienteEnrichment = {}): Usuario {
     riesgo: e.riesgo ?? null,
     riesgoMotivo: e.riesgoMotivo ?? null,
     kycCompleto: Boolean(e.kycCompleto),
-    cvuCount: e.cvuCount ?? 0,
+    subcuentasCount: e.subcuentasCount ?? 0,
     consumoMensualPct: e.consumoMensualPct ?? null,
     limiteTransferencia: c.limiteTransferencia ?? null,
   };

@@ -5,10 +5,9 @@
 // Compartible entre ambos proyectos (sin dependencias de UI).
 
 import { cuentaDelPais } from "@/lib/cuenta-pais";
-import { getPais } from "@/shared/pais";
 
-/** CBU/CVU en Argentina, CLABE en México. */
-const CUENTA = getPais().codigo === "AR" ? "CBU" : cuentaDelPais();
+/** Cuenta bancaria del cliente (CLABE). */
+const CUENTA = cuentaDelPais();
 
 export const ESTADOS_CLIENTE = [
   "pendiente_verificacion",
@@ -68,7 +67,7 @@ export const LABEL_A_ESTADO: Record<string, EstadoClienteNuevo> = Object.fromEnt
 ) as Record<string, EstadoClienteNuevo>;
 
 export type TransicionContext = {
-  hasCbu: boolean;
+  tieneCuenta: boolean;
   hasComision: boolean;
   hasMovimientos: boolean;
   // opcional: flags derivados para auditoría
@@ -102,7 +101,7 @@ const TRANSICIONES: Transicion[] = [
     from: "preactivado",
     to: "activado",
     accion: "activar",
-    requiere: (ctx) => ctx.hasCbu && ctx.hasComision,
+    requiere: (ctx) => ctx.tieneCuenta && ctx.hasComision,
     descripcion: `Activación requiere ${CUENTA} + comisión`,
   },
   {
@@ -175,7 +174,7 @@ export function puedeTransicionar(
       return {
         ok: false,
         motivo:
-          "No se puede eliminar: el usuario tiene movimientos. Solo puede deshabilitarse (BCRA auditoría).",
+          "No se puede eliminar: el usuario tiene movimientos. Solo puede deshabilitarse (auditoría).",
       };
     }
     if (from === "eliminado" || from === "deshabilitado") {
@@ -199,7 +198,7 @@ export function puedeTransicionar(
   if (t.requiere && !t.requiere(ctx)) {
     if (to === "activado") {
       const faltantes: string[] = [];
-      if (!ctx.hasCbu) faltantes.push(CUENTA);
+      if (!ctx.tieneCuenta) faltantes.push(CUENTA);
       if (!ctx.hasComision) faltantes.push("comisión");
       return { ok: false, motivo: `No se puede activar: faltan ${faltantes.join(" y ")}.` };
     }
@@ -235,7 +234,7 @@ export function accionesParaEstado(estadoRaw: string, ctx: TransicionContext): A
   }
 
   if (estado === "preactivado") {
-    const canActivar = ctx.hasCbu && ctx.hasComision;
+    const canActivar = ctx.tieneCuenta && ctx.hasComision;
     acciones.push({
       key: "activar",
       label: canActivar ? "Activar" : `Activar (requiere ${CUENTA} + comisión)`,

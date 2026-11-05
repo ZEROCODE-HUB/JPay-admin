@@ -109,18 +109,18 @@ export type Cliente = {
   tipoPersona: TipoPersona;
   correo: string;
   nombre: string;
-  /** Identificador interno (CUIT en Argentina; número con prefijo 99 en otros países). */
+  /** Número interno del cliente (prefijo 99). No es el identificador fiscal: ese es `taxId`. */
   cuit: string;
   /** País del cliente (código de `@/shared/pais`). */
   pais?: string | null;
-  /** Identificador fiscal del país (RFC, CUIT). */
+  /** Identificador fiscal (RFC). */
   taxId?: string | null;
   taxIdTipo?: string | null;
   /** Identificador personal (CURP). */
   idPersonal?: string | null;
   idPersonalTipo?: string | null;
   regimenFiscal?: string | null;
-  /** Cuenta para liquidaciones (CLABE, CBU). */
+  /** Cuenta para liquidaciones (CLABE). */
   cuentaBancaria?: string | null;
   cuentaBancariaTipo?: string | null;
   estado: EstadoCliente;
@@ -132,7 +132,6 @@ export type Cliente = {
   cbu?: string | null;
   cbuCancelado?: boolean;
   genero?: string | null;
-  cuitCuil?: string | null;
   fechaNacimiento?: string | null;
   ocupacion?: string | null;
   origenFondos?: string | null;
@@ -170,7 +169,7 @@ export const ESTADOS_COMISION: EstadoComision[] = ["Habilitado", "Deshabilitado"
 export type ComisionClienteRow = {
   id: string;
   cliente_id: string;
-  /** CVU/subcuenta a la que aplica; null = comisión del cliente (respaldo). */
+  /** Subcuenta a la que aplica; null = comisión del cliente (respaldo). */
   subcuenta_id: string | null;
   operacion: string;
   tipo: TipoOperacion;
@@ -190,6 +189,7 @@ type ComisionClienteJoined = {
   legajo: string;
   correo: string;
   cuit: string;
+  tax_id?: string | null;
   nombre: string;
   tipo_persona: TipoPersona;
 };
@@ -199,7 +199,7 @@ type ComisionSubcuentaJoined = { cbu: string | null; nombre: string | null };
 export type ComisionCliente = {
   id: string;
   clienteId: string;
-  /** CVU al que aplica la comisión (null = comisión del cliente, respaldo). */
+  /** Subcuenta a la que aplica la comisión (null = comisión del cliente, respaldo). */
   subcuentaId: string | null;
   subcuenta?: { cbu: string | null; nombre: string | null } | null;
   operacion: string;
@@ -240,10 +240,8 @@ export type MovimientoRow = {
   created_at: string;
   estado_id: number;
   comercio_id?: string | null;
-  bandera?: string | null;
-  /** FK a banderas.id (comercio_banderas.id) */
-  bandera_id?: string | null;
   destinatario_nombre?: string | null;
+  /** RFC de la contraparte. */
   destinatario_cuit?: string | null;
   destinatario_banco?: string | null;
   // to-one: PostgREST devuelve object (se acepta array por compat).
@@ -252,7 +250,7 @@ export type MovimientoRow = {
 };
 
 type MovimientoEstadoJoined = { codigo: string; nombre: string; es_final: boolean };
-type MovimientoClienteJoined = { correo: string; nombre: string; cuit: string };
+type MovimientoClienteJoined = { correo: string; nombre: string };
 
 export type Movimiento = {
   id: string;
@@ -260,7 +258,8 @@ export type Movimiento = {
   legajo: string;
   idTxn: string;
   tipo: string;
-  cvu: string | null;
+  /** CLABE de la operación (columna `cvu`). */
+  clabe: string | null;
   montoOperacion: number;
   comision: number;
   impuesto: number;
@@ -269,12 +268,9 @@ export type Movimiento = {
   createdAt: string;
   estadoId: number;
   comercioId?: string | null;
-  /** Texto de la bandera (denormalizado, para display). FK real: bandera_id */
-  bandera?: string | null;
-  /** FK a banderas.id (comercio_banderas.id) */
-  banderaId?: string | null;
   destinatarioNombre?: string | null;
-  destinatarioCuit?: string | null;
+  /** RFC de la contraparte (columna `destinatario_cuit`). */
+  destinatarioRfc?: string | null;
   destinatarioBanco?: string | null;
   estadoCodigo?: string;
   estadoNombre?: string;
@@ -282,7 +278,6 @@ export type Movimiento = {
   cliente?: {
     correo: string;
     nombre: string;
-    cuit: string;
   } | null;
 };
 
@@ -403,31 +398,6 @@ export type Conciliacion = {
   createdAt: string;
 };
 
-// --- conciliaciones_archivos (persistencia de carga CSV) -------------------
-export type ConciliacionArchivoRow = {
-  id: string;
-  nombre_archivo: string;
-  fecha_carga: string;
-  storage_path: string | null;
-  estado: string;
-  tipo: "bancaria" | "blp";
-  archivo_origen: string | null;
-  created_at: string;
-  created_by: string | null;
-};
-
-export type ConciliacionArchivo = {
-  id: string;
-  nombreArchivo: string;
-  fechaCarga: string;
-  storagePath: string | null;
-  estado: string;
-  tipo: "bancaria" | "blp";
-  archivoOrigen: string | null;
-  createdAt: string;
-  createdBy: string | null;
-};
-
 // --- comercios (tabla real: comercios / puntos_venta / codigos_categoria) --
 //
 // Regla de negocio (confirmada por el cliente): `comercios.legajo` es una FK
@@ -541,51 +511,6 @@ export type CodigoCategoriaInput = {
   estado?: "activo" | "inactivo";
 };
 
-export type ComercioClienteRow = {
-  legajo: string;
-  nombre: string;
-  cuit: string;
-  tipo_persona: TipoPersona;
-  correo: string;
-};
-
-export type ComercioBanderaEstado = "Activo" | "Inactivo";
-
-export type ComercioBanderaRow = {
-  id: string;
-  comercio_id: string;
-  bandera: string;
-  bandera_id: string | null;
-  metodo_key: string | null;
-  comision_molipay: number;
-  comision_payway: number;
-  comision_neta: number;
-  estado: ComercioBanderaEstado;
-  created_at: string;
-  updated_at: string;
-};
-
-export type ComercioBandera = {
-  id: string;
-  comercioId: string;
-  bandera: string;
-  banderaId: string | null;
-  metodoKey: string | null;
-  comisionPropia: number;
-  comisionPayway: number;
-  comisionNeta: number;
-  estado: ComercioBanderaEstado;
-  createdAt: string;
-  updatedAt: string;
-};
-
-export type ComercioBanderaInput = {
-  bandera: string;
-  comisionPropia: number;
-  comisionPayway: number;
-  estado?: ComercioBanderaEstado;
-};
-
 export type ComercioRow = {
   id: string;
   usuario: string;
@@ -667,59 +592,6 @@ export type ClienteSelect = {
   tipoPersona?: TipoPersona;
   /** País del cliente: define el IVA por defecto de sus comisiones. */
   pais?: string | null;
-};
-
-// --- resolvers (tabla real: resolvers) -------------------------------------
-
-export type ResolverEstado = "Activo" | "Inactivo";
-export const ESTADOS_RESOLVER: ResolverEstado[] = ["Activo", "Inactivo"];
-
-export type ResolverRow = {
-  id: string;
-  nombre: string;
-  cuit: string;
-  url: string;
-  estado: ResolverEstado;
-  nombre_reverso: string;
-  formato_web: string;
-  pcp_id: string;
-  id_pcp: string;
-  token: string;
-  as_header: boolean;
-  soa: boolean;
-  created_at: string;
-  updated_at: string;
-};
-
-export type Resolver = {
-  id: string;
-  nombre: string;
-  cuit: string;
-  url: string;
-  estado: ResolverEstado;
-  nombreReverso: string;
-  formatoWeb: string;
-  pcpId: string;
-  idPcp: string;
-  token: string;
-  asHeader: boolean;
-  soa: boolean;
-  createdAt: string;
-  updatedAt: string;
-};
-
-export type ResolverInput = {
-  nombre: string;
-  cuit: string;
-  url: string;
-  estado: ResolverEstado;
-  nombreReverso: string;
-  formatoWeb: string;
-  pcpId: string;
-  idPcp: string;
-  token: string;
-  asHeader: boolean;
-  soa: boolean;
 };
 
 // --- APIs externas (api_usuarios / api_endpoints / api_restricciones) ------
@@ -890,42 +762,6 @@ export type IntegracionInput = {
 
 // --- Notificaciones (catálogos + eventos) ------------------------------------
 
-export type AudienciaError = "tecnico" | "admin" | "cliente";
-export const AUDIENCIAS_ERROR: AudienciaError[] = ["tecnico", "admin", "cliente"];
-
-export type CodigoErrorRow = {
-  id: string;
-  codigo: string;
-  mensaje: string;
-  audiencia: AudienciaError;
-  canal_defecto: "Email" | "Telegram" | "WhatsApp";
-  descripcion: string | null;
-  activo: boolean;
-  created_at: string;
-  updated_at: string;
-};
-
-export type CodigoError = {
-  id: string;
-  codigo: string;
-  mensaje: string;
-  audiencia: AudienciaError;
-  canalDefecto: "Email" | "Telegram" | "WhatsApp";
-  descripcion: string | null;
-  activo: boolean;
-  createdAt: string;
-  updatedAt: string;
-};
-
-export type CodigoErrorInput = {
-  codigo: string;
-  mensaje: string;
-  audiencia?: AudienciaError;
-  canalDefecto: "Email" | "Telegram" | "WhatsApp";
-  descripcion?: string | null;
-  activo?: boolean;
-};
-
 export type CanalNotificacionRow = {
   id: string;
   nombre: string;
@@ -1008,596 +844,6 @@ export type EventoNotificacionFiltros = {
   estadoEntrega?: EstadoEntrega;
   fechaDesde?: string;
   fechaHasta?: string;
-};
-
-// --- impuestos -------------------------------------------------------------
-
-export type AmbitoImpuesto = "Externo" | "Interno";
-export const AMBITOS_IMPUESTO: AmbitoImpuesto[] = ["Externo", "Interno"];
-
-export type TipoImpuesto = "Porcentaje" | "Fijo" | "Otro";
-export type EstadoImpuesto = "Activo" | "Inactivo";
-
-export type ImpuestoRow = {
-  id: string;
-  codigo: string;
-  nombre: string;
-  descripcion: string | null;
-  tipo: TipoImpuesto;
-  monto: number | null;
-  estado: EstadoImpuesto;
-  ambito?: AmbitoImpuesto | string | null;
-  created_at: string;
-  updated_at: string;
-};
-
-export type Impuesto = {
-  id: string;
-  codigo: string;
-  nombre: string;
-  descripcion: string | null;
-  tipo: TipoImpuesto;
-  monto: number | null;
-  estado: EstadoImpuesto;
-  ambito: AmbitoImpuesto;
-  alicuotas: Alicuota[];
-  createdAt: string;
-  updatedAt: string;
-};
-
-export type ImpuestoInput = {
-  codigo: string;
-  nombre: string;
-  descripcion?: string | null;
-  tipo: TipoImpuesto;
-  monto: number | null;
-  estado: EstadoImpuesto;
-  ambito?: AmbitoImpuesto | string | null;
-};
-
-export type ImpuestoFilters = Pagination & {
-  search?: string;
-  estado?: EstadoImpuesto;
-};
-
-export type AlicuotaRow = {
-  id: string;
-  impuesto_id: string;
-  codigo: string;
-  tasa: number;
-  descripcion: string | null;
-  estado: "Activo" | "Inactivo";
-  created_at: string;
-  updated_at?: string;
-};
-
-export type Alicuota = {
-  id: string;
-  impuestoId: string;
-  codigo: string;
-  tasa: number;
-  descripcion: string | null;
-  estado: "Activo" | "Inactivo";
-  createdAt: string;
-  updatedAt: string;
-};
-
-export type AlicuotaInput = {
-  impuesto_id: string;
-  codigo: string;
-  tasa: number;
-  descripcion?: string | null;
-  estado: "Activo" | "Inactivo";
-};
-
-export type AlicuotaFilters = Pagination & {
-  impuesto_id?: string;
-  search?: string;
-  estado?: "Activo" | "Inactivo";
-};
-
-export type ImpuestoAsignacionRow = {
-  id: string;
-  legajo: string;
-  impuesto_id: string;
-  tipo: TipoImpuesto;
-  monto: number | null;
-  estado: EstadoImpuesto;
-  fecha_asignacion: string | null;
-  tipo_operacion: TipoOperacion | null;
-  impuestos?: AsignacionImpuestoJoined | AsignacionImpuestoJoined[] | null;
-  clientes?: AsignacionClienteJoined | AsignacionClienteJoined[] | null;
-};
-
-type AsignacionImpuestoJoined = {
-  codigo: string;
-  nombre: string;
-  tipo: TipoImpuesto;
-  monto: number | null;
-};
-type AsignacionClienteJoined = {
-  legajo: string;
-  nombre: string;
-  cuit: string;
-  tipo_persona: TipoPersona;
-  correo: string;
-};
-
-export type ImpuestoAsignacion = {
-  id: string;
-  clienteLegajo: string;
-  impuestoId: string;
-  tipo: TipoImpuesto;
-  monto: number | null;
-  estado: EstadoImpuesto;
-  fechaAsignacion: string | null;
-  tipoOperacion: TipoOperacion | null;
-  impuesto: { codigo: string; nombre: string; tipo: TipoImpuesto; monto: number | null } | null;
-  cliente: {
-    legajo: string;
-    nombre: string;
-    cuit: string;
-    tipoPersona: TipoPersona;
-    correo: string;
-  } | null;
-};
-
-export type ImpuestoAsignacionInput = {
-  cliente_legajo: string;
-  impuesto_id: string;
-  tipo: TipoImpuesto;
-  monto: number;
-  estado: EstadoImpuesto;
-  fecha_asignacion?: string | null;
-  tipo_operacion?: TipoOperacion | null;
-};
-
-export type ImpuestoAsignacionFilters = Pagination & {
-  search?: string;
-  cliente_legajo?: string;
-  impuesto_id?: string;
-  estado?: EstadoImpuesto;
-};
-
-export type EstadoPadron = "Cargando" | "Procesando" | "Finalizado" | "Error";
-
-export type IbPadronRow = {
-  id: string;
-  impuesto_id: string;
-  nombre: string;
-  archivo: string;
-  estado: EstadoPadron;
-  progreso: number;
-  created_at: string;
-};
-
-export type IbPadron = {
-  id: string;
-  impuestoId: string;
-  nombre: string;
-  archivo: string;
-  estado: EstadoPadron;
-  progreso: number;
-  createdAt: string;
-};
-
-export type IbPadronInput = {
-  impuesto_id: string;
-  nombre: string;
-  archivo: string;
-  estado?: EstadoPadron;
-  progreso?: number;
-};
-
-export type IbPadronFilters = Pagination & {
-  search?: string;
-  impuesto_id?: string;
-  estado?: EstadoPadron;
-};
-
-export type IbNormalizacionPreviewRow = {
-  id: string;
-  padron_id: string;
-  kpis_json: Record<string, unknown> | null;
-  creados_json: unknown[] | null;
-  desactivados_json: unknown[] | null;
-  omitidos_json: unknown[] | null;
-  aplicado: boolean;
-  created_at: string;
-};
-
-export type IbNormalizacionPreview = {
-  id: string;
-  padronId: string;
-  kpisJson: Record<string, unknown> | null;
-  creadosJson: unknown[] | null;
-  desactivadosJson: unknown[] | null;
-  omitidosJson: unknown[] | null;
-  aplicado: boolean;
-  createdAt: string;
-};
-
-export type IbNormalizacionPreviewInput = {
-  padron_id: string;
-  kpis_json?: Record<string, unknown> | null;
-  creados_json?: unknown[] | null;
-  desactivados_json?: unknown[] | null;
-  omitidos_json?: unknown[] | null;
-  aplicado?: boolean;
-};
-
-export type IbNormalizacionPreviewFilters = Pagination & {
-  padron_id?: string;
-  aplicado?: boolean;
-};
-
-export type DireccionDcExcepcion = "Entrantes" | "Salientes";
-export type TipoDcExcepcion = "Alta manual" | "Convenio multilateral" | "Exención";
-
-export type DcExcepcionRow = {
-  id: string;
-  usuario: string;
-  cuit: string;
-  tipo: TipoDcExcepcion;
-  direccion: DireccionDcExcepcion;
-  motivo: string | null;
-  vigencia_desde: string | null;
-  vigencia_hasta: string | null;
-  autorizacion_codigo: string | null;
-  estado: EstadoImpuesto;
-  archivo_certificado: string | null;
-  impuesto_id: string | null;
-  fecha_creacion: string;
-  fecha_actualizacion: string;
-  impuestos?: { codigo: string; nombre: string }[] | null;
-};
-
-export type DcExcepcion = {
-  id: string;
-  email: string;
-  cuit: string;
-  tipo: TipoDcExcepcion;
-  direccion: DireccionDcExcepcion;
-  motivo: string | null;
-  vigenciaDesde: string | null;
-  vigenciaHasta: string | null;
-  autorizacionCodigo: string | null;
-  estado: EstadoImpuesto;
-  archivoCertificado: string | null;
-  impuestoId: string | null;
-  impuestoNombre: string | null;
-  createdAt: string;
-  updatedAt: string;
-};
-
-export type DcExcepcionInput = {
-  email: string;
-  cuit: string;
-  tipo: TipoDcExcepcion;
-  direccion: DireccionDcExcepcion;
-  motivo?: string | null;
-  vigencia_desde?: string | null;
-  vigencia_hasta?: string | null;
-  autorizacion_codigo?: string | null;
-  estado: EstadoImpuesto;
-};
-
-export type DcExcepcionFilters = Pagination & {
-  search?: string;
-  cuit?: string;
-  direccion?: DireccionDcExcepcion;
-  estado?: EstadoImpuesto;
-};
-
-export type DcSyncRetroactivoRow = {
-  id: string;
-  cuit: string;
-  desde: string;
-  hasta: string;
-  preview_json: Record<string, unknown> | null;
-  aplicado: boolean;
-  created_at: string;
-};
-
-export type DcSyncRetroactivo = {
-  id: string;
-  cuit: string;
-  desde: string;
-  hasta: string;
-  previewJson: Record<string, unknown> | null;
-  aplicado: boolean;
-  createdAt: string;
-};
-
-export type DcSyncRetroactivoInput = {
-  cuit: string;
-  desde: string;
-  hasta: string;
-  preview_json?: Record<string, unknown> | null;
-  aplicado?: boolean;
-};
-
-export type DcSyncRetroactivoFilters = Pagination & {
-  search?: string;
-  cuit?: string;
-  aplicado?: boolean;
-};
-
-// --- banderas (catálogo) / banderas_cuotas ----------------------------------
-
-export type BanderaCatalogoRow = {
-  id: string;
-  nombre: string;
-  tipo: string;
-  dias_habiles_acreditacion: number;
-  estado: string;
-  created_at: string | null;
-  updated_at: string | null;
-};
-
-export type BanderaCatalogo = {
-  id: string;
-  nombre: string;
-  tipo: string;
-  diasHabilesAcreditacion: number;
-  estado: "Activo" | "Inactivo";
-  createdAt: string;
-  updatedAt: string;
-};
-
-export type BanderaCuotaRow = {
-  id: string;
-  bandera_id: string;
-  cuotas: number;
-  ten: number;
-  coeficiente: number;
-  estado: string;
-};
-
-export type BanderaCuota = {
-  id: string;
-  banderaId: string;
-  cuotas: number;
-  ten: number;
-  coeficiente: number;
-  estado: "Activo" | "Inactivo";
-};
-
-// --- comercio_banderas_cuotas -----------------------------------------------
-
-export type ComercioBanderaCuotaRow = {
-  id: string;
-  comercio_bandera_id: string;
-  cuotas: number;
-  tasa_mensual: number;
-  estado: string;
-};
-
-export type ComercioBanderaCuota = {
-  id: string;
-  comercioBanderaId: string;
-  cuotas: number;
-  tasaMensual: number;
-  estado: "Activo" | "Inactivo";
-};
-
-// --- lotes_venta (vista) ----------------------------------------------------
-
-/**
- * Join a `comercios` tal como lo devuelve PostgREST.
- *
- * Puede ser ARRAY o OBJECT, y no es un detalle menor: PostgREST devuelve
- * **object** para relaciones to-one (comercio_id -> comercios.id) y **array**
- * para las one-to-many. El tipo anterior solo declaraba `[]`, asi que
- * `Array.isArray(...)` siempre daba false, el mapper leia `null` y TypeScript
- * no se quejaba de nada: la columna quedaba en "—" y el legajo caia al
- * fallback del uuid, que es exactamente el comportamiento roto de la pagina de
- * lotes.
- *
- * Se tipea aceptando las dos formas para que ningun mapper vuelva a asumir una
- * sola.
- */
-export type ComercioJoined =
-  | {
-      id: string;
-      usuario: string;
-      legajo: string;
-      nombre_comercio: string | null;
-      /** Identificador del sitio / establecimiento en Payway. Es el
-       *  valor que va en la columna `ESTABLECIMIENTO` del CSV de
-       *  liquidación: el motor de match lo usa para resolver comercio. */
-      site_id?: string | null;
-    }
-  | {
-      id: string;
-      usuario: string;
-      legajo: string;
-      nombre_comercio: string | null;
-      site_id?: string | null;
-    }[];
-
-export type LoteVentaRow = {
-  comercio_id: string;
-  bandera: string;
-  fecha: string;
-  cantidad_operaciones: number;
-  importe_bruto: number;
-  impuestos: number;
-  comision: number;
-  importe_neto: number;
-  /**
-   * La vista `v_lotes_venta` (schema remoto) expone el join a `comercios`
-   * como columnas PLANAS (`comercios_id`, `comercios_usuario`, ...), NO como
-   * embed PostgREST. Intentar `comercios(id, ...)` en el select dejaba el
-   * nombre y el legajo vacíos (la vista no tiene relación embebible).
-   */
-  comercios_id?: string | null;
-  comercios_usuario?: string | null;
-  comercios_legajo?: string | null;
-  comercios_nombre_comercio?: string | null;
-};
-
-export type LoteVenta = {
-  comercioId: string;
-  bandera: string;
-  fecha: string;
-  cantidadOperaciones: number;
-  importeBruto: number;
-  impuestos: number;
-  comision: number;
-  /** Valor que devuelve la vista (sum(monto_cobrado)). NO es el neto de la
-   *  venta: la spec manda usar netoEstimado = Bruto − Impuestos − Comisión. */
-  importeNeto: number;
-  /** Neto estimado = importeBruto − impuestos − comision (fórmula corregida). */
-  netoEstimado: number;
-  comercio?: { id: string; usuario: string; legajo: string; nombreComercio: string | null } | null;
-};
-
-// --- lotes_acreditacion / lote_movimientos / adelantos (real Supabase) -----
-
-export type EstadoLote = "Programado" | "Pendiente" | "Acreditado" | "Contracargo" | "Cancelado";
-export const ESTADOS_LOTE: EstadoLote[] = [
-  "Programado",
-  "Pendiente",
-  "Acreditado",
-  "Contracargo",
-  "Cancelado",
-];
-
-export type LoteAcreditacionRow = {
-  id: string;
-  codigo: string;
-  comercio_id: string;
-  /** Texto denormalizado (para display). FK real: bandera_id */
-  bandera: string;
-  /** FK a banderas.id */
-  bandera_id?: string | null;
-  fecha: string;
-  cantidad_operaciones: number;
-  importe_bruto: number;
-  impuestos: number;
-  tasa_payway_pct: number;
-  tasa_payway_monto: number;
-  tasa_molipay_pct: number;
-  tasa_molipay_monto: number;
-  cuotas: number | null;
-  costo_payway_pago_unico: number | null;
-  contracargo_monto: number;
-  comision_cierre_lote_pct: number | null;
-  comision_cierre_lote_monto: number | null;
-  importe_neto: number;
-  estado: EstadoLote;
-  es_estimado: boolean;
-  dias_habiles_aplicados: number | null;
-  fecha_estimada_recalcular: boolean;
-  resuelto_por: string | null;
-  fecha_resolucion: string | null;
-  notas_resolucion: string | null;
-  created_at: string;
-  updated_at: string;
-  iva_monto: number | null;
-  iibb_monto: number | null;
-  debito_credito_monto: number | null;
-  /** Fecha real del cobro de Payway. null mientras el lote es Programado. */
-  fecha_cobro_real: string | null;
-  comercios?: ComercioJoined | null;
-};
-
-export type LoteAcreditacion = {
-  id: string;
-  codigo: string;
-  comercioId: string;
-  /** Texto denormalizado (para display). FK real: banderaId */
-  bandera: string;
-  /** FK a banderas.id */
-  banderaId?: string | null;
-  fecha: string;
-  cantidadOperaciones: number;
-  importeBruto: number;
-  impuestos: number;
-  tasaPaywayPct: number;
-  tasaPaywayMonto: number;
-  tasaPropiaPct: number;
-  tasaPropiaMonto: number;
-  cuotas: number | null;
-  costoPaywayPagoUnico: number | null;
-  contracargoMonto: number;
-  comisionCierreLotePct: number | null;
-  comisionCierreLoteMonto: number | null;
-  importeNeto: number;
-  estado: EstadoLote;
-  esEstimado: boolean;
-  diasHabilesAplicados: number | null;
-  fechaEstimadaRecalcular: boolean;
-  resueltoPor: string | null;
-  fechaResolucion: string | null;
-  notasResolucion: string | null;
-  createdAt: string;
-  updatedAt: string;
-  ivaMonto: number | null;
-  iibbMonto: number | null;
-  debitoCreditoMonto: number | null;
-  /** Fecha real del cobro de Payway. null mientras el lote es Programado. */
-  fechaCobroReal: string | null;
-  comercio?: {
-    id: string;
-    usuario: string;
-    legajo: string;
-    nombreComercio: string | null;
-    siteId: string | null;
-  } | null;
-  // compat mock
-  importeFinal?: number;
-};
-
-export type LoteMovimientoRow = {
-  lote_id: string;
-  movimiento_id: string;
-};
-
-export type EstadoAdelanto = "Pendiente" | "Aprobado" | "Rechazado" | "Acreditado" | "Cancelado";
-export const ESTADOS_ADELANTO: EstadoAdelanto[] = [
-  "Pendiente",
-  "Aprobado",
-  "Rechazado",
-  "Acreditado",
-  "Cancelado",
-];
-
-export type AdelantoRow = {
-  id: string;
-  comercio_id: string;
-  monto_solicitado: number;
-  plazo_original_dias: number;
-  plazo_adelantado_dias: number;
-  tasa_interes_pct: number | null;
-  estado: EstadoAdelanto;
-  motivo: string | null;
-  fecha_acreditacion: string | null;
-  monto_por_acreditar: number | null;
-  fecha_solicitud: string;
-  fecha_resolucion: string | null;
-  resuelto_por: string | null;
-  created_at: string;
-  updated_at: string;
-};
-
-export type Adelanto = {
-  id: string;
-  comercioId: string;
-  montoSolicitado: number;
-  plazoOriginalDias: number;
-  plazoAdelantadoDias: number;
-  tasaInteresPct: number | null;
-  estado: EstadoAdelanto;
-  motivo: string | null;
-  fechaAcreditacion: string | null;
-  montoPorAcreditar: number | null;
-  fechaSolicitud: string;
-  fechaResolucion: string | null;
-  resueltoPor: string | null;
-  createdAt: string;
-  updatedAt: string;
 };
 
 // --- util ------------------------------------------------------------------

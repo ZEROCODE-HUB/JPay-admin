@@ -6,7 +6,7 @@ import type { Cliente, ClienteRow, EstadoCliente, Page, Pagination, TipoPersona 
 import { normalizarEstado, puedeTransicionar } from "@/lib/cliente-estados";
 
 export type ClienteFilters = Pagination & {
-  /** Búsqueda de texto libre: legajo, correo o nombre (ilike server-side). */
+  /** Búsqueda de texto libre: legajo, correo, nombre o RFC (ilike server-side). */
   search?: string;
   estado?: EstadoCliente;
   tipoPersona?: TipoPersona;
@@ -34,7 +34,9 @@ export async function listClientes(filters: ClienteFilters): Promise<Page<Client
     let q = sb.from("clientes").select(cols, { count: "exact" });
     if (search && search.trim()) {
       const qq = search.trim().replace(/[%_]/g, "\\$&");
-      q = q.or(`legajo.ilike.%${qq}%,correo.ilike.%${qq}%,nombre.ilike.%${qq}%`);
+      q = q.or(
+        `legajo.ilike.%${qq}%,correo.ilike.%${qq}%,nombre.ilike.%${qq}%,tax_id.ilike.%${qq}%`,
+      );
     }
     if (estado) q = q.eq("estado", estado);
     else q = q.neq("estado", "eliminado");
@@ -144,7 +146,7 @@ export type ClienteInput = {
   fechaAlta?: string;
 };
 
-/** El legajo se deriva del CUIT vía trigger `handle_new_cliente` (la DB es la fuente de verdad). */
+/** El legajo se deriva del número interno (`cuit`) vía trigger `handle_new_cliente` (la DB es la fuente de verdad). */
 export async function createCliente(input: ClienteInput): Promise<Cliente> {
   const sb = requireSupabase();
   const nuevo: Omit<TablesInsert<"clientes">, "legajo"> = {
@@ -219,8 +221,8 @@ export async function clienteTieneComision(clienteId: string): Promise<boolean> 
   return (count ?? 0) > 0;
 }
 
-export async function clienteTieneCbu(cliente: Cliente): Promise<boolean> {
-  // CBU puede estar en clientes.cbu o en subcuentas.cbu (si existe)
+export async function clienteTieneCuenta(cliente: Cliente): Promise<boolean> {
+  // La CLABE puede estar en clientes.cbu o en subaccounts.cbu (si existe)
   if (cliente.cbu && cliente.cbu.trim().length >= 10 && !cliente.cbuCancelado) return true;
   // fallback: consultar subcuentas
   try {
@@ -241,7 +243,7 @@ export async function clienteTieneCbu(cliente: Cliente): Promise<boolean> {
 // Las políticas RLS ya están ajustadas: las views y tablas aquí usadas son
 // admin-only. Se cargan en paralelo en una sola llamada para no generar N+1.
 //
-// - getClientesEnrichment(legajos)     — riesgo, CVUs, KYC y consumo mensual
+// - getClientesEnrichment(legajos)     — riesgo, subcuentas, KYC y consumo mensual
 // - getRiesgoVigentePorLegajo(legajo)  — para el detalle
 //
 // Si alguna tabla/view no existe en el remote, las funciones devuelven {}
@@ -254,8 +256,8 @@ export type ClienteEnrichment = {
   /** Nivel de riesgo PLAFT vigente (de v_cliente_riesgo_vigente). */
   riesgo?: RiesgoPLD | null;
   riesgoMotivo?: string | null;
-  /** Cantidad de subcuentas/CVUs operativas. */
-  cvuCount?: number;
+  /** Cantidad de subcuentas operativas. */
+  subcuentasCount?: number;
   /** Cantidad de comercios asociados (de tabla `comercios` con FK al legajo). */
   comerciosCount?: number;
   /** KYC: hay al menos una fila en `validaciones` para este legajo. */
@@ -302,7 +304,7 @@ export async function getClientesEnrichment(
     // view no existe aún: tolerar
   }
 
-  // 2. Conteo de subcuentas/CVUs por legajo.
+  // 2. Conteo de subcuentas por legajo.
   try {
     const { data } = await sb
       .from("subaccounts")
@@ -314,10 +316,10 @@ export async function getClientesEnrichment(
         counts[r.cliente_legajo] = (counts[r.cliente_legajo] ?? 0) + 1;
       }
       for (const [l, n] of Object.entries(counts)) {
-        if (result[l]) result[l].cvuCount = n;
+        if (result[l]) result[l].subcuentasCount = n;
       }
       for (const l of legajos) {
-        if (result[l] && result[l].cvuCount == null) result[l].cvuCount = 0;
+        if (result[l] && result[l].subcuentasCount == null) result[l].subcuentasCount = 0;
       }
     }
   } catch {
@@ -491,13 +493,13 @@ async function transicionarCliente(
 ): Promise<TransicionResult> {
   const hasMov = await clienteTieneMovimientos(cliente.legajo);
   const hasCom = await clienteTieneComision(cliente.id);
-  const hasCbu = await clienteTieneCbu(cliente);
-  const ctx = { hasCbu, hasComision: hasCom, hasMovimientos: hasMov };
+  const tieneCuenta = await clienteTieneCuenta(cliente);
+  const ctx = { tieneCuenta, hasComision: hasCom, hasMovimientos: hasMov };
 
   const check = puedeTransicionar(cliente.estado, nuevoEstado, ctx);
   if (!check.ok) return { ok: false, motivo: check.motivo! };
 
-  // Deshabilitar cancela CBU (idempotente)
+  // Deshabilitar cancela la CLABE (idempotente)
   const patch: TablesUpdate<"clientes"> = { estado: nuevoEstado };
   if (nuevoEstado === "deshabilitado") {
     patch.cbu_cancelado = true;
@@ -566,7 +568,7 @@ export async function reactivarCliente(cliente: Cliente): Promise<TransicionResu
 
 export async function deshabilitarCliente(cliente: Cliente): Promise<TransicionResult> {
   return transicionarCliente(cliente, "deshabilitado", {
-    comentario: "Deshabilitación BCRA: CBU cancelado, historial conservado",
+    comentario: "Deshabilitación: CLABE cancelada, historial conservado",
   });
 }
 
@@ -666,26 +668,4 @@ export async function hardDeleteCliente(id: string): Promise<void> {
       // ignorar: función puede no existir si migración no aplicada
     }
   }
-}
-
-export async function generarCbuParaCliente(cliente: Cliente, cbu: string): Promise<Cliente> {
-  const sb = requireSupabase();
-  let { data, error } = await sb
-    .from("clientes")
-    .update({ cbu: cbu.trim(), cbu_cancelado: false })
-    .eq("id", cliente.id)
-    .select(COLUMNS)
-    .single();
-  if (error && isMissingColumnError(error)) {
-    const r = await sb
-      .from("clientes")
-      .update({ cbu: cbu.trim(), cbu_cancelado: false })
-      .eq("id", cliente.id)
-      .select(COLUMNS_LEGACY)
-      .single();
-    data = r.data as typeof data;
-    error = r.error;
-  }
-  if (error) throw new DataAccessError(error);
-  return toCliente(data as ClienteRow);
 }

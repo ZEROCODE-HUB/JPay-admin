@@ -27,7 +27,6 @@ export type ComercioFilters = Pagination & {
 // Tabla real comercios (verificada via information_schema):
 // id, usuario, legajo (FK -> clientes.legajo), nombre_comercio, categoria_id, estado, nivel, created_at, updated_at
 // + relaciones clientes, codigos_categoria, puntos_venta
-// Ya no existe metodos_config ni habilitado_* — migrado a comercio_banderas.
 const COLUMNS =
   "id, usuario, legajo, nombre_comercio, categoria_id, estado, nivel, ejecutivo_responsable_id, site_id, created_at, updated_at, clientes(legajo, nombre, cuit, tax_id, tipo_persona, correo), codigos_categoria(id, codigo, nombre, descripcion, estado), puntos_venta(id, nombre, estado, created_at), admin_users!left(id, nombre, email)";
 

@@ -2,14 +2,12 @@ import { OPERACIONES } from "../utils";
 
 const inputCls = "h-9 w-full rounded-md border border-input bg-card px-3 text-sm";
 
-/** Filtros propios del listado (TXID, CUIT, CVU, operación, agrupar) dentro del panel del DataTable. */
+/** Filtros propios del listado (TXID, CLABE, operación, agrupar) dentro del panel del DataTable. */
 export function FiltrosExtra({
   txid,
   onTxid,
-  cuit,
-  onCuit,
-  cvu,
-  onCvu,
+  clabe,
+  onClabe,
   operacion,
   onOperacion,
   agrupar,
@@ -17,10 +15,8 @@ export function FiltrosExtra({
 }: {
   txid: string;
   onTxid: (v: string) => void;
-  cuit: string;
-  onCuit: (v: string) => void;
-  cvu: string;
-  onCvu: (v: string) => void;
+  clabe: string;
+  onClabe: (v: string) => void;
   operacion: string;
   onOperacion: (v: string) => void;
   agrupar: boolean;
@@ -37,21 +33,12 @@ export function FiltrosExtra({
           className={`${inputCls} font-mono`}
         />
       </div>
-      <div className="space-y-1 min-w-[150px]">
-        <label className="text-xs font-medium text-muted-foreground">CUIT</label>
-        <input
-          value={cuit}
-          onChange={(e) => onCuit(e.target.value)}
-          placeholder="30719143659"
-          className={`${inputCls} font-mono`}
-        />
-      </div>
       <div className="space-y-1 min-w-[220px]">
-        <label className="text-xs font-medium text-muted-foreground">CVU / CBU</label>
+        <label className="text-xs font-medium text-muted-foreground">CLABE</label>
         <input
-          value={cvu}
-          onChange={(e) => onCvu(e.target.value)}
-          placeholder="0000003100..."
+          value={clabe}
+          onChange={(e) => onClabe(e.target.value)}
+          placeholder="032180000118359719"
           className={`${inputCls} font-mono`}
         />
       </div>

@@ -23,7 +23,7 @@ export function EnlacesPage() {
     <PermissionGuard recurso="comercios">
       <PageHeader
         title="Links de Pago"
-        description={`Links gestionados por ${brand.name}. PayWay crea en Pendiente; Admin gestiona ciclo completo (ver detalle para método/tarjeta/cuotas).`}
+        description={`Links gestionados por ${brand.name} y cobrados con Ecart Pay. Se crean en Pendiente y el admin gestiona el ciclo completo (ver detalle para método, tarjeta y meses).`}
       />
       {l.isLoading ? (
         <div className="flex items-center justify-center rounded-xl border bg-card py-16 text-sm text-muted-foreground">

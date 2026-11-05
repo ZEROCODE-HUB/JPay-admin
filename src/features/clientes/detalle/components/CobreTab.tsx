@@ -75,7 +75,7 @@ export function CobreTab({ legajo }: { legajo: string }) {
                       Cobre rechazó el alta el {formatDateTime(a.alta.revocado_at)}, después de
                       aprobarla (revisión de cumplimiento)
                       {a.alta.revocado_motivo ? `: ${a.alta.revocado_motivo}` : ""}. Sus cuentas
-                      siguen operando; consultá con el KAM qué hacer.
+                      siguen operando; consulta con el KAM qué hacer.
                     </p>
                     {!a.alta.revocado_revisado && (
                       <BtnOutline

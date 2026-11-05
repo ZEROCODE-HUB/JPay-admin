@@ -2,25 +2,20 @@ import { toast } from "sonner";
 import type { CobroComision, ConfiguracionPagos, ModeloFondos } from "@/lib/api/paises";
 import type { Modulo } from "@/shared/pais";
 
-/** Nombre visible de cada módulo de `paises.modulos`; también arman los menús del admin y del portal. */
-export const MODULOS: Record<Modulo, string> = {
+/**
+ * Nombre visible de cada módulo de `paises.modulos` que se puede prender o apagar desde el admin;
+ * también arman los menús del admin y del portal.
+ */
+export const MODULOS: Partial<Record<Modulo, string>> = {
   spei: "Transferencias SPEI",
   oxxo: "Efectivo OXXO",
   msi: "Meses sin intereses",
   pos: "Puntos físicos (POS)",
   cfdi: "Facturación CFDI",
   pld_mx: "PLD México",
-  iibb: "Ingresos Brutos",
-  debitos_creditos: "Débitos y créditos",
-  bcra: "Reportes BCRA",
-  afip: "AFIP",
-  repet: "REPET",
   pagos_proveedor: "Cobros con Ecart Pay",
   retiros_proveedor: "Retiros desde Ecart Pay",
-  payway: "Tarjetas con Payway",
-  transferencias_salientes: "Transferencias BDC / Coelsa",
   transferencias_cobre: "CLABE y transferencias SPEI (Cobre)",
-  qr: "Pagos y cobros con QR",
   monitoreo_automatico: "Alertas y bloqueos automáticos",
   suscripciones: "Suscripciones con tarjeta (Ecart Pay)",
   domiciliacion: "Domiciliación a CLABE (Ecart Pay)",

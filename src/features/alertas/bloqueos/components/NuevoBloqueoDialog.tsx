@@ -35,11 +35,11 @@ export function NuevoBloqueoDialog({
 
   const guardar = async () => {
     if (!cliente) {
-      toast.error("Seleccioná un cliente de la lista");
+      toast.error("Selecciona un cliente de la lista");
       return;
     }
     if (motivo.trim().length < 5) {
-      toast.error("Indicá el motivo del bloqueo (al menos 5 caracteres)");
+      toast.error("Indica el motivo del bloqueo (al menos 5 caracteres)");
       return;
     }
     setEnviando(true);
@@ -125,7 +125,7 @@ export function NuevoBloqueoDialog({
             <option value="">Toda la cuenta del cliente</option>
             {(subs.data ?? []).map((s) => (
               <option key={s.id} value={s.id}>
-                Subcuenta {s.nombre} — {s.cbu ?? "sin CVU"}
+                Subcuenta {s.nombre} — {s.cbu ?? "sin CLABE"}
               </option>
             ))}
           </select>

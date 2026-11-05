@@ -8,7 +8,7 @@ const mov = (over: Partial<Movimiento>): Movimiento => ({
   legajo: "L1",
   idTxn: "t1",
   tipo: "deposito",
-  cvu: null,
+  clabe: null,
   montoOperacion: 0,
   comision: 0,
   impuesto: 0,
@@ -40,7 +40,7 @@ describe("dashboard: utils", () => {
         legajo: "A",
         montoOperacion: 50,
         comision: 2,
-        cliente: { nombre: "Ana", correo: "", cuit: "" },
+        cliente: { nombre: "Ana", correo: "" },
       }),
     ]);
     expect(r.montoTransaccionado).toBe(450);

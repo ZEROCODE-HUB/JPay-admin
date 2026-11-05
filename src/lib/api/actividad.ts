@@ -14,12 +14,13 @@ export type EventoActividad = {
   estado: string;
   nombre: string;
   destino: string;
-  cuit: string;
+  /** RFC de la contraparte (columna `destinatario_cuit`). */
+  rfc: string;
   destinatario: string;
-  /** Cuenta de destino (CLABE / CBU / CVU) o referencia de la operación. */
-  cvu: string;
-  /** Cuenta del cliente desde la que salió o a la que entró el dinero. */
-  cvuBalance: string;
+  /** CLABE de destino (columna `cvu`) o referencia de la operación. */
+  clabe: string;
+  /** CLABE de la subcuenta del cliente desde la que salió o a la que entró el dinero. */
+  clabeCliente: string;
 };
 
 const TIPO: Record<string, string> = {
@@ -28,11 +29,6 @@ const TIPO: Record<string, string> = {
   transferencia: "Transferencia",
   conversion: "Conversión a dólares",
   tarjeta: "Pago con tarjeta",
-  pago_pct: "Pago PCT",
-  cobro_pct: "Cobro PCT",
-  acreditacion_lote: "Acreditación de lote",
-  liquidacion_lote: "Liquidación de lote",
-  adelanto: "Adelanto",
   ajuste_manual: "Ajuste de saldo",
 };
 
@@ -78,10 +74,10 @@ export async function listActividad(limite = 500): Promise<EventoActividad[]> {
       estado: t.estados_movimiento?.nombre ?? t.estados_movimiento?.codigo ?? "—",
       nombre: t.clientes?.nombre ?? "—",
       destino: t.destinatario_banco ?? "—",
-      cuit: t.destinatario_cuit ?? "—",
+      rfc: t.destinatario_cuit ?? "—",
       destinatario: t.destinatario_nombre ?? "—",
-      cvu: t.cvu ?? "—",
-      cvuBalance: t.subaccounts?.cbu ?? t.subaccounts?.nombre ?? "—",
+      clabe: t.cvu ?? "—",
+      clabeCliente: t.subaccounts?.cbu ?? t.subaccounts?.nombre ?? "—",
     };
   });
 }

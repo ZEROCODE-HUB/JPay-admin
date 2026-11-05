@@ -15,22 +15,8 @@ export const Route = createFileRoute("/admin/configuracion/configuraciones")({
 
 type ConfiguracionLogin = { nombre: string; url: string; metodo: string };
 
-const configuraciones: ConfiguracionLogin[] = [
-  { nombre: "pct:wondersoft", url: "https://wondersoft.providers.ar/ws/login", metodo: "POST" },
-  {
-    nombre: "pds:pago_mis_cuentas",
-    url: "https://api.pagomiscuentas.com/v2/auth/login",
-    metodo: "POST",
-  },
-  {
-    nombre: "bank.bdc_conecta",
-    url: "http://login.internal:8083/ms-login-providers/login",
-    metodo: "POST",
-  },
-  { nombre: "cpf:coelsa_cpf", url: "https://coelsa.com.ar/cpf/ws/login", metodo: "POST" },
-  { nombre: "pct:coelsa_cvu", url: "https://coelsa.com.ar/cvu/ws/login", metodo: "POST" },
-  { nombre: "pct:coelsa_debin", url: "https://coelsa.com.ar/debin/ws/login", metodo: "POST" },
-];
+// Pendiente de conectar a la base (antes eran datos de ejemplo).
+const configuraciones: ConfiguracionLogin[] = [];
 
 const columns: Column<ConfiguracionLogin>[] = [
   {

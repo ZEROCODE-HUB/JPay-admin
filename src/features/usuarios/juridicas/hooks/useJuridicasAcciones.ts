@@ -45,7 +45,7 @@ export function useJuridicasAcciones() {
         onClick: () =>
           setConfirmAction({
             title: "Activar persona jurídica",
-            message: `¿Activar a ${row.razonSocial}? Requiere CVU y comisión.`,
+            message: `¿Activar a ${row.razonSocial}? Requiere CLABE y comisión.`,
             confirmLabel: "Activar",
             variant: "default",
             onConfirm: () => ejecutar(row.legajo, "activar"),
@@ -89,7 +89,7 @@ export function useJuridicasAcciones() {
         onClick: () =>
           setConfirmAction({
             title: "Deshabilitar",
-            message: `¿Deshabilitar a ${row.razonSocial}? Se cancelará CVU y se conservará historial.`,
+            message: `¿Deshabilitar a ${row.razonSocial}? Se cancelará la CLABE y se conservará el historial.`,
             confirmLabel: "Deshabilitar",
             variant: "danger",
             onConfirm: () => ejecutar(row.legajo, "deshabilitar"),

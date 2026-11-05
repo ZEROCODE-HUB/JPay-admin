@@ -16,7 +16,7 @@ export const isSupabaseConfigured = supabase !== null;
 export function requireSupabase(): SupabaseClient<Database> {
   if (!supabase) {
     throw new Error(
-      "Supabase no está configurado. Definí VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY en el entorno.",
+      "Supabase no está configurado. Define VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY en el entorno.",
     );
   }
   return supabase;
@@ -25,7 +25,7 @@ export function requireSupabase(): SupabaseClient<Database> {
 /**
  * Errores de Postgres/Supabase que indican falta de permiso por RLS (o política).
  * Se diferencian de un resultado vacío legítimo para que la UI pueda mostrar
- * "no tenés permiso para ver esto" en lugar de "no hay datos".
+ * "no tienes permiso para ver esto" en lugar de "no hay datos".
  */
 const PERMISSION_PATTERNS: RegExp[] = [
   /permission denied/i,
@@ -72,16 +72,16 @@ export function isNotConfiguredError(err: unknown): boolean {
 
 const ERROR_MESSAGES: [RegExp, string][] = [
   [/invalid login credentials/i, "Usuario o contraseña incorrectos."],
-  [/email not confirmed/i, "El correo aún no está confirmado. Revisá tu bandeja de entrada."],
+  [/email not confirmed/i, "El correo aún no está confirmado. Revisa tu bandeja de entrada."],
   [/user not found/i, "No existe una cuenta con ese correo."],
   [
     /too many requests|rate limit/i,
-    "Demasiados intentos fallidos. Esperá unos minutos y volvé a intentar.",
+    "Demasiados intentos fallidos. Espera unos minutos y vuelve a intentar.",
   ],
-  [/invalid email/i, "Ingresá un correo electrónico válido."],
+  [/invalid email/i, "Ingresa un correo electrónico válido."],
   [
     /network|fetch failed|failed to fetch/i,
-    "No se pudo conectar. Verificá tu conexión e intentá de nuevo.",
+    "No se pudo conectar. Verifica tu conexión e intenta de nuevo.",
   ],
 ];
 

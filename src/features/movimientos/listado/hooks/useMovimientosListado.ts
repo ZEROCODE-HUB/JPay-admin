@@ -24,16 +24,14 @@ export function useMovimientosListado({
     dates: {},
   });
   const [txid, setTxid] = useState(txidInicial ?? "");
-  const [cuit, setCuit] = useState("");
-  const [cvu, setCvu] = useState("");
+  const [clabe, setClabe] = useState("");
   const [operacion, setOperacion] = useState("");
   const [agrupar, setAgrupar] = useState(true);
   const [abiertos, setAbiertos] = useState<Set<string>>(new Set());
 
   const search = useDebouncedValue(filtrosPanel.global.trim(), 350);
   const txidQ = useDebouncedValue(txid.trim(), 350);
-  const cuitQ = useDebouncedValue(cuit.trim(), 350);
-  const cvuQ = useDebouncedValue(cvu.trim(), 350);
+  const clabeQ = useDebouncedValue(clabe.trim(), 350);
 
   const aplicarFiltros = (f: TableServerFilters) => {
     setPage(0);
@@ -47,8 +45,7 @@ export function useMovimientosListado({
       legajo,
       search: search || undefined,
       txid: txidQ || undefined,
-      cuit: cuitQ || undefined,
-      cvu: cvuQ || undefined,
+      clabe: clabeQ || undefined,
       tipoOperacion: operacion || undefined,
       tipoLinea: filtrosPanel.enums.tipoLinea
         ? TIPO_LINEA_CODE.get(filtrosPanel.enums.tipoLinea)
@@ -62,8 +59,7 @@ export function useMovimientosListado({
     legajo,
     search,
     txidQ,
-    cuitQ,
-    cvuQ,
+    clabeQ,
     operacion,
     filtrosPanel.enums,
     filtrosPanel.dates,
@@ -105,10 +101,8 @@ export function useMovimientosListado({
     txid,
     setTxid,
     filtrarTxid,
-    cuit,
-    setCuit: conReset(setCuit),
-    cvu,
-    setCvu: conReset(setCvu),
+    clabe,
+    setClabe: conReset(setClabe),
     operacion,
     setOperacion: conReset(setOperacion),
     agrupar,

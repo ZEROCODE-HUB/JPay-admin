@@ -34,14 +34,13 @@ export function useUsuariosAcciones() {
           navigate({ to: "/admin/general/usuarios/$legajo", params: { legajo: row.legajo } }),
       },
       {
-        label: "Asignar / gestionar CVU",
+        label: "Gestionar CLABE (Cobre)",
         icon: ShieldCheck,
         disabled: !puedeModificar,
         onClick: () =>
           navigate({
             to: "/admin/general/usuarios/$legajo",
             params: { legajo: row.legajo },
-            search: { tab: "cvu" },
           }),
       },
       {
@@ -75,7 +74,7 @@ export function useUsuariosAcciones() {
         onClick: () =>
           setConfirmAction({
             title: "Activar usuario",
-            message: `¿Activar a ${row.nombres}? Requiere CVU y comisión cargados.`,
+            message: `¿Activar a ${row.nombres}? Requiere CLABE y comisión cargados.`,
             confirmLabel: "Activar",
             variant: "default",
             onConfirm: () => ejecutar(row.legajo, "activar"),
@@ -122,7 +121,7 @@ export function useUsuariosAcciones() {
         onClick: () =>
           setConfirmAction({
             title: "Deshabilitar usuario",
-            message: `¿Deshabilitar a ${row.nombres}? Se cancelará su CVU y se conservará el historial (auditoría BCRA).`,
+            message: `¿Deshabilitar a ${row.nombres}? Se cancelará su CLABE y se conservará el historial.`,
             confirmLabel: "Deshabilitar",
             variant: "danger",
             onConfirm: () => ejecutar(row.legajo, "deshabilitar"),

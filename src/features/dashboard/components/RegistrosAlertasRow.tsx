@@ -5,23 +5,16 @@ import type { DashboardDetalle } from "@/lib/api/dashboard";
 import type { EstadoCliente } from "@/lib/api/types";
 import { estadoLabel, estadoTone } from "@/features/clientes/detalle/utils";
 import { formatDateTime, formatMoney } from "@/shared/format";
-import { getPais } from "@/shared/pais";
 
 type Props = { d?: DashboardDetalle; isLoading: boolean; isError: boolean };
 
-const segmento = (tipo: string) =>
-  tipo === "fisica"
-    ? "Persona física"
-    : getPais().codigo === "AR"
-      ? "Persona jurídica"
-      : "Persona moral";
+const segmento = (tipo: string) => (tipo === "fisica" ? "Persona física" : "Persona moral");
 
 /** Últimos clientes registrados + alertas sin resolver más recientes. */
 export function RegistrosAlertasRow({ d, isLoading, isError }: Props) {
   const aviso = isLoading ? "Cargando…" : isError ? "No se pudo cargar." : null;
   const registros = d?.ultimosRegistros ?? [];
   const alertas = d?.alertasRecientes ?? [];
-  const idFiscal = getPais().codigo === "AR" ? "CUIT" : "RFC";
 
   return (
     <div className="grid lg:grid-cols-3 gap-6">
@@ -42,7 +35,7 @@ export function RegistrosAlertasRow({ d, isLoading, isError }: Props) {
             <thead>
               <tr className="text-[11px] uppercase tracking-wide text-muted-foreground border-b">
                 <th className="text-left font-display font-semibold py-2 px-5">Razón social</th>
-                <th className="text-left font-display font-semibold py-2">{idFiscal}</th>
+                <th className="text-left font-display font-semibold py-2">RFC</th>
                 <th className="text-left font-display font-semibold py-2">Segmento</th>
                 <th className="text-left font-display font-semibold py-2">Estado</th>
                 <th className="text-right font-display font-semibold py-2 px-5">Volumen del mes</th>

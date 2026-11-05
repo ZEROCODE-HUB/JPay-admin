@@ -151,30 +151,17 @@ export type EstadoTarget = {
   nuevoId: number;
 };
 
-export function downloadCSV(filename: string, rows: (string | number)[][]) {
-  const csv = rows
-    .map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(","))
-    .join("\n");
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
 export function toDetalleMovimiento(m: Movimiento, catalogo: EstadoMovimiento[]): DetailMovimiento {
   return {
     clienteId: m.clienteId,
     legajo: m.legajo,
     id: m.idTxn,
     tipo: m.tipo,
-    cvu: m.cvu ?? "—",
+    clabe: m.clabe ?? "—",
     usuario: m.cliente?.correo ?? m.legajo,
     nombreOrigen: m.cliente?.nombre ?? "—",
     nombreDestino: "—",
-    cuit: m.cliente?.cuit ?? "—",
+    rfc: m.destinatarioRfc ?? "—",
     monto: formatMoney(m.montoCobrado),
     fecha: formatDateTime(m.fecha),
     estado: resolverEstadoMovimiento(m, catalogo).codigo,
@@ -194,13 +181,12 @@ export function camposIdentificacion(c: Cliente) {
       valor: c.tipoPersona === "juridica" ? "Persona Jurídica" : "Persona Física",
     },
     { label: "Estado", valor: estadoLabel[c.estado] ?? c.estado },
-    { label: "Cant. cuentas bancarias", valor: "—" },
-    { label: "Cant. cuentas virtuales", valor: "—" },
+    { label: "Cant. subcuentas", valor: "—" },
     { label: "Nombre", valor: nombreDerivado },
     { label: "Apellido", valor: apellidoDerivado },
     {
       label: idFiscalCliente(c).etiqueta,
-      valor: c.pais && c.pais !== "AR" ? idFiscalCliente(c).valor : (c.cuitCuil ?? c.cuit ?? "—"),
+      valor: idFiscalCliente(c).valor,
     },
     ...(c.idPersonal ? [{ label: c.idPersonalTipo ?? "ID personal", valor: c.idPersonal }] : []),
     ...(c.regimenFiscal ? [{ label: "Régimen fiscal", valor: regimenFiscalCliente(c) }] : []),
@@ -211,7 +197,7 @@ export function camposIdentificacion(c: Cliente) {
     { label: "Dirección", valor: c.direccion ?? "—" },
     { label: "Número de dirección", valor: c.direccion2 ?? "—" },
     { label: "Ciudad", valor: c.ciudad ?? "—" },
-    { label: "Estado / Provincia", valor: c.provincia ?? "—" },
+    { label: "Estado", valor: c.provincia ?? "—" },
     { label: "Código postal", valor: c.cp ?? "—" },
     {
       label: "Fecha de nacimiento",

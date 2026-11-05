@@ -60,7 +60,7 @@ export function AlertaDetalleDialog({ detalle, onClose, onAceptar, onDictamen }:
           </>
         )}
         {detalle.plaftMatchId != null && (
-          <Campo label="Coincidencia PLAFT" value={`#${detalle.plaftMatchId}`} mono />
+          <Campo label="Coincidencia en listas PLD" value={`#${detalle.plaftMatchId}`} mono />
         )}
         {Object.keys(detalle.details).length > 0 && (
           <div className="col-span-2">

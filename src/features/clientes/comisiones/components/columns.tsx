@@ -17,26 +17,28 @@ export const columnasComisiones: Column<Comision>[] = [
   },
   { key: "correo", label: "Usuario", filterable: true, render: (r) => r.correo },
   {
-    key: "cvu",
-    label: "Alcance / CVU",
+    key: "clabe",
+    label: "Alcance / CLABE",
     minWidth: 220,
     render: (r) =>
       r.subcuentaId ? (
         <div className="flex flex-col gap-0.5">
-          <Badge tone="warn">CVU</Badge>
-          <span className="font-mono tabular-nums text-xs">{r.cvu ?? "CVU sin número"}</span>
+          <Badge tone="warn">Subcuenta</Badge>
+          <span className="font-mono tabular-nums text-xs">{r.clabe ?? "Sin CLABE"}</span>
         </div>
       ) : (
         <div className="flex flex-col gap-0.5">
           <Badge tone="neutral">Toda la cuenta</Badge>
-          <span className="text-[11px] text-muted-foreground">Respaldo de todos sus CVU</span>
+          <span className="text-[11px] text-muted-foreground">
+            Respaldo de todas sus subcuentas
+          </span>
         </div>
       ),
   },
   {
-    key: "cuit",
-    label: "CUIT",
-    render: (r) => <span className="font-mono tabular-nums">{r.cuit}</span>,
+    key: "rfc",
+    label: "RFC",
+    render: (r) => <span className="font-mono tabular-nums">{r.rfc}</span>,
   },
   {
     key: "operacion",

@@ -15,7 +15,7 @@ export function MensajeEstado({
       <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-amber-300 bg-amber-50 px-6 py-12 text-center text-sm text-amber-800">
         <AlertTriangle size={28} />
         <div>
-          <p className="font-semibold">No tenés permiso para ver esto</p>
+          <p className="font-semibold">No tienes permiso para ver esto</p>
           <p className="mt-1">{mensaje}</p>
         </div>
       </div>

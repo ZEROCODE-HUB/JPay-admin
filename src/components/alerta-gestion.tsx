@@ -53,7 +53,7 @@ export function AlertaGestionModal({
 
   const guardar = () => {
     if (!resultado) {
-      setError("Debés seleccionar un resultado de la gestión.");
+      setError("Debes seleccionar un resultado de la gestión.");
       return;
     }
     onGuardar({

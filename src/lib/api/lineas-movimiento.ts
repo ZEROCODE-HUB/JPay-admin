@@ -34,13 +34,13 @@ export type LineaMovimiento = {
   fecha: string;
   lineNo: number;
   subaccountId: string | null;
-  cvuPropio: string | null;
-  /** CVU/CBU de la contraparte (solo en la linea principal). */
-  cvu: string | null;
+  /** CLABE de la subcuenta del cliente (columna `cvu_propio` de la vista). */
+  clabePropia: string | null;
+  /** CLABE de la contraparte, solo en la línea principal (columna `cvu` de la vista). */
+  clabe: string | null;
   email: string | null;
   nombre: string | null;
   nombreDestino: string | null;
-  cuit: string | null;
   estadoId: number;
   estadoCodigo: string;
   estadoNombre: string;
@@ -64,7 +64,6 @@ type LineaRow = {
   email: string | null;
   nombre: string | null;
   nombre_destino: string | null;
-  cuit: string | null;
   estado_id: number;
   estado_codigo: string;
   estado_nombre: string;
@@ -72,7 +71,7 @@ type LineaRow = {
 };
 
 const COLUMNS =
-  "line_id, transaction_id, id_txn, legajo, tipo_operacion, tipo_linea, concepto, monto, fecha, line_no, subaccount_id, cvu_propio, cvu, email, nombre, nombre_destino, cuit, estado_id, estado_codigo, estado_nombre, ledger_status";
+  "line_id, transaction_id, id_txn, legajo, tipo_operacion, tipo_linea, concepto, monto, fecha, line_no, subaccount_id, cvu_propio, cvu, email, nombre, nombre_destino, estado_id, estado_codigo, estado_nombre, ledger_status";
 
 export type LineaFilters = Pagination & {
   /** Texto libre: TXID, legajo, email, nombre o nombre destino. */
@@ -82,8 +81,8 @@ export type LineaFilters = Pagination & {
   estadoCodigo?: string;
   legajo?: string;
   txid?: string;
-  cuit?: string;
-  cvu?: string;
+  /** CLABE propia o de la contraparte. */
+  clabe?: string;
   subaccountId?: string;
   fechaDesde?: string;
   fechaHasta?: string;
@@ -104,12 +103,11 @@ function toLinea(r: LineaRow): LineaMovimiento {
     fecha: r.fecha,
     lineNo: r.line_no,
     subaccountId: r.subaccount_id,
-    cvuPropio: r.cvu_propio,
-    cvu: r.cvu,
+    clabePropia: r.cvu_propio,
+    clabe: r.cvu,
     email: r.email,
     nombre: r.nombre,
     nombreDestino: r.nombre_destino,
-    cuit: r.cuit,
     estadoId: r.estado_id,
     estadoCodigo: r.estado_codigo,
     estadoNombre: r.estado_nombre,
@@ -125,10 +123,8 @@ export async function listLineasMovimiento(filters: LineaFilters): Promise<Page<
   let q = sb.from("v_transaction_lines").select(COLUMNS, { count: "exact" });
   if (filters.legajo) q = q.eq("legajo", filters.legajo.trim().toUpperCase());
   if (filters.txid?.trim()) q = q.ilike("id_txn", ilike(filters.txid));
-  const cuitDigitos = (filters.cuit ?? "").replace(/\D/g, "");
-  if (cuitDigitos) q = q.ilike("cuit", ilike(cuitDigitos));
-  if (filters.cvu?.trim())
-    q = q.or(`cvu.ilike.${ilike(filters.cvu)},cvu_propio.ilike.${ilike(filters.cvu)}`);
+  if (filters.clabe?.trim())
+    q = q.or(`cvu.ilike.${ilike(filters.clabe)},cvu_propio.ilike.${ilike(filters.clabe)}`);
   if (filters.tipoLinea) q = q.eq("tipo_linea", filters.tipoLinea);
   if (filters.tipoOperacion) q = q.eq("tipo_operacion", filters.tipoOperacion);
   if (filters.estadoCodigo) q = q.eq("estado_codigo", filters.estadoCodigo);

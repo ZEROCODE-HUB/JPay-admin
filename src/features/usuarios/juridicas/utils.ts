@@ -32,8 +32,7 @@ export type JuridicaRow = {
   id: string;
   legajo: string;
   correo: string;
-  cuit: string;
-  cuitFormatted: string;
+  rfc: string;
   razonSocial: string;
   nombreFantasia: string | null;
   tipoSociedadRaw: string | null;
@@ -44,7 +43,7 @@ export type JuridicaRow = {
   fechaRegistro: string;
   esPep: boolean;
   comerciosCount: number;
-  cvuCount: number;
+  subcuentasCount: number;
 };
 
 /** Fila de la tabla de personas jurídicas a partir del cliente + su enrichment. */
@@ -54,8 +53,7 @@ export function toJuridicaRow(c: Cliente, e: ClienteEnrichment = {}): JuridicaRo
     id: c.id,
     legajo: c.legajo,
     correo: c.correo,
-    cuit: c.cuit,
-    cuitFormatted: idFiscalCliente(c).valor,
+    rfc: idFiscalCliente(c).valor,
     razonSocial: c.nombre,
     nombreFantasia: c.nombreFantasia ?? null,
     tipoSociedadRaw: c.tipoSociedad ?? null,
@@ -66,6 +64,6 @@ export function toJuridicaRow(c: Cliente, e: ClienteEnrichment = {}): JuridicaRo
     fechaRegistro: c.fechaAlta,
     esPep: Boolean(c.esPep),
     comerciosCount: e.comerciosCount ?? 0,
-    cvuCount: e.cvuCount ?? 0,
+    subcuentasCount: e.subcuentasCount ?? 0,
   };
 }

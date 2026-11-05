@@ -106,7 +106,7 @@ export function useEnlacesAcciones() {
           confirmar(
             {
               title: "Marcar como pagado",
-              message: `¿Marcar ${nombre} como Pagado? Se habilitará detalle de método/tarjeta/cuotas.`,
+              message: `¿Marcar ${nombre} como Pagado? Se habilitará detalle de método/tarjeta/meses.`,
               confirmLabel: "Pagado",
               variant: "default",
             },

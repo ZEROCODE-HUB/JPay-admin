@@ -12,7 +12,7 @@ const bloqueo = {
   ruleName: "Depósitos",
   scope: "subaccount",
   subcuentaNombre: "Principal",
-  subcuentaCvu: "000123",
+  subcuentaClabe: "000123",
   reason: "Umbral",
   blockStatus: "active",
   complianceStatus: "pending",

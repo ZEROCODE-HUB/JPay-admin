@@ -50,16 +50,16 @@ const ACTIVIDAD_BASE: Record<string, Actividad[]> = {
   "ADM-002": [
     {
       campo: "Parámetros de bloqueo",
-      valorAnterior: "Límite $ 500.000",
-      valorNuevo: "Límite $ 100.000",
+      valorAnterior: "Límite $500,000",
+      valorNuevo: "Límite $100,000",
       fecha: "15/07/2026",
       hora: "10:00",
       usuario: "admin.operaciones",
     },
     {
       campo: "Parámetros de alertas",
-      valorAnterior: "Volumen anormal $ 1.000.000–$ 5.000.000",
-      valorNuevo: "Volumen anormal $ 500.000–$ 2.000.000",
+      valorAnterior: "Volumen anormal $1,000,000–$5,000,000",
+      valorNuevo: "Volumen anormal $500,000–$2,000,000",
       fecha: "13/07/2026",
       hora: "08:30",
       usuario: "soporte.nivel1",
@@ -138,7 +138,7 @@ export function ReporteActividad() {
   return (
     <div className="space-y-4">
       <p className="text-sm text-muted-foreground">
-        Ingresá un Legajo para consultar la actividad del usuario. Los datos se muestran como en el
+        Ingresa un Legajo para consultar la actividad del usuario. Los datos se muestran como en el
         historial de cambios del detalle del usuario.
       </p>
       <div className="flex flex-wrap items-end gap-3">

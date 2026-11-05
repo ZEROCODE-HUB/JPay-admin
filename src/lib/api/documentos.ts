@@ -1,11 +1,12 @@
 import { requireSupabase } from "@/lib/supabase";
+import { getPais } from "@/shared/pais";
 import { DataAccessError } from "./errors";
 
 export type DocumentoTipo = "id_frente" | "id_dorso" | "servicio" | "selfie";
 
 export const DOCUMENTO_LABELS: Record<DocumentoTipo, string> = {
-  id_frente: "DNI anverso",
-  id_dorso: "DNI reverso",
+  id_frente: `${getPais().documentoIdentidad} (frente)`,
+  id_dorso: `${getPais().documentoIdentidad} (reverso)`,
   servicio: "Comprobante de servicio",
   selfie: "Selfie de verificación",
 };

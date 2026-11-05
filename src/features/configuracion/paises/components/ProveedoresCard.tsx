@@ -14,7 +14,7 @@ export function ProveedoresCard({ proveedores }: { proveedores: ProveedorPago[] 
     <Card>
       <h3 className="font-semibold">Proveedores de pago</h3>
       <p className="text-xs text-muted-foreground mt-1">
-        Las credenciales de cada proveedor viven en los secretos del servidor, nunca acá.
+        Las credenciales de cada proveedor viven en los secretos del servidor, nunca aquí.
       </p>
       <div className="mt-4 overflow-x-auto">
         <table className="w-full text-sm">
@@ -45,7 +45,7 @@ export function ProveedoresCard({ proveedores }: { proveedores: ProveedorPago[] 
                 <td className="py-2.5 pr-4">
                   {p.codigo === "cobre" ? (
                     // El modo de Cobre lo fija el secreto COBRE_MODO; la prueba de conexión lo
-                    // refleja acá (un interruptor no tendría efecto).
+                    // refleja aquí (un interruptor no tendría efecto).
                     <span className="text-xs text-muted-foreground">Por COBRE_MODO</span>
                   ) : (
                     <Toggle

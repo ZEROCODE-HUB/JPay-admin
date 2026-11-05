@@ -16,7 +16,7 @@ import {
 const SELECT_CLS =
   "w-full h-10 px-3 rounded-md border border-input bg-card text-sm outline-none focus:ring-2 focus:ring-ring/40 focus:border-ring";
 
-/** Campos del formulario de comisión: cliente, CVU, tipo, modalidad, valores y estado. */
+/** Campos del formulario de comisión: cliente, subcuenta, tipo, modalidad, valores y estado. */
 export function ComisionFormFields({
   draft,
   onChange,
@@ -29,7 +29,7 @@ export function ComisionFormFields({
   const { data: clientesOpt } = useClientesForSelect(debounced || undefined);
   const [open, setOpen] = useState(false);
 
-  // CVUs del cliente elegido: la comisión se puede atar a uno en particular.
+  // Subcuentas del cliente elegido: la comisión se puede atar a una en particular.
   const { data: subcuentas, isLoading: cargandoSubs } = useQuery({
     queryKey: ["subcuentas", draft.legajo],
     queryFn: () => listSubcuentas(draft.legajo),
@@ -55,7 +55,7 @@ export function ComisionFormFields({
             onChange={(e) => {
               const v = e.target.value;
               setSearchInput(v);
-              // Si cambia el email, la selección de cliente/CVU anterior deja de valer.
+              // Si cambia el email, la selección de cliente/subcuenta anterior deja de valer.
               onChange({ ...draft, correo: v, legajo: "", subcuentaId: null });
               setOpen(true);
             }}
@@ -80,7 +80,7 @@ export function ComisionFormFields({
                     correo: c.correo,
                     legajo: c.legajo,
                     subcuentaId: null,
-                    cuit: (c.cuit as string) ?? draft.cuit,
+                    rfc: c.taxId ?? "—",
                     tipoPersona:
                       (c.tipoPersona as ComisionDraft["tipoPersona"]) ?? draft.tipoPersona,
                     porcentajeImpuesto: IVA_POR_DEFECTO,
@@ -98,44 +98,37 @@ export function ComisionFormFields({
           </div>
         )}
         <p className="text-[11px] text-muted-foreground mt-1">
-          Búsqueda rápida (server-side, 20 resultados). Seleccioná un usuario existente de la lista.
+          Búsqueda rápida (server-side, 20 resultados). Selecciona un usuario existente de la lista.
         </p>
       </div>
       <div>
-        <Label htmlFor="com-cvu">CVU / cuenta</Label>
+        <Label htmlFor="com-subcuenta">Subcuenta / cuenta</Label>
         <select
-          id="com-cvu"
+          id="com-subcuenta"
           className={SELECT_CLS}
           value={draft.subcuentaId ?? ""}
           onChange={(e) => onChange({ ...draft, subcuentaId: e.target.value || null })}
           disabled={!draft.legajo}
         >
           <option value="">
-            {draft.legajo ? "Toda la cuenta (respaldo del cliente)" : "Elegí primero un cliente…"}
+            {draft.legajo ? "Toda la cuenta (respaldo del cliente)" : "Elige primero un cliente…"}
           </option>
           {(subcuentas ?? []).map((s) => (
             <option key={s.id} value={s.id}>
-              {`${s.nombre} ${s.apellido}`.trim() || s.email} — {s.cbu ?? "sin CVU"}
+              {`${s.nombre} ${s.apellido}`.trim() || s.email} — {s.cbu ?? "sin CLABE"}
             </option>
           ))}
         </select>
         <p className="text-[11px] text-muted-foreground mt-1">
           {cargandoSubs
-            ? "Cargando CVUs…"
-            : "La comisión del CVU manda sobre la del cliente. Las transferencias entre CVUs del mismo cliente no pagan comisión ni IVA."}
+            ? "Cargando subcuentas…"
+            : "La comisión de la subcuenta manda sobre la del cliente. Las transferencias entre subcuentas del mismo cliente no pagan comisión ni IVA."}
         </p>
       </div>
       <div>
-        <Label htmlFor="com-cuit">CUIT</Label>
-        <Input
-          id="com-cuit"
-          value={draft.cuit}
-          onChange={(e) => onChange({ ...draft, cuit: e.target.value })}
-          placeholder="20-12345678-9"
-        />
-        <p className="text-[11px] text-muted-foreground mt-1">
-          Se autocompleta al seleccionar email, editable si hace falta.
-        </p>
+        <Label htmlFor="com-rfc">RFC</Label>
+        <Input id="com-rfc" value={draft.rfc} disabled className="font-mono" />
+        <p className="text-[11px] text-muted-foreground mt-1">Se completa al elegir el cliente.</p>
       </div>
       <div>
         <Label htmlFor="com-operacion">Tipo de operación</Label>
@@ -225,7 +218,7 @@ export function ComisionFormFields({
           <option>Deshabilitado</option>
         </select>
         <p className="text-[11px] text-muted-foreground mt-1">
-          Solo puede haber <strong>una Habilitada</strong> por CVU (o por cliente) y tipo (las
+          Solo puede haber <strong>una Habilitada</strong> por subcuenta (o por cliente) y tipo (las
           deshabilitadas quedan como historial).
         </p>
       </div>

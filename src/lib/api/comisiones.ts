@@ -13,7 +13,7 @@ import type {
 } from "./types";
 
 export type ComisionFilters = Pagination & {
-  /** Búsqueda de texto libre: código/descripción o legajo, correo, nombre o CUIT del cliente. */
+  /** Búsqueda de texto libre: código/descripción o legajo, correo, nombre o RFC del cliente. */
   search?: string;
   tipo?: TipoOperacion;
   /** Restringe a estos tipos (la pantalla de usuarios solo maneja Depósito y Retiro). */
@@ -22,12 +22,12 @@ export type ComisionFilters = Pagination & {
   estado?: EstadoComision;
   clienteId?: string;
   subcuentaId?: string;
-  /** "cvu" = solo comisiones de un CVU; "cuenta" = solo las del cliente (respaldo). */
-  alcance?: "cvu" | "cuenta";
+  /** "subcuenta" = solo comisiones de una subcuenta; "cuenta" = solo las del cliente (respaldo). */
+  alcance?: "subcuenta" | "cuenta";
   /** Legajo del cliente (parcial). */
   legajo?: string;
-  /** CVU de la subcuenta (parcial). */
-  cvu?: string;
+  /** CLABE de la subcuenta (parcial; columna `cbu`). */
+  clabe?: string;
 };
 
 const escapeLike = (v: string) => v.trim().replace(/[%_,()]/g, "\\$&");
@@ -40,13 +40,13 @@ async function idsClientes(texto: string, soloLegajo = false): Promise<string[]>
   let query = sb.from("clientes").select("id").limit(200);
   query = soloLegajo
     ? query.ilike("legajo", q)
-    : query.or(`legajo.ilike.${q},correo.ilike.${q},nombre.ilike.${q},cuit.ilike.${q}`);
+    : query.or(`legajo.ilike.${q},correo.ilike.${q},nombre.ilike.${q},tax_id.ilike.${q}`);
   const { data, error } = await query;
   if (error) throw new DataAccessError(error);
   return (data ?? []).map((r) => r.id as string);
 }
 
-async function idsSubcuentasPorCvu(texto: string): Promise<string[]> {
+async function idsSubcuentasPorClabe(texto: string): Promise<string[]> {
   const sb = requireSupabase();
   const { data, error } = await sb
     .from("subaccounts")
@@ -61,7 +61,7 @@ const NINGUNO = "00000000-0000-0000-0000-000000000000";
 const inList = (ids: string[]) => `(${(ids.length ? ids : [NINGUNO]).join(",")})`;
 
 const COLUMNS =
-  "id, cliente_id, subcuenta_id, operacion, tipo, modalidad, porcentaje, monto_fijo, porcentaje_impuesto, estado, descripcion, created_at, updated_at, clientes(legajo, correo, cuit, nombre, tipo_persona), subcuentas:subaccounts(cbu, nombre)";
+  "id, cliente_id, subcuenta_id, operacion, tipo, modalidad, porcentaje, monto_fijo, porcentaje_impuesto, estado, descripcion, created_at, updated_at, clientes(legajo, correo, cuit, tax_id, nombre, tipo_persona), subcuentas:subaccounts(cbu, nombre)";
 
 export async function listComisiones(filters: ComisionFilters): Promise<Page<ComisionCliente>> {
   const sb = requireSupabase();
@@ -77,7 +77,7 @@ export async function listComisiones(filters: ComisionFilters): Promise<Page<Com
     subcuentaId,
     alcance,
     legajo,
-    cvu,
+    clabe,
   } = filters;
   const from = page * pageSize;
   const to = from + pageSize - 1;
@@ -90,14 +90,14 @@ export async function listComisiones(filters: ComisionFilters): Promise<Page<Com
   else if (tipos?.length) query = query.in("tipo", tipos);
   if (modalidad) query = query.eq("modalidad", modalidad);
   if (estado) query = query.eq("estado", estado);
-  if (alcance === "cvu") query = query.not("subcuenta_id", "is", null);
+  if (alcance === "subcuenta") query = query.not("subcuenta_id", "is", null);
   if (alcance === "cuenta") query = query.is("subcuenta_id", null);
   if (legajo?.trim()) {
     const ids = await idsClientes(legajo, true);
     query = query.in("cliente_id", ids.length ? ids : [NINGUNO]);
   }
-  if (cvu?.trim()) {
-    const ids = await idsSubcuentasPorCvu(cvu);
+  if (clabe?.trim()) {
+    const ids = await idsSubcuentasPorClabe(clabe);
     query = query.in("subcuenta_id", ids.length ? ids : [NINGUNO]);
   }
   if (search?.trim()) {
@@ -125,7 +125,7 @@ export async function listComisiones(filters: ComisionFilters): Promise<Page<Com
 
 export type ComisionInput = {
   clienteId: string;
-  /** CVU al que aplica; null/undefined = comisión del cliente (respaldo). */
+  /** Subcuenta a la que aplica; null/undefined = comisión del cliente (respaldo). */
   subcuentaId?: string | null;
   operacion: string;
   tipo: TipoOperacion;
@@ -182,7 +182,7 @@ export async function setComisionEstado(
 export type AlcanceComision = {
   clienteId: string;
   tipo: TipoOperacion;
-  /** CVU de la comisión; null = comisión de toda la cuenta del cliente. */
+  /** Subcuenta de la comisión; null = comisión de toda la cuenta del cliente. */
   subcuentaId: string | null;
   /** Comisión que se está guardando o habilitando (no cuenta como "otra"). */
   excluirId?: string;
@@ -190,7 +190,7 @@ export type AlcanceComision = {
 
 /**
  * Cantidad de OTRAS comisiones habilitadas del mismo cliente, tipo de operación y
- * alcance (mismo CVU, o toda la cuenta). Consulta con count, sin traer filas.
+ * alcance (misma subcuenta, o toda la cuenta). Consulta con count, sin traer filas.
  */
 export async function contarOtrasComisionesHabilitadas(alcance: AlcanceComision): Promise<number> {
   const sb = requireSupabase();

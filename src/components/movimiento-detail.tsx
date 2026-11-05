@@ -9,11 +9,12 @@ export type Movimiento = {
   legajo: string;
   id: string;
   tipo: string;
-  cvu: string;
+  clabe: string;
   usuario: string;
   nombreOrigen: string;
   nombreDestino: string;
-  cuit: string;
+  /** RFC de la contraparte. */
+  rfc: string;
   bancoDestino?: string;
   monto: string;
   fecha: string;
@@ -112,9 +113,9 @@ export function MovimientoDetail({ m, onClose }: { m: Movimiento; onClose: () =>
         { label: "Usuario", value: m.usuario },
         { label: "Nombre completo", value: m.nombreOrigen },
         { label: "Destino", value: m.nombreDestino },
-        { label: "CUIT destino", value: <span className="font-mono tabular-nums">{m.cuit}</span> },
+        { label: "RFC destino", value: <span className="font-mono tabular-nums">{m.rfc}</span> },
         ...(m.bancoDestino ? [{ label: "Banco destino", value: m.bancoDestino }] : []),
-        { label: "CVU", value: <span className="font-mono text-xs">{m.cvu}</span> },
+        { label: "CLABE", value: <span className="font-mono text-xs">{m.clabe}</span> },
         {
           label: "Monto",
           value: <span className="font-mono font-semibold tabular-nums">{m.monto}</span>,

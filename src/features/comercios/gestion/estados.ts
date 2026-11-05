@@ -1,4 +1,4 @@
-import type { ComercioBanderaEstado, EstadoComercio } from "@/lib/api/types";
+import type { EstadoComercio } from "@/lib/api/types";
 
 export type Tono = "success" | "neutral" | "warn" | "danger";
 
@@ -8,9 +8,4 @@ export function estadoComercioTone(estado: EstadoComercio): Tono {
   if (estado === "Desactivado") return "neutral";
   if (estado === "Rechazado") return "danger";
   return "warn";
-}
-
-/** Tono del badge para banderas y cuotas (Activo / Inactivo). */
-export function estadoActivoTone(estado: ComercioBanderaEstado): Tono {
-  return estado === "Activo" ? "success" : "neutral";
 }
