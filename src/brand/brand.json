@@ -1,5 +1,5 @@
 {
-  "$comment": "Única fuente de verdad de la marca. Ver BRANDING.md. Después de editar este archivo corré `npm run brand:sync` (también corre solo antes de dev/build). Identidad visual tomada del Manual de identidad y lineamientos gráficos de JPay.",
+  "$comment": "Única fuente de verdad de la marca. Ver BRANDING.md. Después de editar este archivo ejecuta `npm run brand:sync` (también corre solo antes de dev/build). Identidad visual tomada del Manual de identidad y lineamientos gráficos de JPay.",
   "name": "JPay",
   "shortName": "JPay",
   "previousNames": ["MoliPay", "MoliPlay", "Molly"],
