@@ -9,6 +9,7 @@ import { usePaisConModulos } from "@/shared/modulos-pais";
 import { ClienteAcciones } from "./ClienteAcciones";
 import { ClienteModales } from "./ClienteModales";
 import { CobreTab } from "./CobreTab";
+import { EcartPayTab } from "./EcartPayTab";
 import { ContextoTab } from "./ContextoTab";
 import { DocumentosTab } from "./DocumentosTab";
 import { HistorialTab } from "./HistorialTab";
@@ -45,7 +46,7 @@ export function ClienteDetalle({
 
   const tabLabel = (t: { key: TabKey; label: string }) => {
     if (t.key === "identificacion") {
-      return cliente.tipoPersona === "juridica" ? "Datos de persona jurídica" : "Datos personales";
+      return cliente.tipoPersona === "juridica" ? "Datos de persona moral" : "Datos personales";
     }
     return t.label;
   };
@@ -112,6 +113,7 @@ export function ClienteDetalle({
         {activeTab === "riesgo" && <RiesgoTab cliente={cliente} data={data} ui={ui} />}
         {activeTab === "modulos" && <ModulosTab legajo={legajo} data={data} ui={ui} />}
         {activeTab === "cobre" && cliente.pais === "MX" && <CobreTab legajo={cliente.legajo} />}
+        {activeTab === "ecartpay" && <EcartPayTab legajo={cliente.legajo} />}
         {activeTab === "historial" && <HistorialTab data={data} />}
       </div>
 

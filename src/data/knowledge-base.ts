@@ -62,7 +62,7 @@ export const KB: KbEntry[] = [
   {
     keywords: ["comercios", "comercio", "pago por referencia", "gestión de comercios"],
     response:
-      "La sección Comercios agrupa los módulos que usan los comercios para operar:\n\n• Gestión de comercios: listado centralizado de comercios con alta, edición y asociación a los canales de la plataforma.\n• Enlaces de pago: cobro mediante un link (Ecart Pay).\n• POS físico: puntos de venta de los comercios.\n• Suscripciones y domiciliación: cobros recurrentes con tarjeta y cargos a la CLABE del cliente.\n• Comisiones de JPay: lo que cobra JPay por los cobros de cada comercio.\n• APIs externas: usuarios, endpoints y restricciones de integración.",
+      "El menú está agrupado por lo que quieres hacer:\n\n• Clientes: clientes, comercios (alta, edición y canales) y usuarios con CLABE.\n• Cobros: depósitos SPEI, depósitos sin asignar, links de pago (Ecart Pay), suscripciones y domiciliación, y POS físico.\n• Envíos: aprobaciones pendientes, transferencias y conversiones a dólares.\n• Control: conciliación, contracargos y reembolsos, alertas y bloqueos, y todos los movimientos.\n• Finanzas JPay: comisiones, fondos y reportes.\n• Sistema: integraciones, salud de módulos, notificaciones, usuarios backoffice, soporte, comunicación de incidentes y APIs externas.",
   },
   {
     keywords: [
@@ -74,12 +74,12 @@ export const KB: KbEntry[] = [
       "suspender comercio",
     ],
     response:
-      "Gestión de comercios (Comercios → Gestión de comercios) es el listado centralizado de todos los comercios. Desde aquí se puede: crear un comercio nuevo (usuario, número de cliente, nombre, categoría, nivel, estado), editar, ver el detalle con sus canales y puntos de venta, y eliminar. También se activa o suspende el comercio. Los cambios se reflejan en las demás vistas de Comercios.",
+      "Comercios (Clientes → Comercios) es el listado centralizado de todos los comercios. Desde aquí se puede: crear un comercio nuevo (usuario, número de cliente, nombre, categoría, nivel, estado), editar, ver el detalle con sus canales y puntos de venta, y eliminar. También se activa o suspende el comercio. Los cambios se reflejan en las demás vistas de Comercios.",
   },
   {
     keywords: ["link de pago", "link-pago", "cobrar link"],
     response:
-      "Enlaces de pago permite cobrar a un cliente mediante un link generado desde el portal de empresas (Ecart Pay). En Comercios → Enlaces de pago se ven los enlaces creados, su estado y sus pagos.",
+      "Los links de pago permiten cobrar mediante un link generado desde el portal de empresas (Ecart Pay). En Cobros → Links de pago se ven los links creados, su estado y sus pagos.",
   },
   {
     keywords: ["reportes", "reporte", "administración reportes"],
@@ -167,9 +167,9 @@ export const KB: KbEntry[] = [
       "Administración → Soporte:\n\n• Consultas frecuentes: busca un depósito o una transferencia SPEI por clave de rastreo, TXID o ID de Cobre.\n• Bloqueo de funciones: habilita/deshabilita funcionalidades de la plataforma para todos o para un usuario puntual. Los tipos de bloqueo son Login, Registro, Depósito, Retiro, Transferencia interna y Comprar.",
   },
   {
-    keywords: ["usuarios general", "personas físicas", "jurídicas", "clabe", "comisiones usuario"],
+    keywords: ["usuarios general", "personas físicas", "morales", "clabe", "comisiones usuario"],
     response:
-      "General → Usuarios: es el ABC de las cuentas de los usuarios de la plataforma, con pestañas:\n\n• Personas físicas: listado de usuarios (número de cliente, correo, nombres, apellidos, estado, fecha de registro) con acciones como suspender o eliminar.\n• Personas jurídicas: gestión de empresas.\n• Usuarios con CLABE: subcuentas con su CLABE (la asigna Cobre).\n• Carga de comisiones: asignación de comisiones por usuario.",
+      "Clientes → Clientes: es el ABC de las cuentas de los clientes de la plataforma, con pestañas:\n\n• Personas físicas: listado de clientes (número de cliente, correo, nombres, apellidos, estado, fecha de registro) con acciones como suspender o eliminar.\n• Personas morales: gestión de empresas.\n• Usuarios con CLABE: subcuentas con su CLABE (la asigna Cobre).\n\nLas comisiones por cliente se cargan en Finanzas JPay → Comisiones → Carga por cliente.",
   },
   {
     keywords: [
@@ -184,14 +184,14 @@ export const KB: KbEntry[] = [
   },
   {
     keywords: [
-      "personas jurídicas",
+      "personas morales",
       "empresas",
-      "reactivar persona jurídica",
+      "reactivar persona moral",
       "reactivar juridica",
       "gestión de empresas",
     ],
     response:
-      "General → Usuarios → Personas jurídicas: gestión de las empresas registradas en la plataforma, incluyendo la reactivación de personas jurídicas.",
+      "General → Usuarios → Personas morales: gestión de las empresas registradas en la plataforma, incluyendo la reactivación de personas morales.",
   },
   {
     keywords: ["usuarios con clabe", "clabe de usuario", "subcuenta clabe", "alta en cobre"],
@@ -206,7 +206,7 @@ export const KB: KbEntry[] = [
       "asignar comisión",
     ],
     response:
-      "General → Usuarios → Carga de comisiones: asignación de comisiones a los usuarios, con la opción de deshabilitar la comisión de un usuario puntual.",
+      "Finanzas JPay → Comisiones tiene tres pestañas:\n\n• Ingresos JPay: cuánto le corresponde a JPay por comercio y producto, y los pagos recibidos.\n• Cobradas: movimientos en los que se cobró comisión.\n• Carga por cliente: asignación de comisiones a cada cliente, con la opción de deshabilitar la comisión de un cliente puntual.",
   },
   {
     keywords: [
@@ -217,7 +217,7 @@ export const KB: KbEntry[] = [
       "todos los movimientos",
     ],
     response:
-      "General → Movimientos: agrupa todos los movimientos de la plataforma en pestañas:\n\n• Todos los movimientos: historial completo (depósitos, transferencias SPEI, conversiones a dólares, comisiones, etc.) con estado APROBADO / EN PROGRESO / RECHAZADO y detalle por movimiento.\n• Depósitos, Transferencias, Conversiones a dólares y Cobro de comisiones: cada pestaña filtra el historial por tipo.",
+      "General → Movimientos: agrupa todos los movimientos de la plataforma en pestañas:\n\n• Todos los movimientos: historial completo (depósitos, transferencias SPEI, conversiones a dólares, comisiones, etc.) con estado APROBADO / EN PROGRESO / RECHAZADO y detalle por movimiento.\n• Depósitos, Transferencias y Conversiones a dólares: cada pestaña filtra el historial por tipo. Las comisiones cobradas están en Finanzas JPay → Comisiones.",
   },
   {
     keywords: [
@@ -241,18 +241,7 @@ export const KB: KbEntry[] = [
       "gestor de integraciones",
     ],
     response:
-      "Configuración:\n\n• Gestor de Integraciones (Configuración): panel de estado de las integraciones (Cobre, Ecart Pay) con salud, última/próxima ejecución y ejecuciones totales. En modo desarrollador se ven controles técnicos (configurar logs, ejecutar todos o uno específico, actualizar datos).\n• Configuraciones de login: tabla de las URLs y métodos de cada login configurado.\n• Logins configurados: programación (cron), última/próxima ejecución, tiempo restante y ejecuciones de cada login.\n• País y proveedores: configuración de México, sus módulos y la conexión con los proveedores.",
-  },
-  {
-    keywords: [
-      "configuraciones de login",
-      "url de login",
-      "método login",
-      "endpoint login",
-      "login providers",
-    ],
-    response:
-      "Configuración → Configuraciones de login: tabla con cada login de integración, su URL y método HTTP.",
+      "Configuración:\n\n• Gestor de Integraciones (Configuración): panel de estado de las integraciones (Cobre, Ecart Pay) con salud, última/próxima ejecución y ejecuciones totales. En modo desarrollador se ven controles técnicos (configurar logs, ejecutar todos o uno específico, actualizar datos).\n• Logins configurados: programación (cron), última/próxima ejecución, tiempo restante y ejecuciones de cada login.\n• País y proveedores: configuración de México, sus módulos, la conexión con los proveedores, webhooks, umbrales de aprobación, MSI y simuladores. La conciliación y las disputas están en Control.",
   },
   {
     keywords: [
@@ -342,5 +331,31 @@ export const KB: KbEntry[] = [
     ],
     response:
       "Sistema → Notificaciones: centro de notificaciones de eventos de negocio (timeout con un proveedor, procesador de pagos caído, acceso sospechoso, KYC vencido, etc.). Cada evento muestra a quién afecta, destinatarios (Admin, Cliente o Ambos), canal (Email, Telegram o WhatsApp) y si fue entregado.",
+  },
+  {
+    keywords: [
+      "aprobaciones",
+      "aprobar envío",
+      "aprobar transferencia",
+      "aprobar lote",
+      "envíos pendientes",
+    ],
+    response:
+      "Envíos → Aprobaciones pendientes: transferencias SPEI, envíos en dólares y lotes que pasan el monto de aprobación de Cobre. Al aprobar sale a Cobre; al rechazar se libera el saldo. El contador del menú y del Dashboard muestra cuántos esperan.",
+  },
+  {
+    keywords: ["depósitos sin asignar", "sin asignar", "devolver depósito", "depósito sin dueño"],
+    response:
+      "Cobros → Depósitos sin asignar: SPEI que llegó a un Balance o CLABE que no es de ningún comercio. Se pueden devolver al remitente (el monto completo, una sola vez).",
+  },
+  {
+    keywords: ["conciliación", "conciliar", "diferencias", "cuadre"],
+    response:
+      "Control → Conciliación: cruce diario de las operaciones de JPay con Ecart Pay y con Cobre (una pestaña por proveedor), con la bandeja de diferencias abiertas y el botón para conciliar en el momento.",
+  },
+  {
+    keywords: ["contracargos", "contracargo", "reembolsos", "disputas", "chargeback"],
+    response:
+      "Control → Contracargos y reembolsos: contracargos que abrieron los bancos en Ecart Pay y reembolsos que hay que verificar a mano.",
   },
 ];

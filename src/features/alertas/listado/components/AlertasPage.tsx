@@ -1,12 +1,11 @@
 import { useNavigate } from "@tanstack/react-router";
-import { Landmark, Loader2, RefreshCw } from "lucide-react";
+import { Loader2, RefreshCw } from "lucide-react";
 import { BtnOutline, PageHeader } from "@/components/portal-shell";
 import type { AlertItem } from "@/lib/api/compliance";
 import { TablaServidor } from "../../comun/components/TablaServidor";
 import { useAlertasListado } from "../hooks/useAlertasListado";
 import { AlertaDetalleDialog } from "./AlertaDetalleDialog";
 import { DictamenDialog } from "./DictamenDialog";
-import { SimularDepositoDialog } from "./SimularDepositoDialog";
 import { accionesAlerta, columnasAlertas } from "./columns";
 
 /** Pantalla "Listado de alertas" de compliance. */
@@ -29,9 +28,6 @@ export function AlertasPage() {
         description="Alertas generadas por el motor de monitoreo y el screening PLD (listas de personas bloqueadas)."
         action={
           <div className="flex flex-wrap gap-2">
-            <BtnOutline onClick={() => s.setSimOpen(true)}>
-              <Landmark size={14} /> Simular depósito
-            </BtnOutline>
             <BtnOutline onClick={() => void s.barrer()} disabled={s.barriendo}>
               {s.barriendo ? (
                 <Loader2 size={14} className="animate-spin" />
@@ -78,10 +74,6 @@ export function AlertasPage() {
           onClose={() => s.setDictamen(null)}
           onConfirm={() => void s.confirmarDictamen()}
         />
-      )}
-
-      {s.simOpen && (
-        <SimularDepositoDialog onClose={() => s.setSimOpen(false)} onDone={s.refrescar} />
       )}
     </>
   );

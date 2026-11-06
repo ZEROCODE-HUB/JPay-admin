@@ -8,7 +8,7 @@ type Props = { d?: DashboardDetalle; isLoading: boolean; isError: boolean };
 
 const METODO: Record<string, string> = { tarjeta: "Tarjeta", spei: "SPEI", oxxo: "OXXO" };
 
-/** Cobros de enlaces de pago con Ecart Pay en el mes. */
+/** Cobros de links de pago con Ecart Pay en el mes. */
 export function CobrosProveedorCard({ d, isLoading, isError }: Props) {
   const c = d?.cobrosMes;
   const m = (n: number) => formatMoney(n, { moneda: d?.moneda });
@@ -16,10 +16,10 @@ export function CobrosProveedorCard({ d, isLoading, isError }: Props) {
     <>
       <div className="flex items-center justify-between mb-2">
         <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-          Cobros del mes — Enlaces de pago (Ecart Pay)
+          Cobros del mes — Links de pago (Ecart Pay)
         </h3>
         <Link
-          to="/admin/configuracion/paises"
+          to="/admin/control/conciliacion/ecartpay"
           className="text-xs text-primary-ink font-semibold inline-flex items-center gap-1"
         >
           Conciliación <ArrowUpRight size={12} />

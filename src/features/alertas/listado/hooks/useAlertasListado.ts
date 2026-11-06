@@ -49,7 +49,6 @@ export function useAlertasListado() {
   const [notas, setNotas] = useState("");
   const [enviando, setEnviando] = useState(false);
   const [barriendo, setBarriendo] = useState(false);
-  const [simOpen, setSimOpen] = useState(false);
 
   const refrescar = () => queryClient.invalidateQueries({ queryKey: ["alerts"] });
 
@@ -124,8 +123,6 @@ export function useAlertasListado() {
     setNotas,
     enviando,
     barriendo,
-    simOpen,
-    setSimOpen,
     refrescar,
     aceptar,
     confirmarDictamen,

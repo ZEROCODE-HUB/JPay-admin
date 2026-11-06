@@ -6,7 +6,6 @@ import {
   type AlertFilters,
   type AlertItem,
   type AlertResolution,
-  type SimulatedDeposit,
 } from "@/lib/api/compliance";
 import { invertir, rangoFiltro } from "../comun/utils";
 
@@ -80,50 +79,4 @@ export function mensajeBarrido(r: {
       ? ` Última corrida de listas PLD: ${formatDateTime(r.ultima_corrida_plaft)}.`
       : " No hay corridas de listas PLD registradas.")
   );
-}
-
-export type FormSimulacion = {
-  clabe: string;
-  importe: string;
-  rfc: string;
-  titular: string;
-  clabeOrigen: string;
-};
-
-/** Valida el formulario de depósito simulado; devuelve el error a mostrar o null. */
-export function validarSimulacion(form: FormSimulacion): string | null {
-  if (!/^\d{18}$/.test(form.clabe.trim())) return "La CLABE destino debe tener 18 dígitos";
-  if (!(Number(form.importe) > 0)) return "Ingresa un importe mayor a 0";
-  return null;
-}
-
-/** Parámetros de `simulateDeposit` a partir del formulario. */
-export function inputSimulacion(form: FormSimulacion) {
-  const importe = Number(form.importe);
-  return {
-    clabeDestino: form.clabe.trim(),
-    importe: Math.round(importe * 100) / 100,
-    rfcOrigen: form.rfc.replace(/[\s-]/g, "").toUpperCase(),
-    titularOrigen: form.titular.trim(),
-    clabeOrigen: form.clabeOrigen.trim(),
-  };
-}
-
-/** Mensaje del resultado de la simulación (ok = toast de éxito). */
-export function resultadoSimulacion(r: SimulatedDeposit): { ok: boolean; mensaje: string } {
-  if (r.estado === "acreditado") {
-    return {
-      ok: true,
-      mensaje: r.retenido
-        ? "Depósito acreditado RETENIDO (bloqueo preventivo)."
-        : `Depósito acreditado (${r.decision === "alert" ? "con alertas" : "sin alertas"}).`,
-    };
-  }
-  return {
-    ok: false,
-    mensaje:
-      r.estado === "sin_subcuenta"
-        ? "No hay ninguna subcuenta con esa CLABE"
-        : `Resultado: ${r.estado}`,
-  };
 }

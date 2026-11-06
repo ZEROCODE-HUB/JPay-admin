@@ -14,8 +14,17 @@ import { useDemoMode } from "@/contexts/demo-mode";
 import type { Modulo } from "@/shared/pais";
 import { supabase } from "@/lib/supabase";
 
-/** `modulo`: el ítem solo aparece si el país lo tiene (ver `filtrarPorModulo`). */
-export type NavLeaf = { to: string; label: string; icon: LucideIcon; modulo?: Modulo };
+/**
+ * `modulo`: el ítem solo aparece si el país lo tiene (ver `filtrarPorModulo`).
+ * `badge`: contador de pendientes junto al nombre (se oculta en 0).
+ */
+export type NavLeaf = {
+  to: string;
+  label: string;
+  icon: LucideIcon;
+  modulo?: Modulo;
+  badge?: number;
+};
 export type NavGroup = { label: string; icon: LucideIcon; items: NavLeaf[]; modulo?: Modulo };
 export type NavItem = NavLeaf | NavGroup;
 
@@ -266,15 +275,18 @@ function SidebarLink({
       <Link
         to={item.to}
         onClick={onNavigate}
-        title={item.label}
-        aria-label={item.label}
-        className={`flex items-center justify-center w-11 h-11 mx-auto mb-1 rounded-lg transition-colors ${
+        title={item.badge ? `${item.label} (${item.badge})` : item.label}
+        aria-label={item.badge ? `${item.label} (${item.badge})` : item.label}
+        className={`relative flex items-center justify-center w-11 h-11 mx-auto mb-1 rounded-lg transition-colors ${
           active
             ? "bg-highlight text-highlight-foreground font-semibold"
             : "text-white/80 hover:text-white hover:bg-white/10"
         }`}
       >
         <Icon size={20} strokeWidth={1.75} />
+        {!!item.badge && (
+          <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-danger-600" />
+        )}
       </Link>
     );
   }
@@ -297,7 +309,15 @@ function SidebarLink({
     >
       {!nested && <Icon size={18} strokeWidth={1.75} />}
       {nested && <Icon size={15} strokeWidth={1.75} className="opacity-70" />}
-      {item.label}
+      <span className="flex-1">{item.label}</span>
+      {!!item.badge && (
+        <span
+          className="min-w-5 h-5 px-1.5 rounded-full bg-danger-600 text-white text-[11px] font-semibold tabular-nums inline-flex items-center justify-center"
+          aria-label={`${item.badge} pendientes`}
+        >
+          {item.badge > 99 ? "99+" : item.badge}
+        </span>
+      )}
     </Link>
   );
 }
@@ -331,6 +351,9 @@ function SidebarGroup({
       >
         <Icon size={18} strokeWidth={1.75} />
         <span className="flex-1 text-left">{group.label}</span>
+        {!expanded && group.items.some((i) => i.badge) && (
+          <span className="w-2 h-2 rounded-full bg-danger-600" aria-hidden />
+        )}
         <ChevronDown size={14} className={`transition-transform ${expanded ? "rotate-180" : ""}`} />
       </button>
       {expanded && (

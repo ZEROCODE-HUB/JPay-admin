@@ -7,6 +7,7 @@ import { RegistrosAlertasRow } from "./RegistrosAlertasRow";
 import { useDashboardKpis } from "../hooks/useDashboardKpis";
 import { useDashboardDetalle } from "../hooks/useDashboardDetalle";
 import { CobrosProveedorCard } from "./CobrosProveedorCard";
+import { AprobacionesPendientesCard } from "./AprobacionesPendientesCard";
 import { usePaisConModulos } from "@/shared/modulos-pais";
 import { useRealtimeInvalidate } from "@/shared/realtime";
 import { formatMoney, formatNumber } from "@/shared/format";
@@ -75,6 +76,8 @@ export function DashboardPage() {
           )}
         />
       </div>
+
+      {pais.modulos.transferencias_cobre && <AprobacionesPendientesCard />}
 
       {pais.modulos.pagos_proveedor && <CobrosProveedorCard {...det} />}
 

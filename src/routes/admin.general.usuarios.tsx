@@ -5,8 +5,8 @@ import { brand, pageTitle } from "@/brand/brand";
 export const Route = createFileRoute("/admin/general/usuarios")({
   head: () => ({
     meta: [
-      { title: pageTitle("Usuarios — Admin") },
-      { name: "description", content: `Gestión de usuarios de la plataforma ${brand.shortName}.` },
+      { title: pageTitle("Clientes — Admin") },
+      { name: "description", content: `Gestión de clientes de la plataforma ${brand.shortName}.` },
     ],
   }),
   component: UsuariosLayout,
@@ -14,9 +14,8 @@ export const Route = createFileRoute("/admin/general/usuarios")({
 
 const tabs: Tab[] = [
   { label: "Personas físicas", to: "/admin/general/usuarios" },
-  { label: "Personas jurídicas", to: "/admin/general/usuarios/juridicas" },
+  { label: "Personas morales", to: "/admin/general/usuarios/juridicas" },
   { label: "Usuarios con CLABE", to: "/admin/general/usuarios/clabe" },
-  { label: "Carga de comisiones", to: "/admin/general/usuarios/comisiones" },
 ];
 
 function UsuariosLayout() {

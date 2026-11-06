@@ -32,6 +32,7 @@ import type { EmpresaKyb } from "@/shared/ui/kyb-cobre";
 
 const KEY = ["cobre"] as const;
 
+/** Configuración de Cobre de JPay: montos de aprobación, balances en dólares y avisos. */
 export function useCobreAdmin() {
   return {
     configuracion: useQuery({
@@ -40,22 +41,40 @@ export function useCobreAdmin() {
     }),
     balances: useQuery({ queryKey: [...KEY, "balances"], queryFn: listBalancesMatriz }),
     suscripcion: useQuery({ queryKey: [...KEY, "suscripcion"], queryFn: getSuscripcionMatriz }),
+  };
+}
+
+/** Envíos (transferencias y lotes) que esperan la aprobación de un admin. */
+export function useAprobacionesCobre(enabled = true) {
+  return {
     aprobaciones: useQuery({
       queryKey: [...KEY, "aprobaciones"],
       queryFn: () => listTransferenciasCobre(["pendiente_aprobacion"]),
       refetchInterval: 30_000,
+      enabled,
     }),
     lotes: useQuery({
       queryKey: [...KEY, "lotes"],
       queryFn: listLotesPorAprobar,
       refetchInterval: 30_000,
-    }),
-    sinAsignar: useQuery({
-      queryKey: [...KEY, "sin-asignar"],
-      queryFn: listDepositosSinAsignar,
-      refetchInterval: 60_000,
+      enabled,
     }),
   };
+}
+
+/** Cuántos envíos esperan aprobación (para el menú y el Dashboard). */
+export function usePendientesAprobacion(enabled = true): number {
+  const { aprobaciones, lotes } = useAprobacionesCobre(enabled);
+  return (aprobaciones.data?.length ?? 0) + (lotes.data?.length ?? 0);
+}
+
+/** Depósitos SPEI que llegaron a una CLABE que no es de ningún comercio. */
+export function useDepositosSinAsignar() {
+  return useQuery({
+    queryKey: [...KEY, "sin-asignar"],
+    queryFn: listDepositosSinAsignar,
+    refetchInterval: 60_000,
+  });
 }
 
 export function useCobreAdminMutaciones() {

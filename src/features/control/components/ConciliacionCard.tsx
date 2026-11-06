@@ -2,7 +2,7 @@ import { toast } from "sonner";
 import { Badge, BtnOutline, Card } from "@/components/portal-shell";
 import { useConciliacion, usePaisesMutaciones } from "@/hooks/usePaises";
 import { formatDateTime } from "@/shared/format";
-import { avisarError } from "../utils";
+import { avisarError } from "@/features/configuracion/paises/utils";
 
 const TIPO: Record<string, (proveedor: string) => string> = {
   falta_en_jpay: (p) => `Movimiento en ${p} que JPay no tiene`,

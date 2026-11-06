@@ -24,6 +24,7 @@ import { Route as AdminAdministracionRegistrosRouteImport } from './routes/admin
 import { Route as AdminAdministracionReportesRouteImport } from './routes/admin.administracion.reportes'
 import { Route as AdminAdministracionSoporteRouteImport } from './routes/admin.administracion.soporte'
 import { Route as AdminAdministracionUsuariosRouteImport } from './routes/admin.administracion.usuarios'
+import { Route as AdminCobrosSinAsignarRouteImport } from './routes/admin.cobros.sin-asignar'
 import { Route as AdminComerciosIndexRouteImport } from './routes/admin.comercios.index'
 import { Route as AdminComerciosApisRouteImport } from './routes/admin.comercios.apis'
 import { Route as AdminComerciosComisionesJpayRouteImport } from './routes/admin.comercios.comisiones-jpay'
@@ -32,9 +33,12 @@ import { Route as AdminComerciosLinkPagoRouteImport } from './routes/admin.comer
 import { Route as AdminComerciosPosRouteImport } from './routes/admin.comercios.pos'
 import { Route as AdminComerciosRecurrentesRouteImport } from './routes/admin.comercios.recurrentes'
 import { Route as AdminConfiguracionIndexRouteImport } from './routes/admin.configuracion.index'
-import { Route as AdminConfiguracionConfiguracionesRouteImport } from './routes/admin.configuracion.configuraciones'
 import { Route as AdminConfiguracionLoginsRouteImport } from './routes/admin.configuracion.logins'
 import { Route as AdminConfiguracionPaisesRouteImport } from './routes/admin.configuracion.paises'
+import { Route as AdminControlConciliacionRouteImport } from './routes/admin.control.conciliacion'
+import { Route as AdminControlDisputasRouteImport } from './routes/admin.control.disputas'
+import { Route as AdminEnviosAprobacionesRouteImport } from './routes/admin.envios.aprobaciones'
+import { Route as AdminFinanzasComisionesRouteImport } from './routes/admin.finanzas.comisiones'
 import { Route as AdminGeneralAlertasRouteImport } from './routes/admin.general.alertas'
 import { Route as AdminGeneralMovimientosRouteImport } from './routes/admin.general.movimientos'
 import { Route as AdminGeneralUsuariosRouteImport } from './routes/admin.general.usuarios'
@@ -51,7 +55,12 @@ import { Route as AdminComerciosApisEndpointsRouteImport } from './routes/admin.
 import { Route as AdminComerciosApisRestriccionesRouteImport } from './routes/admin.comercios.apis.restricciones'
 import { Route as AdminComerciosGestionIndexRouteImport } from './routes/admin.comercios.gestion.index'
 import { Route as AdminComerciosGestionCategoriaRouteImport } from './routes/admin.comercios.gestion.categoria'
-import { Route as AdminComerciosLinkPagoIndexRouteImport } from './routes/admin.comercios.link-pago.index'
+import { Route as AdminControlConciliacionIndexRouteImport } from './routes/admin.control.conciliacion.index'
+import { Route as AdminControlConciliacionCobreRouteImport } from './routes/admin.control.conciliacion.cobre'
+import { Route as AdminControlConciliacionEcartpayRouteImport } from './routes/admin.control.conciliacion.ecartpay'
+import { Route as AdminFinanzasComisionesIndexRouteImport } from './routes/admin.finanzas.comisiones.index'
+import { Route as AdminFinanzasComisionesCargaRouteImport } from './routes/admin.finanzas.comisiones.carga'
+import { Route as AdminFinanzasComisionesCobradasRouteImport } from './routes/admin.finanzas.comisiones.cobradas'
 import { Route as AdminGeneralAlertasIndexRouteImport } from './routes/admin.general.alertas.index'
 import { Route as AdminGeneralAlertasBloqueosRouteImport } from './routes/admin.general.alertas.bloqueos'
 import { Route as AdminGeneralAlertasParametrosAlertasRouteImport } from './routes/admin.general.alertas.parametros-alertas'
@@ -146,6 +155,11 @@ const AdminAdministracionUsuariosRoute =
     path: '/administracion/usuarios',
     getParentRoute: () => AdminRoute,
   } as any)
+const AdminCobrosSinAsignarRoute = AdminCobrosSinAsignarRouteImport.update({
+  id: '/cobros/sin-asignar',
+  path: '/cobros/sin-asignar',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminComerciosIndexRoute = AdminComerciosIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -188,12 +202,6 @@ const AdminConfiguracionIndexRoute = AdminConfiguracionIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminConfiguracionRoute,
 } as any)
-const AdminConfiguracionConfiguracionesRoute =
-  AdminConfiguracionConfiguracionesRouteImport.update({
-    id: '/configuraciones',
-    path: '/configuraciones',
-    getParentRoute: () => AdminConfiguracionRoute,
-  } as any)
 const AdminConfiguracionLoginsRoute =
   AdminConfiguracionLoginsRouteImport.update({
     id: '/logins',
@@ -206,6 +214,27 @@ const AdminConfiguracionPaisesRoute =
     path: '/paises',
     getParentRoute: () => AdminConfiguracionRoute,
   } as any)
+const AdminControlConciliacionRoute =
+  AdminControlConciliacionRouteImport.update({
+    id: '/control/conciliacion',
+    path: '/control/conciliacion',
+    getParentRoute: () => AdminRoute,
+  } as any)
+const AdminControlDisputasRoute = AdminControlDisputasRouteImport.update({
+  id: '/control/disputas',
+  path: '/control/disputas',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminEnviosAprobacionesRoute = AdminEnviosAprobacionesRouteImport.update({
+  id: '/envios/aprobaciones',
+  path: '/envios/aprobaciones',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminFinanzasComisionesRoute = AdminFinanzasComisionesRouteImport.update({
+  id: '/finanzas/comisiones',
+  path: '/finanzas/comisiones',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminGeneralAlertasRoute = AdminGeneralAlertasRouteImport.update({
   id: '/general/alertas',
   path: '/general/alertas',
@@ -298,11 +327,41 @@ const AdminComerciosGestionCategoriaRoute =
     path: '/categoria',
     getParentRoute: () => AdminComerciosGestionRoute,
   } as any)
-const AdminComerciosLinkPagoIndexRoute =
-  AdminComerciosLinkPagoIndexRouteImport.update({
+const AdminControlConciliacionIndexRoute =
+  AdminControlConciliacionIndexRouteImport.update({
     id: '/',
     path: '/',
-    getParentRoute: () => AdminComerciosLinkPagoRoute,
+    getParentRoute: () => AdminControlConciliacionRoute,
+  } as any)
+const AdminControlConciliacionCobreRoute =
+  AdminControlConciliacionCobreRouteImport.update({
+    id: '/cobre',
+    path: '/cobre',
+    getParentRoute: () => AdminControlConciliacionRoute,
+  } as any)
+const AdminControlConciliacionEcartpayRoute =
+  AdminControlConciliacionEcartpayRouteImport.update({
+    id: '/ecartpay',
+    path: '/ecartpay',
+    getParentRoute: () => AdminControlConciliacionRoute,
+  } as any)
+const AdminFinanzasComisionesIndexRoute =
+  AdminFinanzasComisionesIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AdminFinanzasComisionesRoute,
+  } as any)
+const AdminFinanzasComisionesCargaRoute =
+  AdminFinanzasComisionesCargaRouteImport.update({
+    id: '/carga',
+    path: '/carga',
+    getParentRoute: () => AdminFinanzasComisionesRoute,
+  } as any)
+const AdminFinanzasComisionesCobradasRoute =
+  AdminFinanzasComisionesCobradasRouteImport.update({
+    id: '/cobradas',
+    path: '/cobradas',
+    getParentRoute: () => AdminFinanzasComisionesRoute,
   } as any)
 const AdminGeneralAlertasIndexRoute =
   AdminGeneralAlertasIndexRouteImport.update({
@@ -405,15 +464,19 @@ export interface FileRoutesByFullPath {
   '/admin/administracion/reportes': typeof AdminAdministracionReportesRoute
   '/admin/administracion/soporte': typeof AdminAdministracionSoporteRouteWithChildren
   '/admin/administracion/usuarios': typeof AdminAdministracionUsuariosRouteWithChildren
+  '/admin/cobros/sin-asignar': typeof AdminCobrosSinAsignarRoute
   '/admin/comercios/apis': typeof AdminComerciosApisRouteWithChildren
   '/admin/comercios/comisiones-jpay': typeof AdminComerciosComisionesJpayRoute
   '/admin/comercios/gestion': typeof AdminComerciosGestionRouteWithChildren
-  '/admin/comercios/link-pago': typeof AdminComerciosLinkPagoRouteWithChildren
+  '/admin/comercios/link-pago': typeof AdminComerciosLinkPagoRoute
   '/admin/comercios/pos': typeof AdminComerciosPosRoute
   '/admin/comercios/recurrentes': typeof AdminComerciosRecurrentesRoute
-  '/admin/configuracion/configuraciones': typeof AdminConfiguracionConfiguracionesRoute
   '/admin/configuracion/logins': typeof AdminConfiguracionLoginsRoute
   '/admin/configuracion/paises': typeof AdminConfiguracionPaisesRoute
+  '/admin/control/conciliacion': typeof AdminControlConciliacionRouteWithChildren
+  '/admin/control/disputas': typeof AdminControlDisputasRoute
+  '/admin/envios/aprobaciones': typeof AdminEnviosAprobacionesRoute
+  '/admin/finanzas/comisiones': typeof AdminFinanzasComisionesRouteWithChildren
   '/admin/general/alertas': typeof AdminGeneralAlertasRouteWithChildren
   '/admin/general/movimientos': typeof AdminGeneralMovimientosRouteWithChildren
   '/admin/general/usuarios': typeof AdminGeneralUsuariosRouteWithChildren
@@ -427,6 +490,10 @@ export interface FileRoutesByFullPath {
   '/admin/comercios/apis/endpoints': typeof AdminComerciosApisEndpointsRoute
   '/admin/comercios/apis/restricciones': typeof AdminComerciosApisRestriccionesRoute
   '/admin/comercios/gestion/categoria': typeof AdminComerciosGestionCategoriaRoute
+  '/admin/control/conciliacion/cobre': typeof AdminControlConciliacionCobreRoute
+  '/admin/control/conciliacion/ecartpay': typeof AdminControlConciliacionEcartpayRoute
+  '/admin/finanzas/comisiones/carga': typeof AdminFinanzasComisionesCargaRoute
+  '/admin/finanzas/comisiones/cobradas': typeof AdminFinanzasComisionesCobradasRoute
   '/admin/general/alertas/bloqueos': typeof AdminGeneralAlertasBloqueosRoute
   '/admin/general/alertas/parametros-alertas': typeof AdminGeneralAlertasParametrosAlertasRoute
   '/admin/general/alertas/parametros-bloqueos': typeof AdminGeneralAlertasParametrosBloqueosRoute
@@ -443,7 +510,8 @@ export interface FileRoutesByFullPath {
   '/admin/administracion/usuarios/': typeof AdminAdministracionUsuariosIndexRoute
   '/admin/comercios/apis/': typeof AdminComerciosApisIndexRoute
   '/admin/comercios/gestion/': typeof AdminComerciosGestionIndexRoute
-  '/admin/comercios/link-pago/': typeof AdminComerciosLinkPagoIndexRoute
+  '/admin/control/conciliacion/': typeof AdminControlConciliacionIndexRoute
+  '/admin/finanzas/comisiones/': typeof AdminFinanzasComisionesIndexRoute
   '/admin/general/alertas/': typeof AdminGeneralAlertasIndexRoute
   '/admin/general/movimientos/': typeof AdminGeneralMovimientosIndexRoute
   '/admin/general/usuarios/': typeof AdminGeneralUsuariosIndexRoute
@@ -457,12 +525,15 @@ export interface FileRoutesByTo {
   '/legales/terminos': typeof LegalesTerminosRoute
   '/admin': typeof AdminIndexRoute
   '/admin/administracion/reportes': typeof AdminAdministracionReportesRoute
+  '/admin/cobros/sin-asignar': typeof AdminCobrosSinAsignarRoute
   '/admin/comercios/comisiones-jpay': typeof AdminComerciosComisionesJpayRoute
+  '/admin/comercios/link-pago': typeof AdminComerciosLinkPagoRoute
   '/admin/comercios/pos': typeof AdminComerciosPosRoute
   '/admin/comercios/recurrentes': typeof AdminComerciosRecurrentesRoute
-  '/admin/configuracion/configuraciones': typeof AdminConfiguracionConfiguracionesRoute
   '/admin/configuracion/logins': typeof AdminConfiguracionLoginsRoute
   '/admin/configuracion/paises': typeof AdminConfiguracionPaisesRoute
+  '/admin/control/disputas': typeof AdminControlDisputasRoute
+  '/admin/envios/aprobaciones': typeof AdminEnviosAprobacionesRoute
   '/admin/comercios': typeof AdminComerciosIndexRoute
   '/admin/configuracion': typeof AdminConfiguracionIndexRoute
   '/admin/notificaciones': typeof AdminNotificacionesIndexRoute
@@ -473,6 +544,10 @@ export interface FileRoutesByTo {
   '/admin/comercios/apis/endpoints': typeof AdminComerciosApisEndpointsRoute
   '/admin/comercios/apis/restricciones': typeof AdminComerciosApisRestriccionesRoute
   '/admin/comercios/gestion/categoria': typeof AdminComerciosGestionCategoriaRoute
+  '/admin/control/conciliacion/cobre': typeof AdminControlConciliacionCobreRoute
+  '/admin/control/conciliacion/ecartpay': typeof AdminControlConciliacionEcartpayRoute
+  '/admin/finanzas/comisiones/carga': typeof AdminFinanzasComisionesCargaRoute
+  '/admin/finanzas/comisiones/cobradas': typeof AdminFinanzasComisionesCobradasRoute
   '/admin/general/alertas/bloqueos': typeof AdminGeneralAlertasBloqueosRoute
   '/admin/general/alertas/parametros-alertas': typeof AdminGeneralAlertasParametrosAlertasRoute
   '/admin/general/alertas/parametros-bloqueos': typeof AdminGeneralAlertasParametrosBloqueosRoute
@@ -489,7 +564,8 @@ export interface FileRoutesByTo {
   '/admin/administracion/usuarios': typeof AdminAdministracionUsuariosIndexRoute
   '/admin/comercios/apis': typeof AdminComerciosApisIndexRoute
   '/admin/comercios/gestion': typeof AdminComerciosGestionIndexRoute
-  '/admin/comercios/link-pago': typeof AdminComerciosLinkPagoIndexRoute
+  '/admin/control/conciliacion': typeof AdminControlConciliacionIndexRoute
+  '/admin/finanzas/comisiones': typeof AdminFinanzasComisionesIndexRoute
   '/admin/general/alertas': typeof AdminGeneralAlertasIndexRoute
   '/admin/general/movimientos': typeof AdminGeneralMovimientosIndexRoute
   '/admin/general/usuarios': typeof AdminGeneralUsuariosIndexRoute
@@ -511,15 +587,19 @@ export interface FileRoutesById {
   '/admin/administracion/reportes': typeof AdminAdministracionReportesRoute
   '/admin/administracion/soporte': typeof AdminAdministracionSoporteRouteWithChildren
   '/admin/administracion/usuarios': typeof AdminAdministracionUsuariosRouteWithChildren
+  '/admin/cobros/sin-asignar': typeof AdminCobrosSinAsignarRoute
   '/admin/comercios/apis': typeof AdminComerciosApisRouteWithChildren
   '/admin/comercios/comisiones-jpay': typeof AdminComerciosComisionesJpayRoute
   '/admin/comercios/gestion': typeof AdminComerciosGestionRouteWithChildren
-  '/admin/comercios/link-pago': typeof AdminComerciosLinkPagoRouteWithChildren
+  '/admin/comercios/link-pago': typeof AdminComerciosLinkPagoRoute
   '/admin/comercios/pos': typeof AdminComerciosPosRoute
   '/admin/comercios/recurrentes': typeof AdminComerciosRecurrentesRoute
-  '/admin/configuracion/configuraciones': typeof AdminConfiguracionConfiguracionesRoute
   '/admin/configuracion/logins': typeof AdminConfiguracionLoginsRoute
   '/admin/configuracion/paises': typeof AdminConfiguracionPaisesRoute
+  '/admin/control/conciliacion': typeof AdminControlConciliacionRouteWithChildren
+  '/admin/control/disputas': typeof AdminControlDisputasRoute
+  '/admin/envios/aprobaciones': typeof AdminEnviosAprobacionesRoute
+  '/admin/finanzas/comisiones': typeof AdminFinanzasComisionesRouteWithChildren
   '/admin/general/alertas': typeof AdminGeneralAlertasRouteWithChildren
   '/admin/general/movimientos': typeof AdminGeneralMovimientosRouteWithChildren
   '/admin/general/usuarios': typeof AdminGeneralUsuariosRouteWithChildren
@@ -533,6 +613,10 @@ export interface FileRoutesById {
   '/admin/comercios/apis/endpoints': typeof AdminComerciosApisEndpointsRoute
   '/admin/comercios/apis/restricciones': typeof AdminComerciosApisRestriccionesRoute
   '/admin/comercios/gestion/categoria': typeof AdminComerciosGestionCategoriaRoute
+  '/admin/control/conciliacion/cobre': typeof AdminControlConciliacionCobreRoute
+  '/admin/control/conciliacion/ecartpay': typeof AdminControlConciliacionEcartpayRoute
+  '/admin/finanzas/comisiones/carga': typeof AdminFinanzasComisionesCargaRoute
+  '/admin/finanzas/comisiones/cobradas': typeof AdminFinanzasComisionesCobradasRoute
   '/admin/general/alertas/bloqueos': typeof AdminGeneralAlertasBloqueosRoute
   '/admin/general/alertas/parametros-alertas': typeof AdminGeneralAlertasParametrosAlertasRoute
   '/admin/general/alertas/parametros-bloqueos': typeof AdminGeneralAlertasParametrosBloqueosRoute
@@ -549,7 +633,8 @@ export interface FileRoutesById {
   '/admin/administracion/usuarios/': typeof AdminAdministracionUsuariosIndexRoute
   '/admin/comercios/apis/': typeof AdminComerciosApisIndexRoute
   '/admin/comercios/gestion/': typeof AdminComerciosGestionIndexRoute
-  '/admin/comercios/link-pago/': typeof AdminComerciosLinkPagoIndexRoute
+  '/admin/control/conciliacion/': typeof AdminControlConciliacionIndexRoute
+  '/admin/finanzas/comisiones/': typeof AdminFinanzasComisionesIndexRoute
   '/admin/general/alertas/': typeof AdminGeneralAlertasIndexRoute
   '/admin/general/movimientos/': typeof AdminGeneralMovimientosIndexRoute
   '/admin/general/usuarios/': typeof AdminGeneralUsuariosIndexRoute
@@ -572,15 +657,19 @@ export interface FileRouteTypes {
     | '/admin/administracion/reportes'
     | '/admin/administracion/soporte'
     | '/admin/administracion/usuarios'
+    | '/admin/cobros/sin-asignar'
     | '/admin/comercios/apis'
     | '/admin/comercios/comisiones-jpay'
     | '/admin/comercios/gestion'
     | '/admin/comercios/link-pago'
     | '/admin/comercios/pos'
     | '/admin/comercios/recurrentes'
-    | '/admin/configuracion/configuraciones'
     | '/admin/configuracion/logins'
     | '/admin/configuracion/paises'
+    | '/admin/control/conciliacion'
+    | '/admin/control/disputas'
+    | '/admin/envios/aprobaciones'
+    | '/admin/finanzas/comisiones'
     | '/admin/general/alertas'
     | '/admin/general/movimientos'
     | '/admin/general/usuarios'
@@ -594,6 +683,10 @@ export interface FileRouteTypes {
     | '/admin/comercios/apis/endpoints'
     | '/admin/comercios/apis/restricciones'
     | '/admin/comercios/gestion/categoria'
+    | '/admin/control/conciliacion/cobre'
+    | '/admin/control/conciliacion/ecartpay'
+    | '/admin/finanzas/comisiones/carga'
+    | '/admin/finanzas/comisiones/cobradas'
     | '/admin/general/alertas/bloqueos'
     | '/admin/general/alertas/parametros-alertas'
     | '/admin/general/alertas/parametros-bloqueos'
@@ -610,7 +703,8 @@ export interface FileRouteTypes {
     | '/admin/administracion/usuarios/'
     | '/admin/comercios/apis/'
     | '/admin/comercios/gestion/'
-    | '/admin/comercios/link-pago/'
+    | '/admin/control/conciliacion/'
+    | '/admin/finanzas/comisiones/'
     | '/admin/general/alertas/'
     | '/admin/general/movimientos/'
     | '/admin/general/usuarios/'
@@ -624,12 +718,15 @@ export interface FileRouteTypes {
     | '/legales/terminos'
     | '/admin'
     | '/admin/administracion/reportes'
+    | '/admin/cobros/sin-asignar'
     | '/admin/comercios/comisiones-jpay'
+    | '/admin/comercios/link-pago'
     | '/admin/comercios/pos'
     | '/admin/comercios/recurrentes'
-    | '/admin/configuracion/configuraciones'
     | '/admin/configuracion/logins'
     | '/admin/configuracion/paises'
+    | '/admin/control/disputas'
+    | '/admin/envios/aprobaciones'
     | '/admin/comercios'
     | '/admin/configuracion'
     | '/admin/notificaciones'
@@ -640,6 +737,10 @@ export interface FileRouteTypes {
     | '/admin/comercios/apis/endpoints'
     | '/admin/comercios/apis/restricciones'
     | '/admin/comercios/gestion/categoria'
+    | '/admin/control/conciliacion/cobre'
+    | '/admin/control/conciliacion/ecartpay'
+    | '/admin/finanzas/comisiones/carga'
+    | '/admin/finanzas/comisiones/cobradas'
     | '/admin/general/alertas/bloqueos'
     | '/admin/general/alertas/parametros-alertas'
     | '/admin/general/alertas/parametros-bloqueos'
@@ -656,7 +757,8 @@ export interface FileRouteTypes {
     | '/admin/administracion/usuarios'
     | '/admin/comercios/apis'
     | '/admin/comercios/gestion'
-    | '/admin/comercios/link-pago'
+    | '/admin/control/conciliacion'
+    | '/admin/finanzas/comisiones'
     | '/admin/general/alertas'
     | '/admin/general/movimientos'
     | '/admin/general/usuarios'
@@ -677,15 +779,19 @@ export interface FileRouteTypes {
     | '/admin/administracion/reportes'
     | '/admin/administracion/soporte'
     | '/admin/administracion/usuarios'
+    | '/admin/cobros/sin-asignar'
     | '/admin/comercios/apis'
     | '/admin/comercios/comisiones-jpay'
     | '/admin/comercios/gestion'
     | '/admin/comercios/link-pago'
     | '/admin/comercios/pos'
     | '/admin/comercios/recurrentes'
-    | '/admin/configuracion/configuraciones'
     | '/admin/configuracion/logins'
     | '/admin/configuracion/paises'
+    | '/admin/control/conciliacion'
+    | '/admin/control/disputas'
+    | '/admin/envios/aprobaciones'
+    | '/admin/finanzas/comisiones'
     | '/admin/general/alertas'
     | '/admin/general/movimientos'
     | '/admin/general/usuarios'
@@ -699,6 +805,10 @@ export interface FileRouteTypes {
     | '/admin/comercios/apis/endpoints'
     | '/admin/comercios/apis/restricciones'
     | '/admin/comercios/gestion/categoria'
+    | '/admin/control/conciliacion/cobre'
+    | '/admin/control/conciliacion/ecartpay'
+    | '/admin/finanzas/comisiones/carga'
+    | '/admin/finanzas/comisiones/cobradas'
     | '/admin/general/alertas/bloqueos'
     | '/admin/general/alertas/parametros-alertas'
     | '/admin/general/alertas/parametros-bloqueos'
@@ -715,7 +825,8 @@ export interface FileRouteTypes {
     | '/admin/administracion/usuarios/'
     | '/admin/comercios/apis/'
     | '/admin/comercios/gestion/'
-    | '/admin/comercios/link-pago/'
+    | '/admin/control/conciliacion/'
+    | '/admin/finanzas/comisiones/'
     | '/admin/general/alertas/'
     | '/admin/general/movimientos/'
     | '/admin/general/usuarios/'
@@ -836,6 +947,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAdministracionUsuariosRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/cobros/sin-asignar': {
+      id: '/admin/cobros/sin-asignar'
+      path: '/cobros/sin-asignar'
+      fullPath: '/admin/cobros/sin-asignar'
+      preLoaderRoute: typeof AdminCobrosSinAsignarRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/comercios/': {
       id: '/admin/comercios/'
       path: '/'
@@ -892,13 +1010,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminConfiguracionIndexRouteImport
       parentRoute: typeof AdminConfiguracionRoute
     }
-    '/admin/configuracion/configuraciones': {
-      id: '/admin/configuracion/configuraciones'
-      path: '/configuraciones'
-      fullPath: '/admin/configuracion/configuraciones'
-      preLoaderRoute: typeof AdminConfiguracionConfiguracionesRouteImport
-      parentRoute: typeof AdminConfiguracionRoute
-    }
     '/admin/configuracion/logins': {
       id: '/admin/configuracion/logins'
       path: '/logins'
@@ -912,6 +1023,34 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/configuracion/paises'
       preLoaderRoute: typeof AdminConfiguracionPaisesRouteImport
       parentRoute: typeof AdminConfiguracionRoute
+    }
+    '/admin/control/conciliacion': {
+      id: '/admin/control/conciliacion'
+      path: '/control/conciliacion'
+      fullPath: '/admin/control/conciliacion'
+      preLoaderRoute: typeof AdminControlConciliacionRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/control/disputas': {
+      id: '/admin/control/disputas'
+      path: '/control/disputas'
+      fullPath: '/admin/control/disputas'
+      preLoaderRoute: typeof AdminControlDisputasRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/envios/aprobaciones': {
+      id: '/admin/envios/aprobaciones'
+      path: '/envios/aprobaciones'
+      fullPath: '/admin/envios/aprobaciones'
+      preLoaderRoute: typeof AdminEnviosAprobacionesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/finanzas/comisiones': {
+      id: '/admin/finanzas/comisiones'
+      path: '/finanzas/comisiones'
+      fullPath: '/admin/finanzas/comisiones'
+      preLoaderRoute: typeof AdminFinanzasComisionesRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/admin/general/alertas': {
       id: '/admin/general/alertas'
@@ -1025,12 +1164,47 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminComerciosGestionCategoriaRouteImport
       parentRoute: typeof AdminComerciosGestionRoute
     }
-    '/admin/comercios/link-pago/': {
-      id: '/admin/comercios/link-pago/'
+    '/admin/control/conciliacion/': {
+      id: '/admin/control/conciliacion/'
       path: '/'
-      fullPath: '/admin/comercios/link-pago/'
-      preLoaderRoute: typeof AdminComerciosLinkPagoIndexRouteImport
-      parentRoute: typeof AdminComerciosLinkPagoRoute
+      fullPath: '/admin/control/conciliacion/'
+      preLoaderRoute: typeof AdminControlConciliacionIndexRouteImport
+      parentRoute: typeof AdminControlConciliacionRoute
+    }
+    '/admin/control/conciliacion/cobre': {
+      id: '/admin/control/conciliacion/cobre'
+      path: '/cobre'
+      fullPath: '/admin/control/conciliacion/cobre'
+      preLoaderRoute: typeof AdminControlConciliacionCobreRouteImport
+      parentRoute: typeof AdminControlConciliacionRoute
+    }
+    '/admin/control/conciliacion/ecartpay': {
+      id: '/admin/control/conciliacion/ecartpay'
+      path: '/ecartpay'
+      fullPath: '/admin/control/conciliacion/ecartpay'
+      preLoaderRoute: typeof AdminControlConciliacionEcartpayRouteImport
+      parentRoute: typeof AdminControlConciliacionRoute
+    }
+    '/admin/finanzas/comisiones/': {
+      id: '/admin/finanzas/comisiones/'
+      path: '/'
+      fullPath: '/admin/finanzas/comisiones/'
+      preLoaderRoute: typeof AdminFinanzasComisionesIndexRouteImport
+      parentRoute: typeof AdminFinanzasComisionesRoute
+    }
+    '/admin/finanzas/comisiones/carga': {
+      id: '/admin/finanzas/comisiones/carga'
+      path: '/carga'
+      fullPath: '/admin/finanzas/comisiones/carga'
+      preLoaderRoute: typeof AdminFinanzasComisionesCargaRouteImport
+      parentRoute: typeof AdminFinanzasComisionesRoute
+    }
+    '/admin/finanzas/comisiones/cobradas': {
+      id: '/admin/finanzas/comisiones/cobradas'
+      path: '/cobradas'
+      fullPath: '/admin/finanzas/comisiones/cobradas'
+      preLoaderRoute: typeof AdminFinanzasComisionesCobradasRouteImport
+      parentRoute: typeof AdminFinanzasComisionesRoute
     }
     '/admin/general/alertas/': {
       id: '/admin/general/alertas/'
@@ -1163,25 +1337,11 @@ const AdminComerciosGestionRouteWithChildren =
     AdminComerciosGestionRouteChildren,
   )
 
-interface AdminComerciosLinkPagoRouteChildren {
-  AdminComerciosLinkPagoIndexRoute: typeof AdminComerciosLinkPagoIndexRoute
-}
-
-const AdminComerciosLinkPagoRouteChildren: AdminComerciosLinkPagoRouteChildren =
-  {
-    AdminComerciosLinkPagoIndexRoute: AdminComerciosLinkPagoIndexRoute,
-  }
-
-const AdminComerciosLinkPagoRouteWithChildren =
-  AdminComerciosLinkPagoRoute._addFileChildren(
-    AdminComerciosLinkPagoRouteChildren,
-  )
-
 interface AdminComerciosRouteChildren {
   AdminComerciosApisRoute: typeof AdminComerciosApisRouteWithChildren
   AdminComerciosComisionesJpayRoute: typeof AdminComerciosComisionesJpayRoute
   AdminComerciosGestionRoute: typeof AdminComerciosGestionRouteWithChildren
-  AdminComerciosLinkPagoRoute: typeof AdminComerciosLinkPagoRouteWithChildren
+  AdminComerciosLinkPagoRoute: typeof AdminComerciosLinkPagoRoute
   AdminComerciosPosRoute: typeof AdminComerciosPosRoute
   AdminComerciosRecurrentesRoute: typeof AdminComerciosRecurrentesRoute
   AdminComerciosIndexRoute: typeof AdminComerciosIndexRoute
@@ -1191,7 +1351,7 @@ const AdminComerciosRouteChildren: AdminComerciosRouteChildren = {
   AdminComerciosApisRoute: AdminComerciosApisRouteWithChildren,
   AdminComerciosComisionesJpayRoute: AdminComerciosComisionesJpayRoute,
   AdminComerciosGestionRoute: AdminComerciosGestionRouteWithChildren,
-  AdminComerciosLinkPagoRoute: AdminComerciosLinkPagoRouteWithChildren,
+  AdminComerciosLinkPagoRoute: AdminComerciosLinkPagoRoute,
   AdminComerciosPosRoute: AdminComerciosPosRoute,
   AdminComerciosRecurrentesRoute: AdminComerciosRecurrentesRoute,
   AdminComerciosIndexRoute: AdminComerciosIndexRoute,
@@ -1202,15 +1362,12 @@ const AdminComerciosRouteWithChildren = AdminComerciosRoute._addFileChildren(
 )
 
 interface AdminConfiguracionRouteChildren {
-  AdminConfiguracionConfiguracionesRoute: typeof AdminConfiguracionConfiguracionesRoute
   AdminConfiguracionLoginsRoute: typeof AdminConfiguracionLoginsRoute
   AdminConfiguracionPaisesRoute: typeof AdminConfiguracionPaisesRoute
   AdminConfiguracionIndexRoute: typeof AdminConfiguracionIndexRoute
 }
 
 const AdminConfiguracionRouteChildren: AdminConfiguracionRouteChildren = {
-  AdminConfiguracionConfiguracionesRoute:
-    AdminConfiguracionConfiguracionesRoute,
   AdminConfiguracionLoginsRoute: AdminConfiguracionLoginsRoute,
   AdminConfiguracionPaisesRoute: AdminConfiguracionPaisesRoute,
   AdminConfiguracionIndexRoute: AdminConfiguracionIndexRoute,
@@ -1284,6 +1441,43 @@ const AdminAdministracionUsuariosRouteChildren: AdminAdministracionUsuariosRoute
 const AdminAdministracionUsuariosRouteWithChildren =
   AdminAdministracionUsuariosRoute._addFileChildren(
     AdminAdministracionUsuariosRouteChildren,
+  )
+
+interface AdminControlConciliacionRouteChildren {
+  AdminControlConciliacionCobreRoute: typeof AdminControlConciliacionCobreRoute
+  AdminControlConciliacionEcartpayRoute: typeof AdminControlConciliacionEcartpayRoute
+  AdminControlConciliacionIndexRoute: typeof AdminControlConciliacionIndexRoute
+}
+
+const AdminControlConciliacionRouteChildren: AdminControlConciliacionRouteChildren =
+  {
+    AdminControlConciliacionCobreRoute: AdminControlConciliacionCobreRoute,
+    AdminControlConciliacionEcartpayRoute:
+      AdminControlConciliacionEcartpayRoute,
+    AdminControlConciliacionIndexRoute: AdminControlConciliacionIndexRoute,
+  }
+
+const AdminControlConciliacionRouteWithChildren =
+  AdminControlConciliacionRoute._addFileChildren(
+    AdminControlConciliacionRouteChildren,
+  )
+
+interface AdminFinanzasComisionesRouteChildren {
+  AdminFinanzasComisionesCargaRoute: typeof AdminFinanzasComisionesCargaRoute
+  AdminFinanzasComisionesCobradasRoute: typeof AdminFinanzasComisionesCobradasRoute
+  AdminFinanzasComisionesIndexRoute: typeof AdminFinanzasComisionesIndexRoute
+}
+
+const AdminFinanzasComisionesRouteChildren: AdminFinanzasComisionesRouteChildren =
+  {
+    AdminFinanzasComisionesCargaRoute: AdminFinanzasComisionesCargaRoute,
+    AdminFinanzasComisionesCobradasRoute: AdminFinanzasComisionesCobradasRoute,
+    AdminFinanzasComisionesIndexRoute: AdminFinanzasComisionesIndexRoute,
+  }
+
+const AdminFinanzasComisionesRouteWithChildren =
+  AdminFinanzasComisionesRoute._addFileChildren(
+    AdminFinanzasComisionesRouteChildren,
   )
 
 interface AdminGeneralAlertasRouteChildren {
@@ -1361,6 +1555,11 @@ interface AdminRouteChildren {
   AdminAdministracionReportesRoute: typeof AdminAdministracionReportesRoute
   AdminAdministracionSoporteRoute: typeof AdminAdministracionSoporteRouteWithChildren
   AdminAdministracionUsuariosRoute: typeof AdminAdministracionUsuariosRouteWithChildren
+  AdminCobrosSinAsignarRoute: typeof AdminCobrosSinAsignarRoute
+  AdminControlConciliacionRoute: typeof AdminControlConciliacionRouteWithChildren
+  AdminControlDisputasRoute: typeof AdminControlDisputasRoute
+  AdminEnviosAprobacionesRoute: typeof AdminEnviosAprobacionesRoute
+  AdminFinanzasComisionesRoute: typeof AdminFinanzasComisionesRouteWithChildren
   AdminGeneralAlertasRoute: typeof AdminGeneralAlertasRouteWithChildren
   AdminGeneralMovimientosRoute: typeof AdminGeneralMovimientosRouteWithChildren
   AdminGeneralUsuariosRoute: typeof AdminGeneralUsuariosRouteWithChildren
@@ -1379,6 +1578,11 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminAdministracionSoporteRoute: AdminAdministracionSoporteRouteWithChildren,
   AdminAdministracionUsuariosRoute:
     AdminAdministracionUsuariosRouteWithChildren,
+  AdminCobrosSinAsignarRoute: AdminCobrosSinAsignarRoute,
+  AdminControlConciliacionRoute: AdminControlConciliacionRouteWithChildren,
+  AdminControlDisputasRoute: AdminControlDisputasRoute,
+  AdminEnviosAprobacionesRoute: AdminEnviosAprobacionesRoute,
+  AdminFinanzasComisionesRoute: AdminFinanzasComisionesRouteWithChildren,
   AdminGeneralAlertasRoute: AdminGeneralAlertasRouteWithChildren,
   AdminGeneralMovimientosRoute: AdminGeneralMovimientosRouteWithChildren,
   AdminGeneralUsuariosRoute: AdminGeneralUsuariosRouteWithChildren,

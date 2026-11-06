@@ -1,23 +1,13 @@
-import { createFileRoute, Outlet } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { pageTitle } from "@/brand/brand";
-import { TabLayout, type Tab } from "@/components/tab-layout";
+import { EnlacesPage } from "@/features/link-pago/enlaces/components/EnlacesPage";
 
 export const Route = createFileRoute("/admin/comercios/link-pago")({
-  component: LinkPagoLayout,
+  component: EnlacesPage,
   head: () => ({
     meta: [
-      { title: pageTitle("Link de pago — Admin") },
-      { name: "description", content: "Gestión del módulo de link de pago." },
+      { title: pageTitle("Links de pago — Admin") },
+      { name: "description", content: "Links de pago creados desde el portal de empresas." },
     ],
   }),
 });
-
-const tabs: Tab[] = [{ label: "Links de Pago", to: "/admin/comercios/link-pago" }];
-
-function LinkPagoLayout() {
-  return (
-    <TabLayout tabs={tabs}>
-      <Outlet />
-    </TabLayout>
-  );
-}

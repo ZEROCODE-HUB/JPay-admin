@@ -9,7 +9,7 @@ import { LABEL_A_ESTADO } from "@/lib/cliente-estados";
 
 /**
  * Paginación, filtros (estado + búsqueda server-side), listado de clientes y
- * enrichment por legajo. Compartido por Personas físicas y Personas jurídicas.
+ * enrichment por legajo. Compartido por Personas físicas y Personas morales.
  */
 export function useClientesListado({
   tipoPersona,

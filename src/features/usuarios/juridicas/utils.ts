@@ -46,7 +46,7 @@ export type JuridicaRow = {
   subcuentasCount: number;
 };
 
-/** Fila de la tabla de personas jurídicas a partir del cliente + su enrichment. */
+/** Fila de la tabla de personas morales a partir del cliente + su enrichment. */
 export function toJuridicaRow(c: Cliente, e: ClienteEnrichment = {}): JuridicaRow {
   const norm = normalizarEstado(c.estado);
   return {

@@ -134,7 +134,7 @@ export const GROUPS: GroupView[] = [
     ],
   },
   {
-    title: "Enlaces de pago",
+    title: "Links de pago",
     rules: [
       {
         code: "payment_link_amount",

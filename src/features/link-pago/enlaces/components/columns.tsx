@@ -9,7 +9,7 @@ import { montoNumero } from "../utils";
 export const columnasEnlaces: Column<EnlacePago>[] = [
   {
     key: "url",
-    label: "Enlace de pago",
+    label: "Link de pago",
     filterable: true,
     render: (r) => (
       <span className="font-mono text-xs break-all flex items-center gap-1">

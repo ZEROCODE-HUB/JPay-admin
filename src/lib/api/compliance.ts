@@ -191,35 +191,6 @@ export const runComplianceSweep = () =>
     ultima_corrida_plaft: string | null;
   }>((sb) => sb.rpc("ejecutar_barrido_compliance"));
 
-export type SimulatedDeposit = {
-  estado: string;
-  importe?: number;
-  comision?: number;
-  impuesto?: number;
-  retenido?: boolean;
-  decision?: string;
-};
-
-/** Depósito entrante simulado (solo desarrollo) para probar las reglas de depósitos. */
-export const simulateDeposit = (input: {
-  /** CLABE de la subcuenta destino (parámetro `p_cbu_destino` de la base). */
-  clabeDestino: string;
-  importe: number;
-  /** RFC del depositante (parámetro `p_cuit_origen` de la base). */
-  rfcOrigen?: string;
-  titularOrigen?: string;
-  clabeOrigen?: string;
-}) =>
-  rpc<SimulatedDeposit>((sb) =>
-    sb.rpc("simular_deposito_entrante", {
-      p_cbu_destino: input.clabeDestino,
-      p_importe: input.importe,
-      p_cuit_origen: input.rfcOrigen || undefined,
-      p_titular_origen: input.titularOrigen || undefined,
-      p_cbu_origen: input.clabeOrigen || undefined,
-    }),
-  );
-
 // ============================================================================
 // Bloqueos
 // ============================================================================

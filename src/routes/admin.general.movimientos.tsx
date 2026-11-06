@@ -28,7 +28,6 @@ const tabs: Tab[] = [
     to: "/admin/general/movimientos/conversiones",
     modulo: "transferencias_cobre",
   },
-  { label: "Cobro de comisiones", to: "/admin/general/movimientos/comisiones" },
 ];
 
 function MovimientosLayout() {

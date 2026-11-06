@@ -5,7 +5,7 @@ import { normalizarEstado } from "@/lib/cliente-estados";
 import { useAccionesCliente } from "../../comun/hooks/useAccionesCliente";
 import type { JuridicaRow } from "../utils";
 
-/** Menú de acciones por fila + diálogo de confirmación de Personas jurídicas. */
+/** Menú de acciones por fila + diálogo de confirmación de Personas morales. */
 export function useJuridicasAcciones() {
   const navigate = useNavigate();
   const { confirmAction, setConfirmAction, ejecutar, puedeModificar, puedeBorrar } =
@@ -44,7 +44,7 @@ export function useJuridicasAcciones() {
         disabled: !puedeModificar,
         onClick: () =>
           setConfirmAction({
-            title: "Activar persona jurídica",
+            title: "Activar persona moral",
             message: `¿Activar a ${row.razonSocial}? Requiere CLABE y comisión.`,
             confirmLabel: "Activar",
             variant: "default",
@@ -59,7 +59,7 @@ export function useJuridicasAcciones() {
         variant: "danger" as const,
         onClick: () =>
           setConfirmAction({
-            title: "Suspender persona jurídica",
+            title: "Suspender persona moral",
             message: `¿Suspender a ${row.razonSocial}?`,
             confirmLabel: "Suspender",
             variant: "danger",
@@ -73,7 +73,7 @@ export function useJuridicasAcciones() {
         disabled: !puedeModificar,
         onClick: () =>
           setConfirmAction({
-            title: "Reactivar persona jurídica",
+            title: "Reactivar persona moral",
             message: `¿Reactivar a ${row.razonSocial}?`,
             confirmLabel: "Reactivar",
             variant: "default",

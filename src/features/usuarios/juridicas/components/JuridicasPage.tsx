@@ -8,7 +8,7 @@ import { useJuridicasAcciones } from "../hooks/useJuridicasAcciones";
 import { toJuridicaRow, type JuridicaRow } from "../utils";
 import { columns } from "./columns";
 
-/** Listado de personas jurídicas. */
+/** Listado de personas morales. */
 export function JuridicasPage() {
   // Enrichment paralelo: comercios y subcuentas por legajo (mismo patrón que Personas Físicas).
   const listado = useClientesListado({
@@ -24,7 +24,7 @@ export function JuridicasPage() {
   return (
     <PermissionGuard recurso="usuarios">
       <PageHeader
-        title="Personas jurídicas"
+        title="Personas morales"
         description="Empresas y organizaciones — flujo homologado con personas físicas."
       />
 
@@ -34,8 +34,8 @@ export function JuridicasPage() {
         data={data}
         getActions={getActions}
         cargandoTexto="Cargando…"
-        errorTitulo="Ocurrió un error al cargar las personas jurídicas"
-        vacioTexto="No hay personas jurídicas que coincidan con la búsqueda."
+        errorTitulo="Ocurrió un error al cargar las personas morales"
+        vacioTexto="No hay personas morales que coincidan con la búsqueda."
         countLabel="resultado(s)"
       />
 

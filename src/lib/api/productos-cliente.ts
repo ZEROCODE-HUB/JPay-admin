@@ -138,7 +138,7 @@ export async function getProductosCliente(legajo: string): Promise<ProductoClien
     },
     {
       proveedor: "Ecart Pay",
-      nombre: "Enlaces de pago",
+      nombre: "Links de pago",
       descripcion: "Cobros con tarjeta, SPEI y OXXO desde un link",
       ...(conectado
         ? { estado: "activo" as const, detalle: `Cuenta conectada${entorno}` }

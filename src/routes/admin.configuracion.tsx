@@ -17,7 +17,6 @@ export const Route = createFileRoute("/admin/configuracion")({
 const tabs: Tab[] = [
   { label: "Resumen", to: "/admin/configuracion" },
   { label: "Logins configurados", to: "/admin/configuracion/logins" },
-  { label: "Configuraciones de login", to: "/admin/configuracion/configuraciones" },
   { label: "País y proveedores", to: "/admin/configuracion/paises" },
 ];
 

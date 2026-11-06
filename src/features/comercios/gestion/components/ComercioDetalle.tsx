@@ -109,7 +109,7 @@ export function ComercioDetalle({
             </div>
             <div className="px-5 pb-5 pt-3 text-sm text-muted-foreground">
               Los puntos de venta se gestionan en <span className="font-semibold">POS físico</span>{" "}
-              y los enlaces en <span className="font-semibold">Enlaces de pago</span>.
+              y los links en <span className="font-semibold">Links de pago</span>.
             </div>
           </Card>
         </div>

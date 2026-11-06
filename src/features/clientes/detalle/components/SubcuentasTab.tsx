@@ -14,7 +14,7 @@ import {
   type SubcuentaTipo,
   type SubcuentaUpdate,
 } from "@/lib/api/subcuentas";
-import { SubcuentaDetalleModal, TablaSubcuentas } from "@/components/subcuentas-tab";
+import { SubcuentaDetalleModal, TablaSubcuentas } from "./TablaSubcuentas";
 import { CargaMasivaSubcuentas } from "./CargaMasivaSubcuentas";
 import { KpiCard } from "./KpiCard";
 import { Seccion } from "./Seccion";

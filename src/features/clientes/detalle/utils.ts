@@ -39,6 +39,7 @@ export type TabKey =
   | "contexto"
   | "modulos"
   | "cobre"
+  | "ecartpay"
   | "historial";
 
 /** Pestañas del detalle; con `modulo`, solo si el país de la instalación lo tiene. */
@@ -51,6 +52,7 @@ export const TABS: { key: TabKey; label: string; modulo?: Modulo }[] = [
   { key: "contexto", label: "Contexto operativo" },
   { key: "modulos", label: "Módulos y productos" },
   { key: "cobre", label: "Cobre", modulo: "transferencias_cobre" },
+  { key: "ecartpay", label: "Ecart Pay", modulo: "pagos_proveedor" },
   { key: "historial", label: "Historial" },
 ];
 

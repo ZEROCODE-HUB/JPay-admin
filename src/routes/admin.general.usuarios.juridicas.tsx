@@ -5,10 +5,10 @@ import { JuridicasPage } from "@/features/usuarios/juridicas/components/Juridica
 export const Route = createFileRoute("/admin/general/usuarios/juridicas")({
   head: () => ({
     meta: [
-      { title: pageTitle("Personas jurídicas — Usuarios — Admin") },
+      { title: pageTitle("Personas morales — Usuarios — Admin") },
       {
         name: "description",
-        content: "Gestión de personas jurídicas registradas en la plataforma.",
+        content: "Gestión de personas morales registradas en la plataforma.",
       },
     ],
   }),
