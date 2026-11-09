@@ -1,13 +1,9 @@
-import { useDeveloperMode } from "@/hooks/use-developer-mode";
 import { useIntegraciones } from "@/hooks/useIntegraciones";
-import { useControlesTecnicos } from "../hooks/useControlesTecnicos";
 import { buildIntegracionUI } from "../utils";
 import { IntegracionesGrid } from "./IntegracionesGrid";
-import { VistaDesarrollador } from "./VistaDesarrollador";
 
-/** Gestor de integraciones: vista operativa o, en modo desarrollador, vista técnica. */
+/** Gestor de integraciones: estado operativo de cada integración. */
 export function ConfiguracionPage() {
-  const { devMode } = useDeveloperMode();
   const {
     rows: integraciones,
     isLoading,
@@ -18,18 +14,12 @@ export function ConfiguracionPage() {
     pageSize: 100,
   });
 
-  const controles = useControlesTecnicos();
-
-  if (!devMode) {
-    return (
-      <IntegracionesGrid
-        integraciones={integraciones.map(buildIntegracionUI)}
-        isLoading={isLoading}
-        isError={isError}
-        isEmpty={isEmpty}
-      />
-    );
-  }
-
-  return <VistaDesarrollador controles={controles} integraciones={integraciones} />;
+  return (
+    <IntegracionesGrid
+      integraciones={integraciones.map(buildIntegracionUI)}
+      isLoading={isLoading}
+      isError={isError}
+      isEmpty={isEmpty}
+    />
+  );
 }

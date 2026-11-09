@@ -25,38 +25,10 @@ type Bloqueo = {
   fecha: string;
 };
 
-let seq = 4;
+let seq = 0;
 
-const initial: Bloqueo[] = [
-  {
-    id: 1,
-    tipo: "Deposito",
-    usuario: "Todos",
-    correo: "—",
-    fecha: "2026-07-21 10:14",
-  },
-  {
-    id: 2,
-    tipo: "Login",
-    usuario: "ana.martinez@cliente.com",
-    correo: "ana.martinez@cliente.com",
-    fecha: "2026-07-22 16:40",
-  },
-  {
-    id: 3,
-    tipo: "Retiro",
-    usuario: "carlos.lopez@cliente.com",
-    correo: "carlos.lopez@cliente.com",
-    fecha: "2026-07-23 09:05",
-  },
-  {
-    id: 4,
-    tipo: "Todos",
-    usuario: "Todos",
-    correo: "—",
-    fecha: "2026-07-24 08:30",
-  },
-];
+// Sin datos de ejemplo: la lista arranca vacía hasta conectarla a la base.
+const initial: Bloqueo[] = [];
 
 type FormState = {
   tipo: string;

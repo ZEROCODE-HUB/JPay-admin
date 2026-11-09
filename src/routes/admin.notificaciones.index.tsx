@@ -3,7 +3,6 @@ import { CheckCircle2, XCircle, Eye } from "lucide-react";
 import { DataTable, type Column } from "@/shared/ui/data-table";
 import { PageHeader, Card, Badge, BtnOutline } from "@/components/portal-shell";
 import { ActionsDropdown, type ActionItem } from "@/components/actions-dropdown";
-import { DeveloperModeToggle } from "@/components/developer-mode-toggle";
 import { pageTitle } from "@/brand/brand";
 import { useEventosNotificacion } from "@/hooks/useEventosNotificacion";
 import type { EventoNotificacion } from "@/lib/api/types";
@@ -138,7 +137,6 @@ function Page() {
       <PageHeader
         title="Centro de Notificaciones"
         description="Qué pasó, a quién afectó y si se notificó correctamente."
-        action={<DeveloperModeToggle />}
       />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">

@@ -13,51 +13,8 @@ type Mensaje = {
   contenido: string;
 };
 
-const historialMock: Mensaje[] = [
-  {
-    id: "MSG-001",
-    asunto: "Mantenimiento programado — POS físico",
-    segmento: "Módulo POS físico",
-    fecha: "2026-07-15 14:30",
-    estado: "Enviado",
-    contenido:
-      "Informamos que el servicio de POS físico estará en mantenimiento el 17/07 de 02:00 a 04:00 hs.",
-  },
-  {
-    id: "MSG-002",
-    asunto: "Demora en transferencias SPEI",
-    segmento: "Todos",
-    fecha: "2026-07-14 09:15",
-    estado: "Enviado",
-    contenido:
-      "Estamos experimentando demoras en la confirmación de transferencias SPEI. Disculpa las molestias.",
-  },
-  {
-    id: "MSG-003",
-    asunto: "Nueva funcionalidad — Link de pago",
-    segmento: "Comercios",
-    fecha: "2026-07-10 11:00",
-    estado: "Enviado",
-    contenido: "Ya está disponible la nueva funcionalidad de Link de pago con soporte para cuotas.",
-  },
-  {
-    id: "MSG-004",
-    asunto: "Incidente resuelto — Transferencias",
-    segmento: "Todos",
-    fecha: "2026-07-08 16:45",
-    estado: "Enviado",
-    contenido:
-      "El incidente con transferencias ha sido resuelto. El servicio funciona con normalidad.",
-  },
-  {
-    id: "MSG-005",
-    asunto: "Programa de referidos",
-    segmento: "Usuarios activos",
-    fecha: "2026-07-05 10:00",
-    estado: "Borrador",
-    contenido: "Lanzamos nuestro programa de referidos. Comparte el link y obtén beneficios.",
-  },
-];
+// Sin tabla de comunicaciones todavía: el historial queda vacío hasta conectarlo a la base.
+const historial: Mensaje[] = [];
 
 export const Route = createFileRoute("/admin/incidentes")({
   head: () => ({ meta: [{ title: "Comunicación de incidentes — Admin Panel" }] }),
@@ -165,7 +122,7 @@ function Page() {
       <PageHeader title="Historial de comunicaciones" />
       <DataTable
         columns={columns}
-        data={historialMock}
+        data={historial}
         keyExtractor={(r) => r.id}
         pageSize={5}
         actions={(r) => (

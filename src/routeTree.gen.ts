@@ -43,6 +43,7 @@ import { Route as AdminGeneralAlertasRouteImport } from './routes/admin.general.
 import { Route as AdminGeneralMovimientosRouteImport } from './routes/admin.general.movimientos'
 import { Route as AdminGeneralUsuariosRouteImport } from './routes/admin.general.usuarios'
 import { Route as AdminNotificacionesIndexRouteImport } from './routes/admin.notificaciones.index'
+import { Route as AdminSistemaPruebasRouteImport } from './routes/admin.sistema.pruebas'
 import { Route as AdminAdministracionRegistrosIndexRouteImport } from './routes/admin.administracion.registros.index'
 import { Route as AdminAdministracionRegistrosTotalRouteImport } from './routes/admin.administracion.registros.total'
 import { Route as AdminAdministracionSoporteIndexRouteImport } from './routes/admin.administracion.soporte.index'
@@ -256,6 +257,11 @@ const AdminNotificacionesIndexRoute =
     path: '/',
     getParentRoute: () => AdminNotificacionesRoute,
   } as any)
+const AdminSistemaPruebasRoute = AdminSistemaPruebasRouteImport.update({
+  id: '/sistema/pruebas',
+  path: '/sistema/pruebas',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminAdministracionRegistrosIndexRoute =
   AdminAdministracionRegistrosIndexRouteImport.update({
     id: '/',
@@ -480,6 +486,7 @@ export interface FileRoutesByFullPath {
   '/admin/general/alertas': typeof AdminGeneralAlertasRouteWithChildren
   '/admin/general/movimientos': typeof AdminGeneralMovimientosRouteWithChildren
   '/admin/general/usuarios': typeof AdminGeneralUsuariosRouteWithChildren
+  '/admin/sistema/pruebas': typeof AdminSistemaPruebasRoute
   '/admin/comercios/': typeof AdminComerciosIndexRoute
   '/admin/configuracion/': typeof AdminConfiguracionIndexRoute
   '/admin/notificaciones/': typeof AdminNotificacionesIndexRoute
@@ -534,6 +541,7 @@ export interface FileRoutesByTo {
   '/admin/configuracion/paises': typeof AdminConfiguracionPaisesRoute
   '/admin/control/disputas': typeof AdminControlDisputasRoute
   '/admin/envios/aprobaciones': typeof AdminEnviosAprobacionesRoute
+  '/admin/sistema/pruebas': typeof AdminSistemaPruebasRoute
   '/admin/comercios': typeof AdminComerciosIndexRoute
   '/admin/configuracion': typeof AdminConfiguracionIndexRoute
   '/admin/notificaciones': typeof AdminNotificacionesIndexRoute
@@ -603,6 +611,7 @@ export interface FileRoutesById {
   '/admin/general/alertas': typeof AdminGeneralAlertasRouteWithChildren
   '/admin/general/movimientos': typeof AdminGeneralMovimientosRouteWithChildren
   '/admin/general/usuarios': typeof AdminGeneralUsuariosRouteWithChildren
+  '/admin/sistema/pruebas': typeof AdminSistemaPruebasRoute
   '/admin/comercios/': typeof AdminComerciosIndexRoute
   '/admin/configuracion/': typeof AdminConfiguracionIndexRoute
   '/admin/notificaciones/': typeof AdminNotificacionesIndexRoute
@@ -673,6 +682,7 @@ export interface FileRouteTypes {
     | '/admin/general/alertas'
     | '/admin/general/movimientos'
     | '/admin/general/usuarios'
+    | '/admin/sistema/pruebas'
     | '/admin/comercios/'
     | '/admin/configuracion/'
     | '/admin/notificaciones/'
@@ -727,6 +737,7 @@ export interface FileRouteTypes {
     | '/admin/configuracion/paises'
     | '/admin/control/disputas'
     | '/admin/envios/aprobaciones'
+    | '/admin/sistema/pruebas'
     | '/admin/comercios'
     | '/admin/configuracion'
     | '/admin/notificaciones'
@@ -795,6 +806,7 @@ export interface FileRouteTypes {
     | '/admin/general/alertas'
     | '/admin/general/movimientos'
     | '/admin/general/usuarios'
+    | '/admin/sistema/pruebas'
     | '/admin/comercios/'
     | '/admin/configuracion/'
     | '/admin/notificaciones/'
@@ -1079,6 +1091,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/notificaciones/'
       preLoaderRoute: typeof AdminNotificacionesIndexRouteImport
       parentRoute: typeof AdminNotificacionesRoute
+    }
+    '/admin/sistema/pruebas': {
+      id: '/admin/sistema/pruebas'
+      path: '/sistema/pruebas'
+      fullPath: '/admin/sistema/pruebas'
+      preLoaderRoute: typeof AdminSistemaPruebasRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/admin/administracion/registros/': {
       id: '/admin/administracion/registros/'
@@ -1563,6 +1582,7 @@ interface AdminRouteChildren {
   AdminGeneralAlertasRoute: typeof AdminGeneralAlertasRouteWithChildren
   AdminGeneralMovimientosRoute: typeof AdminGeneralMovimientosRouteWithChildren
   AdminGeneralUsuariosRoute: typeof AdminGeneralUsuariosRouteWithChildren
+  AdminSistemaPruebasRoute: typeof AdminSistemaPruebasRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
@@ -1586,6 +1606,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminGeneralAlertasRoute: AdminGeneralAlertasRouteWithChildren,
   AdminGeneralMovimientosRoute: AdminGeneralMovimientosRouteWithChildren,
   AdminGeneralUsuariosRoute: AdminGeneralUsuariosRouteWithChildren,
+  AdminSistemaPruebasRoute: AdminSistemaPruebasRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)

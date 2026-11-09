@@ -99,19 +99,17 @@ export type EnlacePago = {
 function toEnlace(r: EnlacePagoRow): EnlacePago {
   const cli = Array.isArray(r.clientes) ? r.clientes[0] : (r.clientes ?? null);
   const estado = normalizeEstado(r.estado);
-  // Mock pago info para Pagado/Contracargo (v1: derivado en UI, no persiste en DB)
+  // Datos del pago para Pagado/Contracargo: solo lo que guarda la base; lo que falta se muestra "—".
   const pago: PagoInfo | null =
     estado === "Pagado" || estado === "Contracargo"
       ? {
           metodoPago: r.metodo_pago ?? r.metodos_pago?.[0] ?? "Tarjeta",
-          tipoTarjeta: r.tipo_tarjeta ?? (Math.random() > 0.5 ? "Crédito" : "Débito"),
-          marcaTarjeta:
-            r.marca_tarjeta ??
-            ["Visa", "Mastercard", "Amex", "Cabal"][Math.floor(Math.random() * 4)],
-          cuotas: r.cuotas ?? (estado === "Pagado" ? (Math.random() > 0.6 ? 1 : 3) : 1),
+          tipoTarjeta: r.tipo_tarjeta ?? "—",
+          marcaTarjeta: r.marca_tarjeta ?? null,
+          cuotas: r.cuotas ?? 1,
           importePagado: r.monto ?? null,
           fechaPago: r.updated_at ?? r.created_at,
-          autorizacion: `AUTH-${r.id.slice(0, 6).toUpperCase()}`,
+          autorizacion: null,
         }
       : null;
   return {

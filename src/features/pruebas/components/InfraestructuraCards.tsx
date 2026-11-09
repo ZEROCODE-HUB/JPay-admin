@@ -1,6 +1,6 @@
 import { Database, Layers, ServerCog, Timer } from "lucide-react";
 import { Card } from "@/components/portal-shell";
-import { proximoGrupo } from "../utils";
+import { proximoGrupo } from "@/features/configuracion/utils";
 
 /** Estado del servicio, conexiones y estadísticas paralelas (datos de referencia). */
 export function InfraestructuraCards() {

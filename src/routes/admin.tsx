@@ -31,6 +31,7 @@ import {
   CreditCard,
   CircleDollarSign,
   Megaphone,
+  FlaskConical,
 } from "lucide-react";
 import { PortalShell, type NavItem } from "@/components/portal-shell";
 import { useDemoMode } from "@/contexts/demo-mode";
@@ -151,6 +152,7 @@ const NAV: NavItem[] = [
       { to: "/admin/administracion/soporte", label: "Soporte", icon: Headphones },
       { to: "/admin/incidentes", label: "Comunicación de incidentes", icon: Megaphone },
       { to: "/admin/comercios/apis", label: "APIs externas", icon: Code2 },
+      { to: "/admin/sistema/pruebas", label: "Herramientas de prueba", icon: FlaskConical },
     ],
   },
 ];

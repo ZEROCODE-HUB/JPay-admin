@@ -141,7 +141,7 @@ function Page() {
       <div className="space-y-2">
         <PageHeader
           title="Logins configurados"
-          description="Logins de integraciones configurados en la plataforma. Métricas operativas (semáforo, última/próxima ejecución, tiempo restante) son datos de REFERENCIA (mock) — provendrían de un sistema de monitoreo/cron real."
+          description="Logins de integraciones configurados en la plataforma."
         />
         <DataTable
           columns={columns}

@@ -241,7 +241,7 @@ export const KB: KbEntry[] = [
       "gestor de integraciones",
     ],
     response:
-      "Configuración:\n\n• Gestor de Integraciones (Configuración): panel de estado de las integraciones (Cobre, Ecart Pay) con salud, última/próxima ejecución y ejecuciones totales. En modo desarrollador se ven controles técnicos (configurar logs, ejecutar todos o uno específico, actualizar datos).\n• Logins configurados: programación (cron), última/próxima ejecución, tiempo restante y ejecuciones de cada login.\n• País y proveedores: configuración de México, sus módulos, la conexión con los proveedores, webhooks, umbrales de aprobación, MSI y simuladores. La conciliación y las disputas están en Control.",
+      "Configuración:\n\n• Gestor de Integraciones (Configuración): panel de estado de las integraciones (Cobre, Ecart Pay) con salud, última/próxima ejecución y ejecuciones totales.\n• Logins configurados: programación (cron), última/próxima ejecución, tiempo restante y ejecuciones de cada login.\n• País y proveedores: configuración de México, sus módulos, la conexión con los proveedores, webhooks, umbrales de aprobación, MSI y simuladores. La conciliación y las disputas están en Control.",
   },
   {
     keywords: [

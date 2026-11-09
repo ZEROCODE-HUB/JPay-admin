@@ -1,7 +1,6 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { TabLayout, type Tab } from "@/components/tab-layout";
 import { PageHeader } from "@/components/portal-shell";
-import { DeveloperModeToggle } from "@/components/developer-mode-toggle";
 import { brand, pageTitle } from "@/brand/brand";
 
 export const Route = createFileRoute("/admin/configuracion")({
@@ -26,7 +25,6 @@ function ConfiguracionLayout() {
       <PageHeader
         title="Gestor de Integraciones"
         description="Seguimiento del estado de las integraciones que alimentan a la plataforma."
-        action={<DeveloperModeToggle />}
       />
       <TabLayout tabs={tabs}>
         <Outlet />

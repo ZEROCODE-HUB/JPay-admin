@@ -12,8 +12,8 @@ import { PaisesCard } from "./PaisesCard";
 import { ProveedoresCard } from "./ProveedoresCard";
 
 /**
- * Configuración > País y proveedores: solo configuración (conexiones, webhooks, umbrales, MSI y
- * simuladores). La conciliación y las disputas están en Control.
+ * Configuración > País y proveedores: solo configuración (conexiones, webhooks, umbrales y MSI).
+ * La conciliación y las disputas están en Control; los simuladores, en Herramientas de prueba.
  */
 export function PaisesPage() {
   const { paises, proveedores, configuracion, isLoading, error } = usePaisesConfig();
@@ -37,18 +37,10 @@ export function PaisesPage() {
       {ecartpay && <MsiCard />}
       {ecartpay && <PuntosFisicosCard />}
       {cobre && (
-        <ConexionProveedorCard
-          proveedor={cobre}
-          descripcion="Cuentas y transferencias SPEI. Mientras Cobre no entregue la instancia de prueba funciona con el simulador (COBRE_MODO)."
-        />
+        <ConexionProveedorCard proveedor={cobre} descripcion="Cuentas y transferencias SPEI." />
       )}
       {cobre && <AlertasProveedorCard proveedor="cobre" nombre="Cobre" />}
-      {/* Sin prueba de conexión todavía, el modo es el simulado (COBRE_MODO por defecto). */}
-      {cobre && (
-        <CobreCard
-          simulado={cobre.conexion.modo !== "prueba" && cobre.conexion.modo !== "produccion"}
-        />
-      )}
+      {cobre && <CobreCard />}
       {configuracion.map((c) => (
         <ConfiguracionPagosCard key={`${c.pais}-${c.proveedor}`} config={c} />
       ))}

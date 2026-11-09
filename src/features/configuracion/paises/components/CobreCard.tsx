@@ -11,10 +11,10 @@ const input = "mt-1 block w-full h-9 rounded-md border border-input bg-card px-2
 /**
  * Cobre (México), según el Solution Design de JPAY: cada comercio tiene su Cobre Balance (se da
  * de alta desde el detalle del cliente). Aquí solo la configuración: Balances Global y USA de JPay
- * (dólares), suscripción de avisos, montos de aprobación y OTP, y los simuladores. Las aprobaciones
- * están en Envíos y los depósitos sin asignar en Cobros.
+ * (dólares), suscripción de avisos, montos de aprobación y OTP. Las aprobaciones están en Envíos
+ * y los depósitos sin asignar en Cobros. Los simuladores están en Sistema → Herramientas de prueba.
  */
-export function CobreCard({ simulado }: { simulado: boolean }) {
+export function CobreCard() {
   const { configuracion, balances, suscripcion } = useCobreAdmin();
   const m = useCobreAdminMutaciones();
   const c = configuracion.data;
@@ -23,8 +23,6 @@ export function CobreCard({ simulado }: { simulado: boolean }) {
   const [otp, setOtp] = useState(false);
   const [reglasFx, setReglasFx] = useState(false);
   const [modoComision, setModoComision] = useState<"descontar" | "calcular">("descontar");
-  const [dep, setDep] = useState({ clabe: "", monto: "" });
-  const [r2p, setR2p] = useState("");
   const [saldos, setSaldos] = useState<Record<string, string>>({});
 
   useEffect(() => {
@@ -235,69 +233,6 @@ export function CobreCard({ simulado }: { simulado: boolean }) {
               </BtnPrimary>
             </div>
           </section>
-
-          {simulado && (
-            <section className="rounded-md border border-dashed border-border p-3 space-y-3">
-              <div>
-                <p className="text-xs font-medium">
-                  Simulador: depósito SPEI a la CLABE de un comercio
-                </p>
-                <div className="mt-2 flex flex-wrap items-end gap-2">
-                  <input
-                    className="h-9 w-56 rounded-md border border-input bg-card px-2 text-sm font-mono"
-                    placeholder="CLABE del comercio"
-                    value={dep.clabe}
-                    onChange={(e) => setDep({ ...dep, clabe: e.target.value.replace(/\D/g, "") })}
-                  />
-                  <input
-                    className="h-9 w-32 rounded-md border border-input bg-card px-2 text-sm"
-                    placeholder="Monto"
-                    inputMode="decimal"
-                    value={dep.monto}
-                    onChange={(e) => setDep({ ...dep, monto: e.target.value })}
-                  />
-                  <BtnOutline
-                    disabled={m.simularDeposito.isPending}
-                    onClick={() =>
-                      m.simularDeposito.mutate(
-                        { clabe: dep.clabe, monto: parseMonto(dep.monto) },
-                        {
-                          onSuccess: () => toast.success("Depósito simulado enviado"),
-                          onError: avisarError,
-                        },
-                      )
-                    }
-                  >
-                    {m.simularDeposito.isPending ? "Enviando…" : "Simular depósito"}
-                  </BtnOutline>
-                </div>
-              </div>
-              <div>
-                <p className="text-xs font-medium">
-                  Simulador: pagar un cobro por SPEI (CLABE dinámica)
-                </p>
-                <div className="mt-2 flex flex-wrap items-end gap-2">
-                  <input
-                    className="h-9 w-56 rounded-md border border-input bg-card px-2 text-sm font-mono"
-                    placeholder="CLABE del cobro"
-                    value={r2p}
-                    onChange={(e) => setR2p(e.target.value.replace(/\D/g, ""))}
-                  />
-                  <BtnOutline
-                    disabled={m.simularPagoR2p.isPending}
-                    onClick={() =>
-                      m.simularPagoR2p.mutate(r2p, {
-                        onSuccess: () => toast.success("Pago simulado enviado"),
-                        onError: avisarError,
-                      })
-                    }
-                  >
-                    {m.simularPagoR2p.isPending ? "Pagando…" : "Simular pago"}
-                  </BtnOutline>
-                </div>
-              </div>
-            </section>
-          )}
         </div>
       )}
     </Card>

@@ -7,7 +7,7 @@ import type { ControlesTecnicos } from "../hooks/useControlesTecnicos";
 import { InfraestructuraCards } from "./InfraestructuraCards";
 import { ControlesTecnicosDialogs } from "./ControlesTecnicosDialogs";
 
-/** Vista técnica (modo desarrollador) del gestor de integraciones. */
+/** Vista técnica del gestor de integraciones con datos de referencia (solo pruebas). */
 export function VistaDesarrollador({
   controles,
   integraciones,
@@ -18,13 +18,11 @@ export function VistaDesarrollador({
   return (
     <PermissionGuard recurso="gestor_integraciones">
       <div className="space-y-6">
-        <div className="rounded-lg border border-amber-200 bg-amber-50 dark:bg-amber-950/20 p-3 text-sm text-amber-800 dark:text-amber-300">
-          Vista de desarrollador: información técnica de infraestructura. Se accede con permiso
-          "gestor_integraciones" (lectura sobre este recurso).{" "}
-          <span className="font-semibold">Nota:</span> métricas operativas (semáforo, última/próxima
-          ejecución, conexiones) son datos de REFERENCIA (mock) — provendrían de un sistema de
-          monitoreo/cron real que aún no existe.
-        </div>
+        <p className="text-sm text-muted-foreground">
+          Vista técnica del gestor de integraciones. Los valores (estado del servicio, conexiones,
+          próxima ejecución) son datos de referencia: todavía no hay un sistema de monitoreo real
+          que los informe. Requiere permiso de lectura sobre "gestor_integraciones".
+        </p>
 
         <InfraestructuraCards />
 
