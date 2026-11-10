@@ -21,6 +21,7 @@ import {
   MapPinned,
   Repeat,
   FlaskConical,
+  PhoneCall,
 } from "lucide-react";
 import { PortalShell, type NavItem } from "@/components/portal-shell";
 import { useDemoMode } from "@/contexts/demo-mode";
@@ -45,6 +46,7 @@ const NAV: NavItem[] = [
     items: [
       { to: "/admin/general/usuarios", label: "Usuarios", icon: Users },
       { to: "/admin/general/movimientos", label: "Movimientos", icon: Activity },
+      { to: "/admin/general/solicitudes", label: "Solicitudes de contacto", icon: PhoneCall },
       {
         to: "/admin/general/alertas",
         label: "Alertas",

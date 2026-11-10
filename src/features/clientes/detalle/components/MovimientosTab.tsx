@@ -22,12 +22,16 @@ export function MovimientosTab({ data, ui }: { data: ClienteDetalleData; ui: Cli
   const { setMovDetail, setEstadoTarget } = ui;
 
   const statsRows = movimientosStatsQuery.data?.rows ?? movimientosQuery.rows;
-  // Saldo real = suma de subcuentas (disponible + retenido) como en el portal de clientes (Enterprises) app.index.tsx:98-99
-  // Cuenta general = +1 (principal) no aporta saldo extra, saldo = disp+retenido de todas las subcuentas del legajo
-  const saldoTotal = (subcuentasQuery.data ?? []).reduce(
-    (acc, s) => acc + Number(s.saldoDisponible ?? 0) + Number(s.saldoRetenido ?? 0),
-    0,
-  );
+  // Saldo = disponible + retenido de las subcuentas del legajo, por moneda: la subcuenta en
+  // dólares no se suma con las de pesos.
+  const subs = subcuentasQuery.data ?? [];
+  const saldoDe = (moneda: "MXN" | "USD") =>
+    subs
+      .filter((s) => s.moneda === moneda)
+      .reduce((acc, s) => acc + Number(s.saldoDisponible ?? 0) + Number(s.saldoRetenido ?? 0), 0);
+  const saldoTotal = saldoDe("MXN");
+  const hayUsd = subs.some((s) => s.moneda === "USD");
+  const saldoUsd = saldoDe("USD");
   const totalMovimientos = movimientosStatsQuery.data?.total ?? movimientosQuery.total ?? 0;
   const porTipo = statsRows.reduce<Record<string, number>>((acc, r) => {
     const k = r.tipo ?? "otro";
@@ -86,16 +90,22 @@ export function MovimientosTab({ data, ui }: { data: ClienteDetalleData; ui: Cli
           <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
             Saldo total de la cuenta{" "}
             <InfoTip>
-              Suma del saldo disponible más el retenido (por contracargos o disputas) de todas las
-              subcuentas del cliente, según los saldos que lleva JPay. No depende del período
-              elegido: es el saldo actual.
+              Suma del saldo disponible más el retenido (por operaciones en curso, contracargos o
+              disputas) de las subcuentas en pesos del cliente, según los saldos que lleva JPay. La
+              subcuenta en dólares se muestra aparte, en dólares. No depende del período elegido: es
+              el saldo actual.
             </InfoTip>
           </p>
           <p className="mt-2 text-2xl font-semibold tabular-nums">{formatMoney(saldoTotal)}</p>
+          {hayUsd && (
+            <p className="text-sm font-semibold tabular-nums">
+              + {formatMoney(saldoUsd, { moneda: "USD" })} en dólares
+            </p>
+          )}
           <p className="mt-1 text-xs text-muted-foreground">
             Disponible + retenido ·{" "}
             {(subcuentasQuery.data?.length ?? 0) > 0
-              ? `1 principal + ${subcuentasQuery.data!.length} subcuenta(s)`
+              ? `${subcuentasQuery.data!.length} subcuenta(s)`
               : "sin subcuentas"}
             {subcuentasQuery.isLoading ? " (cargando…)" : ""}
           </p>

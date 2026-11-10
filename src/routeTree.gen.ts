@@ -40,6 +40,7 @@ import { Route as AdminControlSplatRouteImport } from './routes/admin.control.$'
 import { Route as AdminEnviosAprobacionesRouteImport } from './routes/admin.envios.aprobaciones'
 import { Route as AdminGeneralAlertasRouteImport } from './routes/admin.general.alertas'
 import { Route as AdminGeneralMovimientosRouteImport } from './routes/admin.general.movimientos'
+import { Route as AdminGeneralSolicitudesRouteImport } from './routes/admin.general.solicitudes'
 import { Route as AdminGeneralUsuariosRouteImport } from './routes/admin.general.usuarios'
 import { Route as AdminNotificacionesIndexRouteImport } from './routes/admin.notificaciones.index'
 import { Route as AdminSistemaPruebasRouteImport } from './routes/admin.sistema.pruebas'
@@ -236,6 +237,11 @@ const AdminGeneralAlertasRoute = AdminGeneralAlertasRouteImport.update({
 const AdminGeneralMovimientosRoute = AdminGeneralMovimientosRouteImport.update({
   id: '/general/movimientos',
   path: '/general/movimientos',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminGeneralSolicitudesRoute = AdminGeneralSolicitudesRouteImport.update({
+  id: '/general/solicitudes',
+  path: '/general/solicitudes',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminGeneralUsuariosRoute = AdminGeneralUsuariosRouteImport.update({
@@ -464,6 +470,7 @@ export interface FileRoutesByFullPath {
   '/admin/envios/aprobaciones': typeof AdminEnviosAprobacionesRoute
   '/admin/general/alertas': typeof AdminGeneralAlertasRouteWithChildren
   '/admin/general/movimientos': typeof AdminGeneralMovimientosRouteWithChildren
+  '/admin/general/solicitudes': typeof AdminGeneralSolicitudesRoute
   '/admin/general/usuarios': typeof AdminGeneralUsuariosRouteWithChildren
   '/admin/sistema/pruebas': typeof AdminSistemaPruebasRoute
   '/admin/comercios/': typeof AdminComerciosIndexRoute
@@ -518,6 +525,7 @@ export interface FileRoutesByTo {
   '/admin/configuracion/paises': typeof AdminConfiguracionPaisesRoute
   '/admin/control/$': typeof AdminControlSplatRoute
   '/admin/envios/aprobaciones': typeof AdminEnviosAprobacionesRoute
+  '/admin/general/solicitudes': typeof AdminGeneralSolicitudesRoute
   '/admin/sistema/pruebas': typeof AdminSistemaPruebasRoute
   '/admin/comercios': typeof AdminComerciosIndexRoute
   '/admin/configuracion': typeof AdminConfiguracionIndexRoute
@@ -584,6 +592,7 @@ export interface FileRoutesById {
   '/admin/envios/aprobaciones': typeof AdminEnviosAprobacionesRoute
   '/admin/general/alertas': typeof AdminGeneralAlertasRouteWithChildren
   '/admin/general/movimientos': typeof AdminGeneralMovimientosRouteWithChildren
+  '/admin/general/solicitudes': typeof AdminGeneralSolicitudesRoute
   '/admin/general/usuarios': typeof AdminGeneralUsuariosRouteWithChildren
   '/admin/sistema/pruebas': typeof AdminSistemaPruebasRoute
   '/admin/comercios/': typeof AdminComerciosIndexRoute
@@ -652,6 +661,7 @@ export interface FileRouteTypes {
     | '/admin/envios/aprobaciones'
     | '/admin/general/alertas'
     | '/admin/general/movimientos'
+    | '/admin/general/solicitudes'
     | '/admin/general/usuarios'
     | '/admin/sistema/pruebas'
     | '/admin/comercios/'
@@ -706,6 +716,7 @@ export interface FileRouteTypes {
     | '/admin/configuracion/paises'
     | '/admin/control/$'
     | '/admin/envios/aprobaciones'
+    | '/admin/general/solicitudes'
     | '/admin/sistema/pruebas'
     | '/admin/comercios'
     | '/admin/configuracion'
@@ -771,6 +782,7 @@ export interface FileRouteTypes {
     | '/admin/envios/aprobaciones'
     | '/admin/general/alertas'
     | '/admin/general/movimientos'
+    | '/admin/general/solicitudes'
     | '/admin/general/usuarios'
     | '/admin/sistema/pruebas'
     | '/admin/comercios/'
@@ -1033,6 +1045,13 @@ declare module '@tanstack/react-router' {
       path: '/general/movimientos'
       fullPath: '/admin/general/movimientos'
       preLoaderRoute: typeof AdminGeneralMovimientosRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/general/solicitudes': {
+      id: '/admin/general/solicitudes'
+      path: '/general/solicitudes'
+      fullPath: '/admin/general/solicitudes'
+      preLoaderRoute: typeof AdminGeneralSolicitudesRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/general/usuarios': {
@@ -1502,6 +1521,7 @@ interface AdminRouteChildren {
   AdminEnviosAprobacionesRoute: typeof AdminEnviosAprobacionesRoute
   AdminGeneralAlertasRoute: typeof AdminGeneralAlertasRouteWithChildren
   AdminGeneralMovimientosRoute: typeof AdminGeneralMovimientosRouteWithChildren
+  AdminGeneralSolicitudesRoute: typeof AdminGeneralSolicitudesRoute
   AdminGeneralUsuariosRoute: typeof AdminGeneralUsuariosRouteWithChildren
   AdminSistemaPruebasRoute: typeof AdminSistemaPruebasRoute
   AdminFinanzasComisionesCargaRoute: typeof AdminFinanzasComisionesCargaRoute
@@ -1527,6 +1547,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminEnviosAprobacionesRoute: AdminEnviosAprobacionesRoute,
   AdminGeneralAlertasRoute: AdminGeneralAlertasRouteWithChildren,
   AdminGeneralMovimientosRoute: AdminGeneralMovimientosRouteWithChildren,
+  AdminGeneralSolicitudesRoute: AdminGeneralSolicitudesRoute,
   AdminGeneralUsuariosRoute: AdminGeneralUsuariosRouteWithChildren,
   AdminSistemaPruebasRoute: AdminSistemaPruebasRoute,
   AdminFinanzasComisionesCargaRoute: AdminFinanzasComisionesCargaRoute,

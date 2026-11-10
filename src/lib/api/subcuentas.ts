@@ -63,6 +63,8 @@ export type Subcuenta = {
   saldoDisponible: number;
   saldoRetenido: number;
   saldoConciliado: number;
+  /** La subcuenta en dólares guarda USD; el resto, pesos. */
+  moneda: "MXN" | "USD";
   ingresos: string | null;
   egresos: string | null;
   responsable: string | null;
@@ -91,6 +93,7 @@ type SubcuentaRow = {
   estado: SubcuentaEstado;
   // Relación 1:1: PostgREST la devuelve como objeto (array en versiones viejas).
   subaccount_balances: BalanceRow | BalanceRow[] | null;
+  moneda: string | null;
   ingresos: string | null;
   egresos: string | null;
   responsable: string | null;
@@ -103,7 +106,7 @@ type SubcuentaRow = {
 };
 
 const COLUMNS =
-  "id, cliente_legajo, nombre, apellido, email, cbu, tipo, estado, ingresos, egresos, responsable, limite, retiros_habilitados, validada, configuracion, created_at, updated_at, subaccount_balances(saldo_disponible, saldo_retenido, saldo_conciliado)";
+  "id, cliente_legajo, nombre, apellido, email, cbu, tipo, estado, moneda, ingresos, egresos, responsable, limite, retiros_habilitados, validada, configuracion, created_at, updated_at, subaccount_balances(saldo_disponible, saldo_retenido, saldo_conciliado)";
 
 function balanceOf(r: SubcuentaRow): BalanceRow | null {
   const b = r.subaccount_balances;
@@ -124,6 +127,7 @@ function toSubcuenta(r: SubcuentaRow): Subcuenta {
     saldoDisponible: Number(bal?.saldo_disponible ?? 0),
     saldoRetenido: Number(bal?.saldo_retenido ?? 0),
     saldoConciliado: Number(bal?.saldo_conciliado ?? 0),
+    moneda: r.moneda === "USD" ? "USD" : "MXN",
     ingresos: r.ingresos,
     egresos: r.egresos,
     responsable: r.responsable,

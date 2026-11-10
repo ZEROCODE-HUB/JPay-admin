@@ -66,7 +66,7 @@ export function TablaSubcuentas({
                 )}
               </td>
               <td className="px-4 py-3 text-right tabular-nums">
-                {formatMoney(s.saldoDisponible)}
+                {formatMoney(s.saldoDisponible, { moneda: s.moneda })}
               </td>
               <td className="px-4 py-3 text-right">
                 {s.retirosHabilitados ? "Habilitados" : "Bloqueados"}
