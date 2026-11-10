@@ -124,10 +124,28 @@ export function SubcuentasTab({ legajo }: { legajo: string }) {
       vacio={!query.isLoading && (query.data?.length ?? 0) === 0}
     >
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-        <KpiCard label="Subcuentas" value={String(totalSubcuentas)} />
-        <KpiCard label="Máximo de subcuentas" value="—" />
-        <KpiCard label="Redirección automática" value="Inactiva" tone="muted" />
-        <KpiCard label="Presión operativa" value="Sin tope" tone="muted" />
+        <KpiCard
+          label="Subcuentas"
+          value={String(totalSubcuentas)}
+          info="Todas las subcuentas (CLABE) de este cliente, activas o pausadas."
+        />
+        <KpiCard
+          label="Máximo de subcuentas"
+          value="—"
+          info="Todavía no se configura: no hay un límite de subcuentas guardado para el cliente, por eso se muestra «—»."
+        />
+        <KpiCard
+          label="Redirección automática"
+          value="Inactiva"
+          tone="muted"
+          info="Valor fijo de la pantalla: la redirección automática de fondos entre subcuentas aún no está disponible."
+        />
+        <KpiCard
+          label="Presión operativa"
+          value="Sin tope"
+          tone="muted"
+          info="Valor fijo de la pantalla: todavía no se aplica un tope operativo por subcuentas."
+        />
       </div>
 
       <div className="flex flex-wrap justify-end gap-2 mb-3">

@@ -23,6 +23,9 @@ type ModuleStatus = {
 // ejemplo).
 const modules: ModuleStatus[] = [];
 
+const SIN_MONITOREO =
+  "Todavía no hay un sistema de monitoreo conectado: la lista está vacía y el número queda en 0.";
+
 const pct = (n: number) => (modules.length ? `${Math.round((n / modules.length) * 100)}%` : "—");
 
 function StatusIcon({ status }: { status: ModuleStatus["status"] }) {
@@ -50,11 +53,34 @@ function Page() {
       />
 
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
-        <Stat label="Módulos totales" value={String(modules.length)} />
-        <Stat label="Operativos" value={String(operativos)} sub={pct(operativos)} />
-        <Stat label="Degradados" value={String(degradados)} sub={pct(degradados)} />
-        <Stat label="Caídos" value={String(caidos)} sub={pct(caidos)} />
-        <Stat label="Latencia promedio" value="—" />
+        <Stat
+          label="Módulos totales"
+          value={String(modules.length)}
+          info={`Cantidad de módulos monitoreados. ${SIN_MONITOREO}`}
+        />
+        <Stat
+          label="Operativos"
+          value={String(operativos)}
+          sub={pct(operativos)}
+          info={`Módulos funcionando con normalidad y su porcentaje sobre el total. ${SIN_MONITOREO}`}
+        />
+        <Stat
+          label="Degradados"
+          value={String(degradados)}
+          sub={pct(degradados)}
+          info={`Módulos que responden con problemas y su porcentaje sobre el total. ${SIN_MONITOREO}`}
+        />
+        <Stat
+          label="Caídos"
+          value={String(caidos)}
+          sub={pct(caidos)}
+          info={`Módulos que no responden y su porcentaje sobre el total. ${SIN_MONITOREO}`}
+        />
+        <Stat
+          label="Latencia promedio"
+          value="—"
+          info="Tiempo de respuesta promedio de los módulos. Sin monitoreo conectado todavía, no hay dato."
+        />
       </div>
 
       <Card>

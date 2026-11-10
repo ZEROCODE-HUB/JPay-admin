@@ -5,6 +5,7 @@ import { Input, Label } from "@/components/portal-shell";
 import { DataTable, type Column } from "@/shared/ui/data-table";
 import { useComisionesDashboard } from "../hooks/useComisionesDashboard";
 import type { ComisionPorComercio } from "../utils";
+import { InfoTip } from "@/shared/ui/info-tip";
 
 const desgloseColumns: Column<ComisionPorComercio>[] = [
   {
@@ -62,6 +63,11 @@ export function ComisionesCard() {
       <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
         <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground flex items-center gap-1.5">
           <Wallet size={14} /> Comisiones — Depósitos y Retiros
+          <InfoTip>
+            Movimientos de tipo depósito y retiro del libro contable de JPay con fecha entre «Desde»
+            y «Hasta» (por defecto, del día 1 del mes a hoy), en cualquier estado. Se toman hasta
+            1,000 depósitos y 1,000 retiros del periodo.
+          </InfoTip>
         </h3>
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1.5">
@@ -95,19 +101,38 @@ export function ComisionesCard() {
         <>
           <div className="grid grid-cols-3 gap-3">
             <div className="rounded-lg border bg-muted/30 px-3 py-3">
-              <div className="text-xs text-muted-foreground">Monto transaccionado</div>
+              <div className="text-xs text-muted-foreground">
+                Monto transaccionado{" "}
+                <InfoTip>
+                  Suma del monto de operación de los depósitos y retiros del periodo, sin descontar
+                  comisiones. Suma los montos tal cual, sin convertir monedas.
+                </InfoTip>
+              </div>
               <div className="font-mono font-semibold mt-1">{formatMoney(montoTransaccionado)}</div>
               <div className="text-[11px] text-muted-foreground">Depósitos + Retiros</div>
             </div>
             <div className="rounded-lg border bg-muted/30 px-3 py-3">
-              <div className="text-xs text-muted-foreground">Comisión total</div>
+              <div className="text-xs text-muted-foreground">
+                Comisión total{" "}
+                <InfoTip>
+                  Suma de la comisión que JPay cobró en cada depósito y retiro del periodo (la que
+                  quedó registrada en el movimiento). Los impuestos retenidos van aparte y no se
+                  suman aquí.
+                </InfoTip>
+              </div>
               <div className="font-mono font-semibold mt-1 text-primary-ink">
                 {formatMoney(comisionTotal)}
               </div>
               <div className="text-[11px] text-muted-foreground">Suma comision</div>
             </div>
             <div className="rounded-lg border bg-primary/10 px-3 py-3">
-              <div className="text-xs text-muted-foreground">Remanente</div>
+              <div className="text-xs text-muted-foreground">
+                Remanente{" "}
+                <InfoTip align="right">
+                  Monto transaccionado menos comisión total: lo que les quedó a los clientes. Es el
+                  flujo del periodo, no el saldo de ninguna cuenta.
+                </InfoTip>
+              </div>
               <div className="font-mono font-semibold mt-1 text-emerald-700">
                 {formatMoney(remanente)}
               </div>

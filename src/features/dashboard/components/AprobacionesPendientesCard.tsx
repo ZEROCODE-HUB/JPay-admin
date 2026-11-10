@@ -3,6 +3,7 @@ import { ArrowUpRight } from "lucide-react";
 import { Card } from "@/components/portal-shell";
 import { useAprobacionesCobre } from "@/hooks/useCobre";
 import { formatNumber } from "@/shared/format";
+import { InfoTip } from "@/shared/ui/info-tip";
 
 /** Envíos (transferencias y lotes) que esperan la aprobación de un admin. */
 export function AprobacionesPendientesCard() {
@@ -17,6 +18,12 @@ export function AprobacionesPendientesCard() {
       <div className="flex items-center justify-between mb-2">
         <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
           Envíos por aprobar
+          <InfoTip className="ml-1">
+            Transferencias de Cobre sueltas en estado «pendiente de aprobación» más lotes que
+            requieren aprobación y todavía nadie decidió. Cada lote cuenta como uno, sin importar
+            cuántas transferencias tenga. Se consulta cada 30 segundos (se muestran hasta 50
+            transferencias).
+          </InfoTip>
         </h3>
         <Link
           to="/admin/envios/aprobaciones"

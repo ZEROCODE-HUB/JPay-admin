@@ -2,6 +2,7 @@ import { CheckCircle2, XCircle } from "lucide-react";
 import { Card } from "@/components/portal-shell";
 import type { DashboardDetalle } from "@/lib/api/dashboard";
 import { formatDateTime, formatMoney, formatNumber } from "@/shared/format";
+import { InfoTip } from "@/shared/ui/info-tip";
 
 type Props = { d?: DashboardDetalle; isLoading: boolean; isError: boolean };
 
@@ -19,7 +20,14 @@ export function VolumenSistemaRow({ d, isLoading, isError }: Props) {
       <Card className="lg:col-span-2">
         <div className="flex items-end justify-between mb-4">
           <div>
-            <h3 className="font-display font-semibold">Volumen transaccional</h3>
+            <h3 className="font-display font-semibold">
+              Volumen transaccional{" "}
+              <InfoTip>
+                Suma diaria de todas las operaciones contabilizadas en el libro contable de JPay,
+                solo en la moneda del país (MXN), de los últimos 14 días contados en hora de México.
+                Pasa el mouse sobre una barra para ver el monto y la cantidad de ese día.
+              </InfoTip>
+            </h3>
             <p className="text-xs text-muted-foreground">
               Últimos 14 días — {d?.moneda ?? "—"}
               {d && ` · ${formatMoney(total, { moneda: d.moneda })} en total`}
@@ -50,7 +58,15 @@ export function VolumenSistemaRow({ d, isLoading, isError }: Props) {
       </Card>
 
       <Card>
-        <h3 className="font-display font-semibold mb-4">Estado del sistema</h3>
+        <h3 className="font-display font-semibold mb-4">
+          Estado del sistema{" "}
+          <InfoTip align="right">
+            Resultado de la última prueba de conexión de cada proveedor activo (Cobre, Ecart Pay) y
+            la última corrida de las tareas automáticas. Una tarea se marca atrasada si no corre en
+            15 min (revisión de pendientes), 26 h (conciliación diaria) o 5 min (simulador de
+            Cobre).
+          </InfoTip>
+        </h3>
         {aviso ? (
           <p className="text-sm text-muted-foreground">{aviso}</p>
         ) : (d?.estadoSistema ?? []).length === 0 ? (

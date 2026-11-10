@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { AlertTriangle } from "lucide-react";
 import { Card, PageHeader } from "@/components/portal-shell";
 import { brand } from "@/brand/brand";
+import { InfoTip } from "@/shared/ui/info-tip";
 
 export const Route = createFileRoute("/admin/administracion/registros/total")({
   head: () => ({ meta: [{ title: "Total de fondos — Admin Panel" }] }),
@@ -36,7 +37,12 @@ function Page() {
       <div className="grid lg:grid-cols-2 gap-6 mb-6">
         <Card className="p-6">
           <h3 className="font-display font-semibold mb-4 text-sm uppercase tracking-wide text-muted-foreground">
-            Fórmula 1 ({monedaActiva()})
+            Fórmula 1 ({monedaActiva()}){" "}
+            <InfoTip>
+              Ojo: estos montos son de ejemplo, fijos en la pantalla; todavía no salen de ningún
+              dato real. La fórmula sería: saldo interno de los usuarios + impuestos cobrados −
+              saldo en el banco. Un resultado negativo indicaría que se informa más de lo que hay.
+            </InfoTip>
           </h3>
           <div className="space-y-3 text-sm">
             <div className="flex justify-between">
@@ -66,7 +72,11 @@ function Page() {
 
         <Card className="p-6">
           <h3 className="font-display font-semibold mb-4 text-sm uppercase tracking-wide text-muted-foreground">
-            Fórmula 2 ({monedaActiva()}) — Interno nuevo
+            Fórmula 2 ({monedaActiva()}) — Interno nuevo{" "}
+            <InfoTip align="right">
+              Ojo: montos de ejemplo, fijos en la pantalla; todavía no está conectada a datos
+              reales. La fórmula sería: saldo interno nuevo de los usuarios − saldo en el banco.
+            </InfoTip>
           </h3>
           <div className="space-y-3 text-sm">
             <div className="flex justify-between">

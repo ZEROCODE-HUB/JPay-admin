@@ -26,12 +26,14 @@ export function ContextoTab({ data, ui }: { data: ClienteDetalleData; ui: Client
       <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5">
         <KpiCard
           label="Subcuentas"
+          info="Todas las subcuentas (CLABE) dadas de alta para este cliente, activas o pausadas."
           value={
             subcuentasQuery.isError ? "Por definir" : String(subcuentasQuery.data?.length ?? 0)
           }
         />
         <KpiCard
           label="Comisiones"
+          info="Reglas de comisión configuradas para este cliente que aplican a depósitos y retiros (no son comisiones cobradas). Solo revisa las 10 reglas más recientes, así que el número no pasa de 10."
           value={
             comisionesRealesQuery.isError
               ? "Por definir"
@@ -44,14 +46,17 @@ export function ContextoTab({ data, ui }: { data: ClienteDetalleData; ui: Client
         />
         <KpiCard
           label="Alertas"
+          info="Alertas de monitoreo generadas para este cliente en cualquier estado (pendientes, en revisión, resueltas o descartadas). Cuenta las 100 más recientes."
           value={alertasQuery.isError ? "Por definir" : String(alertasQuery.data?.length ?? 0)}
         />
         <KpiCard
           label="Bloqueos"
+          info="Bloqueos aplicados a la cuenta o a sus subcuentas, vigentes o ya levantados. Cuenta los 100 más recientes."
           value={bloqueosQuery.isError ? "Por definir" : String(bloqueosQuery.data?.length ?? 0)}
         />
         <KpiCard
           label="Módulos inferidos"
+          info="Módulos que el cliente tiene registrados en JPay (por ejemplo API externa, links de pago o subcuentas). Es la cantidad de módulos, no de usos."
           value={modulosQuery.isError ? "Por definir" : String(modulosData.length)}
         />
       </div>

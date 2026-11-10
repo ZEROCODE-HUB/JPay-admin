@@ -49,16 +49,19 @@ export function DashboardPage() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <Stat
           label="Clientes activos"
+          info="Clientes con la cuenta activada, de la base de JPay. El total de abajo cuenta a todos los clientes registrados, en cualquier estado, salvo los eliminados. Se actualiza cada minuto."
           value={valor(formatNumber(k?.clientesActivos ?? 0))}
           sub={sub(`de ${plural(k?.clientesTotal ?? 0, "cliente", "clientes")}`)}
         />
         <Stat
           label="Volumen del día"
+          info="Suma de todas las operaciones contabilizadas hoy en el libro contable de JPay (depósitos, retiros, transferencias, etc.), solo en la moneda del país (MXN). «Hoy» se cuenta desde las 00:00 hora de México. Montos brutos, sin descontar comisiones."
           value={valor(formatMoney(k?.volumenDia ?? 0, { moneda: k?.moneda }))}
           sub={sub(`${plural(k?.operacionesDia ?? 0, "operación", "operaciones")} hoy`)}
         />
         <Stat
           label="Alertas pendientes"
+          info="Alertas de monitoreo en estado pendiente o en revisión (todavía sin resolver ni descartar). «Vencidas» son las que ya pasaron su plazo de atención."
           value={valor(formatNumber(k?.alertasPendientes ?? 0))}
           sub={sub(
             k?.alertasVencidas
@@ -68,6 +71,7 @@ export function DashboardPage() {
         />
         <Stat
           label="Altas en revisión"
+          info="Clientes registrados o preactivados que esperan la revisión del backoffice para activarse. Abajo se cuentan aparte los que se registraron pero todavía no verifican su correo (no están incluidos en el número grande)."
           value={valor(formatNumber(k?.altasRevision ?? 0))}
           sub={sub(
             k?.altasSinEmail

@@ -3,6 +3,7 @@ import { ArrowUpRight } from "lucide-react";
 import { Card } from "@/components/portal-shell";
 import type { DashboardDetalle } from "@/lib/api/dashboard";
 import { formatMoney, formatNumber } from "@/shared/format";
+import { InfoTip } from "@/shared/ui/info-tip";
 
 type Props = { d?: DashboardDetalle; isLoading: boolean; isError: boolean };
 
@@ -17,6 +18,12 @@ export function CobrosProveedorCard({ d, isLoading, isError }: Props) {
       <div className="flex items-center justify-between mb-2">
         <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
           Cobros del mes — Links de pago (Ecart Pay)
+          <InfoTip className="ml-1">
+            Cobros con Ecart Pay registrados en JPay (links de pago) pagados desde el día 1 del mes
+            en curso (hora de México), incluidos los que después se reembolsaron total o
+            parcialmente. Cobrado es el monto bruto; Neto descuenta la comisión de Ecart Pay, no los
+            reembolsos. «Conciliados» son los que ya se cotejaron con el reporte de Ecart Pay.
+          </InfoTip>
         </h3>
         <Link
           to="/admin/control/conciliacion/ecartpay"
@@ -62,7 +69,13 @@ export function CobrosProveedorCard({ d, isLoading, isError }: Props) {
               </p>
             </div>
             <div className="space-y-1.5 text-sm">
-              <p className="text-xs font-medium text-muted-foreground">Por método</p>
+              <p className="text-xs font-medium text-muted-foreground">
+                Por método{" "}
+                <InfoTip>
+                  Los mismos cobros del mes agrupados por forma de pago (tarjeta, SPEI, OXXO), con
+                  su cantidad y monto bruto. Si un cobro no indica método, cuenta como tarjeta.
+                </InfoTip>
+              </p>
               {Object.entries(c.porMetodo).map(([metodo, v]) => (
                 <div key={metodo} className="flex justify-between gap-4">
                   <span>

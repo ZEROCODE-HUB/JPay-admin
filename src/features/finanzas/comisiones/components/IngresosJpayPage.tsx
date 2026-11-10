@@ -21,6 +21,7 @@ import {
 } from "@/lib/api/comisiones-jpay";
 import { formatDate, formatMoney, formatNumber, parseMonto } from "@/shared/format";
 import { FormDialog } from "@/shared/ui/form-dialog";
+import { InfoTip } from "@/shared/ui/info-tip";
 
 const PROVEEDOR = { ecartpay: "Ecart Pay", cobre: "Cobre" } as const;
 
@@ -157,21 +158,25 @@ export function IngresosJpayPage() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
         <Stat
           label="Ecart Pay · por cobrar"
+          info="Comisión de JPay + IVA sobre los cobros con Ecart Pay pagados en el período (links de pago y POS, neto de reembolsos) y sobre suscripciones y domiciliaciones cobradas. Usa el porcentaje propio del comercio o, si no tiene, el general de México. «Recibido» suma los pagos registrados a mano cuyo período se cruza con el elegido."
           value={m(totales.ecart)}
           sub={`Recibido ${m(totales.recibidoEcart)} · falta ${m(Math.max(0, totales.ecart - totales.recibidoEcart))}`}
         />
         <Stat
           label="Cobre · por cobrar"
+          info="Comisión + IVA de depósitos, transferencias y conversiones a dólares contabilizados en el período que NO se descontaron del saldo del comercio (modo «calcular»): hay que pedírsela a cada empresa. «Recibido» suma los pagos de empresas registrados a mano."
           value={m(totales.cobrePorCobrar)}
           sub={`Recibido ${m(totales.recibidoCobre)} · falta ${m(Math.max(0, totales.cobrePorCobrar - totales.recibidoCobre))}`}
         />
         <Stat
           label="Cobre · descontada del saldo"
+          info="Comisión + IVA que ya se descontó del saldo del comercio en cada depósito, transferencia o conversión contabilizada en el período (modo «descontar»). No hay que cobrarla aparte."
           value={m(totales.cobreDescontada)}
           sub="Ya cobrada en cada operación"
         />
         <Stat
           label="Total del período"
+          info="Suma de las tres tarjetas anteriores (comisión + IVA). Abajo, la cantidad de operaciones con comisión que entraron en el cálculo. Fechas en hora de México."
           value={m(totales.ecart + totales.cobrePorCobrar + totales.cobreDescontada)}
           sub={`${formatNumber(filas.reduce((s, f) => s + f.operaciones, 0))} operaciones`}
         />
@@ -240,7 +245,13 @@ export function IngresosJpayPage() {
       </Card>
 
       <Card>
-        <h3 className="font-semibold mb-3">Pagos recibidos en el período</h3>
+        <h3 className="font-semibold mb-3">
+          Pagos recibidos en el período{" "}
+          <InfoTip>
+            Pagos de comisiones que alguien registró a mano con «Registrar pago recibido» (de Ecart
+            Pay o de cada empresa en Cobre) y cuyo período se cruza con las fechas elegidas.
+          </InfoTip>
+        </h3>
         {pagos.isLoading ? (
           <p className="text-sm text-muted-foreground">Cargando…</p>
         ) : (pagos.data ?? []).length === 0 ? (

@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { BtnOutline, BtnPrimary, Card, Input } from "@/components/portal-shell";
 import { listReembolsosEnVerificacion, resolverReembolso } from "@/lib/api/reembolsos";
 import { formatDateTime, formatMoney } from "@/shared/format";
+import { InfoTip } from "@/shared/ui/info-tip";
 
 const MOTIVO: Record<string, string> = {
   requested: "Lo pidió el cliente",
@@ -41,10 +42,17 @@ export function ReembolsosVerificacionCard() {
 
   return (
     <Card>
-      <h3 className="font-semibold">Reembolsos en verificación</h3>
+      <h3 className="font-semibold">
+        Reembolsos en verificación{" "}
+        <InfoTip>
+          Reembolsos de cobros de Ecart Pay pedidos desde JPay (por el comercio o el backoffice) en
+          los que Ecart Pay no confirmó si se hicieron. Muestra el monto del reembolso y el del
+          cobro original; ese monto sigue reservado del disponible hasta que lo resuelvas.
+        </InfoTip>
+      </h3>
       <p className="text-xs text-muted-foreground mt-1">
         Ecart Pay no respondió con claridad y no se sabe si el reembolso se hizo. Busca la orden en
-        el panel de Ecart Pay y resolvelo; mientras tanto, el monto sigue reservado.
+        el panel de Ecart Pay y resuélvelo; mientras tanto, el monto sigue reservado.
       </p>
       {q.isLoading ? (
         <p className="mt-4 text-sm text-muted-foreground">Cargando…</p>

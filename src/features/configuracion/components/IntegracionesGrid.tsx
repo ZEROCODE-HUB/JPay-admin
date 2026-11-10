@@ -3,6 +3,7 @@ import { AlertTriangle, ShieldCheck } from "lucide-react";
 import { Card, Badge } from "@/components/portal-shell";
 import { saludIconClass, saludMeta } from "../estados";
 import type { IntegracionUI } from "../utils";
+import { InfoTip } from "@/shared/ui/info-tip";
 
 /** Vista operativa: una tarjeta por integración con su salud y ejecuciones. */
 export function IntegracionesGrid({
@@ -82,7 +83,14 @@ export function IntegracionesGrid({
             </div>
 
             <div className="flex items-center justify-between border-t border-border pt-3">
-              <span className="text-xs text-muted-foreground">Ejecuciones totales</span>
+              <span className="text-xs text-muted-foreground">
+                Ejecuciones totales{" "}
+                <InfoTip>
+                  Ojo: todavía no hay un sistema de monitoreo conectado. El nombre de la integración
+                  sale de la base de JPay, pero la salud siempre aparece como correcta, las
+                  ejecuciones en 0 y las fechas en «—».
+                </InfoTip>
+              </span>
               <span className="font-display text-lg font-semibold tabular-nums">
                 {formatNumber(i.ejecuciones)}
               </span>

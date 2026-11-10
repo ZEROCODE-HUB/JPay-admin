@@ -8,6 +8,7 @@ import { ALERTA_PARAM_DEF, BLOQUEO_PARAM_DEF, type AlertaView, type BloqueoView 
 import { bloqueosColumns, riesgoColumns } from "./columns";
 import { ParametrosResumen } from "./ParametrosResumen";
 import { SectionCard } from "./SectionCard";
+import { InfoTip } from "@/shared/ui/info-tip";
 
 export function RiesgoTab({
   cliente,
@@ -113,6 +114,11 @@ export function RiesgoTab({
           <div className="flex items-center justify-between gap-2 mb-3">
             <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               <Activity size={13} /> Perfil transaccional
+              <InfoTip>
+                Límites guardados en la ficha del cliente (los edita Compliance con «Editar»): monto
+                máximo por transferencia, cantidad máxima de operaciones por día y monto máximo
+                diario, en MXN. No muestran lo consumido.
+              </InfoTip>
             </div>
             <button
               type="button"

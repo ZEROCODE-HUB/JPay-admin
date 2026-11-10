@@ -7,6 +7,7 @@ import { pageTitle } from "@/brand/brand";
 import { useEventosNotificacion } from "@/hooks/useEventosNotificacion";
 import type { EventoNotificacion } from "@/lib/api/types";
 import { formatDateTime } from "@/shared/format";
+import { InfoTip } from "@/shared/ui/info-tip";
 
 export const Route = createFileRoute("/admin/notificaciones/")({
   component: Page,
@@ -142,7 +143,11 @@ function Page() {
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
         <Card>
           <div className="text-xs uppercase tracking-wide text-muted-foreground">
-            Notificaciones
+            Notificaciones{" "}
+            <InfoTip>
+              Eventos de notificación registrados en JPay (correo, Telegram o WhatsApp). Solo se
+              cuentan los 200 más recientes; las otras tarjetas se calculan sobre esos mismos 200.
+            </InfoTip>
           </div>
           <div className="font-display text-xl md:text-2xl font-semibold mt-1 tabular-nums">
             {eventos.length}
@@ -152,7 +157,12 @@ function Page() {
           </div>
         </Card>
         <Card>
-          <div className="text-xs uppercase tracking-wide text-muted-foreground">Entregadas</div>
+          <div className="text-xs uppercase tracking-wide text-muted-foreground">
+            Entregadas{" "}
+            <InfoTip>
+              Notificaciones marcadas como enviadas, y su porcentaje sobre los últimos 200 eventos.
+            </InfoTip>
+          </div>
           <div className="font-display text-xl md:text-2xl font-semibold mt-1 tabular-nums text-emerald-600">
             {entregadas}
           </div>
@@ -161,7 +171,13 @@ function Page() {
           </div>
         </Card>
         <Card>
-          <div className="text-xs uppercase tracking-wide text-muted-foreground">Fallidas</div>
+          <div className="text-xs uppercase tracking-wide text-muted-foreground">
+            Fallidas{" "}
+            <InfoTip>
+              Todas las que no figuran como enviadas entre los últimos 200 eventos: incluye las que
+              fallaron y también las que siguen pendientes de envío.
+            </InfoTip>
+          </div>
           <div className="font-display text-xl md:text-2xl font-semibold mt-1 tabular-nums text-danger-600">
             {fallidas}
           </div>
@@ -169,7 +185,11 @@ function Page() {
         </Card>
         <Card>
           <div className="text-xs uppercase tracking-wide text-muted-foreground">
-            Con destinatario Cliente
+            Con destinatario Cliente{" "}
+            <InfoTip align="right">
+              Notificaciones dirigidas al cliente o a cliente y admin a la vez (no solo al admin),
+              entre los últimos 200 eventos.
+            </InfoTip>
           </div>
           <div className="font-display text-xl md:text-2xl font-semibold mt-1 tabular-nums">
             {conCliente}

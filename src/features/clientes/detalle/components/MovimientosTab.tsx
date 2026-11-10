@@ -5,6 +5,7 @@ import type { ClienteDetalleUi } from "../hooks/useClienteDetalleUi";
 import { toDetalleMovimiento } from "../utils";
 import { Seccion } from "./Seccion";
 import { TablaMovimientos } from "./TablaMovimientos";
+import { InfoTip } from "@/shared/ui/info-tip";
 
 export function MovimientosTab({ data, ui }: { data: ClienteDetalleData; ui: ClienteDetalleUi }) {
   const { subcuentasQuery, catalogoEstados } = data;
@@ -83,7 +84,12 @@ export function MovimientosTab({ data, ui }: { data: ClienteDetalleData; ui: Cli
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
         <div className="rounded-xl border border-border bg-card p-4">
           <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            Saldo total de la cuenta
+            Saldo total de la cuenta{" "}
+            <InfoTip>
+              Suma del saldo disponible más el retenido (por contracargos o disputas) de todas las
+              subcuentas del cliente, según los saldos que lleva JPay. No depende del período
+              elegido: es el saldo actual.
+            </InfoTip>
           </p>
           <p className="mt-2 text-2xl font-semibold tabular-nums">{formatMoney(saldoTotal)}</p>
           <p className="mt-1 text-xs text-muted-foreground">
@@ -96,7 +102,11 @@ export function MovimientosTab({ data, ui }: { data: ClienteDetalleData; ui: Cli
         </div>
         <div className="rounded-xl border border-border bg-card p-4">
           <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            Total de movimientos
+            Total de movimientos{" "}
+            <InfoTip>
+              Cantidad de movimientos del libro contable de JPay de este cliente en el período
+              elegido (todos si no hay fechas), en cualquier tipo y estado.
+            </InfoTip>
           </p>
           <p className="mt-2 text-2xl font-semibold tabular-nums">{totalMovimientos}</p>
           <p className="mt-1 text-xs text-muted-foreground">
@@ -105,7 +115,11 @@ export function MovimientosTab({ data, ui }: { data: ClienteDetalleData; ui: Cli
         </div>
         <div className="rounded-xl border border-border bg-card p-4">
           <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            Movimientos por tipo
+            Movimientos por tipo{" "}
+            <InfoTip align="right">
+              Los movimientos del período agrupados por tipo (depósito, retiro, transferencia,
+              etc.). Se calcula sobre los primeros 1,000 movimientos del período.
+            </InfoTip>
           </p>
           {Object.keys(porTipo).length === 0 ? (
             <p className="mt-3 text-sm text-muted-foreground">Sin datos en el período.</p>

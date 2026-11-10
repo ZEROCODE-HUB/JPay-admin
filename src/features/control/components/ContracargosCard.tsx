@@ -1,6 +1,7 @@
 import { Badge, Card } from "@/components/portal-shell";
 import { useContracargosProveedor } from "@/hooks/usePaises";
 import { formatDateTime, formatMoney } from "@/shared/format";
+import { InfoTip } from "@/shared/ui/info-tip";
 
 const ESTADO: Record<string, { label: string; tone: "success" | "warn" | "danger" | "neutral" }> = {
   created: { label: "Abierto", tone: "danger" },
@@ -21,7 +22,14 @@ export function ContracargosCard() {
   const { data = [], isLoading, error } = useContracargosProveedor();
   return (
     <Card>
-      <h3 className="font-semibold">Contracargos de Ecart Pay</h3>
+      <h3 className="font-semibold">
+        Contracargos de Ecart Pay{" "}
+        <InfoTip>
+          Contracargos que Ecart Pay nos avisó por webhook firmado, con el estado del último aviso
+          (abierto, en revisión, ganado o perdido). Se muestran los 50 actualizados más
+          recientemente; el monto es el que informó Ecart Pay.
+        </InfoTip>
+      </h3>
       <p className="text-xs text-muted-foreground mt-1">
         Llegan por aviso firmado. El comercio presenta las pruebas en su panel de Ecart Pay antes
         del vencimiento.

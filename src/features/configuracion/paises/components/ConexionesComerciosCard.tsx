@@ -6,6 +6,7 @@ import type { ConexionComercio } from "@/lib/api/paises";
 import { formatDateTime } from "@/shared/format";
 import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
 import { avisarError } from "../utils";
+import { InfoTip } from "@/shared/ui/info-tip";
 
 const TONO: Record<string, "neutral" | "success" | "warn" | "danger"> = {
   conectado: "success",
@@ -29,7 +30,12 @@ export function ConexionesComerciosCard({ legajo }: { legajo?: string } = {}) {
   return (
     <Card>
       <h3 className="font-semibold">
-        {legajo ? "Conexión con Ecart Pay" : "Comercios conectados"}
+        {legajo ? "Conexión con Ecart Pay" : "Comercios conectados"}{" "}
+        <InfoTip>
+          Conexiones que guardó JPay cuando cada comercio autorizó su cuenta del proveedor (OAuth).
+          Estado: «conectado» (JPay puede cobrar en su cuenta), «pendiente», «error» o «revocado»
+          (dado de baja). Permisos es la cantidad de permisos que otorgó el comercio.
+        </InfoTip>
       </h3>
       <p className="text-xs text-muted-foreground mt-1">
         Cuentas de los comercios vinculadas por OAuth. Las claves privadas viven cifradas en Vault.

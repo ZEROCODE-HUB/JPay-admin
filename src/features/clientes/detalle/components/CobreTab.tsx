@@ -5,6 +5,7 @@ import { useCobreCliente } from "@/hooks/useCobre";
 import { formatDateTime } from "@/shared/format";
 import { KybCobreForm } from "@/shared/ui/kyb-cobre";
 import { SectionCard } from "./SectionCard";
+import { InfoTip } from "@/shared/ui/info-tip";
 
 const ALTA: Record<string, { label: string; tone: "success" | "warn" | "danger" | "neutral" }> = {
   enviando: { label: "Enviando", tone: "warn" },
@@ -67,6 +68,11 @@ export function CobreTab({ legajo }: { legajo: string }) {
                     <span className="text-muted-foreground">Todavía no se envió el alta.</span>
                   )}
                   <Badge tone="neutral">{a.modo}</Badge>
+                  <InfoTip>
+                    Estado del alta del comercio como Subcliente en Cobre. Se actualiza con los
+                    avisos (webhooks) de Cobre, con la revisión automática de pendientes cada pocos
+                    minutos o al tocar «Consultar estado».
+                  </InfoTip>
                 </div>
                 {a.alta?.motivo && <p className="text-danger-600">{a.alta.motivo}</p>}
                 {a.alta?.revocado_at && (
@@ -133,7 +139,11 @@ export function CobreTab({ legajo }: { legajo: string }) {
                 CLABE <span className="font-mono">{a.cuenta.clabe ?? "—"}</span>{" "}
                 <Badge tone={a.cuenta.conectividad === "connected" ? "success" : "warn"}>
                   {a.cuenta.conectividad ?? "sin dato"}
-                </Badge>
+                </Badge>{" "}
+                <InfoTip>
+                  Conectividad del Cobre Balance del comercio según Cobre: solo opera SPEI cuando
+                  dice «connected». Se guarda al crear la cuenta o al consultar su saldo en Cobre.
+                </InfoTip>
               </p>
             )}
           </div>

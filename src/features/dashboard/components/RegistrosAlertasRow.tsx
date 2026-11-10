@@ -5,6 +5,7 @@ import type { DashboardDetalle } from "@/lib/api/dashboard";
 import type { EstadoCliente } from "@/lib/api/types";
 import { estadoLabel, estadoTone } from "@/features/clientes/detalle/utils";
 import { formatDateTime, formatMoney } from "@/shared/format";
+import { InfoTip } from "@/shared/ui/info-tip";
 
 type Props = { d?: DashboardDetalle; isLoading: boolean; isError: boolean };
 
@@ -22,6 +23,11 @@ export function RegistrosAlertasRow({ d, isLoading, isError }: Props) {
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-display font-semibold flex items-center gap-2">
             <Building2 size={16} className="text-secondary" /> Últimos registros
+            <InfoTip>
+              Los 6 clientes dados de alta más recientemente (sin contar eliminados). «Volumen del
+              mes» suma sus operaciones contabilizadas en MXN desde el día 1 del mes (hora de
+              México).
+            </InfoTip>
           </h3>
           <Link
             to="/admin/general/usuarios/juridicas"
@@ -84,6 +90,10 @@ export function RegistrosAlertasRow({ d, isLoading, isError }: Props) {
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-display font-semibold flex items-center gap-2">
             <ShieldAlert size={16} className="text-primary-ink" /> Alertas recientes
+            <InfoTip align="right">
+              Las 5 alertas de monitoreo sin resolver (pendientes o en revisión) más nuevas. Es
+              «Vencida» si ya pasó su plazo de atención.
+            </InfoTip>
           </h3>
           <Link to="/admin/general/alertas" className="text-xs text-primary-ink font-semibold">
             Ver alertas →

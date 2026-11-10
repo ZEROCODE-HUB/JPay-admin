@@ -7,6 +7,7 @@ import { ApiUsuariosInline } from "./ApiUsuariosInline";
 import { SectionCard } from "./SectionCard";
 import { ProductosMx } from "./ProductosMx";
 import { usePaisConModulos } from "@/shared/modulos-pais";
+import { InfoTip } from "@/shared/ui/info-tip";
 
 export function ModulosTab({
   legajo,
@@ -83,7 +84,10 @@ export function ModulosTab({
             <div className="space-y-4">
               <div className="rounded-lg border border-border p-4">
                 <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground mb-2">
-                  Comercios vinculados
+                  Comercios vinculados{" "}
+                  <InfoTip>
+                    Links de pago registrados para este cliente (uno por comercio), activos o no.
+                  </InfoTip>
                 </div>
                 <div className="text-2xl font-semibold tabular-nums">{linksPago.length}</div>
                 {linksPago.length === 0 ? (
@@ -176,7 +180,11 @@ export function ModulosTab({
             <div className="space-y-4">
               <div className="rounded-lg border border-border p-4">
                 <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground mb-2">
-                  Usuarios asociados
+                  Usuarios asociados{" "}
+                  <InfoTip>
+                    Usuarios de la API externa vinculados a este cliente. Si no se pueden consultar,
+                    se muestra la cantidad guardada en el módulo API del cliente.
+                  </InfoTip>
                 </div>
                 <div className="text-2xl font-semibold tabular-nums">{apiCantidadReal}</div>
                 <p className="mt-1 text-xs text-muted-foreground">

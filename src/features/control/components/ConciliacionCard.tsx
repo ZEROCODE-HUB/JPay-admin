@@ -3,6 +3,7 @@ import { Badge, BtnOutline, Card } from "@/components/portal-shell";
 import { useConciliacion, usePaisesMutaciones } from "@/hooks/usePaises";
 import { formatDateTime } from "@/shared/format";
 import { avisarError } from "@/features/configuracion/paises/utils";
+import { InfoTip } from "@/shared/ui/info-tip";
 
 const TIPO: Record<string, (proveedor: string) => string> = {
   falta_en_jpay: (p) => `Movimiento en ${p} que JPay no tiene`,
@@ -42,7 +43,16 @@ export function ConciliacionCard({
     <Card>
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h3 className="font-semibold">Conciliación con {nombre}</h3>
+          <h3 className="font-semibold">
+            Conciliación con {nombre}{" "}
+            <InfoTip>
+              «Última» resume la corrida más reciente (automática una vez al día o manual con
+              «Conciliar ahora»): cuántas cuentas o comercios revisó, cuántas transacciones de los
+              últimos 3 días trajo de la API de {nombre} y cuántas diferencias encontró contra JPay.
+              Abajo están todas las diferencias que nadie marcó como resueltas, de cualquier
+              corrida.
+            </InfoTip>
+          </h3>
           <p className="text-xs text-muted-foreground mt-1">{descripcion}</p>
           {ultima && (
             <p className="text-xs mt-2">

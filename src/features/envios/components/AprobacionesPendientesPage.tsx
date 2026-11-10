@@ -3,6 +3,7 @@ import { Badge, BtnOutline, BtnPrimary, Card, PageHeader } from "@/components/po
 import { avisarError } from "@/features/configuracion/paises/utils";
 import { useAprobacionesCobre, useCobreAdminMutaciones } from "@/hooks/useCobre";
 import { formatDateTime, formatMoney } from "@/shared/format";
+import { InfoTip } from "@/shared/ui/info-tip";
 
 /**
  * Envíos > Aprobaciones pendientes: transferencias SPEI, envíos en dólares y lotes que pasan el
@@ -37,7 +38,15 @@ export function AprobacionesPendientesPage() {
         description="Envíos que pasan el monto de aprobación configurado en Integraciones (Cobre). Se actualiza cada 30 segundos."
       />
       <Card>
-        <h3 className="font-semibold">Esperando aprobación</h3>
+        <h3 className="font-semibold">
+          Esperando aprobación{" "}
+          <InfoTip>
+            Transferencias de Cobre (SPEI, Fedwire o SWIFT) en «pendiente de aprobación» porque su
+            monto alcanzó el umbral configurado, más los lotes que lo alcanzaron por su total. El
+            monto se muestra en la moneda del envío; el total del lote, en MXN. Mientras esperan, el
+            saldo del comercio queda apartado.
+          </InfoTip>
+        </h3>
         {cargando ? (
           <p className="mt-2 text-sm text-muted-foreground">Cargando…</p>
         ) : error ? (

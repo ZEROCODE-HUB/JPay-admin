@@ -5,6 +5,7 @@ import { Toggle } from "@/features/alertas/parametros-alertas/components/Toggle"
 import { useCobreAdmin, useCobreAdminMutaciones } from "@/hooks/useCobre";
 import { formatDateTime, formatMoney, parseMonto } from "@/shared/format";
 import { avisarError } from "../utils";
+import { InfoTip } from "@/shared/ui/info-tip";
 
 const input = "mt-1 block w-full h-9 rounded-md border border-input bg-card px-2 text-sm";
 
@@ -73,7 +74,14 @@ export function CobreCard() {
       ) : (
         <div className="mt-3 space-y-5 text-sm">
           <section>
-            <p className="text-xs font-medium">Balances de JPay en dólares (Global y USA)</p>
+            <p className="text-xs font-medium">
+              Balances de JPay en dólares (Global y USA){" "}
+              <InfoTip>
+                Cuentas en dólares de JPay en Cobre. «Ver saldo» consulta en ese momento la API de
+                Cobre y muestra el saldo que Cobre reporta (en USD); no se guarda en JPay. Si la
+                conectividad no es «connected», la cuenta todavía no puede operar.
+              </InfoTip>
+            </p>
             {(balances.data ?? []).length < 2 ? (
               <div className="mt-1 flex flex-wrap items-center gap-3">
                 <span className="text-muted-foreground">
@@ -129,7 +137,14 @@ export function CobreCard() {
           </section>
 
           <section>
-            <p className="text-xs font-medium">Avisos de Cobre (webhooks)</p>
+            <p className="text-xs font-medium">
+              Avisos de Cobre (webhooks){" "}
+              <InfoTip>
+                Suscripción a los avisos de Cobre registrada desde JPay. «Eventos» es cuántos tipos
+                de aviso (depósitos, transferencias, altas, etc.) quedaron suscritos; «Revisar
+                suscripción» agrega los que falten.
+              </InfoTip>
+            </p>
             <div className="mt-1 flex flex-wrap items-center justify-between gap-3">
               <span className="text-muted-foreground">
                 {suscripcion.data
@@ -170,7 +185,12 @@ export function CobreCard() {
                 onChange={(e) => setMonto(e.target.value)}
               />
               <span className="mt-1 block text-[11px] text-muted-foreground">
-                Transferencias SPEI y lotes (por el total) desde este monto esperan a un admin.
+                Transferencias SPEI y lotes (por el total) desde este monto esperan a un admin.{" "}
+                <InfoTip>
+                  Umbral en MXN: una transferencia SPEI de este monto o más (o un lote cuyo total lo
+                  alcance) queda «pendiente de aprobación» hasta que un admin la apruebe. Vacío = no
+                  se pide aprobación.
+                </InfoTip>
               </span>
             </label>
             <label className="text-xs">
@@ -183,7 +203,11 @@ export function CobreCard() {
                 onChange={(e) => setMontoUsd(e.target.value)}
               />
               <span className="mt-1 block text-[11px] text-muted-foreground">
-                Envíos Fedwire y SWIFT desde este monto esperan a un admin.
+                Envíos Fedwire y SWIFT desde este monto esperan a un admin.{" "}
+                <InfoTip>
+                  Umbral en USD para envíos Fedwire y SWIFT: desde este monto (inclusive) esperan la
+                  aprobación de un admin. Vacío = no se pide aprobación.
+                </InfoTip>
               </span>
             </label>
             <div className="text-xs">

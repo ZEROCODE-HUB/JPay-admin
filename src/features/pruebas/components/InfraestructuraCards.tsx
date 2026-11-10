@@ -1,6 +1,7 @@
 import { Database, Layers, ServerCog, Timer } from "lucide-react";
 import { Card } from "@/components/portal-shell";
 import { proximoGrupo } from "@/features/configuracion/utils";
+import { InfoTip } from "@/shared/ui/info-tip";
 
 /** Estado del servicio, conexiones y estadísticas paralelas (datos de referencia). */
 export function InfraestructuraCards() {
@@ -9,7 +10,13 @@ export function InfraestructuraCards() {
       <Card>
         <div className="flex items-center gap-2 mb-4">
           <ServerCog size={18} className="text-secondary" />
-          <h3 className="font-display font-semibold">Estado del Servicio</h3>
+          <h3 className="font-display font-semibold">
+            Estado del Servicio{" "}
+            <InfoTip>
+              Datos de referencia fijos en la pantalla: no se consulta el servicio real, así que
+              «Ejecutándose» no confirma nada.
+            </InfoTip>
+          </h3>
         </div>
         <div className="space-y-3 text-sm">
           <div className="flex justify-between py-2 border-b">
@@ -33,7 +40,13 @@ export function InfraestructuraCards() {
       <Card>
         <div className="flex items-center gap-2 mb-4">
           <Database size={18} className="text-secondary" />
-          <h3 className="font-display font-semibold">Conexiones</h3>
+          <h3 className="font-display font-semibold">
+            Conexiones{" "}
+            <InfoTip>
+              Datos de referencia fijos en la pantalla: no se prueba la conexión real a Redis ni a
+              la base de datos.
+            </InfoTip>
+          </h3>
         </div>
         <div className="space-y-3 text-sm">
           <div className="flex justify-between py-2 border-b">
@@ -67,7 +80,13 @@ export function InfraestructuraCards() {
         <Card>
           <div className="flex items-center gap-2 mb-4">
             <Layers size={18} className="text-secondary" />
-            <h3 className="font-display font-semibold">Estadísticas paralelas</h3>
+            <h3 className="font-display font-semibold">
+              Estadísticas paralelas{" "}
+              <InfoTip align="right">
+                Todavía no hay datos: no existe una fuente de logins ni de grupos de ejecución, por
+                eso se ve «—».
+              </InfoTip>
+            </h3>
           </div>
           <div className="space-y-3 text-sm">
             <div className="flex justify-between py-2 border-b">

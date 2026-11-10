@@ -8,6 +8,7 @@ import {
 } from "@/lib/api/comercios-ecartpay";
 import { formatDateTime, formatMoney } from "@/shared/format";
 import { SectionCard } from "./SectionCard";
+import { InfoTip } from "@/shared/ui/info-tip";
 
 type Tono = "success" | "warn" | "danger" | "neutral";
 
@@ -49,7 +50,18 @@ export function EcartPayTab({ legajo }: { legajo: string }) {
         <ConexionesComerciosCard legajo={legajo} />
       </div>
 
-      <SectionCard title="Cobros recientes">
+      <SectionCard
+        title={
+          <>
+            Cobros recientes{" "}
+            <InfoTip>
+              Los 20 cobros con Ecart Pay más recientes de los comercios de este cliente, en
+              cualquier estado (también sin pagar), registrados en JPay. Monto es el bruto cobrado
+              al pagador; la comisión es la que reportó Ecart Pay («—» si todavía no la informó).
+            </InfoTip>
+          </>
+        }
+      >
         {cobros.isLoading ? (
           <p className="text-sm text-muted-foreground">Cargando…</p>
         ) : cobros.error ? (
@@ -140,6 +152,10 @@ function RetirosComercio({ comercioId, nombre }: { comercioId: string; nombre: s
         {d?.saldo && (
           <span className="text-xs text-muted-foreground">
             Disponible{" "}
+            <InfoTip align="right">
+              Saldo disponible del comercio consultado en vivo a la API de Ecart Pay (con la
+              conexión del comercio), en su moneda. Abajo, sus últimos 10 retiros según Ecart Pay.
+            </InfoTip>{" "}
             <span className="font-mono font-semibold text-foreground">
               {formatMoney(d.saldo.disponible, { moneda: d.saldo.moneda })}
             </span>

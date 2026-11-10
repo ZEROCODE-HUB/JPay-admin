@@ -3,6 +3,7 @@ import { Badge, Card, PageHeader } from "@/components/portal-shell";
 import { avisarError } from "@/features/configuracion/paises/utils";
 import { useCobreAdminMutaciones, useDepositosSinAsignar } from "@/hooks/useCobre";
 import { formatDateTime, formatMoney } from "@/shared/format";
+import { InfoTip } from "@/shared/ui/info-tip";
 
 const DEVOLUCION: Record<
   string,
@@ -28,7 +29,14 @@ export function DepositosSinAsignarPage() {
         description="Llegaron a un Balance o CLABE que no es de ningún comercio: no se acreditaron a nadie. Puedes devolverlos al remitente (el monto completo, una sola vez)."
       />
       <Card>
-        <h3 className="font-semibold">Depósitos sin dueño</h3>
+        <h3 className="font-semibold">
+          Depósitos sin dueño{" "}
+          <InfoTip>
+            Depósitos SPEI que Cobre nos avisó (webhook) y que llegaron a una CLABE que no pertenece
+            a ningún comercio, por eso no se acreditaron. Montos en MXN, tal como llegaron. Se
+            muestran los 50 más recientes y se actualiza cada minuto.
+          </InfoTip>
+        </h3>
         {sinAsignar.isLoading ? (
           <p className="mt-2 text-sm text-muted-foreground">Cargando…</p>
         ) : sinAsignar.error ? (
