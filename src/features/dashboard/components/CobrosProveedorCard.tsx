@@ -9,7 +9,7 @@ type Props = { d?: DashboardDetalle; isLoading: boolean; isError: boolean };
 
 const METODO: Record<string, string> = { tarjeta: "Tarjeta", spei: "SPEI", oxxo: "OXXO" };
 
-/** Cobros de links de pago con Ecart Pay en el mes. */
+/** Cobros de enlaces de pago con Ecart Pay en el mes. */
 export function CobrosProveedorCard({ d, isLoading, isError }: Props) {
   const c = d?.cobrosMes;
   const m = (n: number) => formatMoney(n, { moneda: d?.moneda });
@@ -17,16 +17,16 @@ export function CobrosProveedorCard({ d, isLoading, isError }: Props) {
     <>
       <div className="flex items-center justify-between mb-2">
         <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-          Cobros del mes — Links de pago (Ecart Pay)
+          Cobros del mes — Enlaces de pago (Ecart Pay)
           <InfoTip className="ml-1">
-            Cobros con Ecart Pay registrados en JPay (links de pago) pagados desde el día 1 del mes
-            en curso (hora de México), incluidos los que después se reembolsaron total o
+            Cobros con Ecart Pay registrados en JPay (enlaces de pago) pagados desde el día 1 del
+            mes en curso (hora de México), incluidos los que después se reembolsaron total o
             parcialmente. Cobrado es el monto bruto; Neto descuenta la comisión de Ecart Pay, no los
             reembolsos. «Conciliados» son los que ya se cotejaron con el reporte de Ecart Pay.
           </InfoTip>
         </h3>
         <Link
-          to="/admin/control/conciliacion/ecartpay"
+          to="/admin/configuracion/paises"
           className="text-xs text-primary-ink font-semibold inline-flex items-center gap-1"
         >
           Conciliación <ArrowUpRight size={12} />

@@ -32,9 +32,7 @@ export function RequisitosActivacion({
           </p>
         )}
         {!hasCom && (
-          <p className="mt-1 text-xs">
-            Carga la comisión en Finanzas JPay → Comisiones → Carga por cliente.
-          </p>
+          <p className="mt-1 text-xs">Cargar comisión en Admin → Usuarios → Comisiones.</p>
         )}
       </div>
     );

@@ -1,8 +1,11 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { pageTitle } from "@/brand/brand";
-import { IngresosJpayPage } from "@/features/finanzas/comisiones/components/IngresosJpayPage";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
+/**
+ * Enlace de la reorganización del menú, ya deshecha: las comisiones de JPay están en Comercios →
+ * Comisiones de JPay.
+ */
 export const Route = createFileRoute("/admin/finanzas/comisiones/")({
-  component: IngresosJpayPage,
-  head: () => ({ meta: [{ title: pageTitle("Comisiones de JPay — Admin") }] }),
+  beforeLoad: () => {
+    throw redirect({ to: "/admin/comercios/comisiones-jpay", replace: true });
+  },
 });

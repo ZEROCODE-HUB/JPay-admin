@@ -148,7 +148,8 @@ export function ReporteComisiones() {
         <Badge tone="warn">Reporte en curso</Badge>
         <InfoTip>
           Ojo: las filas de este reporte son datos de ejemplo fijos en la pantalla, todavía no salen
-          del libro contable. Las comisiones reales del período están en Finanzas JPay → Comisiones.
+          del libro contable. Las comisiones reales del período están en Comercios → Comisiones de
+          JPay.
         </InfoTip>
         <span>
           Los períodos marcados como "En curso" corresponden al mes actual y reflejan las comisiones

@@ -1,13 +1,11 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { pageTitle } from "@/brand/brand";
-import { CargaComisionesPage } from "@/features/finanzas/comisiones/components/CargaComisionesPage";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
+/**
+ * Enlace de la reorganización del menú, ya deshecha: la carga de comisiones por cliente está en
+ * General → Usuarios → Carga de comisiones.
+ */
 export const Route = createFileRoute("/admin/finanzas/comisiones/carga")({
-  component: CargaComisionesPage,
-  head: () => ({
-    meta: [
-      { title: pageTitle("Carga de comisiones — Admin") },
-      { name: "description", content: "Comisiones que JPay le cobra a cada cliente." },
-    ],
-  }),
+  beforeLoad: () => {
+    throw redirect({ to: "/admin/general/usuarios/comisiones", replace: true });
+  },
 });

@@ -22,7 +22,7 @@ export function EnlacesPage() {
   return (
     <PermissionGuard recurso="comercios">
       <PageHeader
-        title="Links de pago"
+        title="Links de Pago"
         description={`Links gestionados por ${brand.name} y cobrados con Ecart Pay. Se crean en Pendiente y el admin gestiona el ciclo completo (ver detalle para método, tarjeta y meses).`}
       />
       {l.isLoading ? (
@@ -44,7 +44,7 @@ export function EnlacesPage() {
       ) : l.rows.length === 0 ? (
         <div className="flex flex-col items-center gap-3 rounded-xl border bg-card px-6 py-12 text-sm text-muted-foreground">
           <Inbox size={28} />
-          <p>No hay links de pago.</p>
+          <p>No hay enlaces de pago.</p>
           <p className="text-xs">
             Crea un enlace en Enterprise → aparecerá aquí como Pendiente de aprobación.
           </p>

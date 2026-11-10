@@ -1,10 +1,13 @@
-import { AlertTriangle } from "lucide-react";
-import { Card, PageHeader } from "@/components/portal-shell";
+import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { AlertTriangle, Landmark } from "lucide-react";
+import { BtnOutline, Card, PageHeader } from "@/components/portal-shell";
 import { useIntegraciones } from "@/hooks/useIntegraciones";
 import { usePaisesConfig } from "@/hooks/usePaises";
 import { useControlesTecnicos } from "../hooks/useControlesTecnicos";
 import { SimuladorDepositoSpei } from "./SimuladorDepositoSpei";
 import { SimuladorPagoR2p } from "./SimuladorPagoR2p";
+import { SimularDepositoDialog } from "./SimularDepositoDialog";
 import { VistaDesarrollador } from "./VistaDesarrollador";
 
 /**
@@ -16,6 +19,8 @@ export function PruebasPage() {
   const { proveedores, isLoading } = usePaisesConfig();
   const { rows: integraciones } = useIntegraciones({ page: 0, pageSize: 100 });
   const controles = useControlesTecnicos();
+  const queryClient = useQueryClient();
+  const [simDeposito, setSimDeposito] = useState(false);
 
   const cobre = proveedores.find((p) => p.codigo === "cobre");
   // Los simuladores solo funcionan con Cobre en modo simulado (COBRE_MODO, el modo por defecto).
@@ -58,10 +63,30 @@ export function PruebasPage() {
         </div>
       </Card>
 
+      <Card>
+        <h3 className="font-semibold">Depósito entrante de prueba (alertas)</h3>
+        <p className="text-xs text-muted-foreground mt-1">
+          Registra un PAY-IN de prueba en la subcuenta de un cliente. Pasa por las mismas reglas de
+          depósitos y de monitoreo que uno real; el resultado se ve en General → Alertas.
+        </p>
+        <div className="mt-3">
+          <BtnOutline onClick={() => setSimDeposito(true)}>
+            <Landmark size={14} /> Simular depósito
+          </BtnOutline>
+        </div>
+      </Card>
+
       <div>
         <h3 className="font-semibold mb-3">Vista técnica de integraciones</h3>
         <VistaDesarrollador controles={controles} integraciones={integraciones} />
       </div>
+
+      {simDeposito && (
+        <SimularDepositoDialog
+          onClose={() => setSimDeposito(false)}
+          onDone={() => void queryClient.invalidateQueries({ queryKey: ["alerts"] })}
+        />
+      )}
     </div>
   );
 }

@@ -7,16 +7,28 @@ import { formatDateTime, formatMoney, parseMonto } from "@/shared/format";
 import { avisarError } from "../utils";
 import { InfoTip } from "@/shared/ui/info-tip";
 
+const DEVOLUCION: Record<
+  string,
+  { label: string; tone: "success" | "warn" | "danger" | "neutral" }
+> = {
+  pendiente: { label: "Devolviendo", tone: "warn" },
+  pendiente_aprobacion: { label: "Devolución por aprobar", tone: "warn" },
+  completada: { label: "Devuelto", tone: "success" },
+  rechazada: { label: "Devolución rechazada", tone: "danger" },
+  fallida: { label: "Devolución fallida", tone: "danger" },
+  cancelada: { label: "Devolución cancelada", tone: "neutral" },
+};
+
 const input = "mt-1 block w-full h-9 rounded-md border border-input bg-card px-2 text-sm";
 
 /**
  * Cobre (México), según el Solution Design de JPAY: cada comercio tiene su Cobre Balance (se da
- * de alta desde el detalle del cliente). Aquí solo la configuración: Balances Global y USA de JPay
- * (dólares), suscripción de avisos, montos de aprobación y OTP. Las aprobaciones están en Envíos
- * y los depósitos sin asignar en Cobros. Los simuladores están en Sistema → Herramientas de prueba.
+ * de alta desde el detalle del cliente). Aquí: Balances Global y USA de JPay (dólares), suscripción
+ * de avisos, montos de aprobación y OTP, aprobaciones y depósitos sin asignar. Los simuladores están
+ * en Sistema → Herramientas de prueba.
  */
 export function CobreCard() {
-  const { configuracion, balances, suscripcion } = useCobreAdmin();
+  const { configuracion, balances, suscripcion, aprobaciones, lotes, sinAsignar } = useCobreAdmin();
   const m = useCobreAdminMutaciones();
   const c = configuracion.data;
   const [monto, setMonto] = useState("");
@@ -52,6 +64,21 @@ export function CobreCard() {
       { onSuccess: () => toast.success("Configuración de Cobre guardada"), onError: avisarError },
     );
   };
+
+  const decidir = (id: string, aprobar: boolean, lote = false) =>
+    m.decidir.mutate(
+      {
+        id,
+        aprobar,
+        lote,
+        nota: aprobar ? "Aprobada desde el backoffice" : "Rechazada desde el backoffice",
+      },
+      {
+        onSuccess: () =>
+          toast.success(aprobar ? "Aprobado: sale a Cobre" : "Rechazado: se liberó el saldo"),
+        onError: avisarError,
+      },
+    );
 
   const verSaldo = (id: string) =>
     m.consultarBalance.mutate(id, {
@@ -233,7 +260,7 @@ export function CobreCard() {
                 </option>
               </select>
               <p className="mt-1 text-muted-foreground">
-                Lo calculado se ve en Finanzas JPay → Comisiones.
+                Lo calculado se ve en Comercios → Comisiones de JPay.
               </p>
             </div>
             <div className="text-xs md:col-span-3">
@@ -247,8 +274,8 @@ export function CobreCard() {
                 <span className="text-muted-foreground">{reglasFx ? "Sí" : "No"}</span>
               </div>
               <p className="mt-1 text-muted-foreground">
-                La comisión de JPay por convertir se carga por cliente en Finanzas JPay → Comisiones
-                → Carga por cliente (tipo Conversión).
+                La comisión de JPay por convertir se carga por cliente en Usuarios → Carga de
+                comisiones (tipo Conversión).
               </p>
             </div>
             <div className="md:col-span-3 flex justify-end">
@@ -256,6 +283,133 @@ export function CobreCard() {
                 {m.guardar.isPending ? "Guardando…" : "Guardar"}
               </BtnPrimary>
             </div>
+          </section>
+
+          <section>
+            <p className="text-xs font-medium">
+              Esperando aprobación{" "}
+              <InfoTip>
+                Transferencias de Cobre (SPEI, Fedwire o SWIFT) en «pendiente de aprobación» porque
+                su monto alcanzó el umbral configurado, más los lotes que lo alcanzaron por su
+                total. El monto se muestra en la moneda del envío; el total del lote, en MXN.
+                Mientras esperan, el saldo del comercio queda apartado.
+              </InfoTip>
+            </p>
+            {(aprobaciones.data ?? []).length === 0 && (lotes.data ?? []).length === 0 ? (
+              <p className="mt-1 text-muted-foreground">No hay envíos pendientes.</p>
+            ) : (
+              <ul className="mt-1 divide-y divide-border">
+                {(aprobaciones.data ?? []).map((t) => (
+                  <li key={t.id} className="py-2 flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                      <div className="font-medium tabular-nums">
+                        {formatMoney(t.monto, { moneda: t.moneda })} · {t.legajo}{" "}
+                        <Badge tone="neutral">{t.tipo.toUpperCase()}</Badge>
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        A {t.destinatario ?? "—"} · {t.concepto ?? ""} ·{" "}
+                        {formatDateTime(t.creadaAt)} · {t.idTxn}
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <BtnOutline
+                        disabled={m.decidir.isPending}
+                        onClick={() => decidir(t.id, false)}
+                      >
+                        Rechazar
+                      </BtnOutline>
+                      <BtnPrimary
+                        disabled={m.decidir.isPending}
+                        onClick={() => decidir(t.id, true)}
+                      >
+                        Aprobar
+                      </BtnPrimary>
+                    </div>
+                  </li>
+                ))}
+                {(lotes.data ?? []).map((l) => (
+                  <li key={l.id} className="py-2 flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                      <div className="font-medium tabular-nums">
+                        Lote de {l.cantidad} pagos · {formatMoney(l.total)} · {l.legajo}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {formatDateTime(l.creadoAt)}
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <BtnOutline
+                        disabled={m.decidir.isPending}
+                        onClick={() => decidir(l.id, false, true)}
+                      >
+                        Rechazar
+                      </BtnOutline>
+                      <BtnPrimary
+                        disabled={m.decidir.isPending}
+                        onClick={() => decidir(l.id, true, true)}
+                      >
+                        Aprobar
+                      </BtnPrimary>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+
+          <section>
+            <p className="text-xs font-medium">
+              Depósitos sin asignar{" "}
+              <InfoTip>
+                Depósitos SPEI que Cobre nos avisó (webhook) y que llegaron a una CLABE que no
+                pertenece a ningún comercio, por eso no se acreditaron. Montos en MXN, tal como
+                llegaron. Se muestran los 50 más recientes y se actualiza cada minuto.
+              </InfoTip>
+            </p>
+            {(sinAsignar.data ?? []).length === 0 ? (
+              <p className="mt-1 text-muted-foreground">Todos los depósitos tienen dueño.</p>
+            ) : (
+              <ul className="mt-1 divide-y divide-border">
+                {sinAsignar.data!.map((d) => (
+                  <li key={d.id} className="py-2 flex flex-wrap justify-between gap-2">
+                    <span>
+                      {d.remitente ?? "Sin remitente"} · CLABE{" "}
+                      <span className="font-mono">{d.clabe ?? "—"}</span>
+                    </span>
+                    <span className="flex items-center gap-3 tabular-nums">
+                      {d.devolucion &&
+                      !["rechazada", "fallida", "cancelada"].includes(d.devolucion) ? (
+                        <Badge tone={DEVOLUCION[d.devolucion]?.tone ?? "warn"}>
+                          {DEVOLUCION[d.devolucion]?.label ?? d.devolucion}
+                        </Badge>
+                      ) : (
+                        <button
+                          type="button"
+                          className="text-xs font-semibold text-danger-600 hover:underline disabled:opacity-50"
+                          disabled={m.devolver.isPending}
+                          onClick={() =>
+                            m.devolver.mutate(d.id, {
+                              onSuccess: () => toast.success("Devolución enviada a Cobre"),
+                              onError: avisarError,
+                            })
+                          }
+                        >
+                          Devolver
+                        </button>
+                      )}
+                      {formatMoney(d.monto)}{" "}
+                      <span className="text-xs text-muted-foreground">
+                        {formatDateTime(d.recibidoAt)}
+                      </span>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              Llegaron a un Balance o CLABE que no es de ningún comercio: no se acreditaron a nadie.
+              Puedes devolverlos al remitente (el monto completo, una sola vez).
+            </p>
           </section>
         </div>
       )}

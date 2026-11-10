@@ -1,13 +1,11 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { pageTitle } from "@/brand/brand";
-import { DepositosSinAsignarPage } from "@/features/cobros/components/DepositosSinAsignarPage";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
+/**
+ * Enlace de la reorganización del menú, ya deshecha: los depósitos sin asignar están en
+ * Integraciones → País y proveedores (tarjeta Cobre).
+ */
 export const Route = createFileRoute("/admin/cobros/sin-asignar")({
-  component: DepositosSinAsignarPage,
-  head: () => ({
-    meta: [
-      { title: pageTitle("Depósitos sin asignar — Admin") },
-      { name: "description", content: "Depósitos SPEI que llegaron a una CLABE sin comercio." },
-    ],
-  }),
+  beforeLoad: () => {
+    throw redirect({ to: "/admin/configuracion/paises", replace: true });
+  },
 });

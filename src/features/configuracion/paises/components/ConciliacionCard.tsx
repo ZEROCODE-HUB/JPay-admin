@@ -2,7 +2,7 @@ import { toast } from "sonner";
 import { Badge, BtnOutline, Card } from "@/components/portal-shell";
 import { useConciliacion, usePaisesMutaciones } from "@/hooks/usePaises";
 import { formatDateTime } from "@/shared/format";
-import { avisarError } from "@/features/configuracion/paises/utils";
+import { avisarError } from "../utils";
 import { InfoTip } from "@/shared/ui/info-tip";
 
 const TIPO: Record<string, (proveedor: string) => string> = {

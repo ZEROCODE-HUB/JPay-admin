@@ -160,7 +160,7 @@ export type SubcuentasFilters = {
   fechaHasta?: string;
 };
 
-/** Subcuenta con los datos de su cliente (Clientes → Usuarios con CLABE). */
+/** Subcuenta con los datos de su cliente (Usuarios → Usuarios con CLABE). */
 export type SubcuentaConCliente = Subcuenta & {
   cliente?: {
     id: string;

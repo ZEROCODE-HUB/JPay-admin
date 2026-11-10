@@ -19,7 +19,7 @@ export function EnlaceDetalle({ enlace, onClose }: { enlace: EnlacePago; onClose
         <div className="sticky top-0 bg-card border-b px-6 py-4 flex justify-between items-start">
           <div className="min-w-0">
             <h3 className="font-display text-lg font-semibold flex items-center gap-2">
-              <Link2 size={18} /> Link de pago
+              <Link2 size={18} /> Enlace de pago
             </h3>
             <p className="text-sm text-muted-foreground break-all">{enlace.url ?? "—"}</p>
           </div>

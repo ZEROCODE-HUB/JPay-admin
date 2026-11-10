@@ -1,7 +1,10 @@
 import { usePaisesConfig } from "@/hooks/usePaises";
+import { ReembolsosVerificacionCard } from "./ReembolsosVerificacionCard";
 import { AlertasProveedorCard } from "./AlertasProveedorCard";
 import { CobreCard } from "./CobreCard";
+import { ConciliacionCard } from "./ConciliacionCard";
 import { ConexionProveedorCard } from "./ConexionProveedorCard";
+import { ContracargosCard } from "./ContracargosCard";
 import { ConexionesComerciosCard } from "./ConexionesComerciosCard";
 import { ConfiguracionPagosCard } from "./ConfiguracionPagosCard";
 import { EventosWebhookCard } from "./EventosWebhookCard";
@@ -11,10 +14,7 @@ import { FeriadosCard } from "./FeriadosCard";
 import { PaisesCard } from "./PaisesCard";
 import { ProveedoresCard } from "./ProveedoresCard";
 
-/**
- * Configuración > País y proveedores: solo configuración (conexiones, webhooks, umbrales y MSI).
- * La conciliación y las disputas están en Control; los simuladores, en Herramientas de prueba.
- */
+/** Configuración > País y proveedores. Los simuladores están en Herramientas de prueba. */
 export function PaisesPage() {
   const { paises, proveedores, configuracion, isLoading, error } = usePaisesConfig();
   if (isLoading) return <p className="text-sm text-muted-foreground">Cargando configuración…</p>;
@@ -33,6 +33,15 @@ export function PaisesPage() {
       {ecartpay && <AlertasProveedorCard proveedor="ecartpay" nombre="Ecart Pay" />}
       {ecartpay && <ConexionProveedorCard proveedor={ecartpay} />}
       {ecartpay && <ConexionesComerciosCard />}
+      {ecartpay && (
+        <ConciliacionCard
+          proveedor="ecartpay"
+          nombre="Ecart Pay"
+          descripcion="Todos los días se comparan los pagos de JPay con las transacciones de cada comercio (últimos 3 días). También guarda la comisión y el neto de Ecart Pay en cada pago."
+        />
+      )}
+      {ecartpay && <ReembolsosVerificacionCard />}
+      {ecartpay && <ContracargosCard />}
       {ecartpay && <EventosWebhookCard />}
       {ecartpay && <MsiCard />}
       {ecartpay && <PuntosFisicosCard />}
@@ -41,6 +50,13 @@ export function PaisesPage() {
       )}
       {cobre && <AlertasProveedorCard proveedor="cobre" nombre="Cobre" />}
       {cobre && <CobreCard />}
+      {cobre && (
+        <ConciliacionCard
+          proveedor="cobre"
+          nombre="Cobre"
+          descripcion="Todos los días se cruzan las transacciones de las cuentas en Cobre (últimos 3 días) con los depósitos y transferencias de JPay, y el saldo en Cobre con el del ledger. Los depósitos que no llegaron por aviso se acreditan en ese momento."
+        />
+      )}
       {configuracion.map((c) => (
         <ConfiguracionPagosCard key={`${c.pais}-${c.proveedor}`} config={c} />
       ))}

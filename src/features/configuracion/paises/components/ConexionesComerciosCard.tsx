@@ -15,22 +15,16 @@ const TONO: Record<string, "neutral" | "success" | "warn" | "danger"> = {
   revocado: "neutral",
 };
 
-/**
- * Comercios que conectaron (o intentaron conectar) su cuenta del proveedor por OAuth. Con
- * `legajo`, solo las conexiones con Ecart Pay de los comercios de ese cliente.
- */
-export function ConexionesComerciosCard({ legajo }: { legajo?: string } = {}) {
-  const { data: todas = [], isLoading, error } = useConexionesComercios();
-  const data = legajo
-    ? todas.filter((c) => c.legajo === legajo && c.proveedor === "ecartpay")
-    : todas;
+/** Comercios que conectaron (o intentaron conectar) su cuenta del proveedor por OAuth. */
+export function ConexionesComerciosCard() {
+  const { data = [], isLoading, error } = useConexionesComercios();
   const { desconectarComercio } = usePaisesMutaciones();
   const [baja, setBaja] = useState<ConexionComercio | null>(null);
 
   return (
     <Card>
       <h3 className="font-semibold">
-        {legajo ? "Conexión con Ecart Pay" : "Comercios conectados"}{" "}
+        Comercios conectados{" "}
         <InfoTip>
           Conexiones que guardó JPay cuando cada comercio autorizó su cuenta del proveedor (OAuth).
           Estado: «conectado» (JPay puede cobrar en su cuenta), «pendiente», «error» o «revocado»
@@ -45,11 +39,7 @@ export function ConexionesComerciosCard({ legajo }: { legajo?: string } = {}) {
       ) : error ? (
         <p className="mt-4 text-sm text-danger-600">No se pudieron cargar las conexiones.</p>
       ) : data.length === 0 ? (
-        <p className="mt-4 text-sm text-muted-foreground">
-          {legajo
-            ? "Ningún comercio de este cliente conectó su cuenta de Ecart Pay."
-            : "Ningún comercio conectó su cuenta."}
-        </p>
+        <p className="mt-4 text-sm text-muted-foreground">Ningún comercio conectó su cuenta.</p>
       ) : (
         <div className="mt-4 overflow-x-auto">
           <table className="w-full text-sm">

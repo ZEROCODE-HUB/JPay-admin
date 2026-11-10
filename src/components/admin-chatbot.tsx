@@ -28,7 +28,7 @@ const FULL_KB = [
 ];
 
 const DEFAULT_RESPONSE =
-  "No encontré una respuesta exacta, pero puedo ayudarte con cualquiera de estas áreas del panel: transacciones y estados, alertas vs. bloqueos, clientes y comercios, cobros (depósitos SPEI, depósitos sin asignar, links de pago, suscripciones, POS físico), envíos y aprobaciones, control (conciliación, contracargos y reembolsos), comisiones de JPay, APIs externas, reportes, registros y fondos, soporte (búsqueda de transferencias SPEI y bloqueo de funciones), usuarios y roles, movimientos, configuración e integraciones, módulos, notificaciones e incidentes. Escríbeme tu duda con más detalle y la busco.";
+  "No encontré una respuesta exacta, pero puedo ayudarte con cualquiera de estas áreas del panel: transacciones y estados, alertas vs. bloqueos, comercios (gestión, enlaces de pago, POS físico, suscripciones, comisiones de JPay, APIs externas), reportes, registros y fondos, soporte (búsqueda de transferencias SPEI y bloqueo de funciones), usuarios y roles, movimientos, configuración e integraciones, módulos, notificaciones e incidentes. Escríbeme tu duda con más detalle y la busco.";
 
 const SUGGESTED = [
   "¿Cómo busco una transferencia SPEI?",

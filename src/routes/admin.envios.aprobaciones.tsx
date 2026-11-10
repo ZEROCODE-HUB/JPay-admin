@@ -1,13 +1,11 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { pageTitle } from "@/brand/brand";
-import { AprobacionesPendientesPage } from "@/features/envios/components/AprobacionesPendientesPage";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
+/**
+ * Enlace de la reorganización del menú, ya deshecha: las aprobaciones de Cobre están en
+ * Integraciones → País y proveedores (tarjeta Cobre).
+ */
 export const Route = createFileRoute("/admin/envios/aprobaciones")({
-  component: AprobacionesPendientesPage,
-  head: () => ({
-    meta: [
-      { title: pageTitle("Aprobaciones pendientes — Admin") },
-      { name: "description", content: "Envíos y lotes que esperan la aprobación de un admin." },
-    ],
-  }),
+  beforeLoad: () => {
+    throw redirect({ to: "/admin/configuracion/paises", replace: true });
+  },
 });

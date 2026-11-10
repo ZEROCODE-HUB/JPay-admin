@@ -12,7 +12,7 @@ const tabs: Tab[] = [
 export const Route = createFileRoute("/admin/general/alertas")({
   head: () => ({
     meta: [
-      { title: pageTitle("Alertas y bloqueos — Admin") },
+      { title: pageTitle("Alertas — Admin") },
       { name: "description", content: "Gestión de alertas y bloqueos del sistema." },
     ],
   }),
