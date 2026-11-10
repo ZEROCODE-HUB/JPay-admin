@@ -305,7 +305,9 @@ export async function getDatosKyb(legajo: string): Promise<DatosKyb> {
   const [{ data: c, error }, { data: personas, error: e2 }] = await Promise.all([
     sb
       .from("clientes")
-      .select("telefono, sitio_web, industria_cobre, pais_constitucion, pais_operacion")
+      .select(
+        "telefono, sitio_web, industria_cobre, fecha_inscripcion, pais_constitucion, pais_operacion",
+      )
       .eq("legajo", legajo)
       .single(),
     sb.from("cliente_personas_kyb").select("*").eq("cliente_legajo", legajo).order("created_at"),
@@ -317,6 +319,7 @@ export async function getDatosKyb(legajo: string): Promise<DatosKyb> {
       telefono: c.telefono ?? "",
       sitioWeb: c.sitio_web ?? "",
       industria: c.industria_cobre ?? "",
+      fechaConstitucion: c.fecha_inscripcion ? String(c.fecha_inscripcion).slice(0, 10) : "",
       paisConstitucion: c.pais_constitucion ?? "MEX",
       paisOperacion: c.pais_operacion ?? "MEX",
     },
@@ -342,6 +345,7 @@ export async function guardarEmpresaKyb(legajo: string, e: EmpresaKyb): Promise<
       telefono: e.telefono,
       sitio_web: e.sitioWeb,
       industria_cobre: e.industria,
+      fecha_inscripcion: e.fechaConstitucion || null,
       pais_constitucion: e.paisConstitucion,
       pais_operacion: e.paisOperacion,
     })
