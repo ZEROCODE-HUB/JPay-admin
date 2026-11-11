@@ -4,6 +4,7 @@ import { Card, Badge } from "@/components/portal-shell";
 import { saludIconClass, saludMeta } from "../estados";
 import type { IntegracionUI } from "../utils";
 import { InfoTip } from "@/shared/ui/info-tip";
+import { brand } from "@/brand/brand";
 
 /** Vista operativa: una tarjeta por integración con su salud y ejecuciones. */
 export function IntegracionesGrid({
@@ -87,7 +88,7 @@ export function IntegracionesGrid({
                 Ejecuciones totales{" "}
                 <InfoTip>
                   Ojo: todavía no hay un sistema de monitoreo conectado. El nombre de la integración
-                  sale de la base de JPay, pero la salud siempre aparece como correcta, las
+                  sale de la base de {brand.name}, pero la salud siempre aparece como correcta, las
                   ejecuciones en 0 y las fechas en «—».
                 </InfoTip>
               </span>

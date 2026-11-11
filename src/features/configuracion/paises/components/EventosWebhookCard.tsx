@@ -5,6 +5,7 @@ import type { EventoWebhook } from "@/lib/api/paises";
 import { formatDateTime } from "@/shared/format";
 import { avisarError } from "../utils";
 import { InfoTip } from "@/shared/ui/info-tip";
+import { brand } from "@/brand/brand";
 
 function Firma({ e }: { e: EventoWebhook }) {
   if (e.firmaValida === true) return <Badge tone="success">Firmado</Badge>;
@@ -42,7 +43,7 @@ export function EventosWebhookCard() {
       <h3 className="font-semibold">
         Avisos de Ecart Pay{" "}
         <InfoTip>
-          Avisos (webhooks) que Ecart Pay le mandó a JPay, con su firma y el resultado de
+          Avisos (webhooks) que Ecart Pay le mandó a {brand.name}, con su firma y el resultado de
           procesarlos. «Revisados» es cuántos pagos pendientes consultó a Ecart Pay la última
           revisión automática.
         </InfoTip>

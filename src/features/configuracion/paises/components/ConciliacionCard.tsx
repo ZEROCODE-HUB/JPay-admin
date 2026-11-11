@@ -4,13 +4,14 @@ import { useConciliacion, usePaisesMutaciones } from "@/hooks/usePaises";
 import { formatDateTime } from "@/shared/format";
 import { avisarError } from "../utils";
 import { InfoTip } from "@/shared/ui/info-tip";
+import { brand } from "@/brand/brand";
 
 const TIPO: Record<string, (proveedor: string) => string> = {
-  falta_en_jpay: (p) => `Movimiento en ${p} que JPay no tiene`,
-  falta_en_proveedor: (p) => `Operación de JPay sin movimiento en ${p}`,
+  falta_en_jpay: (p) => `Movimiento en ${p} que ${brand.name} no tiene`,
+  falta_en_proveedor: (p) => `Operación de ${brand.name} sin movimiento en ${p}`,
   monto_distinto: () => "Monto distinto",
   estado_distinto: () => "Estado distinto",
-  saldo_distinto: (p) => `El saldo en ${p} no coincide con el de JPay`,
+  saldo_distinto: (p) => `El saldo en ${p} no coincide con el de ${brand.name}`,
 };
 
 const num = (v: unknown) => (typeof v === "number" ? v : 0);
@@ -48,9 +49,9 @@ export function ConciliacionCard({
             <InfoTip>
               «Última» resume la corrida más reciente (automática una vez al día o manual con
               «Conciliar ahora»): cuántas cuentas o comercios revisó, cuántas transacciones de los
-              últimos 3 días trajo de la API de {nombre} y cuántas diferencias encontró contra JPay.
-              Abajo están todas las diferencias que nadie marcó como resueltas, de cualquier
-              corrida.
+              últimos 3 días trajo de la API de {nombre} y cuántas diferencias encontró contra{" "}
+              {brand.name}. Abajo están todas las diferencias que nadie marcó como resueltas, de
+              cualquier corrida.
             </InfoTip>
           </h3>
           <p className="text-xs text-muted-foreground mt-1">{descripcion}</p>

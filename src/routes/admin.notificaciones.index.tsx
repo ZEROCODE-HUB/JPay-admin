@@ -3,7 +3,7 @@ import { CheckCircle2, XCircle, Eye } from "lucide-react";
 import { DataTable, type Column } from "@/shared/ui/data-table";
 import { PageHeader, Card, Badge, BtnOutline } from "@/components/portal-shell";
 import { ActionsDropdown, type ActionItem } from "@/components/actions-dropdown";
-import { pageTitle } from "@/brand/brand";
+import { brand, pageTitle } from "@/brand/brand";
 import { useEventosNotificacion } from "@/hooks/useEventosNotificacion";
 import type { EventoNotificacion } from "@/lib/api/types";
 import { formatDateTime } from "@/shared/format";
@@ -145,8 +145,9 @@ function Page() {
           <div className="text-xs uppercase tracking-wide text-muted-foreground">
             Notificaciones{" "}
             <InfoTip>
-              Eventos de notificación registrados en JPay (correo, Telegram o WhatsApp). Solo se
-              cuentan los 200 más recientes; las otras tarjetas se calculan sobre esos mismos 200.
+              Eventos de notificación registrados en {brand.name} (correo, Telegram o WhatsApp).
+              Solo se cuentan los 200 más recientes; las otras tarjetas se calculan sobre esos
+              mismos 200.
             </InfoTip>
           </div>
           <div className="font-display text-xl md:text-2xl font-semibold mt-1 tabular-nums">

@@ -1,6 +1,7 @@
 import { Badge, Card } from "@/components/portal-shell";
 import { usePuntosFisicos } from "@/hooks/usePaises";
 import { InfoTip } from "@/shared/ui/info-tip";
+import { brand } from "@/brand/brand";
 
 /** Sucursales de todos los comercios (Ecart Pay), con sus cajas y terminales vinculadas. */
 export function PuntosFisicosCard() {
@@ -10,9 +11,10 @@ export function PuntosFisicosCard() {
       <h3 className="font-semibold">
         Puntos físicos{" "}
         <InfoTip>
-          Sucursales registradas en JPay (las borradas no aparecen). «Cajas» cuenta los puntos de
-          venta vigentes de cada sucursal y «Con terminal», cuántas de esas cajas ya tienen una
-          terminal física vinculada. Es lo guardado en JPay, no una consulta en vivo a Ecart Pay.
+          Sucursales registradas en {brand.name} (las borradas no aparecen). «Cajas» cuenta los
+          puntos de venta vigentes de cada sucursal y «Con terminal», cuántas de esas cajas ya
+          tienen una terminal física vinculada. Es lo guardado en {brand.name}, no una consulta en
+          vivo a Ecart Pay.
         </InfoTip>
       </h3>
       <p className="text-xs text-muted-foreground mt-1">

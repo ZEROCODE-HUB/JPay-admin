@@ -3,6 +3,7 @@ import { Card } from "@/components/portal-shell";
 import type { DashboardDetalle } from "@/lib/api/dashboard";
 import { formatDateTime, formatMoney, formatNumber } from "@/shared/format";
 import { InfoTip } from "@/shared/ui/info-tip";
+import { brand } from "@/brand/brand";
 
 type Props = { d?: DashboardDetalle; isLoading: boolean; isError: boolean };
 
@@ -23,9 +24,10 @@ export function VolumenSistemaRow({ d, isLoading, isError }: Props) {
             <h3 className="font-display font-semibold">
               Volumen transaccional{" "}
               <InfoTip>
-                Suma diaria de todas las operaciones contabilizadas en el libro contable de JPay,
-                solo en la moneda del país (MXN), de los últimos 14 días contados en hora de México.
-                Pasa el mouse sobre una barra para ver el monto y la cantidad de ese día.
+                Suma diaria de todas las operaciones contabilizadas en el libro contable de{" "}
+                {brand.name}, solo en la moneda del país (MXN), de los últimos 14 días contados en
+                hora de México. Pasa el mouse sobre una barra para ver el monto y la cantidad de ese
+                día.
               </InfoTip>
             </h3>
             <p className="text-xs text-muted-foreground">

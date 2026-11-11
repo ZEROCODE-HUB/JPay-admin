@@ -61,8 +61,7 @@ export const KB: KbEntry[] = [
   },
   {
     keywords: ["comercios", "comercio", "pago por referencia", "gestión de comercios"],
-    response:
-      "La sección Comercios agrupa los módulos que usan los comercios para operar:\n\n• Gestión de comercios: listado centralizado de comercios con alta, edición y asociación a los canales de la plataforma.\n• Enlaces de pago: cobro mediante un link (Ecart Pay).\n• POS físico: puntos de venta de los comercios.\n• Suscripciones y domiciliación: cobros recurrentes con tarjeta y cargos a la CLABE del cliente.\n• Comisiones de JPay: lo que cobra JPay por los cobros de cada comercio.\n• APIs externas: usuarios, endpoints y restricciones de integración.",
+    response: `La sección Comercios agrupa los módulos que usan los comercios para operar:\n\n• Gestión de comercios: listado centralizado de comercios con alta, edición y asociación a los canales de la plataforma.\n• Enlaces de pago: cobro mediante un link (Ecart Pay).\n• POS físico: puntos de venta de los comercios.\n• Suscripciones y domiciliación: cobros recurrentes con tarjeta y cargos a la CLABE del cliente.\n• Comisiones de ${brand.name}: lo que cobra ${brand.name} por los cobros de cada comercio.\n• APIs externas: usuarios, endpoints y restricciones de integración.`,
   },
   {
     keywords: [

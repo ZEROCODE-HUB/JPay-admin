@@ -6,6 +6,7 @@ import { DataTable, type Column } from "@/shared/ui/data-table";
 import { useComisionesDashboard } from "../hooks/useComisionesDashboard";
 import type { ComisionPorComercio } from "../utils";
 import { InfoTip } from "@/shared/ui/info-tip";
+import { brand } from "@/brand/brand";
 
 const desgloseColumns: Column<ComisionPorComercio>[] = [
   {
@@ -64,9 +65,9 @@ export function ComisionesCard() {
         <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground flex items-center gap-1.5">
           <Wallet size={14} /> Comisiones — Depósitos y Retiros
           <InfoTip>
-            Movimientos de tipo depósito y retiro del libro contable de JPay con fecha entre «Desde»
-            y «Hasta» (por defecto, del día 1 del mes a hoy), en cualquier estado. Se toman hasta
-            1,000 depósitos y 1,000 retiros del periodo.
+            Movimientos de tipo depósito y retiro del libro contable de {brand.name} con fecha entre
+            «Desde» y «Hasta» (por defecto, del día 1 del mes a hoy), en cualquier estado. Se toman
+            hasta 1,000 depósitos y 1,000 retiros del periodo.
           </InfoTip>
         </h3>
         <div className="flex items-center gap-2">
@@ -115,9 +116,9 @@ export function ComisionesCard() {
               <div className="text-xs text-muted-foreground">
                 Comisión total{" "}
                 <InfoTip>
-                  Suma de la comisión que JPay cobró en cada depósito y retiro del periodo (la que
-                  quedó registrada en el movimiento). Los impuestos retenidos van aparte y no se
-                  suman aquí.
+                  Suma de la comisión que {brand.name} cobró en cada depósito y retiro del periodo
+                  (la que quedó registrada en el movimiento). Los impuestos retenidos van aparte y
+                  no se suman aquí.
                 </InfoTip>
               </div>
               <div className="font-mono font-semibold mt-1 text-primary-ink">

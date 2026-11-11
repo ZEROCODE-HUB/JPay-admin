@@ -5,6 +5,7 @@ import { DataTable, type Column } from "@/shared/ui/data-table";
 import { downloadExcel } from "@/features/reportes/utils/download";
 import { periodoEnCurso } from "@/features/reportes/utils/periodos";
 import { InfoTip } from "@/shared/ui/info-tip";
+import { brand } from "@/brand/brand";
 
 /* ---------- Reportes de Comisiones ---------- */
 
@@ -149,7 +150,7 @@ export function ReporteComisiones() {
         <InfoTip>
           Ojo: las filas de este reporte son datos de ejemplo fijos en la pantalla, todavía no salen
           del libro contable. Las comisiones reales del período están en Comercios → Comisiones de
-          JPay.
+          {brand.name}.
         </InfoTip>
         <span>
           Los períodos marcados como "En curso" corresponden al mes actual y reflejan las comisiones

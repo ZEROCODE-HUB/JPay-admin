@@ -1,5 +1,6 @@
 import { requireSupabase } from "@/lib/supabase";
 import { DataAccessError } from "./errors";
+import { brand } from "@/brand/brand";
 
 /**
  * Estado de los productos de un cliente en México: los 4 de Cobre (pay-in, pay-out,
@@ -127,7 +128,10 @@ export async function getProductosCliente(legajo: string): Promise<ProductoClien
       nombre: "Transferencias internacionales",
       descripcion: "Pesos a dólares y pagos Fedwire / SWIFT",
       ...(conCuenta && !dolares
-        ? { estado: "pendiente" as const, detalle: "Faltan los Balances Global y USA de JPay" }
+        ? {
+            estado: "pendiente" as const,
+            detalle: `Faltan los Balances Global y USA de ${brand.name}`,
+          }
         : cobre("Conversión y envíos en dólares habilitados")),
     },
     {

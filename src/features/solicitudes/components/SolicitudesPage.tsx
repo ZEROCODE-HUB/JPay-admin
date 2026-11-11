@@ -11,6 +11,7 @@ import {
   type Solicitud,
 } from "@/lib/api/solicitudes";
 import { formatDateTime } from "@/shared/format";
+import { brand } from "@/brand/brand";
 
 const KEY = ["solicitudes-contacto"] as const;
 
@@ -45,7 +46,7 @@ export function SolicitudesPage() {
     <PermissionGuard recurso="usuarios">
       <PageHeader
         title="Solicitudes de contacto"
-        description="Comercios que pidieron que un ejecutivo de JPay los contacte para activar un servicio (por ejemplo, Domiciliación)."
+        description={`Comercios que pidieron que un ejecutivo de ${brand.name} los contacte para activar un servicio (por ejemplo, Domiciliación).`}
       />
       <div className="mb-4 flex flex-wrap gap-2">
         {FILTROS.map((f) => (

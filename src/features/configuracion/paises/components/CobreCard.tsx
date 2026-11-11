@@ -6,6 +6,7 @@ import { useCobreAdmin, useCobreAdminMutaciones } from "@/hooks/useCobre";
 import { formatDateTime, formatMoney, parseMonto } from "@/shared/format";
 import { avisarError } from "../utils";
 import { InfoTip } from "@/shared/ui/info-tip";
+import { brand } from "@/brand/brand";
 
 const DEVOLUCION: Record<
   string,
@@ -102,11 +103,12 @@ export function CobreCard() {
         <div className="mt-3 space-y-5 text-sm">
           <section>
             <p className="text-xs font-medium">
-              Balances de JPay en dólares (Global y USA){" "}
+              Balances de {brand.name} en dólares (Global y USA){" "}
               <InfoTip>
-                Cuentas en dólares de JPay en Cobre. «Ver saldo» consulta en ese momento la API de
-                Cobre y muestra el saldo que Cobre reporta (en USD); no se guarda en JPay. Si la
-                conectividad no es «connected», la cuenta todavía no puede operar.
+                Cuentas en dólares de {brand.name} en Cobre. «Ver saldo» consulta en ese momento la
+                API de Cobre y muestra el saldo que Cobre reporta (en USD); no se guarda en{" "}
+                {brand.name}. Si la conectividad no es «connected», la cuenta todavía no puede
+                operar.
               </InfoTip>
             </p>
             {(balances.data ?? []).length < 2 ? (
@@ -167,9 +169,9 @@ export function CobreCard() {
             <p className="text-xs font-medium">
               Avisos de Cobre (webhooks){" "}
               <InfoTip>
-                Suscripción a los avisos de Cobre registrada desde JPay. «Eventos» es cuántos tipos
-                de aviso (depósitos, transferencias, altas, etc.) quedaron suscritos; «Revisar
-                suscripción» agrega los que falten.
+                Suscripción a los avisos de Cobre registrada desde {brand.name}. «Eventos» es
+                cuántos tipos de aviso (depósitos, transferencias, altas, etc.) quedaron suscritos;
+                «Revisar suscripción» agrega los que falten.
               </InfoTip>
             </p>
             <div className="mt-1 flex flex-wrap items-center justify-between gap-3">
@@ -245,7 +247,7 @@ export function CobreCard() {
               </div>
             </div>
             <div className="text-xs md:col-span-3">
-              <label htmlFor="cobre-modo-comision">Comisión de JPay</label>
+              <label htmlFor="cobre-modo-comision">Comisión de {brand.name}</label>
               <select
                 id="cobre-modo-comision"
                 className="mt-2 block w-full md:w-[28rem] h-9 px-2 rounded-md border border-input bg-card text-sm"
@@ -260,7 +262,7 @@ export function CobreCard() {
                 </option>
               </select>
               <p className="mt-1 text-muted-foreground">
-                Lo calculado se ve en Comercios → Comisiones de JPay.
+                Lo calculado se ve en Comercios → Comisiones de {brand.name}.
               </p>
             </div>
             <div className="text-xs md:col-span-3">
@@ -274,8 +276,8 @@ export function CobreCard() {
                 <span className="text-muted-foreground">{reglasFx ? "Sí" : "No"}</span>
               </div>
               <p className="mt-1 text-muted-foreground">
-                La comisión de JPay por convertir se carga por cliente en Usuarios → Carga de
-                comisiones (tipo Conversión).
+                La comisión de {brand.name} por convertir se carga por cliente en Usuarios → Carga
+                de comisiones (tipo Conversión).
               </p>
             </div>
             <div className="md:col-span-3 flex justify-end">

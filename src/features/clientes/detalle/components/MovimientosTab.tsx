@@ -6,6 +6,7 @@ import { toDetalleMovimiento } from "../utils";
 import { Seccion } from "./Seccion";
 import { TablaMovimientos } from "./TablaMovimientos";
 import { InfoTip } from "@/shared/ui/info-tip";
+import { brand } from "@/brand/brand";
 
 export function MovimientosTab({ data, ui }: { data: ClienteDetalleData; ui: ClienteDetalleUi }) {
   const { subcuentasQuery, catalogoEstados } = data;
@@ -91,9 +92,9 @@ export function MovimientosTab({ data, ui }: { data: ClienteDetalleData; ui: Cli
             Saldo total de la cuenta{" "}
             <InfoTip>
               Suma del saldo disponible más el retenido (por operaciones en curso, contracargos o
-              disputas) de las subcuentas en pesos del cliente, según los saldos que lleva JPay. La
-              subcuenta en dólares se muestra aparte, en dólares. No depende del período elegido: es
-              el saldo actual.
+              disputas) de las subcuentas en pesos del cliente, según los saldos que lleva{" "}
+              {brand.name}. La subcuenta en dólares se muestra aparte, en dólares. No depende del
+              período elegido: es el saldo actual.
             </InfoTip>
           </p>
           <p className="mt-2 text-2xl font-semibold tabular-nums">{formatMoney(saldoTotal)}</p>
@@ -114,8 +115,8 @@ export function MovimientosTab({ data, ui }: { data: ClienteDetalleData; ui: Cli
           <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
             Total de movimientos{" "}
             <InfoTip>
-              Cantidad de movimientos del libro contable de JPay de este cliente en el período
-              elegido (todos si no hay fechas), en cualquier tipo y estado.
+              Cantidad de movimientos del libro contable de {brand.name} de este cliente en el
+              período elegido (todos si no hay fechas), en cualquier tipo y estado.
             </InfoTip>
           </p>
           <p className="mt-2 text-2xl font-semibold tabular-nums">{totalMovimientos}</p>

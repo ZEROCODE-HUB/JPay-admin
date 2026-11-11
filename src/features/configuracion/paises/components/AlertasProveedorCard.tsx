@@ -2,6 +2,7 @@ import { AlertTriangle, CheckCircle2, XCircle } from "lucide-react";
 import { Card } from "@/components/portal-shell";
 import { useAlertasProveedor } from "@/hooks/usePaises";
 import { InfoTip } from "@/shared/ui/info-tip";
+import { brand } from "@/brand/brand";
 
 /**
  * Monitoreo de un proveedor: avisos fallidos, tareas atrasadas, conciliación y lo propio de cada
@@ -16,7 +17,7 @@ export function AlertasProveedorCard({ proveedor, nombre }: { proveedor: string;
       <h3 className="font-semibold">
         Alertas de {nombre}{" "}
         <InfoTip>
-          Revisión automática que hace JPay sobre sus propios registros de {nombre}: avisos
+          Revisión automática que hace {brand.name} sobre sus propios registros de {nombre}: avisos
           (webhooks) que fallaron, tareas automáticas atrasadas, la última conciliación y
           operaciones trabadas (pagos, reembolsos y contracargos en Ecart Pay; transferencias,
           aprobaciones y depósitos en Cobre). Se recalcula cada minuto.

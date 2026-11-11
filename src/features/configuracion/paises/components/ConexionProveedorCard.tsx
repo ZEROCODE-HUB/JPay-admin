@@ -6,6 +6,7 @@ import type { EstadoConexion, ProveedorPago } from "@/lib/api/paises";
 import { formatDateTime } from "@/shared/format";
 import { avisarError } from "../utils";
 import { InfoTip } from "@/shared/ui/info-tip";
+import { brand } from "@/brand/brand";
 
 const ESTADO: Record<EstadoConexion, { label: string; tone: "success" | "danger" | "neutral" }> = {
   ok: { label: "Conectado", tone: "success" },
@@ -64,8 +65,8 @@ export function ConexionProveedorCard({
               {c.estado === "ok" && ` (${entorno})`}
             </Badge>
             <InfoTip>
-              Resultado de la última prueba de conexión de JPay con el proveedor (claves, token,
-              lectura de la API, webhooks). Se actualiza cada vez que alguien toca «Probar
+              Resultado de la última prueba de conexión de {brand.name} con el proveedor (claves,
+              token, lectura de la API, webhooks). Se actualiza cada vez que alguien toca «Probar
               conexión». La latencia es lo que tardó el proveedor en responder en esa prueba.
             </InfoTip>
           </h3>

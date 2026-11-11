@@ -5,6 +5,7 @@ import { Badge, BtnPrimary, Input, PageHeader } from "@/components/portal-shell"
 import { EmptyState } from "@/shared/ui/empty-state";
 import { buscarOperacionSpei, type OperacionSpei } from "@/lib/api/consulta-spei";
 import { formatDateTime, formatMoney } from "@/shared/format";
+import { brand } from "@/brand/brand";
 
 /**
  * Consultas frecuentes en México: busca un depósito o una transferencia SPEI de Cobre por clave
@@ -64,7 +65,7 @@ export function ConsultaSpeiMx() {
           {resultado.length === 0 ? (
             <EmptyState
               title="Sin resultados"
-              description="No hay depósitos ni transferencias con ese dato en JPay."
+              description={`No hay depósitos ni transferencias con ese dato en ${brand.name}.`}
             />
           ) : (
             <ul className="divide-y">

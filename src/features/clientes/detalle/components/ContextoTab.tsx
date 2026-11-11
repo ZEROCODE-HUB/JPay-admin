@@ -6,6 +6,7 @@ import type { ClienteDetalleData } from "../hooks/useClienteDetalle";
 import type { ClienteDetalleUi } from "../hooks/useClienteDetalleUi";
 import { KpiCard } from "./KpiCard";
 import { MiniDashboard } from "./MiniDashboard";
+import { brand } from "@/brand/brand";
 
 export function ContextoTab({ data, ui }: { data: ClienteDetalleData; ui: ClienteDetalleUi }) {
   const {
@@ -56,7 +57,7 @@ export function ContextoTab({ data, ui }: { data: ClienteDetalleData; ui: Client
         />
         <KpiCard
           label="Módulos inferidos"
-          info="Módulos que el cliente tiene registrados en JPay (por ejemplo API externa, links de pago o subcuentas). Es la cantidad de módulos, no de usos."
+          info={`Módulos que el cliente tiene registrados en ${brand.name} (por ejemplo API externa, links de pago o subcuentas). Es la cantidad de módulos, no de usos.`}
           value={modulosQuery.isError ? "Por definir" : String(modulosData.length)}
         />
       </div>

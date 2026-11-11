@@ -6,6 +6,7 @@ import { formatDateTime } from "@/shared/format";
 import { KybCobreForm } from "@/shared/ui/kyb-cobre";
 import { SectionCard } from "./SectionCard";
 import { InfoTip } from "@/shared/ui/info-tip";
+import { brand } from "@/brand/brand";
 
 const ALTA: Record<string, { label: string; tone: "success" | "warn" | "danger" | "neutral" }> = {
   enviando: { label: "Enviando", tone: "warn" },
@@ -48,7 +49,7 @@ export function CobreTab({ legajo }: { legajo: string }) {
               <p>
                 El comercio opera con{" "}
                 <span className="font-medium">su propia instancia de Cobre</span>: no lleva
-                Subcliente bajo JPay.
+                Subcliente bajo {brand.name}.
               </p>
             ) : (
               <>
@@ -178,8 +179,9 @@ export function CobreTab({ legajo }: { legajo: string }) {
 
       <SectionCard title="Instancia Cobre propia (excepción)">
         <p className="text-xs text-muted-foreground">
-          Solo para un comercio con contrato directo con Cobre: JPay opera su instancia con sus
-          credenciales (quedan en Vault y no se vuelven a mostrar), sus avisos y su conciliación.
+          Solo para un comercio con contrato directo con Cobre: {brand.name} opera su instancia con
+          sus credenciales (quedan en Vault y no se vuelven a mostrar), sus avisos y su
+          conciliación.
         </p>
         {instancia && (
           <div className="mt-3 flex flex-wrap items-center gap-3 text-sm">

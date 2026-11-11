@@ -13,6 +13,7 @@ import { PuntosFisicosCard } from "./PuntosFisicosCard";
 import { FeriadosCard } from "./FeriadosCard";
 import { PaisesCard } from "./PaisesCard";
 import { ProveedoresCard } from "./ProveedoresCard";
+import { brand } from "@/brand/brand";
 
 /** Configuración > País y proveedores. Los simuladores están en Herramientas de prueba. */
 export function PaisesPage() {
@@ -37,7 +38,7 @@ export function PaisesPage() {
         <ConciliacionCard
           proveedor="ecartpay"
           nombre="Ecart Pay"
-          descripcion="Todos los días se comparan los pagos de JPay con las transacciones de cada comercio (últimos 3 días). También guarda la comisión y el neto de Ecart Pay en cada pago."
+          descripcion={`Todos los días se comparan los pagos de ${brand.name} con las transacciones de cada comercio (últimos 3 días). También guarda la comisión y el neto de Ecart Pay en cada pago.`}
         />
       )}
       {ecartpay && <ReembolsosVerificacionCard />}
@@ -54,7 +55,7 @@ export function PaisesPage() {
         <ConciliacionCard
           proveedor="cobre"
           nombre="Cobre"
-          descripcion="Todos los días se cruzan las transacciones de las cuentas en Cobre (últimos 3 días) con los depósitos y transferencias de JPay, y el saldo en Cobre con el del ledger. Los depósitos que no llegaron por aviso se acreditan en ese momento."
+          descripcion={`Todos los días se cruzan las transacciones de las cuentas en Cobre (últimos 3 días) con los depósitos y transferencias de ${brand.name}, y el saldo en Cobre con el del ledger. Los depósitos que no llegaron por aviso se acreditan en ese momento.`}
         />
       )}
       {configuracion.map((c) => (

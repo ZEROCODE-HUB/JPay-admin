@@ -14,7 +14,7 @@ import {
   Stat,
 } from "@/components/portal-shell";
 import { PermissionGuard } from "@/components/permission-guard";
-import { pageTitle } from "@/brand/brand";
+import { brand, pageTitle } from "@/brand/brand";
 import {
   getComisionesJpay,
   listPagosComisiones,
@@ -26,7 +26,7 @@ import { FormDialog } from "@/shared/ui/form-dialog";
 import { InfoTip } from "@/shared/ui/info-tip";
 
 export const Route = createFileRoute("/admin/comercios/comisiones-jpay")({
-  head: () => ({ meta: [{ title: pageTitle("Comisiones de JPay — Admin") }] }),
+  head: () => ({ meta: [{ title: pageTitle(`Comisiones de ${brand.name} — Admin`) }] }),
   component: Page,
 });
 
@@ -115,8 +115,8 @@ function Page() {
   return (
     <PermissionGuard recurso="comercios">
       <PageHeader
-        title="Comisiones de JPay"
-        description="Cuánto le corresponde a JPay por comercio y producto, y cuánto ya se cobró."
+        title={`Comisiones de ${brand.name}`}
+        description={`Cuánto le corresponde a ${brand.name} por comercio y producto, y cuánto ya se cobró.`}
         action={
           <div className="flex gap-2">
             <BtnOutline
@@ -155,7 +155,7 @@ function Page() {
             />
           </div>
           <p className="text-xs text-muted-foreground max-w-xl">
-            Ecart Pay: comisión de JPay sobre lo cobrado (neto de reembolsos), según la
+            Ecart Pay: comisión de {brand.name} sobre lo cobrado (neto de reembolsos), según la
             configuración de cobros o la propia del comercio. Cobre: según el modo (descontada del
             saldo o por cobrar). Todo con IVA.
           </p>
@@ -165,7 +165,7 @@ function Page() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
         <Stat
           label="Ecart Pay · por cobrar"
-          info="Comisión de JPay + IVA sobre los cobros con Ecart Pay pagados en el período (enlaces de pago y POS, neto de reembolsos) y sobre suscripciones y domiciliaciones cobradas. Usa el porcentaje propio del comercio o, si no tiene, el general de México. «Recibido» suma los pagos registrados a mano cuyo período se cruza con el elegido."
+          info={`Comisión de ${brand.name} + IVA sobre los cobros con Ecart Pay pagados en el período (enlaces de pago y POS, neto de reembolsos) y sobre suscripciones y domiciliaciones cobradas. Usa el porcentaje propio del comercio o, si no tiene, el general de México. «Recibido» suma los pagos registrados a mano cuyo período se cruza con el elegido.`}
           value={m(totales.ecart)}
           sub={`Recibido ${m(totales.recibidoEcart)} · falta ${m(Math.max(0, totales.ecart - totales.recibidoEcart))}`}
         />

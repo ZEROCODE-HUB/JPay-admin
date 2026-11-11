@@ -2,7 +2,7 @@
 // Archivo generado automáticamente por scripts/generate-kb-nav.mjs (disparado por el hook git post-commit).
 // No editar manualmente: se regenera en cada commit a partir de src/routeTree.gen.ts.
 // Los títulos de marca se emiten como pageTitle(): el nombre sale de src/brand/brand.json.
-import { pageTitle } from "@/brand/brand";
+import { brand, pageTitle } from "@/brand/brand";
 
 export const KB_NAVIGATION = `Estructura actual del panel administrativo (se genera automáticamente en cada cambio):
 
@@ -24,7 +24,7 @@ export const KB_NAVIGATION = `Estructura actual del panel administrativo (se gen
    - ${pageTitle("APIs externas — Admin")}  (/admin/comercios/apis)
    - ${pageTitle("APIs externas — Endpoints — Admin")}  (/admin/comercios/apis/endpoints)
    - ${pageTitle("APIs externas — Restricciones — Admin")}  (/admin/comercios/apis/restricciones)
-   - ${pageTitle("Comisiones de JPay — Admin")}  (/admin/comercios/comisiones-jpay)
+   - ${pageTitle(`Comisiones de ${brand.name} — Admin`)}  (/admin/comercios/comisiones-jpay)
    - ${pageTitle("Gestión — Admin")}  (/admin/comercios/gestion)
    - ${pageTitle("Códigos de categoría — Admin")}  (/admin/comercios/gestion/categoria)
    - ${pageTitle("Link de pago — Admin")}  (/admin/comercios/link-pago)
@@ -90,7 +90,7 @@ export const KB_ROUTES: { path: string; title: string }[] = [
   { path: "/admin/comercios/apis", title: pageTitle("APIs externas — Admin") },
   { path: "/admin/comercios/apis/endpoints", title: pageTitle("APIs externas — Endpoints — Admin") },
   { path: "/admin/comercios/apis/restricciones", title: pageTitle("APIs externas — Restricciones — Admin") },
-  { path: "/admin/comercios/comisiones-jpay", title: pageTitle("Comisiones de JPay — Admin") },
+  { path: "/admin/comercios/comisiones-jpay", title: pageTitle(`Comisiones de ${brand.name} — Admin`) },
   { path: "/admin/comercios/gestion", title: pageTitle("Gestión — Admin") },
   { path: "/admin/comercios/gestion/categoria", title: pageTitle("Códigos de categoría — Admin") },
   { path: "/admin/comercios/link-pago", title: pageTitle("Link de pago — Admin") },

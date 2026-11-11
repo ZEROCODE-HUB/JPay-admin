@@ -5,6 +5,7 @@ import { BtnOutline, BtnPrimary, Card, Input } from "@/components/portal-shell";
 import { listReembolsosEnVerificacion, resolverReembolso } from "@/lib/api/reembolsos";
 import { formatDateTime, formatMoney } from "@/shared/format";
 import { InfoTip } from "@/shared/ui/info-tip";
+import { brand } from "@/brand/brand";
 
 const MOTIVO: Record<string, string> = {
   requested: "Lo pidió el cliente",
@@ -45,9 +46,10 @@ export function ReembolsosVerificacionCard() {
       <h3 className="font-semibold">
         Reembolsos en verificación{" "}
         <InfoTip>
-          Reembolsos de cobros de Ecart Pay pedidos desde JPay (por el comercio o el backoffice) en
-          los que Ecart Pay no confirmó si se hicieron. Muestra el monto del reembolso y el del
-          cobro original; ese monto sigue reservado del disponible hasta que lo resuelvas.
+          Reembolsos de cobros de Ecart Pay pedidos desde {brand.name} (por el comercio o el
+          backoffice) en los que Ecart Pay no confirmó si se hicieron. Muestra el monto del
+          reembolso y el del cobro original; ese monto sigue reservado del disponible hasta que lo
+          resuelvas.
         </InfoTip>
       </h3>
       <p className="text-xs text-muted-foreground mt-1">
