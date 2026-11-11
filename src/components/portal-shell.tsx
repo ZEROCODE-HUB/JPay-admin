@@ -14,6 +14,7 @@ import { useDemoMode } from "@/contexts/demo-mode";
 import { EtiquetaConInfo } from "@/shared/ui/info-tip";
 import type { Modulo } from "@/shared/pais";
 import { supabase } from "@/lib/supabase";
+import { Cargando } from "@/shared/ui/estado-carga";
 
 /** `modulo`: el ítem solo aparece si el país lo tiene (ver `filtrarPorModulo`). */
 export type NavLeaf = { to: string; label: string; icon: LucideIcon; modulo?: Modulo };
@@ -386,12 +387,15 @@ export function Stat({
   value,
   sub,
   info,
+  loading = false,
 }: {
   label: string;
   value: string;
   sub?: string;
   /** De dónde sale el dato; se muestra con una «i» al pasar el mouse. */
   info?: React.ReactNode;
+  /** Mientras carga se muestra un gris animado en vez del valor (nunca $0). */
+  loading?: boolean;
 }) {
   return (
     <Card>
@@ -399,9 +403,9 @@ export function Stat({
         <EtiquetaConInfo label={label} info={info} />
       </div>
       <div className="font-display text-xl md:text-2xl font-semibold text-foreground mt-1 tabular-nums">
-        {value}
+        {loading ? <Cargando className="h-8 w-32" /> : value}
       </div>
-      {sub && <div className="text-xs text-muted-foreground mt-1">{sub}</div>}
+      {sub && !loading && <div className="text-xs text-muted-foreground mt-1">{sub}</div>}
     </Card>
   );
 }
