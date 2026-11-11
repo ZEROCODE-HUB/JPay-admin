@@ -51,6 +51,7 @@ export function ProveedoresCard({ proveedores }: { proveedores: ProveedorPago[] 
                     <Toggle
                       label={`Entorno de pruebas de ${p.nombre}`}
                       enabled={p.sandbox}
+                      disabled={actualizarProveedor.isPending}
                       onClick={() => cambiar(p.codigo, { sandbox: !p.sandbox })}
                     />
                   )}
@@ -59,6 +60,7 @@ export function ProveedoresCard({ proveedores }: { proveedores: ProveedorPago[] 
                   <Toggle
                     label={`Activar ${p.nombre}`}
                     enabled={p.activo}
+                    disabled={actualizarProveedor.isPending}
                     onClick={() => cambiar(p.codigo, { activo: !p.activo })}
                   />
                 </td>

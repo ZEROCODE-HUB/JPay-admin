@@ -7,6 +7,7 @@ import { Seccion } from "./Seccion";
 import { TablaMovimientos } from "./TablaMovimientos";
 import { InfoTip } from "@/shared/ui/info-tip";
 import { brand } from "@/brand/brand";
+import { Cargando } from "@/shared/ui/estado-carga";
 
 export function MovimientosTab({ data, ui }: { data: ClienteDetalleData; ui: ClienteDetalleUi }) {
   const { subcuentasQuery, catalogoEstados } = data;
@@ -33,6 +34,7 @@ export function MovimientosTab({ data, ui }: { data: ClienteDetalleData; ui: Cli
   const saldoTotal = saldoDe("MXN");
   const hayUsd = subs.some((s) => s.moneda === "USD");
   const saldoUsd = saldoDe("USD");
+  const cargandoStats = movimientosStatsQuery.isLoading || movimientosQuery.isLoading;
   const totalMovimientos = movimientosStatsQuery.data?.total ?? movimientosQuery.total ?? 0;
   const porTipo = statsRows.reduce<Record<string, number>>((acc, r) => {
     const k = r.tipo ?? "otro";
@@ -97,7 +99,15 @@ export function MovimientosTab({ data, ui }: { data: ClienteDetalleData; ui: Cli
               período elegido: es el saldo actual.
             </InfoTip>
           </p>
-          <p className="mt-2 text-2xl font-semibold tabular-nums">{formatMoney(saldoTotal)}</p>
+          <p className="mt-2 text-2xl font-semibold tabular-nums">
+            {subcuentasQuery.isLoading ? (
+              <Cargando className="h-7 w-32" />
+            ) : subcuentasQuery.isError ? (
+              <span className="text-base text-danger-600">No se pudo cargar</span>
+            ) : (
+              formatMoney(saldoTotal)
+            )}
+          </p>
           {hayUsd && (
             <p className="text-sm font-semibold tabular-nums">
               + {formatMoney(saldoUsd, { moneda: "USD" })} en dólares
@@ -105,10 +115,11 @@ export function MovimientosTab({ data, ui }: { data: ClienteDetalleData; ui: Cli
           )}
           <p className="mt-1 text-xs text-muted-foreground">
             Disponible + retenido ·{" "}
-            {(subcuentasQuery.data?.length ?? 0) > 0
-              ? `${subcuentasQuery.data!.length} subcuenta(s)`
-              : "sin subcuentas"}
-            {subcuentasQuery.isLoading ? " (cargando…)" : ""}
+            {subcuentasQuery.isLoading
+              ? "cargando…"
+              : (subcuentasQuery.data?.length ?? 0) > 0
+                ? `${subcuentasQuery.data!.length} subcuenta(s)`
+                : "sin subcuentas"}
           </p>
         </div>
         <div className="rounded-xl border border-border bg-card p-4">
@@ -119,9 +130,11 @@ export function MovimientosTab({ data, ui }: { data: ClienteDetalleData; ui: Cli
               período elegido (todos si no hay fechas), en cualquier tipo y estado.
             </InfoTip>
           </p>
-          <p className="mt-2 text-2xl font-semibold tabular-nums">{totalMovimientos}</p>
+          <p className="mt-2 text-2xl font-semibold tabular-nums">
+            {cargandoStats ? <Cargando className="h-7 w-16" /> : totalMovimientos}
+          </p>
           <p className="mt-1 text-xs text-muted-foreground">
-            {Object.keys(porTipo).length} tipo(s) distinto(s)
+            {cargandoStats ? "cargando…" : `${Object.keys(porTipo).length} tipo(s) distinto(s)`}
           </p>
         </div>
         <div className="rounded-xl border border-border bg-card p-4">
@@ -132,7 +145,9 @@ export function MovimientosTab({ data, ui }: { data: ClienteDetalleData; ui: Cli
               etc.). Se calcula sobre los primeros 1,000 movimientos del período.
             </InfoTip>
           </p>
-          {Object.keys(porTipo).length === 0 ? (
+          {cargandoStats ? (
+            <Cargando className="mt-3 block h-16 w-full" />
+          ) : Object.keys(porTipo).length === 0 ? (
             <p className="mt-3 text-sm text-muted-foreground">Sin datos en el período.</p>
           ) : (
             <ul className="mt-3 space-y-1.5">

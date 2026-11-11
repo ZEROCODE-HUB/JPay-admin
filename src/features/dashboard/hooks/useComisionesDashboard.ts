@@ -9,7 +9,7 @@ export function useComisionesDashboard() {
   const [hasta, setHasta] = useState(inicial.hasta);
   const [showDesglose, setShowDesglose] = useState(false);
 
-  const { rows: depRows, isLoading: depLoading } = useMovimientos({
+  const dep = useMovimientos({
     page: 0,
     pageSize: 1000,
     tipo: "deposito",
@@ -17,7 +17,7 @@ export function useComisionesDashboard() {
     fechaHasta: finDeDia(hasta),
     countMode: "exact",
   });
-  const { rows: retRows, isLoading: retLoading } = useMovimientos({
+  const ret = useMovimientos({
     page: 0,
     pageSize: 1000,
     tipo: "retiro",
@@ -26,7 +26,12 @@ export function useComisionesDashboard() {
     countMode: "exact",
   });
 
-  const isLoading = depLoading || retLoading;
+  const isLoading = dep.isLoading || ret.isLoading;
+  // Si falla cualquiera de las dos consultas, el resumen estaría incompleto: se muestra el error.
+  const error = (dep.isError && dep.error) || (ret.isError && ret.error) || null;
+  const reintentar = () => void Promise.all([dep.refetch(), ret.refetch()]);
+  const depRows = dep.rows;
+  const retRows = ret.rows;
 
   const resumen = useMemo(
     () => resumirComisiones([...(depRows ?? []), ...(retRows ?? [])]),
@@ -41,6 +46,8 @@ export function useComisionesDashboard() {
     showDesglose,
     setShowDesglose,
     isLoading,
+    error,
+    reintentar,
     ...resumen,
   };
 }

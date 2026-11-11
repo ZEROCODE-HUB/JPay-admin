@@ -24,6 +24,7 @@ import {
 import { formatDate, formatMoney, formatNumber, parseMonto } from "@/shared/format";
 import { FormDialog } from "@/shared/ui/form-dialog";
 import { InfoTip } from "@/shared/ui/info-tip";
+import { ErrorCarga } from "@/shared/ui/estado-carga";
 
 export const Route = createFileRoute("/admin/comercios/comisiones-jpay")({
   head: () => ({ meta: [{ title: pageTitle(`Comisiones de ${brand.name} — Admin`) }] }),
@@ -164,24 +165,28 @@ function Page() {
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
         <Stat
+          loading={calc.isLoading || pagos.isLoading}
           label="Ecart Pay · por cobrar"
           info={`Comisión de ${brand.name} + IVA sobre los cobros con Ecart Pay pagados en el período (enlaces de pago y POS, neto de reembolsos) y sobre suscripciones y domiciliaciones cobradas. Usa el porcentaje propio del comercio o, si no tiene, el general de México. «Recibido» suma los pagos registrados a mano cuyo período se cruza con el elegido.`}
           value={m(totales.ecart)}
           sub={`Recibido ${m(totales.recibidoEcart)} · falta ${m(Math.max(0, totales.ecart - totales.recibidoEcart))}`}
         />
         <Stat
+          loading={calc.isLoading || pagos.isLoading}
           label="Cobre · por cobrar"
           info="Comisión + IVA de depósitos, transferencias y conversiones a dólares contabilizados en el período que NO se descontaron del saldo del comercio (modo «calcular»): hay que pedírsela a cada empresa. «Recibido» suma los pagos de empresas registrados a mano."
           value={m(totales.cobrePorCobrar)}
           sub={`Recibido ${m(totales.recibidoCobre)} · falta ${m(Math.max(0, totales.cobrePorCobrar - totales.recibidoCobre))}`}
         />
         <Stat
+          loading={calc.isLoading || pagos.isLoading}
           label="Cobre · descontada del saldo"
           info="Comisión + IVA que ya se descontó del saldo del comercio en cada depósito, transferencia o conversión contabilizada en el período (modo «descontar»). No hay que cobrarla aparte."
           value={m(totales.cobreDescontada)}
           sub="Ya cobrada en cada operación"
         />
         <Stat
+          loading={calc.isLoading || pagos.isLoading}
           label="Total del período"
           info="Suma de las tres tarjetas anteriores (comisión + IVA). Abajo, la cantidad de operaciones con comisión que entraron en el cálculo. Fechas en hora de México."
           value={m(totales.ecart + totales.cobrePorCobrar + totales.cobreDescontada)}
@@ -194,7 +199,7 @@ function Page() {
         {calc.isLoading ? (
           <p className="text-sm text-muted-foreground">Cargando…</p>
         ) : calc.isError ? (
-          <p className="text-sm text-danger-600">{(calc.error as Error).message}</p>
+          <ErrorCarga error={calc.error} onRetry={() => void calc.refetch()} compacto />
         ) : filas.length === 0 ? (
           <p className="text-sm text-muted-foreground">
             Sin operaciones con comisión en el período.
@@ -261,6 +266,8 @@ function Page() {
         </h3>
         {pagos.isLoading ? (
           <p className="text-sm text-muted-foreground">Cargando…</p>
+        ) : pagos.isError && !pagos.data ? (
+          <ErrorCarga error={pagos.error} onRetry={() => void pagos.refetch()} compacto />
         ) : (pagos.data ?? []).length === 0 ? (
           <p className="text-sm text-muted-foreground">Todavía no se registraron pagos.</p>
         ) : (

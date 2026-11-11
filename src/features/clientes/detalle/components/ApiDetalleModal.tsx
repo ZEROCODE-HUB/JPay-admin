@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { mensajeError } from "@/shared/errores";
 import { Eye } from "lucide-react";
 import { formatDateTime } from "@/shared/format";
 import { ModalDialog } from "@/shared/ui/modal-dialog";
@@ -51,7 +53,9 @@ export function ApiDetalleModal({
       queryClient.invalidateQueries({ queryKey: ["api_usuarios"] });
       queryClient.invalidateQueries({ queryKey: ["cliente_api_usuarios"] });
       queryClient.invalidateQueries({ queryKey: ["cliente_modulos"] });
+      toast.success("Credencial actualizada");
     },
+    onError: (e) => toast.error(`No se pudo cambiar la credencial: ${mensajeError(e)}`),
   });
 
   return (

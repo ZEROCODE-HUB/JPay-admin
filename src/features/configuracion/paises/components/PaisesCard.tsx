@@ -52,6 +52,7 @@ export function PaisesCard({ paises: todos }: { paises: Pais[] }) {
                 <Toggle
                   label={`Activar ${p.nombre}`}
                   enabled={p.activo}
+                  disabled={actualizarPais.isPending}
                   onClick={() =>
                     p.predeterminado
                       ? toast.error("El país de la instalación no se puede desactivar")
@@ -73,6 +74,7 @@ export function PaisesCard({ paises: todos }: { paises: Pais[] }) {
                   <Toggle
                     label={`${nombre} en ${p.nombre}`}
                     enabled={!!p.modulos[clave]}
+                    disabled={cambiarModulo.isPending}
                     onClick={() =>
                       cambiarModulo.mutate(
                         { codigo: p.codigo, modulo: clave, activo: !p.modulos[clave] },

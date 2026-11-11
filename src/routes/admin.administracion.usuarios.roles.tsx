@@ -16,6 +16,7 @@ import {
 import { useCan } from "@/lib/permissions";
 import { PermissionGuard } from "@/components/permission-guard";
 import type { Permiso } from "@/lib/api/types";
+import { ErrorCarga, FilaError, FilasCargando } from "@/shared/ui/estado-carga";
 
 type PermField = "puedeLeer" | "puedeCrear" | "puedeModificar" | "puedeBorrar";
 const CAMPOS: { field: PermField; label: string }[] = [
@@ -40,20 +41,21 @@ function Page() {
 
   const rolesQ = useQuery({ queryKey: ["roles"], queryFn: listRoles });
   const recursosQ = useQuery({ queryKey: ["recursos"], queryFn: listRecursos });
+  const roles = rolesQ.data ?? [];
+  // Sin rol elegido se muestra el primero: sus permisos también se tienen que cargar (antes se
+  // veían todos apagados y un clic podía guardar el permiso sin los demás campos).
+  const rolActivo = selectedRol ?? roles[0]?.id ?? null;
   const permisosQ = useQuery({
-    queryKey: ["permisos", selectedRol],
-    queryFn: () => getPermisosByRol(selectedRol as string),
-    enabled: !!selectedRol,
+    queryKey: ["permisos", rolActivo],
+    queryFn: () => getPermisosByRol(rolActivo as string),
+    enabled: !!rolActivo,
   });
 
-  const roles = rolesQ.data ?? [];
   const recursos = recursosQ.data ?? [];
   // Mapa recursoId -> Permiso para el rol seleccionado.
   const permisosByRecurso = new Map<string, Permiso>(
     (permisosQ.data ?? []).map((p) => [p.recursoId, p]),
   );
-
-  const rolActivo = selectedRol ?? roles[0]?.id ?? null;
 
   const toggleMut = useMutation({
     mutationFn: (vars: { recursoId: string; field: PermField }) => {
@@ -119,7 +121,11 @@ function Page() {
         </div>
       )}
 
-      {!rolesQ.isLoading && roles.length === 0 && (
+      {rolesQ.isError && !rolesQ.data && (
+        <ErrorCarga error={rolesQ.error} onRetry={() => void rolesQ.refetch()} />
+      )}
+
+      {!rolesQ.isLoading && !rolesQ.isError && roles.length === 0 && (
         <p className="text-sm text-muted-foreground py-8">No hay roles cargados.</p>
       )}
 
@@ -183,35 +189,44 @@ function Page() {
                 </tr>
               </thead>
               <tbody className="divide-y">
-                {recursos.map((rec) => {
-                  const p = permisosByRecurso.get(rec.id);
-                  return (
-                    <tr key={rec.id} className="hover:bg-muted/30">
-                      <td className="py-3 px-4 font-medium">
-                        {rec.nombre}
-                        {rec.modulo ? (
-                          <span className="ml-2 text-xs text-muted-foreground">{rec.modulo}</span>
-                        ) : null}
-                      </td>
-                      {CAMPOS.map((c) => {
-                        const checked = !!(p?.[c.field] ?? false);
-                        return (
-                          <td key={c.field} className="text-center py-3 px-2">
-                            <input
-                              type="checkbox"
-                              checked={checked}
-                              disabled={toggleMut.isPending || !puedeModificar}
-                              onChange={() =>
-                                toggleMut.mutate({ recursoId: rec.id, field: c.field })
-                              }
-                              className="accent-primary w-4 h-4 cursor-pointer disabled:cursor-not-allowed"
-                            />
-                          </td>
-                        );
-                      })}
-                    </tr>
-                  );
-                })}
+                {permisosQ.isLoading && <FilasCargando colSpan={CAMPOS.length + 1} />}
+                {permisosQ.isError && !permisosQ.data && (
+                  <FilaError
+                    colSpan={CAMPOS.length + 1}
+                    error={permisosQ.error}
+                    onRetry={() => void permisosQ.refetch()}
+                  />
+                )}
+                {permisosQ.data &&
+                  recursos.map((rec) => {
+                    const p = permisosByRecurso.get(rec.id);
+                    return (
+                      <tr key={rec.id} className="hover:bg-muted/30">
+                        <td className="py-3 px-4 font-medium">
+                          {rec.nombre}
+                          {rec.modulo ? (
+                            <span className="ml-2 text-xs text-muted-foreground">{rec.modulo}</span>
+                          ) : null}
+                        </td>
+                        {CAMPOS.map((c) => {
+                          const checked = !!(p?.[c.field] ?? false);
+                          return (
+                            <td key={c.field} className="text-center py-3 px-2">
+                              <input
+                                type="checkbox"
+                                checked={checked}
+                                disabled={toggleMut.isPending || !puedeModificar}
+                                onChange={() =>
+                                  toggleMut.mutate({ recursoId: rec.id, field: c.field })
+                                }
+                                className="accent-primary w-4 h-4 cursor-pointer disabled:cursor-not-allowed"
+                              />
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    );
+                  })}
               </tbody>
             </table>
           </div>

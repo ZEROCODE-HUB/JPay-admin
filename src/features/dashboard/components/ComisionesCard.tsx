@@ -7,6 +7,7 @@ import { useComisionesDashboard } from "../hooks/useComisionesDashboard";
 import type { ComisionPorComercio } from "../utils";
 import { InfoTip } from "@/shared/ui/info-tip";
 import { brand } from "@/brand/brand";
+import { ErrorCarga } from "@/shared/ui/estado-carga";
 
 const desgloseColumns: Column<ComisionPorComercio>[] = [
   {
@@ -53,6 +54,8 @@ export function ComisionesCard() {
     showDesglose,
     setShowDesglose,
     isLoading,
+    error,
+    reintentar,
     montoTransaccionado,
     comisionTotal,
     remanente,
@@ -93,7 +96,9 @@ export function ComisionesCard() {
           </div>
         </div>
       </div>
-      {isLoading ? (
+      {error ? (
+        <ErrorCarga error={error} onRetry={reintentar} />
+      ) : isLoading ? (
         <div className="flex items-center justify-center py-8 text-sm text-muted-foreground">
           <span className="inline-block w-4 h-4 border-2 border-muted-foreground/30 border-t-muted-foreground rounded-full animate-spin mr-2" />
           Cargando comisiones…

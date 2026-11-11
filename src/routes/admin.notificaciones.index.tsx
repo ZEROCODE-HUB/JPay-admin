@@ -8,6 +8,7 @@ import { useEventosNotificacion } from "@/hooks/useEventosNotificacion";
 import type { EventoNotificacion } from "@/lib/api/types";
 import { formatDateTime } from "@/shared/format";
 import { InfoTip } from "@/shared/ui/info-tip";
+import { Cargando } from "@/shared/ui/estado-carga";
 
 export const Route = createFileRoute("/admin/notificaciones/")({
   component: Page,
@@ -151,7 +152,7 @@ function Page() {
             </InfoTip>
           </div>
           <div className="font-display text-xl md:text-2xl font-semibold mt-1 tabular-nums">
-            {eventos.length}
+            {q.isLoading ? <Cargando className="h-7 w-16" /> : eventos.length}
           </div>
           <div className="text-xs text-muted-foreground mt-1">
             {q.isLoading ? "Cargando…" : "últimos eventos registrados"}
@@ -165,10 +166,12 @@ function Page() {
             </InfoTip>
           </div>
           <div className="font-display text-xl md:text-2xl font-semibold mt-1 tabular-nums text-emerald-600">
-            {entregadas}
+            {q.isLoading ? <Cargando className="h-7 w-16" /> : entregadas}
           </div>
           <div className="text-xs text-muted-foreground mt-1">
-            {Math.round((entregadas / Math.max(1, eventos.length)) * 100)}% de entrega
+            {q.isLoading
+              ? "Cargando…"
+              : `${Math.round((entregadas / Math.max(1, eventos.length)) * 100)}% de entrega`}
           </div>
         </Card>
         <Card>
@@ -180,7 +183,7 @@ function Page() {
             </InfoTip>
           </div>
           <div className="font-display text-xl md:text-2xl font-semibold mt-1 tabular-nums text-danger-600">
-            {fallidas}
+            {q.isLoading ? <Cargando className="h-7 w-16" /> : fallidas}
           </div>
           <div className="text-xs text-muted-foreground mt-1">requieren revisión</div>
         </Card>
@@ -193,7 +196,7 @@ function Page() {
             </InfoTip>
           </div>
           <div className="font-display text-xl md:text-2xl font-semibold mt-1 tabular-nums">
-            {conCliente}
+            {q.isLoading ? <Cargando className="h-7 w-16" /> : conCliente}
           </div>
           <div className="text-xs text-muted-foreground mt-1">visibles en Cliente Empresa</div>
         </Card>
@@ -209,6 +212,9 @@ function Page() {
         <DataTable
           columns={columns}
           data={eventos}
+          loading={q.isLoading}
+          error={q.isError ? q.error : undefined}
+          onRetry={() => void q.refetch()}
           keyExtractor={(r) => r.id}
           pageSize={10}
           actions={(r) => <ActionsDropdown actions={getActions(r)} />}

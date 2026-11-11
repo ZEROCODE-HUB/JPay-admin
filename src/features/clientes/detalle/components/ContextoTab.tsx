@@ -26,18 +26,22 @@ export function ContextoTab({ data, ui }: { data: ClienteDetalleData; ui: Client
       </h2>
       <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5">
         <KpiCard
+          loading={subcuentasQuery.isLoading}
           label="Subcuentas"
           info="Todas las subcuentas (CLABE) dadas de alta para este cliente, activas o pausadas."
           value={
-            subcuentasQuery.isError ? "Por definir" : String(subcuentasQuery.data?.length ?? 0)
+            subcuentasQuery.isError
+              ? "No se pudo cargar"
+              : String(subcuentasQuery.data?.length ?? 0)
           }
         />
         <KpiCard
+          loading={comisionesRealesQuery.isLoading}
           label="Comisiones"
           info="Reglas de comisión configuradas para este cliente que aplican a depósitos y retiros (no son comisiones cobradas). Solo revisa las 10 reglas más recientes, así que el número no pasa de 10."
           value={
             comisionesRealesQuery.isError
-              ? "Por definir"
+              ? "No se pudo cargar"
               : String(
                   (comisionesRealesQuery.data?.rows ?? []).filter(
                     (c) => c.tipo === "Depósito" || c.tipo === "Retiro",
@@ -46,19 +50,26 @@ export function ContextoTab({ data, ui }: { data: ClienteDetalleData; ui: Client
           }
         />
         <KpiCard
+          loading={alertasQuery.isLoading}
           label="Alertas"
           info="Alertas de monitoreo generadas para este cliente en cualquier estado (pendientes, en revisión, resueltas o descartadas). Cuenta las 100 más recientes."
-          value={alertasQuery.isError ? "Por definir" : String(alertasQuery.data?.length ?? 0)}
+          value={
+            alertasQuery.isError ? "No se pudo cargar" : String(alertasQuery.data?.length ?? 0)
+          }
         />
         <KpiCard
+          loading={bloqueosQuery.isLoading}
           label="Bloqueos"
           info="Bloqueos aplicados a la cuenta o a sus subcuentas, vigentes o ya levantados. Cuenta los 100 más recientes."
-          value={bloqueosQuery.isError ? "Por definir" : String(bloqueosQuery.data?.length ?? 0)}
+          value={
+            bloqueosQuery.isError ? "No se pudo cargar" : String(bloqueosQuery.data?.length ?? 0)
+          }
         />
         <KpiCard
+          loading={modulosQuery.isLoading}
           label="Módulos inferidos"
           info={`Módulos que el cliente tiene registrados en ${brand.name} (por ejemplo API externa, links de pago o subcuentas). Es la cantidad de módulos, no de usos.`}
-          value={modulosQuery.isError ? "Por definir" : String(modulosData.length)}
+          value={modulosQuery.isError ? "No se pudo cargar" : String(modulosData.length)}
         />
       </div>
 

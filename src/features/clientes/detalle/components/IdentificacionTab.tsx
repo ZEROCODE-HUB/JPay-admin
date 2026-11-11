@@ -53,7 +53,12 @@ export function IdentificacionTab({
         <KpiCard
           label="Documentos cargados"
           info="Documentos del expediente que se subieron para este cliente, en cualquier estado de revisión."
-          value={String(documentosResumenQuery.data?.length ?? 0)}
+          loading={documentosResumenQuery.isLoading}
+          value={
+            documentosResumenQuery.isError
+              ? "No se pudo cargar"
+              : String(documentosResumenQuery.data?.length ?? 0)
+          }
         />
         <KpiCard
           label="PEP"

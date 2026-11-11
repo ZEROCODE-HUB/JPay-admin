@@ -140,6 +140,9 @@ function Page() {
       <DataTable
         columns={columns}
         data={mock}
+        loading={q.isLoading}
+        error={q.isError ? q.error : undefined}
+        onRetry={() => void q.refetch()}
         keyExtractor={(r) => r.id}
         pageSize={10}
         actions={(r) => <ActionsDropdown actions={getActions(r)} />}

@@ -2,10 +2,13 @@ export function Toggle({
   enabled,
   onClick,
   label,
+  disabled = false,
 }: {
   enabled: boolean;
   onClick: () => void;
   label: string;
+  /** Mientras se guarda el cambio anterior (evita clics repetidos). */
+  disabled?: boolean;
 }) {
   return (
     <button
@@ -14,7 +17,8 @@ export function Toggle({
       aria-checked={enabled}
       aria-label={label}
       onClick={onClick}
-      className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1 ${
+      disabled={disabled}
+      className={`disabled:opacity-50 disabled:cursor-wait relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1 ${
         enabled ? "bg-secondary" : "bg-gray-300 dark:bg-gray-600"
       }`}
     >
