@@ -16,7 +16,10 @@ export function ContextoTab({ data, ui }: { data: ClienteDetalleData; ui: Client
     bloqueosQuery,
     modulosQuery,
     modulosData,
+    resumenClienteQuery,
   } = data;
+  const conteo = (k: "comisiones" | "alertas" | "bloqueos") =>
+    resumenClienteQuery.isError ? "No se pudo cargar" : String(resumenClienteQuery.data?.[k] ?? 0);
   const { comisionDetail, setComisionDetail } = ui;
 
   return (
@@ -36,34 +39,22 @@ export function ContextoTab({ data, ui }: { data: ClienteDetalleData; ui: Client
           }
         />
         <KpiCard
-          loading={comisionesRealesQuery.isLoading}
+          loading={resumenClienteQuery.isLoading}
           label="Comisiones"
-          info="Reglas de comisión configuradas para este cliente que aplican a depósitos y retiros (no son comisiones cobradas). Solo revisa las 10 reglas más recientes, así que el número no pasa de 10."
-          value={
-            comisionesRealesQuery.isError
-              ? "No se pudo cargar"
-              : String(
-                  (comisionesRealesQuery.data?.rows ?? []).filter(
-                    (c) => c.tipo === "Depósito" || c.tipo === "Retiro",
-                  ).length,
-                )
-          }
+          info="Reglas de comisión configuradas para este cliente (depósitos, envíos y conversiones), en cualquier estado. No son comisiones cobradas."
+          value={conteo("comisiones")}
         />
         <KpiCard
-          loading={alertasQuery.isLoading}
+          loading={resumenClienteQuery.isLoading}
           label="Alertas"
-          info="Alertas de monitoreo generadas para este cliente en cualquier estado (pendientes, en revisión, resueltas o descartadas). Cuenta las 100 más recientes."
-          value={
-            alertasQuery.isError ? "No se pudo cargar" : String(alertasQuery.data?.length ?? 0)
-          }
+          info="Alertas de monitoreo generadas para este cliente en cualquier estado (pendientes, en revisión, resueltas o descartadas)."
+          value={conteo("alertas")}
         />
         <KpiCard
-          loading={bloqueosQuery.isLoading}
+          loading={resumenClienteQuery.isLoading}
           label="Bloqueos"
-          info="Bloqueos aplicados a la cuenta o a sus subcuentas, vigentes o ya levantados. Cuenta los 100 más recientes."
-          value={
-            bloqueosQuery.isError ? "No se pudo cargar" : String(bloqueosQuery.data?.length ?? 0)
-          }
+          info="Bloqueos aplicados a la cuenta o a sus subcuentas, vigentes o ya levantados."
+          value={conteo("bloqueos")}
         />
         <KpiCard
           loading={modulosQuery.isLoading}

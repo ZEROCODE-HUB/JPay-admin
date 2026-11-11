@@ -9,6 +9,9 @@ import { FormDialog } from "@/shared/ui/form-dialog";
 import { ActionsDropdown, type ActionItem } from "@/components/actions-dropdown";
 import { Badge, PageHeader } from "@/components/portal-shell";
 import { listFondosPorUsuario, type FondoSubcuenta } from "@/lib/api/fondos";
+import { getFondosTotales } from "@/lib/api/totales";
+import { KpiCard } from "@/shared/ui/kpi-card";
+import { ErrorCarga } from "@/shared/ui/estado-carga";
 import { cuentaDelPais } from "@/lib/cuenta-pais";
 import { formatMoney } from "@/shared/format";
 
@@ -38,6 +41,8 @@ const saldo = (r: FondoSubcuenta) => formatMoney(r.disponible + r.retenido, { mo
 function Page() {
   const [viewing, setViewing] = useState<FondoSubcuenta | null>(null);
   const q = useQuery({ queryKey: ["fondos-por-usuario"], queryFn: listFondosPorUsuario });
+  // Totales por moneda calculados por la base (no se suman pesos con dólares).
+  const tot = useQuery({ queryKey: ["fondos-totales"], queryFn: getFondosTotales });
   const filas = q.data ?? [];
   const cuenta = cuentaDelPais();
 
@@ -120,18 +125,41 @@ function Page() {
           </button>
         }
       />
-      {q.isLoading ? (
-        <p className="text-sm text-muted-foreground">Cargando…</p>
-      ) : q.isError ? (
-        <p className="text-sm text-danger-600">{(q.error as Error).message}</p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
+        {(["MXN", "USD"] as const).map((mon) => {
+          const t = tot.data?.[mon];
+          if (!tot.isLoading && !t && mon === "USD") return null;
+          return (
+            <KpiCard
+              key={mon}
+              loading={tot.isLoading}
+              label={mon === "MXN" ? "Total en pesos" : "Total en dólares"}
+              info="Disponible más retenido de todas las subcuentas de los clientes en esta moneda, calculado por la base."
+              value={
+                tot.isError
+                  ? "No se pudo cargar"
+                  : formatMoney(Number(t?.total ?? 0), { moneda: mon })
+              }
+              sub={
+                t
+                  ? `Retenido ${formatMoney(Number(t.retenido), { moneda: mon })} · ${t.subcuentas} subcuentas de ${t.clientes} clientes`
+                  : undefined
+              }
+            />
+          );
+        })}
+      </div>
+      {q.isError ? (
+        <ErrorCarga error={q.error} onRetry={() => void q.refetch()} />
       ) : (
         <DataTable
           columns={columns}
+          loading={q.isLoading}
           data={filas}
           keyExtractor={(r) => r.id}
           pageSize={10}
           actions={(r) => <ActionsDropdown actions={getActions(r)} />}
-          onDownloadCSV={() => downloadExcel("fondos_filtrados.xlsx", excelRows(filas))}
+          onDownloadCSV={(rows) => downloadExcel("fondos_filtrados.xlsx", excelRows(rows))}
         />
       )}
 

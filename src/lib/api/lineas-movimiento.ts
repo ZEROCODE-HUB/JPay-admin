@@ -31,6 +31,8 @@ export type LineaMovimiento = {
   concepto: string;
   /** Con signo, desde el cliente: + entra, - sale. */
   monto: number;
+  /** Moneda del asiento (la vista la trae desde la migración 1057). */
+  moneda: "MXN" | "USD";
   fecha: string;
   lineNo: number;
   subaccountId: string | null;
@@ -56,6 +58,7 @@ type LineaRow = {
   tipo_linea: TipoLinea;
   concepto: string;
   monto: number | string;
+  moneda: string | null;
   fecha: string;
   line_no: number;
   subaccount_id: string | null;
@@ -71,7 +74,7 @@ type LineaRow = {
 };
 
 const COLUMNS =
-  "line_id, transaction_id, id_txn, legajo, tipo_operacion, tipo_linea, concepto, monto, fecha, line_no, subaccount_id, cvu_propio, cvu, email, nombre, nombre_destino, estado_id, estado_codigo, estado_nombre, ledger_status";
+  "line_id, transaction_id, id_txn, legajo, tipo_operacion, tipo_linea, concepto, monto, fecha, line_no, subaccount_id, cvu_propio, cvu, email, nombre, nombre_destino, estado_id, estado_codigo, estado_nombre, ledger_status, moneda";
 
 export type LineaFilters = Pagination & {
   /** Texto libre: TXID, legajo, email, nombre o nombre destino. */
@@ -100,6 +103,7 @@ function toLinea(r: LineaRow): LineaMovimiento {
     tipoLinea: r.tipo_linea,
     concepto: r.concepto,
     monto: Number(r.monto),
+    moneda: r.moneda === "USD" ? "USD" : "MXN",
     fecha: r.fecha,
     lineNo: r.line_no,
     subaccountId: r.subaccount_id,

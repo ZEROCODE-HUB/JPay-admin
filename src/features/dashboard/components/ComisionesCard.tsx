@@ -56,6 +56,7 @@ export function ComisionesCard() {
     isLoading,
     error,
     reintentar,
+    usd,
     montoTransaccionado,
     comisionTotal,
     remanente,
@@ -110,20 +111,23 @@ export function ComisionesCard() {
               <div className="text-xs text-muted-foreground">
                 Monto transaccionado{" "}
                 <InfoTip>
-                  Suma del monto de operación de los depósitos y retiros del periodo, sin descontar
-                  comisiones. Suma los montos tal cual, sin convertir monedas.
+                  Suma del monto de los depósitos, transferencias y conversiones a dólares
+                  contabilizados en el periodo (en pesos), sin descontar comisiones. Lo que se movió
+                  en dólares se muestra aparte, abajo.
                 </InfoTip>
               </div>
               <div className="font-mono font-semibold mt-1">{formatMoney(montoTransaccionado)}</div>
-              <div className="text-[11px] text-muted-foreground">Depósitos + Retiros</div>
+              <div className="text-[11px] text-muted-foreground">
+                Depósitos + envíos + conversiones
+              </div>
             </div>
             <div className="rounded-lg border bg-muted/30 px-3 py-3">
               <div className="text-xs text-muted-foreground">
                 Comisión total{" "}
                 <InfoTip>
-                  Suma de la comisión que {brand.name} cobró en cada depósito y retiro del periodo
-                  (la que quedó registrada en el movimiento). Los impuestos retenidos van aparte y
-                  no se suman aquí.
+                  Suma de la comisión que {brand.name} cobró en cada depósito, transferencia y
+                  conversión del periodo (la que quedó registrada en el movimiento). El IVA va
+                  aparte y no se suma aquí.
                 </InfoTip>
               </div>
               <div className="font-mono font-semibold mt-1 text-primary-ink">
@@ -145,6 +149,13 @@ export function ComisionesCard() {
               <div className="text-[11px] text-muted-foreground">Monto − Comisión</div>
             </div>
           </div>
+          {usd && Number(usd.operaciones) > 0 && (
+            <p className="text-xs text-muted-foreground mt-3">
+              En dólares: {formatMoney(Number(usd.monto), { moneda: "USD" })} transaccionado ·
+              comisión {formatMoney(Number(usd.comision), { moneda: "USD" })} ·{" "}
+              {Number(usd.operaciones)} operaciones.
+            </p>
+          )}
           <p className="text-[11px] text-muted-foreground mt-3">
             Este cuadro refleja el flujo de transacciones del periodo seleccionado, no el saldo
             acumulado de la cuenta recaudadora.

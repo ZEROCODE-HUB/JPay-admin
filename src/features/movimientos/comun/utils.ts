@@ -27,7 +27,7 @@ export function toViewMovimiento(
     nombreDestino: m.destinatarioNombre ?? (m.tipo === "transferencia" ? "—" : brand.name),
     rfc: m.destinatarioRfc ?? "—",
     bancoDestino: m.destinatarioBanco ?? undefined,
-    monto: formatMoney(m.montoOperacion),
+    monto: formatMoney(m.montoOperacion, { moneda: m.moneda }),
     fecha: fmtFecha(m.fecha),
     estado,
     desglose: calcularDesglose(m.comision, pctImpuesto),

@@ -1,42 +1,27 @@
 import { useMemo, useState } from "react";
-import { useMovimientos } from "@/hooks/useMovimientos";
-import { finDeDia, rangoMesActual, resumirComisiones } from "../utils";
+import { useQuery } from "@tanstack/react-query";
+import { getComisionesDashboard } from "@/lib/api/totales";
+import { rangoMesActual, resumenDesdeBase } from "../utils";
 
-/** Rango de fechas, depósitos + retiros del periodo y su resumen de comisiones. */
+/**
+ * Rango de fechas y resumen de comisiones del período, calculado por la base: depósitos, envíos y
+ * conversiones contabilizados, por moneda (antes: 1000 filas por tipo y todos los estados).
+ */
 export function useComisionesDashboard() {
   const [inicial] = useState(() => rangoMesActual(new Date()));
   const [desde, setDesde] = useState(inicial.desde);
   const [hasta, setHasta] = useState(inicial.hasta);
   const [showDesglose, setShowDesglose] = useState(false);
 
-  const dep = useMovimientos({
-    page: 0,
-    pageSize: 1000,
-    tipo: "deposito",
-    fechaDesde: desde,
-    fechaHasta: finDeDia(hasta),
-    countMode: "exact",
-  });
-  const ret = useMovimientos({
-    page: 0,
-    pageSize: 1000,
-    tipo: "retiro",
-    fechaDesde: desde,
-    fechaHasta: finDeDia(hasta),
-    countMode: "exact",
+  const q = useQuery({
+    queryKey: ["comisiones-dashboard", desde, hasta],
+    queryFn: () => getComisionesDashboard(desde, hasta),
+    enabled: !!desde && !!hasta && hasta >= desde,
+    meta: { silencioso: true },
   });
 
-  const isLoading = dep.isLoading || ret.isLoading;
-  // Si falla cualquiera de las dos consultas, el resumen estaría incompleto: se muestra el error.
-  const error = (dep.isError && dep.error) || (ret.isError && ret.error) || null;
-  const reintentar = () => void Promise.all([dep.refetch(), ret.refetch()]);
-  const depRows = dep.rows;
-  const retRows = ret.rows;
-
-  const resumen = useMemo(
-    () => resumirComisiones([...(depRows ?? []), ...(retRows ?? [])]),
-    [depRows, retRows],
-  );
+  const resumen = useMemo(() => resumenDesdeBase(q.data?.MXN), [q.data]);
+  const usd = q.data?.USD;
 
   return {
     desde,
@@ -45,9 +30,10 @@ export function useComisionesDashboard() {
     setHasta,
     showDesglose,
     setShowDesglose,
-    isLoading,
-    error,
-    reintentar,
+    isLoading: q.isLoading,
+    error: q.isError && !q.data ? q.error : null,
+    reintentar: () => void q.refetch(),
+    usd,
     ...resumen,
   };
 }

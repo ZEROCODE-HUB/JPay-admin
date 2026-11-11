@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useMovimientos } from "@/hooks/useMovimientos";
+import { getResumenCliente } from "@/lib/api/totales";
 
 /** Filtros por período, paginación y KPIs de la pestaña Movimientos. */
 export function useMovimientosCliente(legajo: string) {
@@ -24,19 +25,11 @@ export function useMovimientosCliente(legajo: string) {
     fechaHasta: movFechaHastaISO,
   });
 
-  // Stats para KPIs: fetch amplio (1000) con mismos filtros de período
+  // KPIs del período calculados por la base (saldo por moneda, total y movimientos por tipo):
+  // antes se contaban sobre los primeros 1000 movimientos.
   const movimientosStatsQuery = useQuery({
-    queryKey: ["movimientos", "stats", legajo, movDesde, movHasta],
-    queryFn: () =>
-      import("@/lib/api/movimientos").then((m) =>
-        m.listMovimientos({
-          page: 0,
-          pageSize: 1000,
-          legajo: legajo ?? undefined,
-          fechaDesde: movFechaDesdeISO,
-          fechaHasta: movFechaHastaISO,
-        }),
-      ),
+    queryKey: ["resumen-cliente", legajo, movDesde, movHasta],
+    queryFn: () => getResumenCliente(legajo, movFechaDesdeISO, movFechaHastaISO),
     enabled: !!legajo,
     staleTime: 15_000,
   });

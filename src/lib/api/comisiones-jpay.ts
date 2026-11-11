@@ -17,6 +17,8 @@ export type FilaComision = {
   iva: number;
   /** "por_cobrar": hay que pedirla; "descontada": ya salió del saldo del comercio (Cobre). */
   forma: "por_cobrar" | "descontada";
+  /** Moneda de la base y la comisión (MXN o USD: no se suman entre sí). */
+  moneda: "MXN" | "USD";
 };
 
 export type PagoComisiones = {
@@ -45,6 +47,7 @@ export async function getComisionesJpay(desde: string, hasta: string): Promise<F
     comision: Number(r.comision),
     iva: Number(r.iva),
     forma: r.forma as FilaComision["forma"],
+    moneda: r.moneda === "USD" ? "USD" : "MXN",
   }));
 }
 

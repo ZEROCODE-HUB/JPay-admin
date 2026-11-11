@@ -37,17 +37,29 @@ type Fila = {
     | null;
 };
 
+/** Filas por pedido: PostgREST corta cada respuesta en 1000. */
+const LOTE = 1000;
+
+/** Todas las subcuentas con su saldo (se piden en lotes de 1000 hasta traer todas). */
 export async function listFondosPorUsuario(): Promise<FondoSubcuenta[]> {
   const sb = requireSupabase();
-  const { data, error } = await sb
-    .from("subaccounts")
-    .select(
-      "id, cliente_legajo, nombre, tipo, cbu, moneda, estado, clientes(correo, nombre, pais), subaccount_balances(saldo_disponible, saldo_retenido)",
-    )
-    .order("cliente_legajo")
-    .order("created_at");
-  if (error) throw new DataAccessError(error);
-  return ((data ?? []) as unknown as Fila[]).map((r) => {
+  const filas: Fila[] = [];
+  for (;;) {
+    const { data, error } = await sb
+      .from("subaccounts")
+      .select(
+        "id, cliente_legajo, nombre, tipo, cbu, moneda, estado, clientes(correo, nombre, pais), subaccount_balances(saldo_disponible, saldo_retenido)",
+      )
+      .order("cliente_legajo")
+      .order("created_at")
+      .order("id")
+      .range(filas.length, filas.length + LOTE - 1);
+    if (error) throw new DataAccessError(error);
+    const lote = (data ?? []) as unknown as Fila[];
+    if (lote.length === 0) break;
+    filas.push(...lote);
+  }
+  return filas.map((r) => {
     const b = Array.isArray(r.subaccount_balances)
       ? r.subaccount_balances[0]
       : r.subaccount_balances;

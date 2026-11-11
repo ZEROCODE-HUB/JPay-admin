@@ -43,6 +43,7 @@ function descargarCsv(nombre: string, filas: FilaComision[]) {
     "Número de cliente",
     "Comercio",
     "Operaciones",
+    "Moneda",
     "Base",
     "Comisión",
     "IVA",
@@ -56,6 +57,7 @@ function descargarCsv(nombre: string, filas: FilaComision[]) {
       f.legajo,
       f.nombre,
       f.operaciones,
+      f.moneda,
       f.base.toFixed(2),
       f.comision.toFixed(2),
       f.iva.toFixed(2),
@@ -97,9 +99,15 @@ function Page() {
   });
   const filas = useMemo(() => calc.data ?? [], [calc.data]);
 
+  // Las tarjetas suman en pesos; lo que se cobró en dólares se muestra aparte (no se mezcla).
+  const filasMxn = useMemo(() => filas.filter((f) => f.moneda === "MXN"), [filas]);
+  const comisionUsd = useMemo(
+    () => filas.filter((f) => f.moneda === "USD").reduce((s, f) => s + f.comision + f.iva, 0),
+    [filas],
+  );
   const totales = useMemo(() => {
     const t = (pred: (f: FilaComision) => boolean) =>
-      filas.filter(pred).reduce((s, f) => s + f.comision + f.iva, 0);
+      filasMxn.filter(pred).reduce((s, f) => s + f.comision + f.iva, 0);
     const recibido = (p: "ecartpay" | "cobre") =>
       (pagos.data ?? []).filter((x) => x.proveedor === p).reduce((s, x) => s + x.monto, 0);
     return {
@@ -109,7 +117,7 @@ function Page() {
       recibidoEcart: recibido("ecartpay"),
       recibidoCobre: recibido("cobre"),
     };
-  }, [filas, pagos.data]);
+  }, [filasMxn, pagos.data]);
 
   const m = (n: number) => formatMoney(n, { moneda: "MXN" });
 
@@ -194,6 +202,13 @@ function Page() {
         />
       </div>
 
+      {comisionUsd > 0 && (
+        <p className="mb-4 text-xs text-muted-foreground">
+          Además, en dólares: {formatMoney(comisionUsd, { moneda: "USD" })} de comisión + IVA
+          (envíos en dólares). Las tarjetas de arriba suman solo pesos.
+        </p>
+      )}
+
       <Card className="mb-4">
         <h3 className="font-semibold mb-3">Detalle por comercio y producto</h3>
         {calc.isLoading ? (
@@ -237,11 +252,17 @@ function Page() {
                     <td className="py-2 pr-3 text-right tabular-nums">
                       {formatNumber(f.operaciones)}
                     </td>
-                    <td className="py-2 pr-3 text-right font-mono">{m(f.base)}</td>
-                    <td className="py-2 pr-3 text-right font-mono">{m(f.comision)}</td>
-                    <td className="py-2 pr-3 text-right font-mono">{m(f.iva)}</td>
+                    <td className="py-2 pr-3 text-right font-mono">
+                      {formatMoney(f.base, { moneda: f.moneda })}
+                    </td>
+                    <td className="py-2 pr-3 text-right font-mono">
+                      {formatMoney(f.comision, { moneda: f.moneda })}
+                    </td>
+                    <td className="py-2 pr-3 text-right font-mono">
+                      {formatMoney(f.iva, { moneda: f.moneda })}
+                    </td>
                     <td className="py-2 pr-3 text-right font-mono font-semibold">
-                      {m(f.comision + f.iva)}
+                      {formatMoney(f.comision + f.iva, { moneda: f.moneda })}
                     </td>
                     <td className="py-2">
                       <Badge tone={f.forma === "descontada" ? "neutral" : "warn"}>

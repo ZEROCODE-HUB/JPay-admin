@@ -9,6 +9,7 @@ const mov = (over: Partial<Movimiento>): Movimiento => ({
   idTxn: "t1",
   tipo: "deposito",
   clabe: null,
+  moneda: "MXN",
   montoOperacion: 0,
   comision: 0,
   impuesto: 0,

@@ -72,7 +72,7 @@ export const columnasSubRuta: Column<FilaSubRuta>[] = [
     minWidth: 150,
     render: (r) => (
       <span className="font-mono tabular-nums">
-        {formatMoney(r._comision)}{" "}
+        {formatMoney(r._comision, { moneda: r._moneda })}{" "}
         <span className="text-muted-foreground">
           ({formatPercent(pctSobreOperacion(r._comision, r._montoOperacion))})
         </span>
@@ -85,7 +85,7 @@ export const columnasSubRuta: Column<FilaSubRuta>[] = [
     minWidth: 150,
     render: (r) => (
       <span className="font-mono tabular-nums">
-        {formatMoney(r._impuesto)}{" "}
+        {formatMoney(r._impuesto, { moneda: r._moneda })}{" "}
         <span className="text-muted-foreground">
           ({formatPercent(pctSobreOperacion(r._impuesto, r._montoOperacion))})
         </span>
@@ -96,14 +96,18 @@ export const columnasSubRuta: Column<FilaSubRuta>[] = [
     key: "iva",
     label: "IVA sobre comisión",
     minWidth: 140,
-    render: (r) => <span className="font-mono tabular-nums">{formatMoney(r._iva)}</span>,
+    render: (r) => (
+      <span className="font-mono tabular-nums">{formatMoney(r._iva, { moneda: r._moneda })}</span>
+    ),
   },
   {
     key: "cobrado",
     label: "Monto cobrado",
     minWidth: 150,
     render: (r) => (
-      <span className="font-mono font-semibold tabular-nums">{formatMoney(r._cobrado)}</span>
+      <span className="font-mono font-semibold tabular-nums">
+        {formatMoney(r._cobrado, { moneda: r._moneda })}
+      </span>
     ),
   },
   {

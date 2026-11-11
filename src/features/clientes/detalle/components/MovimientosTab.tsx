@@ -23,7 +23,6 @@ export function MovimientosTab({ data, ui }: { data: ClienteDetalleData; ui: Cli
   } = data.movimientos;
   const { setMovDetail, setEstadoTarget } = ui;
 
-  const statsRows = movimientosStatsQuery.data?.rows ?? movimientosQuery.rows;
   // Saldo = disponible + retenido de las subcuentas del legajo, por moneda: la subcuenta en
   // dólares no se suma con las de pesos.
   const subs = subcuentasQuery.data ?? [];
@@ -34,13 +33,9 @@ export function MovimientosTab({ data, ui }: { data: ClienteDetalleData; ui: Cli
   const saldoTotal = saldoDe("MXN");
   const hayUsd = subs.some((s) => s.moneda === "USD");
   const saldoUsd = saldoDe("USD");
-  const cargandoStats = movimientosStatsQuery.isLoading || movimientosQuery.isLoading;
-  const totalMovimientos = movimientosStatsQuery.data?.total ?? movimientosQuery.total ?? 0;
-  const porTipo = statsRows.reduce<Record<string, number>>((acc, r) => {
-    const k = r.tipo ?? "otro";
-    acc[k] = (acc[k] ?? 0) + 1;
-    return acc;
-  }, {});
+  const cargandoStats = movimientosStatsQuery.isLoading;
+  const totalMovimientos = Number(movimientosStatsQuery.data?.movimientos ?? 0);
+  const porTipo = movimientosStatsQuery.data?.movimientos_por_tipo ?? {};
 
   return (
     <div className="mt-6 space-y-4">
@@ -142,7 +137,7 @@ export function MovimientosTab({ data, ui }: { data: ClienteDetalleData; ui: Cli
             Movimientos por tipo{" "}
             <InfoTip align="right">
               Los movimientos del período agrupados por tipo (depósito, retiro, transferencia,
-              etc.). Se calcula sobre los primeros 1,000 movimientos del período.
+              etc.). Cuenta todos los movimientos del período.
             </InfoTip>
           </p>
           {cargandoStats ? (

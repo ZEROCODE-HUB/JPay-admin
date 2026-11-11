@@ -108,7 +108,7 @@ export function buildColumns({
         <span
           className={`font-mono tabular-nums font-semibold ${r.monto >= 0 ? "text-emerald-700" : "text-danger-700"}`}
         >
-          {formatMoney(r.monto, { signo: true })}
+          {formatMoney(r.monto, { signo: true, moneda: r.moneda })}
         </span>
       ),
     },

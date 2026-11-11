@@ -19,6 +19,7 @@ export type FilaSubRuta = Movimiento & {
   _cobrado: number;
   _montoOperacion: number;
   _impuesto: number;
+  _moneda: "MXN" | "USD";
   _dbId: string;
 };
 
@@ -30,6 +31,7 @@ export function toFilaSubRuta(m: MovimientoDB, catalogo: EstadoMovimiento[]): Fi
     _cobrado: m.montoCobrado,
     _montoOperacion: m.montoOperacion,
     _impuesto: m.impuesto,
+    _moneda: m.moneda,
     _dbId: m.id,
   };
 }

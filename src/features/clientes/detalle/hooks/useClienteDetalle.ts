@@ -5,6 +5,7 @@ import { listEvaluacionesRiesgo } from "@/lib/api/clientes";
 import { listSubcuentas } from "@/lib/api/subcuentas";
 import { listDocumentos } from "@/lib/api/documentos";
 import { listComisiones } from "@/lib/api/comisiones";
+import { getResumenCliente } from "@/lib/api/totales";
 import {
   listAlertas,
   listBloqueos,
@@ -46,6 +47,12 @@ export function useClienteDetalle(legajo: string) {
     queryKey: ["comisiones", "by-cliente", cliente?.id],
     queryFn: () => listComisiones({ page: 0, pageSize: 10, clienteId: cliente!.id }),
     enabled: !!cliente?.id,
+  });
+  // Conteos reales (comisiones, alertas, bloqueos): las listas de abajo están cortadas en 10/100.
+  const resumenClienteQuery = useQuery({
+    queryKey: ["resumen-cliente", legajo, "", ""],
+    queryFn: () => getResumenCliente(legajo),
+    enabled: !!legajo,
   });
   const documentosResumenQuery = useQuery({
     queryKey: ["documentos", legajo],
@@ -130,6 +137,7 @@ export function useClienteDetalle(legajo: string) {
     historialCambiosQuery,
     alertasQuery,
     bloqueosQuery,
+    resumenClienteQuery,
     modulosQuery,
     paramAlertasQuery,
     paramBloqueosQuery,

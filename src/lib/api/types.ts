@@ -247,6 +247,7 @@ export type MovimientoRow = {
   // to-one: PostgREST devuelve object (se acepta array por compat).
   estados_movimiento?: MovimientoEstadoJoined | MovimientoEstadoJoined[] | null;
   clientes?: MovimientoClienteJoined | MovimientoClienteJoined[] | null;
+  currency_code?: string | null;
 };
 
 type MovimientoEstadoJoined = { codigo: string; nombre: string; es_final: boolean };
@@ -260,6 +261,8 @@ export type Movimiento = {
   tipo: string;
   /** CLABE de la operación (columna `cvu`). */
   clabe: string | null;
+  /** Moneda de la operación (MXN o USD). */
+  moneda: "MXN" | "USD";
   montoOperacion: number;
   comision: number;
   impuesto: number;

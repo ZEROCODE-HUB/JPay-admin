@@ -34,11 +34,17 @@ export function TablaMovimientos({
             <tr key={m.id} className="border-b border-border last:border-b-0">
               <td className="px-4 py-3 font-mono text-xs">{m.idTxn}</td>
               <td className="px-4 py-3">{m.tipo}</td>
-              <td className="px-4 py-3 text-right tabular-nums">{formatMoney(m.montoOperacion)}</td>
-              <td className="px-4 py-3 text-right tabular-nums">{formatMoney(m.comision)}</td>
-              <td className="px-4 py-3 text-right tabular-nums">{formatMoney(m.impuesto)}</td>
+              <td className="px-4 py-3 text-right tabular-nums">
+                {formatMoney(m.montoOperacion, { moneda: m.moneda })}
+              </td>
+              <td className="px-4 py-3 text-right tabular-nums">
+                {formatMoney(m.comision, { moneda: m.moneda })}
+              </td>
+              <td className="px-4 py-3 text-right tabular-nums">
+                {formatMoney(m.impuesto, { moneda: m.moneda })}
+              </td>
               <td className="px-4 py-3 text-right tabular-nums font-medium">
-                {formatMoney(m.montoCobrado)}
+                {formatMoney(m.montoCobrado, { moneda: m.moneda })}
               </td>
               <td className="px-4 py-3 whitespace-nowrap">{formatDateTime(m.fecha)}</td>
               <td className="px-4 py-3">

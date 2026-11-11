@@ -1,4 +1,5 @@
 import type { Movimiento } from "@/lib/api/types";
+import type { ComisionesMoneda } from "@/lib/api/totales";
 
 /** Fecha `YYYY-MM-DD` a partir de `toISOString()` (en UTC). */
 export function toISODate(d: Date): string {
@@ -62,5 +63,21 @@ export function resumirComisiones(movimientos: Movimiento[]): ResumenComisiones 
     comisionTotal: comision,
     remanente: monto - comision,
     porComercio,
+  };
+}
+
+/** Resumen de la tarjeta a partir de lo que calcula la base (una moneda). */
+export function resumenDesdeBase(m: ComisionesMoneda | undefined): ResumenComisiones {
+  return {
+    montoTransaccionado: Number(m?.monto ?? 0),
+    comisionTotal: Number(m?.comision ?? 0),
+    remanente: Number(m?.remanente ?? 0),
+    porComercio: (m?.por_cliente ?? []).map((c) => ({
+      legajo: c.legajo,
+      nombre: c.nombre,
+      monto: Number(c.monto),
+      comision: Number(c.comision),
+      count: Number(c.operaciones),
+    })),
   };
 }

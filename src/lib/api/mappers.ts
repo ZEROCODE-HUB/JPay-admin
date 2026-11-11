@@ -113,6 +113,7 @@ export function toMovimiento(r: MovimientoRow): Movimiento {
     idTxn: r.id_txn,
     tipo: r.tipo,
     clabe: r.cvu,
+    moneda: r.currency_code === "USD" ? "USD" : "MXN",
     montoOperacion: r.monto_operacion,
     comision: r.comision,
     impuesto: r.impuesto,
