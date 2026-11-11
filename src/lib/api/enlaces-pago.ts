@@ -45,6 +45,7 @@ export type EnlacePagoRow = {
   comercio_nombre: string;
   url: string | null;
   monto: number | null;
+  moneda?: string | null;
   estado: string | null;
   referencia: string | null;
   notas: string | null;
@@ -81,6 +82,8 @@ export type EnlacePago = {
   comercioNombre: string;
   url: string | null;
   monto: number | null;
+  /** Moneda del link (MXN o USD). */
+  moneda: "MXN" | "USD";
   estado: string;
   referencia: string | null;
   notas: string | null;
@@ -118,6 +121,7 @@ function toEnlace(r: EnlacePagoRow): EnlacePago {
     comercioNombre: r.comercio_nombre,
     url: r.url,
     monto: r.monto == null ? null : Number(r.monto),
+    moneda: r.moneda === "USD" ? "USD" : "MXN",
     estado,
     referencia: r.referencia,
     notas: r.notas,
@@ -153,7 +157,7 @@ export type EnlaceFilters = Pagination & {
 };
 
 const COLUMNS =
-  "id, cliente_legajo, comercio_nombre, url, monto, estado, referencia, notas, expira_en, pagos_parciales, metodos_pago, vistas, pagos, created_at, clientes(correo, nombre)";
+  "id, cliente_legajo, comercio_nombre, url, monto, moneda, estado, referencia, notas, expira_en, pagos_parciales, metodos_pago, vistas, pagos, created_at, clientes(correo, nombre)";
 const COLUMNS_LEGACY =
   "id, cliente_legajo, comercio_nombre, url, monto, estado, created_at, clientes(correo, nombre)";
 

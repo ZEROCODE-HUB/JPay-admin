@@ -19,11 +19,16 @@ export function CobrosProveedorCard({ d, isLoading, isError }: Props) {
       <div className="flex items-center justify-between mb-2">
         <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
           Cobros del mes — Enlaces de pago (Ecart Pay)
+          {c?.entorno === "sandbox" && c.cantidad > 0 && (
+            <span className="ml-2 normal-case font-medium text-amber-700">(de prueba)</span>
+          )}
           <InfoTip className="ml-1">
             Cobros con Ecart Pay registrados en {brand.name} (enlaces de pago) pagados desde el día
             1 del mes en curso (hora de México), incluidos los que después se reembolsaron total o
             parcialmente. Cobrado es el monto bruto; Neto descuenta la comisión de Ecart Pay, no los
-            reembolsos. «Conciliados» son los que ya se cotejaron con el reporte de Ecart Pay.
+            reembolsos. «Conciliados» son los que ya se cotejaron con el reporte de Ecart Pay. Solo
+            en pesos, y los cobros de prueba nunca se suman con los reales: si todavía no hay
+            reales, se muestran los de prueba marcados así.
           </InfoTip>
         </h3>
         <Link

@@ -63,6 +63,8 @@ export type CobrosMes = {
   reembolsado: number;
   conciliados: number;
   porMetodo: Record<string, { cantidad: number; monto: number }>;
+  /** "sandbox" si todavía no hay cobros reales y se muestran los de prueba (no se mezclan). */
+  entorno: string;
 };
 export type DashboardDetalle = {
   moneda: string;
@@ -120,6 +122,7 @@ export async function getDashboardDetalle(): Promise<DashboardDetalle> {
       reembolsado: Number(c.reembolsado ?? 0),
       conciliados: Number(c.conciliados ?? 0),
       porMetodo: (c.por_metodo ?? {}) as CobrosMes["porMetodo"],
+      entorno: String(c.entorno ?? "produccion"),
     },
   };
 }

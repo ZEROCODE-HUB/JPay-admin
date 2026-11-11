@@ -61,7 +61,9 @@ export function ContracargosCard() {
                     <td className="py-2 pr-4 font-mono text-xs">{c.legajo ?? "—"}</td>
                     <td className="py-2 pr-4 font-mono text-xs break-all">{c.ordenId ?? "—"}</td>
                     <td className="py-2 pr-4 text-right tabular-nums">
-                      {c.monto != null ? formatMoney(c.monto) : "—"}
+                      {c.monto != null
+                        ? formatMoney(c.monto, { moneda: c.moneda ?? undefined })
+                        : "—"}
                     </td>
                     <td className="py-2 pr-4">{MOTIVO[c.motivo ?? ""] ?? c.motivo ?? "—"}</td>
                     <td className="py-2 pr-4">

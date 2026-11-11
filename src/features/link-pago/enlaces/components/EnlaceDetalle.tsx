@@ -70,7 +70,7 @@ export function EnlaceDetalle({ enlace, onClose }: { enlace: EnlacePago; onClose
               <div>
                 <span className="text-muted-foreground">Monto</span>
                 <div className="font-mono font-semibold">
-                  {formatMoney(montoNumero(enlace.monto))}
+                  {formatMoney(montoNumero(enlace.monto), { moneda: enlace.moneda })}
                 </div>
               </div>
               <div>
@@ -144,7 +144,7 @@ export function EnlaceDetalle({ enlace, onClose }: { enlace: EnlacePago; onClose
                 <div>
                   <span className="text-muted-foreground">Importe pagado</span>
                   <div className="font-mono font-semibold">
-                    {formatMoney(montoNumero(pago.importePagado))}
+                    {formatMoney(montoNumero(pago.importePagado), { moneda: enlace.moneda })}
                   </div>
                 </div>
                 <div>

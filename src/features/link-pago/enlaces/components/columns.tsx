@@ -24,7 +24,9 @@ export const columnasEnlaces: Column<EnlacePago>[] = [
     key: "monto",
     label: "Monto",
     render: (r) => (
-      <span className="font-mono tabular-nums text-xs">{formatMoney(montoNumero(r.monto))}</span>
+      <span className="font-mono tabular-nums text-xs">
+        {formatMoney(montoNumero(r.monto), { moneda: r.moneda })}
+      </span>
     ),
   },
   {
