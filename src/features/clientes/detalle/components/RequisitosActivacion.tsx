@@ -22,13 +22,15 @@ export function RequisitosActivacion({
         <p className="font-semibold">Requisitos para activar</p>
         <ul className="mt-1 list-disc pl-5">
           <li>
-            {cuenta}: {tieneCuenta ? "✓ cargada" : "✗ pendiente"}
+            {cuenta}: {tieneCuenta ? "✓ cargada" : "opcional, puede quedar para después"}
           </li>
           <li>Comisión: {hasCom ? "✓ cargada" : "✗ pendiente"}</li>
         </ul>
         {!tieneCuenta && (
           <p className="mt-1 text-xs">
-            Dar de alta al cliente en Cobre (pestaña Cobre): al aprobarse se le asigna la {cuenta}.
+            Sin {cuenta} el cliente puede activarse: la obtiene al conectar su cuenta Cobre en el
+            portal (Conexiones), o se la asignas desde la pestaña Cobre. Hasta entonces no puede
+            usar SPEI.
           </p>
         )}
         {!hasCom && (

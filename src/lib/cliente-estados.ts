@@ -101,8 +101,10 @@ const TRANSICIONES: Transicion[] = [
     from: "preactivado",
     to: "activado",
     accion: "activar",
-    requiere: (ctx) => ctx.tieneCuenta && ctx.hasComision,
-    descripcion: `Activación requiere ${CUENTA} + comisión`,
+    // La CLABE no se exige: el cliente la obtiene después, al conectar su cuenta Cobre en el
+    // portal (Conexiones), o se la asigna un admin desde la pestaña Cobre.
+    requiere: (ctx) => ctx.hasComision,
+    descripcion: "Activación requiere comisión",
   },
   {
     from: "activado",
@@ -198,7 +200,6 @@ export function puedeTransicionar(
   if (t.requiere && !t.requiere(ctx)) {
     if (to === "activado") {
       const faltantes: string[] = [];
-      if (!ctx.tieneCuenta) faltantes.push(CUENTA);
       if (!ctx.hasComision) faltantes.push("comisión");
       return { ok: false, motivo: `No se puede activar: faltan ${faltantes.join(" y ")}.` };
     }
@@ -234,10 +235,10 @@ export function accionesParaEstado(estadoRaw: string, ctx: TransicionContext): A
   }
 
   if (estado === "preactivado") {
-    const canActivar = ctx.tieneCuenta && ctx.hasComision;
+    const canActivar = ctx.hasComision;
     acciones.push({
       key: "activar",
-      label: canActivar ? "Activar" : `Activar (requiere ${CUENTA} + comisión)`,
+      label: canActivar ? "Activar" : "Activar (requiere comisión)",
       target: "activado",
     });
   }
