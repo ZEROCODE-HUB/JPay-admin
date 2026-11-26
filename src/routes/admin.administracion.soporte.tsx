@@ -5,10 +5,7 @@ export const Route = createFileRoute("/admin/administracion/soporte")({
   component: Layout,
 });
 
-const tabs: Tab[] = [
-  { label: "Consultas frecuentes", to: "/admin/administracion/soporte" },
-  { label: "Bloqueo de funciones", to: "/admin/administracion/soporte/bloqueo" },
-];
+const tabs: Tab[] = [{ label: "Consultas frecuentes", to: "/admin/administracion/soporte" }];
 
 function Layout() {
   return (

@@ -14,14 +14,12 @@ la guía de operación (conexiones, correo, funciones, seguridad) están en el r
 - [ ] La pantalla de configuración muestra hosts de ejemplo (`redis.internal`, `db.internal`,
       `login.internal`): son textos de muestra, no configuración real.
 
-## 2. Pantallas sin datos reales
+## 2. Envíos
 
-Siguen vacías o con datos fijos, pendientes de conectar a la base:
-
-- [ ] Dashboard: acreditaciones de links de pago, gráfico de volumen, estado del sistema, últimos
-      registros y alertas recientes.
-- [ ] Administración › Registros (fondos por usuario) y Usuarios › Actividad.
-- [ ] Notificaciones.
+- [ ] **Código por correo y aprobaciones apagados**: en la configuración de Cobre `exigir_otp` está
+      en falso y no hay monto de aprobación. Prenderlos después de cargar Resend.
+- [ ] **Dólares**: cargar los Balances Global y USA de la cuenta de la plataforma cuando Cobre los
+      habilite (hoy vacíos: los envíos en dólares no operan).
 
 ## 3. Limpieza
 
@@ -31,6 +29,10 @@ Siguen vacías o con datos fijos, pendientes de conectar a la base:
       historia.
 
 ## Resuelto (para referencia)
+
+- 26/11/2026 — Se quitaron «Total de fondos» (montos fijos inventados) y «Bloqueo de funciones»
+  (no guardaba nada; los bloqueos reales están en Alertas y bloqueos). El dashboard, Registros,
+  Actividad y Notificaciones ya leen la base. Exportación CSV sin fórmulas.
 
 - 26/11/2026 — Las fotos del KYC muestran «Cargando…» mientras se pide el enlace firmado y mientras
   baja la imagen (antes decían «Sin archivo» y parecía que no había documentos).
