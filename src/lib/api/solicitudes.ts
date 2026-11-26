@@ -2,8 +2,9 @@ import { requireSupabase } from "@/lib/supabase";
 import { DataAccessError } from "./errors";
 
 /**
- * Solicitudes de contacto que dejan los comercios desde el portal (tabla `solicitudes_contacto`):
- * servicios que activa un ejecutivo de JPay, como Domiciliación.
+ * Solicitudes que dejan los clientes desde el portal (tabla `solicitudes_contacto`): piden que un
+ * ejecutivo les active un servicio (cobros con tarjeta, cuenta SPEI, domiciliación) o los ayude.
+ * Además de aparecer aquí, cada solicitud se avisa por correo al buzón de soporte.
  */
 export type EstadoSolicitud = "nueva" | "contactado" | "descartada";
 
@@ -12,6 +13,8 @@ export type Solicitud = {
   legajo: string;
   cliente: string;
   servicio: string;
+  /** Comercio para el que se pide (clientes con varios comercios). */
+  comercio: string | null;
   nombre: string;
   telefono: string;
   correo: string;
@@ -20,6 +23,8 @@ export type Solicitud = {
   nota: string | null;
   atendidaPor: string | null;
   atendidaAt: string | null;
+  /** Cuándo se avisó por correo al buzón de soporte (null = no se pudo o no está configurado). */
+  notificadaAt: string | null;
   createdAt: string;
 };
 
@@ -28,7 +33,7 @@ export async function listSolicitudes(estado: EstadoSolicitud | "todas"): Promis
   let q = sb
     .from("solicitudes_contacto")
     .select(
-      "id, cliente_legajo, servicio, nombre, telefono, correo, mensaje, estado, nota, atendida_por, atendida_at, created_at, clientes(nombre, nombre_fantasia)",
+      "id, cliente_legajo, servicio, nombre, telefono, correo, mensaje, estado, nota, atendida_por, atendida_at, notificada_at, created_at, clientes(nombre, nombre_fantasia), comercios(nombre_comercio)",
     )
     .order("created_at", { ascending: false })
     .limit(200);
@@ -40,11 +45,15 @@ export async function listSolicitudes(estado: EstadoSolicitud | "todas"): Promis
       nombre: string | null;
       nombre_fantasia: string | null;
     } | null;
+    const com = (Array.isArray(r.comercios) ? r.comercios[0] : r.comercios) as {
+      nombre_comercio: string | null;
+    } | null;
     return {
       id: r.id,
       legajo: r.cliente_legajo,
       cliente: c?.nombre_fantasia || c?.nombre || r.cliente_legajo,
       servicio: r.servicio,
+      comercio: com?.nombre_comercio ?? null,
       nombre: r.nombre,
       telefono: r.telefono,
       correo: r.correo,
@@ -53,6 +62,7 @@ export async function listSolicitudes(estado: EstadoSolicitud | "todas"): Promis
       nota: r.nota,
       atendidaPor: r.atendida_por,
       atendidaAt: r.atendida_at,
+      notificadaAt: r.notificada_at,
       createdAt: r.created_at,
     };
   });

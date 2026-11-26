@@ -41,7 +41,22 @@ export type TabKey =
   | "cobre"
   | "historial";
 
-/** Pestañas del detalle; con `modulo`, solo si el país de la instalación lo tiene. */
+/**
+ * Pestañas del detalle; con `modulo`, solo si el país de la instalación lo tiene. La clave
+ * `cobre` es la pestaña «Conexiones» (cobros con tarjeta y cuenta SPEI del cliente).
+ */
+export const TAB_KEYS = [
+  "identificacion",
+  "movimientos",
+  "subcuentas",
+  "documentos",
+  "riesgo",
+  "contexto",
+  "modulos",
+  "cobre",
+  "historial",
+] as const satisfies readonly TabKey[];
+
 export const TABS: { key: TabKey; label: string; modulo?: Modulo }[] = [
   { key: "identificacion", label: "Datos personales" },
   { key: "movimientos", label: "Movimientos" },
@@ -50,7 +65,7 @@ export const TABS: { key: TabKey; label: string; modulo?: Modulo }[] = [
   { key: "riesgo", label: "Riesgo y monitoreo", modulo: "monitoreo_automatico" },
   { key: "contexto", label: "Contexto operativo" },
   { key: "modulos", label: "Módulos y productos" },
-  { key: "cobre", label: "Cobre", modulo: "transferencias_cobre" },
+  { key: "cobre", label: "Conexiones", modulo: "transferencias_cobre" },
   { key: "historial", label: "Historial" },
 ];
 

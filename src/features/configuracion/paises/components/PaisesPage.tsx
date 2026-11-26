@@ -4,6 +4,7 @@ import { AlertasProveedorCard } from "./AlertasProveedorCard";
 import { CobreCard } from "./CobreCard";
 import { ConciliacionCard } from "./ConciliacionCard";
 import { ConexionProveedorCard } from "./ConexionProveedorCard";
+import { CorreoCard } from "./CorreoCard";
 import { ContracargosCard } from "./ContracargosCard";
 import { ConexionesComerciosCard } from "./ConexionesComerciosCard";
 import { ConfiguracionPagosCard } from "./ConfiguracionPagosCard";
@@ -31,6 +32,7 @@ export function PaisesPage() {
   const cobre = proveedores.find((p) => p.codigo === "cobre");
   return (
     <div className="space-y-4">
+      <CorreoCard />
       {ecartpay && <AlertasProveedorCard proveedor="ecartpay" nombre="Ecart Pay" />}
       {ecartpay && <ConexionProveedorCard proveedor={ecartpay} />}
       {ecartpay && <ConexionesComerciosCard />}

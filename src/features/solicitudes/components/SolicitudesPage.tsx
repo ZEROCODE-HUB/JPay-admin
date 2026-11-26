@@ -21,7 +21,15 @@ const ESTADO: Record<EstadoSolicitud, { label: string; tone: "warn" | "success" 
   descartada: { label: "Descartada", tone: "neutral" },
 };
 
-const SERVICIO: Record<string, string> = { domiciliacion: "Domiciliación" };
+const SERVICIO: Record<string, string> = {
+  cobros_tarjeta: "Cobros con tarjeta",
+  cuenta_spei: "Cuenta SPEI",
+  domiciliacion: "Domiciliación",
+  soporte: "Soporte",
+};
+
+/** Servicios que se activan en la pestaña Conexiones de la ficha del cliente. */
+const SE_ACTIVA_EN_CONEXIONES = ["cobros_tarjeta", "cuenta_spei"];
 
 const FILTROS: { k: EstadoSolicitud | "todas"; l: string }[] = [
   { k: "nueva", l: "Nuevas" },
@@ -31,8 +39,10 @@ const FILTROS: { k: EstadoSolicitud | "todas"; l: string }[] = [
 ];
 
 /**
- * Solicitudes que los comercios dejan desde el portal ("Llena tus datos y un ejecutivo te
- * contactará"). El ejecutivo llama, la marca como contactada (o descartada) y deja una nota.
+ * Solicitudes que los clientes dejan desde el portal: activación de cobros con tarjeta o de la
+ * cuenta SPEI (Conexiones), domiciliación o ayuda. El ejecutivo llama, activa el servicio desde
+ * la ficha del cliente (pestaña Conexiones), marca la solicitud como contactada (o descartada) y
+ * deja una nota.
  */
 export function SolicitudesPage() {
   const [filtro, setFiltro] = useState<EstadoSolicitud | "todas">("nueva");
@@ -46,7 +56,7 @@ export function SolicitudesPage() {
     <PermissionGuard recurso="usuarios">
       <PageHeader
         title="Solicitudes de contacto"
-        description={`Comercios que pidieron que un ejecutivo de ${brand.name} los contacte para activar un servicio (por ejemplo, Domiciliación).`}
+        description={`Clientes que pidieron desde su portal que un ejecutivo de ${brand.name} les active un servicio (cobros con tarjeta, cuenta SPEI, domiciliación) o los ayude. Cada solicitud también se avisa por correo.`}
       />
       <div className="mb-4 flex flex-wrap gap-2">
         {FILTROS.map((f) => (
@@ -125,11 +135,22 @@ function FilaSolicitud({ s }: { s: Solicitud }) {
             >
               {s.cliente} ({s.legajo})
             </Link>{" "}
-            · Enviada {formatDateTime(s.createdAt)}
+            {s.comercio && <>· Comercio {s.comercio} </>}· Enviada {formatDateTime(s.createdAt)}
+            {s.notificadaAt ? " · avisada por correo" : " · sin aviso por correo"}
             {s.atendidaAt &&
               ` · ${e.label} el ${formatDateTime(s.atendidaAt)}${s.atendidaPor ? ` por ${s.atendidaPor}` : ""}`}
           </div>
           {s.mensaje && <p className="mt-2 text-sm whitespace-pre-line">“{s.mensaje}”</p>}
+          {SE_ACTIVA_EN_CONEXIONES.includes(s.servicio) && (
+            <Link
+              to="/admin/general/usuarios/$legajo"
+              params={{ legajo: s.legajo }}
+              search={{ tab: "cobre" }}
+              className="mt-2 inline-block text-sm font-medium text-primary-ink hover:underline"
+            >
+              Activar en la ficha del cliente (Conexiones) →
+            </Link>
+          )}
         </div>
         <div className="w-full sm:w-72 space-y-2">
           <textarea

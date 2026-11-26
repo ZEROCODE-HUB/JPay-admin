@@ -5,10 +5,10 @@ import type { Movimiento as DetailMovimiento } from "@/components/movimiento-det
 import type { ConfirmActionState, EstadoTarget, TabKey } from "../utils";
 
 /** Estado de UI de la ficha (pestaña activa, sub-pestañas, modales abiertos, gestiones locales). */
-export function useClienteDetalleUi() {
+export function useClienteDetalleUi(tabInicial: TabKey = "identificacion") {
   const [confirmAction, setConfirmAction] = useState<ConfirmActionState | null>(null);
 
-  const [activeTab, setActiveTab] = useState<TabKey>("identificacion");
+  const [activeTab, setActiveTab] = useState<TabKey>(tabInicial);
   const [riesgoSub, setRiesgoSub] = useState<"alertas" | "bloqueos">("alertas");
   const [modulosSub, setModulosSub] = useState<"productos" | "links" | "api" | null>(null);
 

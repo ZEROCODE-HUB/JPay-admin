@@ -5,6 +5,9 @@ import { useCobreCliente } from "@/hooks/useCobre";
 import { formatDateTime } from "@/shared/format";
 import { KybCobreForm } from "@/shared/ui/kyb-cobre";
 import { SectionCard } from "./SectionCard";
+import { ConexionCobreSection } from "./ConexionCobreSection";
+import { ConexionTarjetaSection } from "./ConexionTarjetaSection";
+import { usePaisConModulos } from "@/shared/modulos-pais";
 import { InfoTip } from "@/shared/ui/info-tip";
 import { brand } from "@/brand/brand";
 
@@ -20,8 +23,10 @@ const ALTA: Record<string, { label: string; tone: "success" | "warn" | "danger" 
 const avisar = (e: unknown) => toast.error((e as Error).message);
 
 /**
- * Cobre del cliente (Solution Design de JPAY): datos KYB, alta como Subcliente (onboarding FBO),
- * su Cobre Balance y CLABE y, como excepción, la instancia Cobre propia del comercio.
+ * Conexiones del cliente con los proveedores (solo las hace un administrador):
+ * - Cobros con tarjeta (Ecart Pay): una conexión por comercio.
+ * - Cuenta SPEI (Cobre), modelo mixto: su cuenta Cobre propia conectada con sus claves, o el alta
+ *   como Subcliente de la plataforma (datos KYB, Cobre Balance y CLABE).
  */
 export function CobreTab({ legajo }: { legajo: string }) {
   const c = useCobreCliente(legajo);
@@ -35,9 +40,12 @@ export function CobreTab({ legajo }: { legajo: string }) {
     cuenta: "",
   });
   const instancia = c.instancia.data;
+  const pais = usePaisConModulos();
 
   return (
     <div className="space-y-4">
+      {pais.modulos.pagos_proveedor && <ConexionTarjetaSection legajo={legajo} />}
+      <ConexionCobreSection legajo={legajo} />
       <SectionCard title="Alta en Cobre (Subcliente)">
         {c.alta.isLoading ? (
           <p className="text-sm text-muted-foreground">Cargando…</p>
@@ -177,11 +185,12 @@ export function CobreTab({ legajo }: { legajo: string }) {
         ) : null}
       </SectionCard>
 
-      <SectionCard title="Instancia Cobre propia (excepción)">
+      <SectionCard title="Cuenta Cobre propia: opciones avanzadas">
         <p className="text-xs text-muted-foreground">
-          Solo para un comercio con contrato directo con Cobre: {brand.name} opera su instancia con
-          sus credenciales (quedan en Vault y no se vuelven a mostrar), sus avisos y su
-          conciliación.
+          Lo normal es usar «Conectar cuenta» de arriba, que hace todo en un paso. Esto es para
+          casos especiales: una instancia de prueba con otra URL, cargar a mano la clave de sus
+          avisos, elegir un Cobre Balance concreto o volver a suscribir los avisos. {brand.name}
+          opera la cuenta con esas credenciales (quedan en Vault y no se vuelven a mostrar).
         </p>
         {instancia && (
           <div className="mt-3 flex flex-wrap items-center gap-3 text-sm">
