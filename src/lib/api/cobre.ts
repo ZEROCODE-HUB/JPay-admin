@@ -3,6 +3,7 @@ import type { PersonaKyb } from "@/shared/cobre-kyb";
 import type { EmpresaKyb } from "@/shared/ui/kyb-cobre";
 import { DataAccessError } from "./errors";
 import { errorDeFuncion } from "./edge";
+import type { CuentaEstados, DescargaEstado } from "@/shared/ui/estados-cuenta";
 
 /**
  * Cobre (México) desde el backoffice, según el Solution Design de JPAY: configuración, Balances
@@ -499,4 +500,29 @@ export async function getEnvioCobre(idTxn: string): Promise<EnvioCobre | null> {
       ? { titular: cp.titular, numero: cp.numero, rfc: cp.id_numero, banco: cp.banco }
       : null,
   };
+}
+
+// ── Estados de cuenta mensuales (PDF de Cobre) de un cliente ─────────────────
+
+export async function listEstadosCuentaCliente(legajo: string): Promise<CuentaEstados[]> {
+  const sb = requireSupabase();
+  const { data, error } = await sb.functions.invoke<{ cuentas: CuentaEstados[] }>(
+    "cobre-estados-cuenta",
+    { body: { accion: "listar", legajo } },
+  );
+  if (error) throw await errorDeFuncion(error);
+  return data?.cuentas ?? [];
+}
+
+export async function descargarEstadoCuentaCliente(
+  legajo: string,
+  cuenta: string,
+  periodo: string,
+): Promise<DescargaEstado> {
+  const sb = requireSupabase();
+  const { data, error } = await sb.functions.invoke<DescargaEstado>("cobre-estados-cuenta", {
+    body: { accion: "descargar", legajo, cuenta, periodo },
+  });
+  if (error) throw await errorDeFuncion(error);
+  return data as DescargaEstado;
 }

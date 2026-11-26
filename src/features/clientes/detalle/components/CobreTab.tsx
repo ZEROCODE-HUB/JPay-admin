@@ -6,6 +6,7 @@ import { formatDateTime } from "@/shared/format";
 import { KybCobreForm } from "@/shared/ui/kyb-cobre";
 import { SectionCard } from "./SectionCard";
 import { ConexionCobreSection } from "./ConexionCobreSection";
+import { EstadosCuentaSection } from "./EstadosCuentaSection";
 import { ConexionTarjetaSection } from "./ConexionTarjetaSection";
 import { usePaisConModulos } from "@/shared/modulos-pais";
 import { InfoTip } from "@/shared/ui/info-tip";
@@ -46,6 +47,7 @@ export function CobreTab({ legajo }: { legajo: string }) {
     <div className="space-y-4">
       {pais.modulos.pagos_proveedor && <ConexionTarjetaSection legajo={legajo} />}
       <ConexionCobreSection legajo={legajo} />
+      <EstadosCuentaSection legajo={legajo} />
       <SectionCard title="Alta en Cobre (Subcliente)">
         {c.alta.isLoading ? (
           <p className="text-sm text-muted-foreground">Cargando…</p>
