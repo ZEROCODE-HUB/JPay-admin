@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { Badge } from "@/components/portal-shell";
 import { LegajoCell } from "@/components/legajo-label";
 import { type Desglose } from "@/lib/aranceles";
+import { EnvioCobreDetalle } from "@/components/envio-cobre-detalle";
 
 export type Movimiento = {
   clienteId: string;
@@ -65,10 +66,13 @@ export function DetailModal({
   title,
   rows,
   onClose,
+  children,
 }: {
   title: string;
   rows: DetailRow[];
   onClose: () => void;
+  /** Contenido extra debajo de las filas. */
+  children?: ReactNode;
 }) {
   return (
     <div
@@ -76,7 +80,7 @@ export function DetailModal({
       onClick={onClose}
     >
       <div
-        className="bg-card border rounded-xl shadow-2xl w-full max-w-lg mx-4 p-6"
+        className="bg-card border rounded-xl shadow-2xl w-full max-w-lg mx-4 p-6 max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-4">
@@ -93,6 +97,7 @@ export function DetailModal({
             </div>
           ))}
         </dl>
+        {children}
       </div>
     </div>
   );
@@ -147,6 +152,8 @@ export function MovimientoDetail({ m, onClose }: { m: Movimiento; onClose: () =>
         { label: "Fecha", value: <span className="font-mono">{m.fecha}</span> },
         { label: "Estado", value: estadoBadge(m.estado) },
       ]}
-    />
+    >
+      <EnvioCobreDetalle idTxn={m.id} />
+    </DetailModal>
   );
 }

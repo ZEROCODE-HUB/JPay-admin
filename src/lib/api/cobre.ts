@@ -432,3 +432,70 @@ export const vincularBalanceInstancia = (id: string, cuentaExterna?: string) =>
     instancia_id: id,
     cuenta_externa_id: cuentaExterna || undefined,
   });
+
+/** Envío de Cobre (SPEI, Fedwire o SWIFT) de un TXID, para el detalle del movimiento. */
+export type EnvioCobre = {
+  idTxn: string;
+  tipo: "spei" | "fedwire" | "swift";
+  moneda: "MXN" | "USD";
+  monto: number;
+  concepto: string | null;
+  estado: string;
+  claveRastreo: string | null;
+  cep: string | null;
+  uetr: string | null;
+  mmId: string | null;
+  creadaAt: string;
+  origen: { nombre: string; rfc: string; clabe: string };
+  destino: { titular: string; numero: string; rfc: string; banco: string | null } | null;
+};
+
+export async function getEnvioCobre(idTxn: string): Promise<EnvioCobre | null> {
+  const sb = requireSupabase();
+  const { data: t, error } = await sb
+    .from("cobre_transferencias")
+    .select(
+      "id_txn, tipo, moneda, monto, concepto, estado, clave_rastreo, cep, swift_uetr, mm_id, created_at, cliente_legajo, cuenta_origen_externa_id, cobre_contrapartes(titular, numero, id_numero, banco)",
+    )
+    .eq("id_txn", idTxn)
+    .maybeSingle();
+  if (error) throw new DataAccessError(error);
+  if (!t) return null;
+  const [{ data: cli }, { data: cta }] = await Promise.all([
+    sb.from("clientes").select("nombre, tax_id").eq("legajo", t.cliente_legajo).maybeSingle(),
+    t.cuenta_origen_externa_id
+      ? sb
+          .from("cobre_cuentas")
+          .select("clabe")
+          .eq("cuenta_externa_id", t.cuenta_origen_externa_id)
+          .maybeSingle()
+      : Promise.resolve({ data: null }),
+  ]);
+  const cp = t.cobre_contrapartes as unknown as {
+    titular: string;
+    numero: string;
+    id_numero: string;
+    banco: string | null;
+  } | null;
+  return {
+    idTxn: t.id_txn,
+    tipo: t.tipo as EnvioCobre["tipo"],
+    moneda: t.moneda === "USD" ? "USD" : "MXN",
+    monto: Number(t.monto),
+    concepto: t.concepto,
+    estado: t.estado,
+    claveRastreo: t.clave_rastreo,
+    cep: t.cep?.startsWith("https://") ? t.cep : null,
+    uetr: t.swift_uetr,
+    mmId: t.mm_id,
+    creadaAt: t.created_at,
+    origen: {
+      nombre: String(cli?.nombre ?? ""),
+      rfc: String(cli?.tax_id ?? ""),
+      clabe: t.moneda === "USD" ? "" : String(cta?.clabe ?? ""),
+    },
+    destino: cp
+      ? { titular: cp.titular, numero: cp.numero, rfc: cp.id_numero, banco: cp.banco }
+      : null,
+  };
+}
