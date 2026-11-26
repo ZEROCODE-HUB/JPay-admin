@@ -119,7 +119,8 @@ export async function listBalancesMatriz(): Promise<BalanceMatriz[]> {
     .from("cobre_cuentas")
     .select("id, tipo, cuenta_externa_id, conectividad")
     .in("tipo", ["global", "usa"])
-    .eq("estado", "activa");
+    .eq("estado", "activa")
+    .is("instancia_id", null);
   if (error) throw new DataAccessError(error);
   return (data ?? []).map((r) => ({
     id: r.id,

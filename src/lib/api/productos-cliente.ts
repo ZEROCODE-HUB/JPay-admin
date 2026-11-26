@@ -39,13 +39,17 @@ export async function getProductosCliente(legajo: string): Promise<ProductoClien
       .maybeSingle(),
     sb
       .from("cobre_cuentas")
-      .select("clabe, conectividad")
+      .select("clabe, conectividad, instancia_id")
       .eq("cliente_legajo", legajo)
       .eq("tipo", "cliente")
       .eq("estado", "activa")
       .limit(1)
       .maybeSingle(),
-    sb.from("cobre_cuentas").select("tipo").in("tipo", ["global", "usa"]).eq("estado", "activa"),
+    sb
+      .from("cobre_cuentas")
+      .select("tipo, instancia_id")
+      .in("tipo", ["global", "usa"])
+      .eq("estado", "activa"),
     sb.from("comercios").select("id").eq("legajo", legajo),
   ]);
   for (const r of [alta, cuenta, matriz, comercios]) {
@@ -93,7 +97,10 @@ export async function getProductosCliente(legajo: string): Promise<ProductoClien
   const revocada = alta.data?.revocado_at ? " · Cobre la rechazó después por cumplimiento" : "";
   const cobre = (detalle: string): Pick<ProductoCliente, "estado" | "detalle"> =>
     conCuenta ? { estado: "activo", detalle: detalle + revocada } : sinCuenta;
-  const dolares = (matriz.data ?? []).length >= 2;
+  // Dólares: con los Balances Global y USA de JPay o, en cuenta propia, con los del comercio.
+  const propia = cuenta.data?.instancia_id ?? null;
+  const dolares =
+    (matriz.data ?? []).filter((b) => (b.instancia_id ?? null) === propia).length >= 2;
 
   // Ecart Pay: la conexión del comercio (OAuth).
   const conexion =
@@ -130,7 +137,9 @@ export async function getProductosCliente(legajo: string): Promise<ProductoClien
       ...(conCuenta && !dolares
         ? {
             estado: "pendiente" as const,
-            detalle: `Faltan los Balances Global y USA de ${brand.name}`,
+            detalle: propia
+              ? "Faltan los Balances Global y USA de su cuenta de Cobre (Conexiones)"
+              : `Faltan los Balances Global y USA de ${brand.name}`,
           }
         : cobre("Conversión y envíos en dólares habilitados")),
     },

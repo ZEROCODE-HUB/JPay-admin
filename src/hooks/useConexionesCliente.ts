@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+  activarDolaresCobreCliente,
   conectarCobreCliente,
   desconectarCobreCliente,
   desvincularTarjeta,
@@ -42,6 +43,7 @@ export function useConexionCobreCliente(legajo: string) {
   return {
     conexion: useQuery({ queryKey: k, queryFn: () => getConexionCobreCliente(legajo) }),
     conectar: useMutation({ mutationFn: conectarCobreCliente, onSuccess: refrescar }),
+    dolares: useMutation({ mutationFn: activarDolaresCobreCliente, onSuccess: refrescar }),
     desconectar: useMutation({
       mutationFn: () => desconectarCobreCliente(legajo),
       onSuccess: refrescar,

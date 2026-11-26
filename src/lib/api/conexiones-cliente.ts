@@ -107,6 +107,8 @@ export type ConexionCobreCliente = {
   avisos?: boolean;
   conectada_at?: string;
   cuenta?: { cuenta_externa_id: string; clabe: string | null; conectividad: string | null } | null;
+  /** Balances Global y USA de su cuenta (dólares en cuenta propia). */
+  dolares?: { global: string | null; usa: string | null };
   /** Solo al conectar: pasos que no se pudieron completar. */
   faltantes?: string[];
 };
@@ -121,6 +123,18 @@ export const conectarCobreCliente = (v: { legajo: string; userId: string; secret
     legajo: v.legajo,
     user_id: v.userId,
     secret: v.secret,
+  });
+
+/**
+ * Dólares en la cuenta propia: vincula sus Balances Global y USA (el `acc_…` indicado, el que ya
+ * tenga en Cobre o uno nuevo).
+ */
+export const activarDolaresCobreCliente = (v: { legajo: string; global?: string; usa?: string }) =>
+  invocar<ConexionCobreCliente>("cobre-instancias", {
+    accion: "balances_usd",
+    legajo: v.legajo,
+    global: v.global || undefined,
+    usa: v.usa || undefined,
   });
 
 export const desconectarCobreCliente = (legajo: string) =>

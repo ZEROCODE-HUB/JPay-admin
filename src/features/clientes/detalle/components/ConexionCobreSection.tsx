@@ -17,7 +17,10 @@ const avisar = (e: unknown) => toast.error((e as Error).message);
  * movimientos. El cliente no carga claves en su portal: pide la activación y se hace aquí.
  */
 export function ConexionCobreSection({ legajo }: { legajo: string }) {
-  const { conexion, conectar, desconectar } = useConexionCobreCliente(legajo);
+  const { conexion, conectar, desconectar, dolares } = useConexionCobreCliente(legajo);
+  const [usdAbierto, setUsdAbierto] = useState(false);
+  const [accGlobal, setAccGlobal] = useState("");
+  const [accUsa, setAccUsa] = useState("");
   const [abierto, setAbierto] = useState(false);
   const [userId, setUserId] = useState("");
   const [secret, setSecret] = useState("");
@@ -107,6 +110,97 @@ export function ConexionCobreSection({ legajo }: { legajo: string }) {
                 <dd>{c.avisos ? "Activos" : "Pendientes"}</dd>
               </div>
             </dl>
+          )}
+
+          {c.conectada && (
+            <div className="rounded-md border border-border p-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <p className="font-medium">
+                    Dólares en su cuenta{" "}
+                    <InfoTip>
+                      Para convertir pesos a dólares y pagar por Fedwire o SWIFT desde su propia
+                      cuenta de Cobre. Cobre tiene que habilitarle los Balances Global y USA, el
+                      cruce MXN/USD y los pagos USD. Los dólares quedan en su cuenta, no en la de{" "}
+                      {brand.name}.
+                    </InfoTip>
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {c.dolares?.global && c.dolares?.usa
+                      ? "Activos"
+                      : "Sin activar: el cliente solo opera en pesos"}
+                  </p>
+                </div>
+                <BtnOutline onClick={() => setUsdAbierto((v) => !v)}>
+                  {c.dolares?.global && c.dolares?.usa ? "Cambiar Balances" : "Activar dólares"}
+                </BtnOutline>
+              </div>
+              <dl className="mt-2 grid gap-2 sm:grid-cols-2 text-xs">
+                <div>
+                  <dt className="text-muted-foreground">Balance Global (USD)</dt>
+                  <dd className="font-mono break-all">{c.dolares?.global ?? "—"}</dd>
+                </div>
+                <div>
+                  <dt className="text-muted-foreground">Balance USA</dt>
+                  <dd className="font-mono break-all">{c.dolares?.usa ?? "—"}</dd>
+                </div>
+              </dl>
+              {usdAbierto && (
+                <form
+                  className="mt-3 space-y-3"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    dolares.mutate(
+                      { legajo, global: accGlobal.trim(), usa: accUsa.trim() },
+                      {
+                        onSuccess: (r) => {
+                          setUsdAbierto(false);
+                          if (r.dolares?.global && r.dolares?.usa)
+                            toast.success("Dólares activos en su cuenta");
+                          else toast.warning("No se pudieron vincular los dos Balances");
+                        },
+                        onError: avisar,
+                      },
+                    );
+                  }}
+                >
+                  <p className="text-xs text-muted-foreground">
+                    Deja los campos vacíos para usar los Balances que ya tenga en Cobre o crearlos.
+                    Si ya sabes cuáles son, escribe sus IDs (acc_…).
+                  </p>
+                  <div className="grid gap-3 md:grid-cols-2">
+                    <div>
+                      <Label htmlFor="cc-global">Balance Global (opcional)</Label>
+                      <Input
+                        id="cc-global"
+                        className="mt-1 font-mono"
+                        placeholder="acc_…"
+                        value={accGlobal}
+                        onChange={(e) => setAccGlobal(e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="cc-usa">Balance USA (opcional)</Label>
+                      <Input
+                        id="cc-usa"
+                        className="mt-1 font-mono"
+                        placeholder="acc_…"
+                        value={accUsa}
+                        onChange={(e) => setAccUsa(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                  <div className="flex justify-end gap-2">
+                    <BtnOutline type="button" onClick={() => setUsdAbierto(false)}>
+                      Cancelar
+                    </BtnOutline>
+                    <BtnPrimary type="submit" disabled={dolares.isPending}>
+                      {dolares.isPending ? "Activando…" : "Activar"}
+                    </BtnPrimary>
+                  </div>
+                </form>
+              )}
+            </div>
           )}
 
           {c.conectada && (faltantes.length > 0 || !clabe || !c.avisos) && (
