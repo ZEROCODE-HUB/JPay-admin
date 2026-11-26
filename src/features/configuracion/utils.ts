@@ -11,9 +11,6 @@ export type IntegracionUI = {
   ejecuciones: number;
 };
 
-/** Logins del próximo grupo de ejecución (sin monitoreo real todavía: vacío). */
-export const proximoGrupo: string[] = [];
-
 /**
  * Integración de la base con sus métricas operativas. No hay tabla de métricas (pendiente del
  * sistema de monitoreo): salud "ok" y sin ejecuciones.

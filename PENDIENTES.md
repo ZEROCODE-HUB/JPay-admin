@@ -11,8 +11,6 @@ la guía de operación (conexiones, correo, funciones, seguridad) están en el r
 - [ ] **Correo (Resend)**: Sistema › Integraciones › Correo → pegar la clave, remitente de un
       dominio verificado, buzón que recibe las solicitudes y «Enviar prueba».
 - [ ] **Datos de la marca**: reemplazar los de ejemplo en `src/brand/brand.json` (ver `BRANDING.md`).
-- [ ] La pantalla de configuración muestra hosts de ejemplo (`redis.internal`, `db.internal`,
-      `login.internal`): son textos de muestra, no configuración real.
 
 - [ ] **Barrido de comisiones** (Integraciones → «Cobre: barrido de comisiones»): crear o vincular
       la cuenta de comisiones, elegir el modo y probar un barrido con $1 en Cobre real.
@@ -26,12 +24,16 @@ la guía de operación (conexiones, correo, funciones, seguridad) están en el r
 
 ## 3. Limpieza
 
-- [ ] Columnas con nombres heredados (`tasa_molipay_pct`, `comision_molipay*`): renombrarlas con
-      una migración que cambie columnas, vistas, funciones y código a la vez.
+- [ ] Columnas con nombres heredados (`tasa_molipay_pct`, `comision_molipay*`): **no se renombran**.
+      Solo las usan funciones heredadas de Payway (el portal y el admin no las leen) y tocarlas
+      obliga a reescribir funciones del ledger. Se van cuando se borren esas tablas.
 - [ ] `ESTADO_ACTUAL.md` describe el panel anterior al refactor y a México: sirve solo como
       historia.
 
 ## Resuelto (para referencia)
+
+- 26/11/2026 — Se quitaron las tarjetas con hosts de ejemplo (`redis.internal`, `db.internal`) de
+  la vista técnica de Integraciones.
 
 - 26/11/2026 — Se quitaron «Total de fondos» (montos fijos inventados) y «Bloqueo de funciones»
   (no guardaba nada; los bloqueos reales están en Alertas y bloqueos). El dashboard, Registros,
