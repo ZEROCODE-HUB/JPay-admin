@@ -2,6 +2,7 @@ import { usePaisesConfig } from "@/hooks/usePaises";
 import { ReembolsosVerificacionCard } from "./ReembolsosVerificacionCard";
 import { AlertasProveedorCard } from "./AlertasProveedorCard";
 import { CobreCard } from "./CobreCard";
+import { BarridoComisionesCard } from "./BarridoComisionesCard";
 import { ConciliacionCard } from "./ConciliacionCard";
 import { ConexionProveedorCard } from "./ConexionProveedorCard";
 import { CorreoCard } from "./CorreoCard";
@@ -53,6 +54,7 @@ export function PaisesPage() {
       )}
       {cobre && <AlertasProveedorCard proveedor="cobre" nombre="Cobre" />}
       {cobre && <CobreCard />}
+      {cobre && <BarridoComisionesCard />}
       {cobre && (
         <ConciliacionCard
           proveedor="cobre"

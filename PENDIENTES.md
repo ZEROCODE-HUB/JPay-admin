@@ -14,6 +14,9 @@ la guía de operación (conexiones, correo, funciones, seguridad) están en el r
 - [ ] La pantalla de configuración muestra hosts de ejemplo (`redis.internal`, `db.internal`,
       `login.internal`): son textos de muestra, no configuración real.
 
+- [ ] **Barrido de comisiones** (Integraciones → «Cobre: barrido de comisiones»): crear o vincular
+      la cuenta de comisiones, elegir el modo y probar un barrido con $1 en Cobre real.
+
 ## 2. Envíos
 
 - [ ] **Código por correo y aprobaciones apagados**: en la configuración de Cobre `exigir_otp` está
