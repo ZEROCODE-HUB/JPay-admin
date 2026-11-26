@@ -12,7 +12,7 @@ export function DocumentosTab({ legajo }: { legajo: string }) {
   });
 
   const documentos = query.data ?? [];
-  const { urls, thumbs } = useDocumentosUrls(documentos, legajo);
+  const { urls, thumbs, cargando } = useDocumentosUrls(documentos, legajo);
 
   return (
     <Seccion
@@ -30,6 +30,7 @@ export function DocumentosTab({ legajo }: { legajo: string }) {
             legajo={legajo}
             resolvedUrl={urls[doc.id] ?? null}
             thumbUrl={thumbs[doc.id] ?? null}
+            cargando={cargando}
           />
         ))}
       </div>

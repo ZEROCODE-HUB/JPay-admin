@@ -99,6 +99,8 @@ export type DocumentosUrls = {
   urls: Record<string, string | null>;
   /** URL del thumbnail redimensionado (para mostrar en la grilla). */
   thumbs: Record<string, string | null>;
+  /** Todavía se están pidiendo los enlaces firmados: la UI muestra «Cargando…», no «Sin archivo». */
+  cargando: boolean;
 };
 
 const CACHE_KEY = "docurls:v1";
@@ -132,7 +134,13 @@ function escribirCache(cache: CacheShape) {
  * volver a la pestaña.
  */
 export function useDocumentosUrls(docs: DocumentoParaResolver[], legajo: string): DocumentosUrls {
-  const [out, setOut] = useState<DocumentosUrls>({ urls: {}, thumbs: {} });
+  // `para` guarda la clave de los documentos ya resueltos: mientras no coincida con la actual,
+  // los enlaces se están pidiendo.
+  const [out, setOut] = useState<{
+    urls: Record<string, string | null>;
+    thumbs: Record<string, string | null>;
+    para: string | null;
+  }>({ urls: {}, thumbs: {}, para: null });
 
   // Clave estable basada en el contenido (no en la referencia del array),
   // para no recrear el efecto en cada render mientras los datos cargan.
@@ -141,7 +149,7 @@ export function useDocumentosUrls(docs: DocumentoParaResolver[], legajo: string)
   useEffect(() => {
     let cancelled = false;
     if (!supabase) {
-      setOut({ urls: {}, thumbs: {} });
+      setOut({ urls: {}, thumbs: {}, para: key });
       return;
     }
     const sb = supabase;
@@ -228,8 +236,11 @@ export function useDocumentosUrls(docs: DocumentoParaResolver[], legajo: string)
       }
 
       if (cacheDirty) escribirCache(cache);
-      if (!cancelled) setOut({ urls, thumbs });
-    })();
+      if (!cancelled) setOut({ urls, thumbs, para: key });
+    })().catch(() => {
+      // Nunca dejar la pantalla en «Cargando…» para siempre.
+      if (!cancelled) setOut({ urls: {}, thumbs: {}, para: key });
+    });
 
     return () => {
       cancelled = true;
@@ -237,5 +248,9 @@ export function useDocumentosUrls(docs: DocumentoParaResolver[], legajo: string)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key]);
 
-  return out;
+  return {
+    urls: out.urls,
+    thumbs: out.thumbs,
+    cargando: docs.length > 0 && out.para !== key,
+  };
 }
